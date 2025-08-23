@@ -1,0 +1,70 @@
+
+基于mineru"2.1.11"版本二开，移除vlm，专注于pipeline产线下CPU高速识别
+
+ocr模型更换为rapid_ocr，支持更多推理引擎
+layout模型更换为PP-DocLayout系列的onnx模型（有L、M、S三种型号）L速度也很快推荐使用，S速度极快但是会出现部分漏检的情况
+公式模型更换为PP_FORMULANET_PLUS系列onnx模型（有L、M、S三种型号）L速度比较慢，推荐使用S （支持配置只识别行间公式）
+
+添加/修改：
+model
+    -ocr
+        -rapid_ocr.py
+    -layout
+        -rapid_layout_self
+        -rapid_layout.py
+    -formula
+        -rapid_formula_self
+        -rapid_formula_model.py
+    -reading_order
+        -utils.py
+        -xycut_plus.py
+
+backend
+    -pipeline
+        -model_init.py (使用定义的模型)
+            atom_model_init
+            MineruPipelineModel
+        -model_list.py (添加formula公式)
+        -batch_analyze.py (更新公式识别逻辑)
+        -utils
+            -model_utils.py
+                get_res_list_from_layout_res （公式更新）
+            -block_sort.py （使用xycut-plus）
+        -pipeline_magic_model.py （公式更新）
+        -enum_class.py(ModelPath)
+
+
+删除：
+    model
+        -layout
+            -doclayout_yolo.py
+        -mfd
+        -mfr
+        -ocr
+            -paddleocr2pytorch
+        -vlm_hf_model
+        -vlm_sglang_model
+        -reading_order
+            -layout_reader.py
+    cli
+        - 只保留 common.py 相关工具方法
+    backend
+        -vlm
+    utils
+        -cli_parser.py
+        -format_utils.py
+        -run_async.py
+        -models_download_utils.py
+
+
+TODO
+    # 阅读顺序恢复 （已完成）
+    # ocr-det 进行批处理（相同尺寸的）
+    # openvino.py 引擎支持 版面识别和公式识别 （要批量提速才明显，然后试图转为专有模型格式）
+    先从pdf读取文本，再使用ocr
+
+    # 自动下载模型，传参修改
+
+    markdown页码
+
+hzkitty/KittyDoc

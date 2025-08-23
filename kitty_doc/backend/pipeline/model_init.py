@@ -1,0 +1,141 @@
+import os
+
+from loguru import logger
+
+from .model_list import AtomicModel
+from ...model.layout.rapid_layout import RapidLayoutModel
+from ...model.formula.rapid_formula_model import RapidFormulaModel
+from ...model.ocr.rapid_ocr import RapidOcrModel
+from ...model.table.rapid_table import RapidTableModel
+
+
+def table_model_init(lang=None, ocr_config=None, table_config=None):
+    atom_model_manager = AtomModelSingleton()
+    ocr_engine = atom_model_manager.get_atom_model(
+        atom_model_name='ocr',
+        det_db_box_thresh=0.5,
+        det_db_unclip_ratio=1.6,
+        lang=lang,
+        ocr_config=ocr_config
+    )
+    table_model = RapidTableModel(ocr_engine, table_config)
+    return table_model
+
+def formula_model_init(formula_config=None):
+    model = RapidFormulaModel(formula_config)
+    return model
+
+
+def layout_model_init(layout_config=None):
+    model = RapidLayoutModel(layout_config)
+    return model
+
+def ocr_model_init(det_db_box_thresh=0.3, lang=None, ocr_config=None, use_dilation=True, det_db_unclip_ratio=1.8,):
+    model = RapidOcrModel(det_db_box_thresh, lang, ocr_config, use_dilation, det_db_unclip_ratio)
+    return model
+
+
+class AtomModelSingleton:
+    _instance = None
+    _models = {}
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
+    def get_atom_model(self, atom_model_name: str, **kwargs):
+
+        lang = kwargs.get('lang', None)
+        table_model_name = kwargs.get('table_model_name', None)
+
+        if atom_model_name in [AtomicModel.OCR]:
+            key = (atom_model_name, lang)
+        elif atom_model_name in [AtomicModel.Table]:
+            key = (atom_model_name, table_model_name, lang)
+        else:
+            key = atom_model_name
+
+        if key not in self._models:
+            self._models[key] = atom_model_init(model_name=atom_model_name, **kwargs)
+        return self._models[key]
+
+def atom_model_init(model_name: str, **kwargs):
+    atom_model = None
+    if model_name == AtomicModel.Layout:
+        atom_model = layout_model_init(
+            kwargs.get('layout_config'),
+        )
+    elif model_name == AtomicModel.FORMULA:
+        atom_model = formula_model_init(
+            kwargs.get('formula_config'),
+        )
+    elif model_name == AtomicModel.OCR:
+        atom_model = ocr_model_init(
+            kwargs.get('det_db_box_thresh'),
+            kwargs.get('lang'),
+            kwargs.get('ocr_config'),
+        )
+    elif model_name == AtomicModel.Table:
+        atom_model = table_model_init(
+            kwargs.get('lang'),
+            kwargs.get('ocr_config'),
+            kwargs.get('table_config'),
+        )
+    else:
+        logger.error('model name not allow')
+        exit(1)
+
+    if atom_model is None:
+        logger.error('model init failed')
+        exit(1)
+    else:
+        return atom_model
+
+
+class MineruPipelineModel:
+    def __init__(self, **kwargs):
+        self.layout_config = kwargs.get('layout_config')
+        self.ocr_config = kwargs.get('ocr_config')
+        self.formula_config = kwargs.get('formula_config')
+        self.apply_formula = self.formula_config.get('enable', True)
+        self.table_config = kwargs.get('table_config')
+        self.apply_table = self.table_config.get('enable', True)
+        self.lang = kwargs.get('lang', None)
+        self.device = kwargs.get('device', 'cpu')
+        logger.info(
+            'DocAnalysis init, this may take some times......'
+        )
+        atom_model_manager = AtomModelSingleton()
+
+        if self.apply_formula:
+            # 初始化公式解析模型
+            self.formula_model = atom_model_manager.get_atom_model(
+                atom_model_name=AtomicModel.FORMULA,
+                device=self.device,
+                formula_config=self.formula_config,
+            )
+
+        # 初始化layout模型
+        self.layout_model = atom_model_manager.get_atom_model(
+            atom_model_name=AtomicModel.Layout,
+            device=self.device,
+            layout_config=self.layout_config,
+        )
+        # 初始化ocr
+        self.ocr_model = atom_model_manager.get_atom_model(
+            atom_model_name=AtomicModel.OCR,
+            det_db_box_thresh=0.3,
+            lang=self.lang,
+            ocr_config=self.ocr_config,
+        )
+        # init table model
+        if self.apply_table:
+            self.table_model = atom_model_manager.get_atom_model(
+                atom_model_name=AtomicModel.Table,
+                lang=self.lang,
+                ocr_config=self.ocr_config,
+                table_config=self.table_config,
+            )
+
+        logger.info('DocAnalysis init done!')
