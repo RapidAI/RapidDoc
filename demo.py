@@ -49,7 +49,7 @@ def do_parse(
             # "model_type": LayoutModelType.PP_DOCLAYOUT_L,
             # "conf_thresh": 0.5,
             # "batch_num": 1,
-            # "model_dir_or_path": "C:\ocr\models\ppmodel\layout\PP-DocLayout-L\pp_doclayout_l.onnx"
+            # "model_dir_or_path": "C:\ocr\models\ppmodel\layout\PP-DocLayout-L\pp_doclayout_l.onnx",
         }
 
         ocr_config = {
@@ -67,20 +67,20 @@ def do_parse(
             # "model_type": FormulaModelType.PP_FORMULANET_PLUS_S,
             # "formula_level": 1, # 公式识别等级，默认为0，全识别。1:仅识别行间公式，行内公式不识别
             # "batch_num": 1,
-            # "model_dir_or_path": r"C:\ocr\models\ppmodel\formula\PP-FormulaNet_plus-S\pp_formulanet_plus_s.onnx"
+            # "model_dir_or_path": r"C:\ocr\models\ppmodel\formula\PP-FormulaNet_plus-S\pp_formulanet_plus_s.onnx",
         }
 
         # os.environ['MINERU_MODEL_SOURCE'] = 'local'
 
         table_config = {
             # "table_pipeline": True, # 采用“表格分类+表格结构识别+单元格检测”多模型串联组网方案
-            "model_type": TableModelType.UNITABLE, # 如果是 SLANEXT_WIRED_WIRELESS 自动根据表格分类，选择有线/无线表格模型
+            # "model_type": TableModelType.UNITABLE, # 如果是 SLANEXT_WIRED_WIRELESS 自动根据表格分类，选择有线/无线表格模型
             # "model_dir_or_path": "",
             #
             # "wired_cell.model_dir_or_path": "", # 有线单元格模型地址，配置SLANEXT_WIRED_WIRELESS时使用
             # "wireless_cell.model_dir_or_path": "", # 无线单元格模型地址，配置SLANEXT_WIRED_WIRELESS时使用
             # "wired_table.model_dir_or_path": "", # 有线表结构模型地址，配置table_pipeline时使用
-            # "wireless_table.model_dir_or_path": "", # 无线表结构模型地址，配置table_pipeline时使用
+            # "wireless_table.model_dir_or_path": "", # 无线表结构模型地址，配置table_pipeline时使用,
         }
 
 
@@ -210,7 +210,7 @@ if __name__ == '__main__':
     image_suffixes = [".png", ".jpeg", ".jpg"]
 
     doc_path_list = [
-        # "D:\\file\\text-pdf\\示例1-论文模板.pdf",
+        "D:\\file\\text-pdf\\示例1-论文模板.pdf",
         # "D:\\file\\text-pdf\\示例1-论文模板.pdf",
         # "D:\\file\\text-pdf\\示例7-研究报告.pdf",
         # "D:\\file\\text-pdf\\示例7-研究报告.pdf"
@@ -220,11 +220,11 @@ if __name__ == '__main__':
         # "C:\ocr\img\pages_50_04.png",
         # "C:\ocr\img\pages_50_49.png",
         # "D:\\file\\text-pdf\\demo1.pdf",
-        # "C:\\ocr\\pdf\\pages_50.pdf"
+        "C:\\ocr\\pdf\\pages_50.pdf"
         # "C:\\ocr\\table\\table.jpg"
 
-        "demo/pdfs/demo1.pdf",
-        "demo/pdfs/demo1.pdf",
+        # "demo/pdfs/demo1.pdf",
+        # "demo/pdfs/demo1.pdf",
         # Formula Predict: 100%|██████████| 192/192 [00:45<00:00,  4.22it/s]
     ]
     # """Use pipeline mode if your environment does not support VLM"""

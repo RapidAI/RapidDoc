@@ -2,14 +2,19 @@
 
 **基于 [Mineru](https://github.com/opendatalab/MinerU) 二次开发，移除 VLM，专注于 Pipeline 产线下的高效文档解析，在 CPU 上也能保持不错的解析速度。**
 
-## 项目简介
+## 😺 项目介绍
 
 KittyDoc 是一个轻量级、专注于文档解析的开源框架，支持 **OCR、版面分析、公式识别、表格识别和阅读顺序恢复** 等多种功能。  
 与原框架相比，本项目使用 **PP-StructureV3 系列模型**，并完全 **去除对 Paddle 的依赖**，所有模型均已转换为 ONNX，可直接通过 **ONNX Runtime** 或 **OpenVINO**（部分模型）进行高效推理。
 
 ---
 
-## 特性
+> ✨如果该项目对您有帮助，您的star是我不断优化的动力！！！
+>
+> - [github点击前往](https://github.com/hzkitty/KittyDoc)
+> - [gitee点击前往](https://gitee.com/hzkitty/KittyDoc)
+
+## 👏 项目特点
 
 - **OCR 识别**
   - 使用 [RapidOCR](https://www.modelscope.cn/models/RapidAI/RapidOCR)
@@ -41,7 +46,7 @@ KittyDoc 是一个轻量级、专注于文档解析的开源框架，支持 **OC
     - [RapidTable](https://www.modelscope.cn/models/RapidAI/RapidTable)
 
 - **阅读顺序恢复**
-  - 移除 LayoutLMv3ForTokenClassification 和 xycut
+  - 移除 layoutreader 和 xycut
   - 使用 PP-StructureV3 阅读顺序 `xycut++` 算法简化 [xycut_plus.py](kitty_doc%2Fmodel%2Freading_order%2Fxycut_plus.py)
   - 速度快且阅读顺序恢复效果良好
 
@@ -54,6 +59,7 @@ KittyDoc 是一个轻量级、专注于文档解析的开源框架，支持 **OC
 
 | 模型名称 | 类型 | OpenVINO 支持 |
 |----------|------|---------------|
+| PP-DocLayout-M/S | 版面识别 | ✅ |
 | PP-DocLayout-L | 版面识别 | ❌ |
 | PP-FormulaNet_plus-L/M/S | 公式识别 | ❌ |
 | SLANeXt_wired / SLANeXt_wireless | 表格结构识别 | ❌ |
@@ -63,7 +69,7 @@ KittyDoc 是一个轻量级、专注于文档解析的开源框架，支持 **OC
 
 ---
 
-## 安装
+## 🛠️ 安装
 
 ```bash
 # 克隆仓库
@@ -76,7 +82,7 @@ pip install -r requirements.txt
 
 ---
 
-## 使用示例
+## 📋 使用示例
 
 参考 [demo.py](demo%2Fdemo.py)
 
@@ -86,10 +92,19 @@ pip install -r requirements.txt
 
 - [KittyDoc 模型集（版面/公式/表格）](https://www.modelscope.cn/models/hzkitty/KittyDoc)  
 - [RapidOCR 模型](https://www.modelscope.cn/models/RapidAI/RapidOCR)  
-- [部分表格模型RapidTable](https://www.modelscope.cn/models/RapidAI/RapidTable)
+- [部分表格模型RapidTable](https://www.modelscope.cn/models/RapidAI/RapidTable) 
 
 ---
 
-## License Information
+## 🙏 致谢
 
-[LICENSE.md](LICENSE.md)
+- [MinerU](https://github.com/opendatalab/MinerU)
+- [PaddleOCR & PP-StructureV3](https://github.com/PaddlePaddle/PaddleOCR)
+- [RapidOCR](https://github.com/RapidAI/RapidOCR)
+
+## ⚖️ 开源许可
+
+基于 [MinerU](https://github.com/opendatalab/MinerU) 改造而来，已**移除原项目中的 YOLO 模型**，并替换为 **PP-StructureV3 系列 ONNX 模型**。  
+由于已移除 AGPL 授权的 YOLO 模型部分，本项目整体不再受 AGPL 约束。
+
+该项目采用 [Apache 2.0 license](LICENSE) 开源许可证。

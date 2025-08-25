@@ -20,6 +20,10 @@ class RapidTableModel(object):
         if table_config is None:
             table_config = {}
         device = get_device()
+        engine_cfg = None
+        if device.startswith('cuda'):
+            gpu_id = int(device.split(':')[1]) if ':' in device else 0  # GPU 编号
+            engine_cfg = {'use_cuda': True, "cuda_ep_cfg.gpu_id": gpu_id}
         self.table_pipeline = table_config.get("table_pipeline", False)
         self.model_type = table_config.get("model_type", ModelType.SLANETPLUS)
         self.ocr_engine = ocr_engine
@@ -28,22 +32,26 @@ class RapidTableModel(object):
             # 采用“表格分类+表格结构识别+单元格检测”多模型串联组网方案
             self.table_cls = TableCls()
             wired_cell_args = RapidLayoutInput(model_type=LayoutModelType.RT_DETR_L_WIRED_TABLE_CELL_DET,
-                                               model_dir_or_path=table_config.get("wired_cell.model_dir_or_path"))
-            self.wired_table_cell = RapidLayout(cfg=wired_cell_args)
+                                               model_dir_or_path=table_config.get("wired_cell.model_dir_or_path"),
+                                               engine_cfg=engine_cfg or {},)
             wireless_cell_args = RapidLayoutInput(model_type=LayoutModelType.RT_DETR_L_WIRELESS_TABLE_CELL_DET,
-                             model_dir_or_path=table_config.get("wireless_cell.model_dir_or_path"))
+                                                model_dir_or_path=table_config.get("wireless_cell.model_dir_or_path"),
+                                                engine_cfg=engine_cfg or {},)
             self.wireless_table_cell = RapidLayout(cfg=wireless_cell_args)
 
         if self.model_type == ModelType.SLANEXT_WIRED_WIRELESS:
             wired_input_args = RapidTableInput(model_type=ModelType.SLANEXT_WIRED, use_ocr=False,
-                                               model_dir_or_path=table_config.get("wired_table.model_dir_or_path"))
+                                               model_dir_or_path=table_config.get("wired_table.model_dir_or_path"),
+                                               engine_cfg=engine_cfg or {},)
             self.wired_table_model = RapidTable(wired_input_args)
             wireless_input_args = RapidTableInput(model_type=ModelType.SLANEXT_WIRELESS, use_ocr=False,
-                                                  model_dir_or_path=table_config.get("wireless_table.model_dir_or_path"))
+                                                  model_dir_or_path=table_config.get("wireless_table.model_dir_or_path"),
+                                                  engine_cfg=engine_cfg or {},)
             self.wireless_table_model = RapidTable(wireless_input_args)
         else:
             input_args = RapidTableInput(model_type=self.model_type, use_ocr=False,
-                                         model_dir_or_path=table_config.get("model_dir_or_path"))
+                                         model_dir_or_path=table_config.get("model_dir_or_path"),
+                                         engine_cfg=engine_cfg or {},)
             self.table_model = RapidTable(input_args)
 
     def predict(self, image):

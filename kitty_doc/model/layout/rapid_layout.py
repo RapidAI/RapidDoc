@@ -10,7 +10,8 @@ class RapidLayoutModel(object):
 
         device = get_device()
         if device.startswith('cuda'):
-            engine_cfg = {'use_cuda': True}
+            gpu_id = int(device.split(':')[1]) if ':' in device else 0  # GPU 编号
+            engine_cfg = {'use_cuda': True, "cuda_ep_cfg.gpu_id": gpu_id}
             cfg.engine_cfg = engine_cfg
 
         # 如果传入了 layout_config，则用传入配置覆盖默认配置
@@ -18,6 +19,7 @@ class RapidLayoutModel(object):
             # 遍历字典，把传入配置设置到 default_cfg 对象中
             for key, value in layout_config.items():
                 if hasattr(cfg, key):
+                    setattr(cfg, key, value)
                     setattr(cfg, key, value)
         self.model = RapidLayout(cfg=cfg)
         self.doclayout_yolo_list = ['title', 'plain text', 'abandon', 'figure', 'figure_caption', 'table', 'table_caption', 'table_footnote', 'isolate_formula', 'formula_caption',

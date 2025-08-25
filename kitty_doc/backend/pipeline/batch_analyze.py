@@ -35,7 +35,7 @@ class BatchAnalyze:
         self.formula_config = formula_config
         self.table_config = table_config
         self.model_manager = model_manager
-        self.enable_ocr_det_batch = ocr_config.get("Det.rec_batch_num") > 1 if ocr_config else False
+        self.enable_ocr_det_batch = ocr_config.get("Det.rec_batch_num", 1) > 1 if ocr_config else False
         self.ocr_det_base_batch_size = ocr_config.get("Det.rec_batch_num", 1) if ocr_config else 1 #16
         self.layout_base_batch_size = layout_config.get("batch_num", 1) if layout_config else 1 #8
         self.formula_base_batch_size = formula_config.get("batch_num", 1) if formula_config else 1 #16

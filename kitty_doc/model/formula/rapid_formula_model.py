@@ -7,7 +7,8 @@ class RapidFormulaModel(object):
         cfg = RapidFormulaInput(model_type= ModelType.PP_FORMULANET_PLUS_S)
         device = get_device()
         if device.startswith('cuda'):
-            engine_cfg = {'use_cuda': True}
+            gpu_id = int(device.split(':')[1]) if ':' in device else 0  # GPU 编号
+            engine_cfg = {'use_cuda': True, "cuda_ep_cfg.gpu_id": gpu_id}
             cfg.engine_cfg = engine_cfg
         # 如果传入了 formula_config，则用传入配置覆盖默认配置
         if formula_config is not None:

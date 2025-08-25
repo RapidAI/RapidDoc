@@ -42,12 +42,16 @@ class RapidOcrModel(object):
                 default_params[key] = value
 
         if device.startswith('cuda'):
+            gpu_id = int(device.split(':')[1]) if ':' in device else 0 # GPU 编号
             if default_params.get('Det.engine_type') == EngineType.ONNXRUNTIME:
                 default_params['EngineConfig.onnxruntime.use_cuda'] = True
+                default_params['EngineConfig.onnxruntime.cuda_ep_cfg.device_id'] = gpu_id
             elif default_params.get('Det.engine_type') == EngineType.TORCH:
                 default_params['EngineConfig.torch.use_cuda'] = True
+                default_params['EngineConfig.torch.gpu_id'] = gpu_id
             elif default_params.get('Det.engine_type') == EngineType.PADDLE:
                 default_params['EngineConfig.paddle.use_cuda'] = True
+                default_params['EngineConfig.paddle.gpu_id'] = gpu_id
         default_params.pop('engine_type', None)
         self.ocr_engine = RapidOCR(params=default_params)
         self.text_detector = self.ocr_engine.text_det
@@ -241,7 +245,6 @@ class RapidOcrModel(object):
             scores,
             all_word_results,
             elapse,
-            viser=VisRes(lang_type=self.text_recognizer.cfg.lang_type, font_path=self.text_recognizer.cfg.font_path),
         )
 
     def det_batch_predict(self, img_list, max_batch_size=8):
