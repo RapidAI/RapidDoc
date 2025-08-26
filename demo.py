@@ -46,10 +46,11 @@ def do_parse(
 
     if backend == "pipeline":
         layout_config = {
-            # "model_type": LayoutModelType.PP_DOCLAYOUT_L,
-            # "conf_thresh": 0.5,
+            "model_type": LayoutModelType.PP_DOCLAYOUT_PLUS_L,
+            # "conf_thresh": 0.4,
             # "batch_num": 1,
             # "model_dir_or_path": "C:\ocr\models\ppmodel\layout\PP-DocLayout-L\pp_doclayout_l.onnx",
+            # "model_dir_or_path": r"C:\ocr\models\ppmodel\layout\PP-DocLayout_plus-L\pp_doclayout_plus_l.onnx",
         }
 
         ocr_config = {
@@ -211,7 +212,7 @@ if __name__ == '__main__':
 
     doc_path_list = [
         "D:\\file\\text-pdf\\示例1-论文模板.pdf",
-        # "D:\\file\\text-pdf\\示例1-论文模板.pdf",
+        "D:\\file\\text-pdf\\示例1-论文模板.pdf",
         # "D:\\file\\text-pdf\\示例7-研究报告.pdf",
         # "D:\\file\\text-pdf\\示例7-研究报告.pdf"
         # "D:\\file\\text-pdf\\demo1.pdf",
@@ -220,8 +221,9 @@ if __name__ == '__main__':
         # "C:\ocr\img\pages_50_04.png",
         # "C:\ocr\img\pages_50_49.png",
         # "D:\\file\\text-pdf\\demo1.pdf",
-        "C:\\ocr\\pdf\\pages_50.pdf"
+        # "C:\\ocr\\pdf\\pages_50.pdf"
         # "C:\\ocr\\table\\table.jpg"
+        # "D:\CodeProjects\doc\paddleocr-v3\layout\page_2.png"
 
         # "demo/pdfs/demo1.pdf",
         # "demo/pdfs/demo1.pdf",

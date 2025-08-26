@@ -1,14 +1,18 @@
-pp_doclayout_s:
-  model_dir_or_path: https://www.modelscope.cn/models/hzkitty/KittyDoc/resolve/master/layout/PP-DocLayout-S/pp_doclayout_s.onnx
-  SHA256: 0ae97252feb0d64ee2c70ee0449ec9de4b08140056f32ce3c725c16ca50142e4
+pp_doclayout_plus_l:
+  model_dir_or_path: https://www.modelscope.cn/models/hzkitty/KittyDoc/resolve/master/layout/PP-DocLayout_plus-L/pp_doclayout_plus_l.onnx
+  SHA256: 3e0a48f1eead902e83e04695430597e92207ef50e19b06bdf65f46096ba6bbd3
+
+pp_doclayout_l:
+  model_dir_or_path: https://www.modelscope.cn/models/hzkitty/KittyDoc/resolve/master/layout/PP-DocLayout-L/pp_doclayout_l.onnx
+  SHA256: 116d4a65052187be1ed408d6286fc5a5a07de361a1c85969d633d7ca56a73c05
 
 pp_doclayout_m:
   model_dir_or_path: https://www.modelscope.cn/models/hzkitty/KittyDoc/resolve/master/layout/PP-DocLayout-M/pp_doclayout_m.onnx
   SHA256: 2e5997712f69e2db59e78fc837e0e3ee9e71cba4d41fa57125e438950f37196d
 
-pp_doclayout_l:
-  model_dir_or_path: https://www.modelscope.cn/models/hzkitty/KittyDoc/resolve/master/layout/PP-DocLayout-L/pp_doclayout_l.onnx
-  SHA256: 116d4a65052187be1ed408d6286fc5a5a07de361a1c85969d633d7ca56a73c05
+pp_doclayout_s:
+  model_dir_or_path: https://www.modelscope.cn/models/hzkitty/KittyDoc/resolve/master/layout/PP-DocLayout-S/pp_doclayout_s.onnx
+  SHA256: 0ae97252feb0d64ee2c70ee0449ec9de4b08140056f32ce3c725c16ca50142e4
 
 rt_detr_l_wired_table_cell_det:
   model_dir_or_path: https://www.modelscope.cn/models/hzkitty/KittyDoc/resolve/master/table/RT-DETR-L_wired_table_cell_det/rt_detr_l_wired_table_cell_det.onnx

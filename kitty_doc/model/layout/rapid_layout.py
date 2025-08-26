@@ -6,7 +6,7 @@ from kitty_doc.utils.enum_class import CategoryId
 
 class RapidLayoutModel(object):
     def __init__(self, layout_config=None):
-        cfg = RapidLayoutInput(model_type=ModelType.PP_DOCLAYOUT_L, conf_thresh=0.5)
+        cfg = RapidLayoutInput(model_type=ModelType.PP_DOCLAYOUT_L, conf_thresh=0.4)
 
         device = get_device()
         if device.startswith('cuda'):
@@ -16,15 +16,20 @@ class RapidLayoutModel(object):
 
         # 如果传入了 layout_config，则用传入配置覆盖默认配置
         if layout_config is not None:
+            if cfg.model_type == ModelType.PP_DOCLAYOUT_S and not layout_config.get("conf_thresh"):
+                # S可能存在部分漏检，自动调低阈值
+                cfg.conf_thresh = 0.2
             # 遍历字典，把传入配置设置到 default_cfg 对象中
             for key, value in layout_config.items():
                 if hasattr(cfg, key):
                     setattr(cfg, key, value)
                     setattr(cfg, key, value)
         self.model = RapidLayout(cfg=cfg)
+        self.model_type = cfg.model_type
         self.doclayout_yolo_list = ['title', 'plain text', 'abandon', 'figure', 'figure_caption', 'table', 'table_caption', 'table_footnote', 'isolate_formula', 'formula_caption',
                           '10', '11', '12', 'inline_formula', 'isolated_formula', 'ocr_text']
 
+        # PP-DocLayout-L、PP-DocLayout-M、PP-DocLayout-S 23个常见的类别
         self.category_dict = {
             "paragraph_title": CategoryId.Title,
             "image": CategoryId.ImageBody,
@@ -51,6 +56,30 @@ class RapidLayoutModel(object):
             "aside_text": CategoryId.Text,
         }
 
+        # PP-DocLayout_plus-L 20个常见的类别
+        self.category_plus_mapping = {
+            "paragraph_title": CategoryId.Title,
+            "image": CategoryId.ImageBody,
+            "text": CategoryId.Text,
+            "number": CategoryId.Abandon,
+            "abstract": CategoryId.Text,
+            "content": CategoryId.Text,
+            "figure_title": CategoryId.ImageCaption,
+            "formula": CategoryId.InterlineEquation_YOLO,
+            "table": CategoryId.TableBody,
+            "reference": CategoryId.Text,
+            "doc_title": CategoryId.Title,
+            "footnote": CategoryId.Abandon,
+            "header": CategoryId.Abandon,
+            "algorithm": CategoryId.Text,
+            "footer": CategoryId.Abandon,
+            "seal": CategoryId.Abandon,
+            "chart": CategoryId.ImageBody,
+            "formula_number": CategoryId.InterlineEquationNumber_Layout,
+            "aside_text": CategoryId.Text,
+            "reference_content": CategoryId.Text,
+        }
+
     def predict(self, image):
         return self.batch_predict(images=[image], batch_size=1)[0]
 
@@ -65,7 +94,10 @@ class RapidLayoutModel(object):
             temp_results = []
             for xyxy, conf, cla in zip(boxes, scores, class_names):
                 xmin, ymin, xmax, ymax = [int(p.item()) for p in xyxy]
-                category_id = self.category_dict[cla]
+                if self.model_type == ModelType.PP_DOCLAYOUT_PLUS_L:
+                    category_id = self.category_plus_mapping[cla]
+                else:
+                    category_id = self.category_dict[cla]
                 temp_results.append({
                     "category_id": category_id,
                     "bbox": (xmin, ymin, xmax, ymax),
@@ -152,8 +184,8 @@ if __name__ == '__main__':
 
     # r"C:\ocr\models\ppmodel\layout\PP-DocLayout-M\openvino\pp_doclayout_m.xml"
 
-    cfg = RapidLayoutInput(model_type=ModelType.PP_DOCLAYOUT_S, conf_thresh=0.5)
+    cfg = RapidLayoutInput(model_type=ModelType.PP_DOCLAYOUT_PLUS_L, conf_thresh=0.2, model_dir_or_path=r"C:\ocr\models\ppmodel\layout\PP-DocLayout_plus-L\pp_doclayout_plus_l.onnx")
     model = RapidLayout(cfg=cfg)
 
-    all_results = model(img_contents=["C:\ocr\img\page_6.png"])
+    all_results = model(img_contents=["D:\CodeProjects\doc\paddleocr-v3\layout\page_2.png"])
     print(all_results)

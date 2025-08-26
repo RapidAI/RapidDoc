@@ -12,9 +12,12 @@ from ..utils import ModelType
 
 class PPDocLayoutModelHandler(BaseModelHandler):
     def __init__(self, labels, conf_thres, iou_thres, session: InferSession, model_type: ModelType):
-        if model_type.value.endswith("_s"):
+        if model_type == ModelType.PP_DOCLAYOUT_PLUS_L:
+            target_size = (800, 800)
+        elif model_type == ModelType.PP_DOCLAYOUT_S:
             target_size = (480, 480)
         else:
+            # PP_DOCLAYOUT_L、PP_DOCLAYOUT_M、RT_DETR_L_WIRED_TABLE_CELL_DET、RT_DETR_L_WIRELESS_TABLE_CELL_DET
             target_size = (640, 640)
         self.img_size = target_size
         self.pp_preprocess = PPPreProcess(img_size=self.img_size, model_type=model_type)
@@ -46,7 +49,10 @@ class PPDocLayoutModelHandler(BaseModelHandler):
         for i, output in enumerate(batch_outputs):
             ori_img_shape = ori_img_list[i].shape[:2]
             datas = self.pp_postprocess(output["boxes"],[ori_img_shape[1], ori_img_shape[0]])
-            boxes, scores, class_names = zip(*[(d["coordinate"], d["score"], d["label"]) for d in datas])
+            if datas:
+                boxes, scores, class_names = zip(*[(d["coordinate"], d["score"], d["label"]) for d in datas])
+            else:
+                boxes, scores, class_names = [], [], []
             elapse = time.perf_counter() - s1
             result = RapidLayoutOutput(img=ori_img_list[i], boxes=boxes,
                                        class_names=class_names, scores=scores, elapse=elapse)

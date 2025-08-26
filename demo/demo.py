@@ -44,7 +44,7 @@ def do_parse(
     if backend == "pipeline":
         layout_config = {
             # "model_type": LayoutModelType.PP_DOCLAYOUT_L,
-            # "conf_thresh": 0.5,
+            # "conf_thresh": 0.4,
             # "batch_num": 1,
             # "model_dir_or_path": "C:\ocr\models\ppmodel\layout\PP-DocLayout-L\pp_doclayout_l.onnx"
         }

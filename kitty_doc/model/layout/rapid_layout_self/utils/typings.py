@@ -12,9 +12,10 @@ logger = Logger(logger_name=__name__).get_log()
 
 
 class ModelType(Enum):
-    PP_DOCLAYOUT_S = "pp_doclayout_s"
-    PP_DOCLAYOUT_M = "pp_doclayout_m"
+    PP_DOCLAYOUT_PLUS_L = "pp_doclayout_plus_l"
     PP_DOCLAYOUT_L = "pp_doclayout_l"
+    PP_DOCLAYOUT_M = "pp_doclayout_m"
+    PP_DOCLAYOUT_S = "pp_doclayout_s"
     RT_DETR_L_WIRED_TABLE_CELL_DET = "rt_detr_l_wired_table_cell_det"
     RT_DETR_L_WIRELESS_TABLE_CELL_DET = "rt_detr_l_wireless_table_cell_det"
 

@@ -23,16 +23,17 @@ KittyDoc 是一个轻量级、专注于文档解析的开源框架，支持 **OC
   
 - **版面识别**
   - 自定义 [rapid_layout_self](kitty_doc%2Fmodel%2Flayout%2Frapid_layout_self)（参考RapidLayout）
-  - 模型使用 `PP-DocLayout` 系列 ONNX 模型（L、M、S）
-    - **L**：速度快，推荐使用  
-    - **S**：速度极快，可能存在部分漏检  
+  - 模型使用 `PP-DocLayout` 系列 ONNX 模型（plus-L、L、M、S）
+    - **PP-DocLayout_plus-L**：效果最好，速度稍慢 
+    - **PP-DocLayout-L**：速度快，效果也不错，默认使用  
+    - **PP-DocLayout-S**：速度极快，可能存在部分漏检，会自动调低阈值，conf_thresh=0.2
   - 模型下载：[KittyDoc 模型集](https://www.modelscope.cn/models/hzkitty/KittyDoc)
 
 - **公式识别**
   - 自定义 [rapid_formula_self](kitty_doc%2Fmodel%2Fformula%2Frapid_formula_self)
   - 使用 `PP-FormulaNet_plus` 系列 ONNX 模型（L、M、S）
-    - **L**：速度慢  
-    - **S**：速度最快，推荐使用  
+    - **PP-FormulaNet_plus-L**：速度慢  
+    - **PP-FormulaNet_plus-S**：速度最快，默认使用  
   - 支持配置只识别行间公式
 
 - **表格识别**
@@ -51,22 +52,8 @@ KittyDoc 是一个轻量级、专注于文档解析的开源框架，支持 **OC
   - 速度快且阅读顺序恢复效果良好
 
 - **推理方式**
-  - 所有模型通过 ONNXRuntime 推理
-  - OCR可配置其他推理引擎
----
-
-## 模型支持情况
-
-| 模型名称 | 类型 | OpenVINO 支持 |
-|----------|------|---------------|
-| PP-DocLayout-M/S | 版面识别 | ✅ |
-| PP-DocLayout-L | 版面识别 | ❌ |
-| PP-FormulaNet_plus-L/M/S | 公式识别 | ❌ |
-| SLANeXt_wired / SLANeXt_wireless | 表格结构识别 | ❌ |
-| RT-DETR-L_wired / wireless | 单元格检测 | ❌ |
-
-> 注意：部分模型因 opset_version ≥17，OpenVINO 部分算子不支持。
-
+  - 所有模型通过 ONNXRuntime 推理，OCR可配置其他推理引擎
+  - 除了 OCR 和 PP-DocLayout-M/S 模型，OpenVINO推理会报错，可能是opset_version ≥16，OpenVINO 部分算子不支持。
 ---
 
 ## 🛠️ 安装
