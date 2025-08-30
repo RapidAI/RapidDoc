@@ -5,6 +5,8 @@ import pypdfium2 as pdfium
 from pdftext.pdf.chars import get_chars, deduplicate_chars
 from pdftext.pdf.pages import get_spans, get_lines, assign_scripts, get_blocks
 
+from kitty_doc.utils import PyPDFium2Parser
+
 
 def get_page(
     page: pdfium.PdfPage,
@@ -12,15 +14,16 @@ def get_page(
     superscript_height_threshold: float = 0.7,
     line_distance_threshold: float = 0.1,
 ) -> dict:
-
-        textpage = page.get_textpage()
-        page_bbox: List[float] = page.get_bbox()
+        with PyPDFium2Parser.lock:
+            textpage = page.get_textpage()
+            page_bbox: List[float] = page.get_bbox()
         page_width = math.ceil(abs(page_bbox[2] - page_bbox[0]))
         page_height = math.ceil(abs(page_bbox[1] - page_bbox[3]))
 
         page_rotation = 0
         try:
-            page_rotation = page.get_rotation()
+            with PyPDFium2Parser.lock:
+                page_rotation = page.get_rotation()
         except:
             pass
 

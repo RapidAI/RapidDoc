@@ -46,7 +46,7 @@ def do_parse(
 
     if backend == "pipeline":
         layout_config = {
-            "model_type": LayoutModelType.PP_DOCLAYOUT_PLUS_L,
+            # "model_type": LayoutModelType.PP_DOCLAYOUT_PLUS_L,
             # "conf_thresh": 0.4,
             # "batch_num": 1,
             # "model_dir_or_path": "C:\ocr\models\ppmodel\layout\PP-DocLayout-L\pp_doclayout_l.onnx",
@@ -212,9 +212,7 @@ if __name__ == '__main__':
 
     doc_path_list = [
         "D:\\file\\text-pdf\\示例1-论文模板.pdf",
-        "D:\\file\\text-pdf\\示例1-论文模板.pdf",
         # "D:\\file\\text-pdf\\示例7-研究报告.pdf",
-        # "D:\\file\\text-pdf\\示例7-研究报告.pdf"
         # "D:\\file\\text-pdf\\demo1.pdf",
         # "C:\ocr\img\pageddd_5.png",
         # "C:\ocr\img\pages_50_02.png",
@@ -224,10 +222,7 @@ if __name__ == '__main__':
         # "C:\\ocr\\pdf\\pages_50.pdf"
         # "C:\\ocr\\table\\table.jpg"
         # "D:\CodeProjects\doc\paddleocr-v3\layout\page_2.png"
-
         # "demo/pdfs/demo1.pdf",
-        # "demo/pdfs/demo1.pdf",
-        # Formula Predict: 100%|██████████| 192/192 [00:45<00:00,  4.22it/s]
     ]
     # """Use pipeline mode if your environment does not support VLM"""
     # # 记录开始时间

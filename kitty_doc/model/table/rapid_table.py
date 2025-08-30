@@ -22,8 +22,8 @@ class RapidTableModel(object):
         device = get_device()
         engine_cfg = None
         if device.startswith('cuda'):
-            gpu_id = int(device.split(':')[1]) if ':' in device else 0  # GPU 编号
-            engine_cfg = {'use_cuda': True, "cuda_ep_cfg.gpu_id": gpu_id}
+            device_id = int(device.split(':')[1]) if ':' in device else 0  # GPU 编号
+            engine_cfg = {'use_cuda': True, "cuda_ep_cfg.device_id": device_id}
         self.table_pipeline = table_config.get("table_pipeline", False)
         self.model_type = table_config.get("model_type", ModelType.SLANETPLUS)
         self.ocr_engine = ocr_engine
@@ -34,6 +34,7 @@ class RapidTableModel(object):
             wired_cell_args = RapidLayoutInput(model_type=LayoutModelType.RT_DETR_L_WIRED_TABLE_CELL_DET,
                                                model_dir_or_path=table_config.get("wired_cell.model_dir_or_path"),
                                                engine_cfg=engine_cfg or {},)
+            self.wired_table_cell = RapidLayout(cfg=wired_cell_args)
             wireless_cell_args = RapidLayoutInput(model_type=LayoutModelType.RT_DETR_L_WIRELESS_TABLE_CELL_DET,
                                                 model_dir_or_path=table_config.get("wireless_cell.model_dir_or_path"),
                                                 engine_cfg=engine_cfg or {},)
@@ -116,7 +117,7 @@ class RapidTableModel(object):
                 else:
                     cls, elasp = self.table_cls(image)
                     if cls == "wired":
-                        cell_res = self.wired_table_model([image])
+                        cell_res = self.wired_table_cell([image])
                         model_runner = (
                             self.wired_table_model if self.model_type == ModelType.SLANEXT_WIRED_WIRELESS
                             else self.table_model

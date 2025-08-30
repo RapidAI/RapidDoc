@@ -10,8 +10,8 @@ class RapidLayoutModel(object):
 
         device = get_device()
         if device.startswith('cuda'):
-            gpu_id = int(device.split(':')[1]) if ':' in device else 0  # GPU 编号
-            engine_cfg = {'use_cuda': True, "cuda_ep_cfg.gpu_id": gpu_id}
+            device_id = int(device.split(':')[1]) if ':' in device else 0  # GPU 编号
+            engine_cfg = {'use_cuda': True, "cuda_ep_cfg.device_id": device_id}
             cfg.engine_cfg = engine_cfg
 
         # 如果传入了 layout_config，则用传入配置覆盖默认配置
@@ -93,7 +93,7 @@ class RapidLayoutModel(object):
 
             temp_results = []
             for xyxy, conf, cla in zip(boxes, scores, class_names):
-                xmin, ymin, xmax, ymax = [int(p.item()) for p in xyxy]
+                xmin, ymin, xmax, ymax = [int(p) for p in xyxy]
                 if self.model_type == ModelType.PP_DOCLAYOUT_PLUS_L:
                     category_id = self.category_plus_mapping[cla]
                 else:

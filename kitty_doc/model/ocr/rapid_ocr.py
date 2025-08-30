@@ -42,10 +42,15 @@ class RapidOcrModel(object):
                 default_params[key] = value
 
         if device.startswith('cuda'):
+            if not engine_type:
+                # cuda 环境默认使用 torch
+                default_params["Det.engine_type"] = EngineType.TORCH
+                default_params["Rec.engine_type"] = EngineType.TORCH
             gpu_id = int(device.split(':')[1]) if ':' in device else 0 # GPU 编号
             if default_params.get('Det.engine_type') == EngineType.ONNXRUNTIME:
                 default_params['EngineConfig.onnxruntime.use_cuda'] = True
                 default_params['EngineConfig.onnxruntime.cuda_ep_cfg.device_id'] = gpu_id
+                # default_params['EngineConfig.onnxruntime.cuda_ep_cfg.cudnn_conv_algo_search'] = "DEFAULT"
             elif default_params.get('Det.engine_type') == EngineType.TORCH:
                 default_params['EngineConfig.torch.use_cuda'] = True
                 default_params['EngineConfig.torch.gpu_id'] = gpu_id

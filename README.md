@@ -17,7 +17,7 @@ KittyDoc 是一个轻量级、专注于文档解析的开源框架，支持 **OC
 ## 👏 项目特点
 
 - **OCR 识别**
-  - 使用 [RapidOCR](https://www.modelscope.cn/models/RapidAI/RapidOCR)
+  - 使用 [RapidOCR](https://github.com/RapidAI/RapidOCR)
   - 支持多种推理引擎
   - CPU 上优先使用 OpenVINO（若可用且用户未指定 engine_type）
   
@@ -35,6 +35,7 @@ KittyDoc 是一个轻量级、专注于文档解析的开源框架，支持 **OC
     - **PP-FormulaNet_plus-L**：速度慢  
     - **PP-FormulaNet_plus-S**：速度最快，默认使用  
   - 支持配置只识别行间公式
+  - cuda环境默认不使用gpu，公式模型onnx gpu推理会报错 [PaddleOCR/issues/15125](https://github.com/PaddlePaddle/PaddleOCR/issues/15125)
 
 - **表格识别**
   - 基于 [rapid_table_self](kitty_doc%2Fmodel%2Ftable%2Frapid_table_self) 增强，在原有基础上增强为多模型串联方案：  

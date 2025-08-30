@@ -7,6 +7,7 @@ from PIL import Image
 
 from kitty_doc.data.data_reader_writer import FileBasedDataWriter
 from kitty_doc.utils.pdf_reader import image_to_b64str, image_to_bytes, page_to_image
+from . import PyPDFium2Parser
 from .hash_utils import str_sha256
 
 
@@ -37,19 +38,20 @@ def load_images_from_pdf(
     start_page_id=0,
     end_page_id=None,
 ):
-    images_list = []
-    pdf_doc = pdfium.PdfDocument(pdf_bytes)
-    pdf_page_num = len(pdf_doc)
-    end_page_id = end_page_id if end_page_id is not None and end_page_id >= 0 else pdf_page_num - 1
-    if end_page_id > pdf_page_num - 1:
-        logger.warning("end_page_id is out of range, use images length")
-        end_page_id = pdf_page_num - 1
+    with PyPDFium2Parser.lock:
+        images_list = []
+        pdf_doc = pdfium.PdfDocument(pdf_bytes)
+        pdf_page_num = len(pdf_doc)
+        end_page_id = end_page_id if end_page_id is not None and end_page_id >= 0 else pdf_page_num - 1
+        if end_page_id > pdf_page_num - 1:
+            logger.warning("end_page_id is out of range, use images length")
+            end_page_id = pdf_page_num - 1
 
-    for index in range(0, pdf_page_num):
-        if start_page_id <= index <= end_page_id:
-            page = pdf_doc[index]
-            image_dict = pdf_page_to_image(page, dpi=dpi)
-            images_list.append(image_dict)
+        for index in range(0, pdf_page_num):
+            if start_page_id <= index <= end_page_id:
+                page = pdf_doc[index]
+                image_dict = pdf_page_to_image(page, dpi=dpi)
+                images_list.append(image_dict)
 
     return images_list, pdf_doc
 

@@ -27,7 +27,7 @@ class PPPostProcess:
             Boxes: The post-processed detection boxes.
         """
 
-        expect_boxes = (boxes[:, 1] > self.conf_thres) & (boxes[:, 0] > -1)
+        expect_boxes = (boxes[:, 1] >= self.conf_thres) & (boxes[:, 0] > -1)
         boxes = boxes[expect_boxes, :]
 
         selected_indices = nms(boxes, iou_same=0.6, iou_diff=0.98)
@@ -150,10 +150,10 @@ def restructured_boxes(
 
     for box in boxes:
         xmin, ymin, xmax, ymax = box[2:]
-        xmin = max(0, xmin)
-        ymin = max(0, ymin)
-        xmax = min(w, xmax)
-        ymax = min(h, ymax)
+        xmin = float(max(0, xmin))
+        ymin = float(max(0, ymin))
+        xmax = float(min(w, xmax))
+        ymax = float(min(h, ymax))
         if xmax <= xmin or ymax <= ymin:
             continue
         box_list.append(
