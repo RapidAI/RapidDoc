@@ -184,7 +184,7 @@ if __name__ == '__main__':
 
     # r"C:\ocr\models\ppmodel\layout\PP-DocLayout-M\openvino\pp_doclayout_m.xml"
 
-    cfg = RapidLayoutInput(model_type=ModelType.PP_DOCLAYOUT_PLUS_L, conf_thresh=0.2, model_dir_or_path=r"C:\ocr\models\ppmodel\layout\PP-DocLayout_plus-L\pp_doclayout_plus_l.onnx")
+    cfg = RapidLayoutInput(model_type=ModelType.PP_DOCLAYOUT_PLUS_L, conf_thresh=0.4)
     model = RapidLayout(cfg=cfg)
 
     all_results = model(img_contents=["D:\CodeProjects\doc\paddleocr-v3\layout\page_2.png"])

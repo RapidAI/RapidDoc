@@ -24,7 +24,7 @@ KittyDoc 是一个轻量级、专注于文档解析的开源框架，支持 **OC
 - **版面识别**
   - 自定义 [rapid_layout_self](kitty_doc%2Fmodel%2Flayout%2Frapid_layout_self)（参考RapidLayout）
   - 模型使用 `PP-DocLayout` 系列 ONNX 模型（plus-L、L、M、S）
-    - **PP-DocLayout_plus-L**：效果最好，速度稍慢 
+    - **PP-DocLayout_plus-L**：速度稍慢 
     - **PP-DocLayout-L**：速度快，效果也不错，默认使用  
     - **PP-DocLayout-S**：速度极快，可能存在部分漏检，会自动调低阈值，conf_thresh=0.2
   - 模型下载：[KittyDoc 模型集](https://www.modelscope.cn/models/hzkitty/KittyDoc)
@@ -57,15 +57,29 @@ KittyDoc 是一个轻量级、专注于文档解析的开源框架，支持 **OC
   - 除了 OCR 和 PP-DocLayout-M/S 模型，OpenVINO推理会报错，可能是opset_version ≥16，OpenVINO 部分算子不支持。
 ---
 
-## 🛠️ 安装
+## 🛠️ 安装KittyDoc
 
+#### 使用pip安装KittyDoc
+```bash
+pip install kitty_doc -i https://mirrors.aliyun.com/pypi/simple
+```
+
+#### 通过源码安装KittyDoc
 ```bash
 # 克隆仓库
 git clone https://github.com/hzkitty/KittyDoc.git
 cd KittyDoc
 
 # 安装依赖
-pip install -r requirements.txt
+pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple
+```
+#### 使用gpu推理
+```bash
+# 在安装完kitty_doc之后，卸载cpu版的onnxruntime
+pip uninstall onnxruntime
+# 这里一定要确定onnxruntime-gpu与GPU对应
+# 可参见https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html#requirements
+pip install onnxruntime-gpu
 ```
 
 ---
