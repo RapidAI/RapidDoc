@@ -39,12 +39,10 @@ KittyDoc 是一个轻量级、专注于文档解析的开源框架，支持 **OC
 
 - **表格识别**
   - 基于 [rapid_table_self](kitty_doc%2Fmodel%2Ftable%2Frapid_table_self) 增强，在原有基础上增强为多模型串联方案：  
-    1. **表格分类**  
-    2. **表格结构识别**：支持 `SLANeXt_wired` 和 `SLANeXt_wireless` 模型  
-       - 注意：SLANeXt 系列模型预测的表格单元格信息无效，因此需要单元格检测模型配合使用  
-    3. **单元格检测**：支持 `RT-DETR-L_wired_table_cell_det` 和 `RT-DETR-L_wireless_table_cell_det` 模型  
-       - 单元格检测也可以直接作用于 `SLANeXt_plus` 模型进行增强 
-  - 部分模型下载：
+    - **表格分类**（区分有线/无线表格）
+    - **SLANeXt** 系列 [表结构识别](https://www.paddleocr.ai/main/version3.x/module_usage/table_structure_recognition.html) + [单元格检测](https://www.paddleocr.ai/main/version3.x/module_usage/table_cells_detection.html)
+    - **[有线表格识别UNET](https://github.com/RapidAI/TableStructureRec)** + SLANET_plus/UNITABLE（作为无线表格识别）
+  - SLANeXt 相关模型下载：
     - [RapidTable](https://www.modelscope.cn/models/RapidAI/RapidTable)
 
 - **阅读顺序恢复**
@@ -59,7 +57,7 @@ KittyDoc 是一个轻量级、专注于文档解析的开源框架，支持 **OC
 
 ## 🛠️ 安装KittyDoc
 
-#### 使用pip安装KittyDoc
+#### 使用pip安装KittyDoc （暂未发布）
 ```bash
 pip install kitty_doc -i https://mirrors.aliyun.com/pypi/simple
 ```
