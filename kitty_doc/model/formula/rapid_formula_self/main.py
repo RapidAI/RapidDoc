@@ -26,7 +26,7 @@ class RapidFormula:
         self.load_img = LoadImage()
 
     def __call__(
-        self, img_contents: List[Union[str, np.ndarray, bytes, Path]], batch_size: int = 4, tqdm_enable=False
+        self, img_contents: List[Union[str, np.ndarray, bytes, Path]], batch_size: int = 1, tqdm_enable=False
     ) -> List[RapidFormulaOutput]:
         # 先读取所有图片
         img_contents = [self.load_img(img_content) for img_content in img_contents]

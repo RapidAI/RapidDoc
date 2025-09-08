@@ -8,7 +8,9 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import numpy as np
+from .wired_table_rec.main import WiredTableInput, WiredTableRecognition
 
+from .table_matcher.table_match_pipeline import TableMatchPipeline
 from .model_processor.main import ModelProcessor
 from .table_matcher import TableMatch
 from .utils import (
@@ -30,7 +32,7 @@ class RapidTable:
         if cfg is None:
             cfg = RapidTableInput()
 
-        if not cfg.model_dir_or_path:
+        if not cfg.model_dir_or_path and cfg.model_type != ModelType.UNET:
             cfg.model_dir_or_path = ModelProcessor.get_model_path(cfg.model_type)
 
         self.cfg = cfg
@@ -41,6 +43,7 @@ class RapidTable:
             self.ocr_engine = self._init_ocr_engine(self.cfg.ocr_params)
 
         self.table_matcher = TableMatch()
+        self.table_matcher_pipeline = TableMatchPipeline()
         self.load_img = LoadImage()
 
     def _init_ocr_engine(self, params: Dict[Any, Any]):
@@ -56,8 +59,11 @@ class RapidTable:
     def _init_table_structer(self):
         if self.cfg.model_type == ModelType.UNITABLE:
             from .table_structure.unitable import UniTableStructure
-
             return UniTableStructure(asdict(self.cfg))
+
+        if self.cfg.model_type == ModelType.UNET:
+            wired_input = WiredTableInput()
+            return WiredTableRecognition(wired_input)
 
         from .table_structure.pp_structure import PPTableStructurer
 
@@ -67,21 +73,37 @@ class RapidTable:
         self,
         img_content: Union[str, np.ndarray, bytes, Path],
         ocr_results: Optional[Tuple[np.ndarray, Tuple[str], Tuple[float]]] = None,
-        cell_results: Optional[List[List[float]]] = None,
+        cell_results: Optional[Tuple[List[List[float]], Tuple[float]]] = None,
     ) -> RapidTableOutput:
         s = time.perf_counter()
 
         img = self.load_img(img_content)
+        if self.cfg.model_type == ModelType.UNET:
+            ocr_results = list(
+                zip(ocr_results[0], ocr_results[1], ocr_results[2])
+            )
+            table_results = self.table_structure(img, ocr_result=ocr_results)
+            return RapidTableOutput(img, table_results.pred_html, table_results.cell_bboxes,
+                                    table_results.logic_points.tolist(), table_results.elapse)
 
         dt_boxes, rec_res = self.get_ocr_results(img, ocr_results)
         pred_structures, cell_bboxes, logic_points = self.get_table_rec_results(img)
         if cell_results is not None:
-            cell_results1 = self.sort_table_cells_boxes(cell_results)
-            cell_bboxes = self.convert_to_four_point_coordinates(cell_results1[0])
-
+            cell_results, _ = cell_results
+            cell_results1, cells_flags = self.sort_table_cells_boxes(cell_results)
+            cell_bboxes = self.convert_to_four_point_coordinates(cell_results1)
         pred_html = self.get_table_matcher(
             pred_structures, cell_bboxes, dt_boxes, rec_res
         )
+        # if cell_results is None:
+        #     pred_html = self.get_table_matcher(
+        #         pred_structures, cell_bboxes, dt_boxes, rec_res
+        #     )
+        # else:
+        #     pred_html, cell_bboxes = self.table_matcher_pipeline(
+        #         pred_structures, cell_bboxes, dt_boxes, rec_res, cell_results
+        #     )
+        #     cell_bboxes = self.convert_to_four_point_coordinates(cell_bboxes)
 
         elapse = time.perf_counter() - s
         return RapidTableOutput(img, pred_html, cell_bboxes, logic_points, elapse)
@@ -101,46 +123,56 @@ class RapidTable:
             ])
         return np.array(result)
 
-    def sort_table_cells_boxes(self, boxes):
+    def sort_table_cells_boxes(self, boxes, overlap_threshold=0.5):
         """
-        对表格单元格的检测框进行排序
+        对表格单元格的检测框进行排序 (更鲁棒版本)
 
         参数:
             boxes (list of lists): 输入的检测框列表，
                                    每个检测框格式为 [x1, y1, x2, y2]
+            overlap_threshold (float): 判断是否同行的垂直重叠率阈值，默认 0.5
 
         返回:
             sorted_boxes (list of lists): 按行优先、列次序排序后的检测框列表
             flag (list): 每行起始索引的标记列表，用于区分行
         """
 
+        def is_same_row(box1, box2):
+            _, y1a, _, y2a = box1
+            _, y1b, _, y2b = box2
+            # 计算上下边界的重叠
+            overlap = max(0, min(y2a, y2b) - max(y1a, y1b))
+            min_height = min(y2a - y1a, y2b - y1b)
+            if min_height <= 0:
+                return False
+            return overlap / min_height >= overlap_threshold
+
+        # 1. 先按 y1 排序
         boxes_sorted_by_y = sorted(boxes, key=lambda box: box[1])
+
         rows = []
-        current_row = []
-        current_y = None
-        tolerance = 10
-        for box in boxes_sorted_by_y:
-            x1, y1, x2, y2 = box
-            if current_y is None:
+        current_row = [boxes_sorted_by_y[0]]
+
+        # 2. 分行
+        for box in boxes_sorted_by_y[1:]:
+            if is_same_row(current_row[-1], box):
                 current_row.append(box)
-                current_y = y1
             else:
-                if abs(y1 - current_y) <= tolerance:
-                    current_row.append(box)
-                else:
-                    current_row.sort(key=lambda x: x[0])
-                    rows.append(current_row)
-                    current_row = [box]
-                    current_y = y1
+                # 当前行结束，保存
+                current_row.sort(key=lambda x: x[0])
+                rows.append(current_row)
+                current_row = [box]
         if current_row:
             current_row.sort(key=lambda x: x[0])
             rows.append(current_row)
+
+        # 3. 拼接结果 & flag
         sorted_boxes = []
         flag = [0]
-        for i in range(len(rows)):
-            sorted_boxes.extend(rows[i])
-            if i < len(rows):
-                flag.append(flag[i] + len(rows[i]))
+        for row in rows:
+            sorted_boxes.extend(row)
+            flag.append(flag[-1] + len(row))
+
         return sorted_boxes, flag
 
     def get_ocr_results(

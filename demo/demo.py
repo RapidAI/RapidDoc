@@ -70,14 +70,23 @@ def do_parse(
         # os.environ['MINERU_MODEL_SOURCE'] = 'local'
 
         table_config = {
-            # "table_pipeline": True, # 采用“表格分类+表格结构识别+单元格检测”多模型串联组网方案
-            # "model_type": TableModelType.SLANEXT_WIRED_WIRELESS, # 如果是 SLANEXT_WIRED_WIRELESS 自动根据表格分类，选择有线/无线表格模型
-            # "model_dir_or_path": "",
-            #
-            # "wired_cell.model_dir_or_path": "", # 有线单元格模型地址，配置SLANEXT_WIRED_WIRELESS时使用
-            # "wireless_cell.model_dir_or_path": "", # 无线单元格模型地址，配置SLANEXT_WIRED_WIRELESS时使用
-            # "wired_table.model_dir_or_path": "", # 有线表结构模型地址，配置table_pipeline时使用
-            # "wireless_table.model_dir_or_path": "", # 无线表结构模型地址，配置table_pipeline时使用
+            # "model_type": TableModelType.UNET_SLANET_PLUS,  # （默认） 有线表格使用unet，无线表格使用slanet_plus
+            # "model_type": TableModelType.UNET_UNITABLE, # 有线表格使用unet，无线表格使用unitable
+            # "model_type": TableModelType.SLANEXT,  # 有线表格使用slanext_wired，无线表格使用slanext_wireless
+
+            # "model_dir_or_path": "", #单个模型使用。如SLANET_PLUS、UNITABLE
+
+            # "cls.model_dir_or_path": "", # 表格分类模型地址
+
+            # "unet.model_dir_or_path": "", # UNET表格模型地址
+
+            # "unitable.model_dir_or_path": "", # UNITABLE表格模型地址
+            # "slanet_plus.model_dir_or_path": "", # SLANET_PLUS表格模型地址
+
+            # "wired_cell.model_dir_or_path": "", # 有线单元格模型地址，配置SLANEXT时使用
+            # "wireless_cell.model_dir_or_path": "", # 无线单元格模型地址，配置SLANEXT时使用
+            # "wired_table.model_dir_or_path": "", # 有线表结构模型地址，配置SLANEXT时使用
+            # "wireless_table.model_dir_or_path": "", # 无线表结构模型地址，配置SLANEXT时使用,
         }
         for idx, pdf_bytes in enumerate(pdf_bytes_list):
             new_pdf_bytes = convert_pdf_bytes_to_bytes_by_pypdfium2(pdf_bytes, start_page_id, end_page_id)

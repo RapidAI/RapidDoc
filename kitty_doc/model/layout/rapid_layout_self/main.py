@@ -26,7 +26,7 @@ class RapidLayout:
         self.load_img = LoadImage()
 
     def __call__(
-        self, img_contents: List[Union[str, np.ndarray, bytes, Path]], batch_size: int = 4, tqdm_enable=False
+        self, img_contents: List[Union[str, np.ndarray, bytes, Path]], batch_size: int = 1, tqdm_enable=False
     ) -> List[RapidLayoutOutput]:
 
         # 先读取所有图片
@@ -50,7 +50,7 @@ def parse_args(arg_list: Optional[List[str]] = None):
         "-m",
         "--model_type",
         type=str,
-        default=ModelType.PP_LAYOUT_CDLA.value,
+        default=ModelType.PP_DOCLAYOUT_L.value,
         choices=[v.value for v in ModelType],
         help="Support model type",
     )
@@ -93,7 +93,7 @@ def main(arg_list: Optional[List[str]] = None):
         save_path = "layout_vis.jpg"
         if not is_url(args.img_path):
             save_path = args.img_path.resolve().parent / "layout_vis.jpg"
-        results.vis(save_path)
+        results[0].vis(save_path)
 
 
 if __name__ == "__main__":

@@ -187,5 +187,6 @@ if __name__ == '__main__':
     cfg = RapidLayoutInput(model_type=ModelType.PP_DOCLAYOUT_PLUS_L, conf_thresh=0.4)
     model = RapidLayout(cfg=cfg)
 
-    all_results = model(img_contents=["D:\CodeProjects\doc\paddleocr-v3\layout\page_2.png"])
+
+    all_results = model(img_contents=[r'C:\ocr\img\88b41949e122304fe0b98f45c08aaf14.jpg'])
     print(all_results)

@@ -18,13 +18,14 @@ class EngineType(Enum):
 
 
 class ModelType(Enum):
-    PPSTRUCTURE_EN = "ppstructure_en"
-    PPSTRUCTURE_ZH = "ppstructure_zh"
     SLANETPLUS = "slanet_plus"
+    UNITABLE = "unitable"
     SLANEXT_WIRED = "slanext_wired"
     SLANEXT_WIRELESS = "slanext_wireless"
-    SLANEXT_WIRED_WIRELESS = "slanext_wired_wireless"
-    UNITABLE = "unitable"
+    UNET = "unet" # 有线表格unet
+    UNET_SLANET_PLUS = "unet_slanet_plus"  # 有线表格使用unet，无线表格使用slanet_plus
+    UNET_UNITABLE = "unet_unitable"  # 有线表格使用unet，无线表格使用unitable
+    SLANEXT = "slanext" # 有线表格使用slanext_wired，无线表格使用slanext_wireless
 
 
 @dataclass

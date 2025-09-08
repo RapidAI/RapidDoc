@@ -147,6 +147,7 @@ def doc_analyze(
             f'Batch {index + 1}/{len(batch_images)}: '
             f'{processed_images_count} pages/{len(images_with_extra_info)} pages'
         )
+        # TODO 把 pdf_doc 传进去，尝试直接读取pdf表格文本和表格结构
         batch_results = batch_image_analyze(batch_image, formula_enable, table_enable, layout_config, ocr_config, formula_config, table_config)
         results.extend(batch_results)
 

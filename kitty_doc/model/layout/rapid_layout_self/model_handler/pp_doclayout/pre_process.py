@@ -31,7 +31,8 @@ class PPPreProcess:
 
     def resize(self, img: np.ndarray) -> np.ndarray:
         resize_h, resize_w = self.size
-        img = cv2.resize(img, (int(resize_w), int(resize_h)))
+        # img = cv2.resize(img, (int(resize_w), int(resize_h)))
+        img = cv2.resize(img, (int(resize_w), int(resize_h)), interpolation=2)  # interp: 2
         return img
 
     def normalize(self, img: np.ndarray) -> np.ndarray:

@@ -91,12 +91,19 @@ pip install onnxruntime-gpu
 ---
 
 ## 模型下载
-
+不指定模型路径，初次运行时，会自动下载
 - [KittyDoc 模型集（版面/公式/表格）](https://www.modelscope.cn/models/hzkitty/KittyDoc)  
 - [RapidOCR 模型](https://www.modelscope.cn/models/RapidAI/RapidOCR)  
 - [部分表格模型RapidTable](https://www.modelscope.cn/models/RapidAI/RapidTable) 
 
 ---
+
+## TODO
+
+- [ ] 公式识别支持gpu
+- [ ] 版面、表格、公式支持openvino
+- [ ] RapidTable非OCR文本提取
+
 
 ## 🙏 致谢
 

@@ -16,8 +16,13 @@ pypdfium2>=4.30.0
 requests
 tokenizers>=0.13.2
 rapidocr>=3.1.0,<=3.3.0
-onnxruntime>=1.15.1
+onnxruntime>=1.18.1
 openvino>=2024.6.0
 ftfy>=6.3.1,<7
 matplotlib>=3.10,<4
 json_repair
+#scikit-learn
+#img2table
+# wired_table_rec相关包
+scipy
+Shapely

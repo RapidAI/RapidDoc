@@ -33,7 +33,9 @@ class LoadImage:
             if is_url(img):
                 img = Image.open(requests.get(img, stream=True, timeout=60).raw)
             else:
-                return cv2.imread(img, flags=cv2.IMREAD_COLOR)
+                self.verify_exist(img)
+                img = Image.open(img)
+
             try:
                 img = self.img_to_ndarray(img)
             except UnidentifiedImageError as e:
@@ -55,8 +57,9 @@ class LoadImage:
     def img_to_ndarray(self, img: Image.Image) -> np.ndarray:
         if img.mode == "1":
             img = img.convert("L")
-            return np.array(img)
-        return np.array(img)
+            # return np.array(img)
+        # return np.array(img)
+        return cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2BGR)
 
     def convert_img(self, img: np.ndarray, origin_img_type: Any) -> np.ndarray:
         if img.ndim == 2:

@@ -60,8 +60,15 @@ class VisTable:
         }
                     </style>"""
 
-        prefix_table, suffix_table = table_html_str.split("<body>")
-        html_with_border = f"{prefix_table}{style_res}<body>{suffix_table}"
+        # prefix_table, suffix_table = table_html_str.split("<body>")
+        # html_with_border = f"{prefix_table}{style_res}<body>{suffix_table}"
+        # return html_with_border
+        if "<body>" in table_html_str:
+            prefix_table, suffix_table = table_html_str.split("<body>", 1)
+            html_with_border = f"{prefix_table}{style_res}<body>{suffix_table}"
+        else:
+            # 没有 body 的情况，直接加上样式
+            html_with_border = f"{style_res}{table_html_str}"
         return html_with_border
 
     def draw(self, img: np.ndarray, cell_bboxes: np.ndarray) -> np.ndarray:

@@ -60,8 +60,10 @@ class LoadImage:
     def img_to_ndarray(self, img: Image.Image) -> np.ndarray:
         if img.mode == "1":
             img = img.convert("L")
-            return np.array(img)
-        return np.array(img)
+            # return np.array(img)
+        # return np.array(img)
+        return cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2BGR)
+
 
     def convert_img(self, img: np.ndarray, origin_img_type: Any) -> np.ndarray:
         if img.ndim == 2:
