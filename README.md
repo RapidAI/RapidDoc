@@ -35,14 +35,14 @@ KittyDoc 是一个轻量级、专注于文档解析的开源框架，支持 **OC
     - **PP-FormulaNet_plus-L**：速度慢  
     - **PP-FormulaNet_plus-S**：速度最快，默认使用  
   - 支持配置只识别行间公式
-  - cuda环境默认不使用gpu，公式模型onnx gpu推理会报错 [PaddleOCR/issues/15125](https://github.com/PaddlePaddle/PaddleOCR/issues/15125)
+  - cuda环境默认不使用gpu，公式模型onnx gpu推理会报错，暂时无人解决 [PaddleOCR/issues/15125](https://github.com/PaddlePaddle/PaddleOCR/issues/15125), [PaddleX/issues/4238](https://github.com/PaddlePaddle/PaddleX/issues/4238), [Paddle2ONNX/issues/1593](https://github.com/PaddlePaddle/Paddle2ONNX/issues/1593)
 
 - **表格识别**
   - 基于 [rapid_table_self](kitty_doc%2Fmodel%2Ftable%2Frapid_table_self) 增强，在原有基础上增强为多模型串联方案：  
     - **表格分类**（区分有线/无线表格）
     - **SLANeXt** 系列 [表结构识别](https://www.paddleocr.ai/main/version3.x/module_usage/table_structure_recognition.html) + [单元格检测](https://www.paddleocr.ai/main/version3.x/module_usage/table_cells_detection.html)
     - **[有线表格识别UNET](https://github.com/RapidAI/TableStructureRec)** + SLANET_plus/UNITABLE（作为无线表格识别）
-  - SLANeXt 相关模型下载：
+  - 相关模型下载：
     - [RapidTable](https://www.modelscope.cn/models/RapidAI/RapidTable)
 
 - **阅读顺序恢复**
@@ -52,7 +52,7 @@ KittyDoc 是一个轻量级、专注于文档解析的开源框架，支持 **OC
 
 - **推理方式**
   - 所有模型通过 ONNXRuntime 推理，OCR可配置其他推理引擎
-  - 除了 OCR 和 PP-DocLayout-M/S 模型，OpenVINO推理会报错，可能是opset_version ≥16，OpenVINO 部分算子不支持。
+  - 除了 OCR 和 PP-DocLayout-M/S 模型，OpenVINO推理会报错，暂时难以解决。[PaddleOCR/issues/16277](https://github.com/PaddlePaddle/PaddleOCR/issues/16277)
 ---
 
 ## 🛠️ 安装KittyDoc
@@ -99,6 +99,7 @@ pip install onnxruntime-gpu
 ## TODO
 
 - [ ] 公式识别支持gpu
+- [ ] 复选框（checkbox）的检测与识别，包括勾选/未勾选状态。
 - [ ] 版面、表格、公式支持openvino
 - [ ] RapidTable非OCR文本提取
 

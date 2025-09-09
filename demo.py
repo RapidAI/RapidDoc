@@ -220,6 +220,8 @@ if __name__ == '__main__':
     image_suffixes = [".png", ".jpeg", ".jpg"]
 
     doc_path_list = [
+        # "D:\\file\\text-pdf\\比亚迪财报.pdf",
+        "D:\\file\\text-pdf\\示例1-论文模板.pdf",
         "D:\\file\\text-pdf\\示例1-论文模板.pdf",
         # "D:\\file\\text-pdf\\示例7-研究报告.pdf",
         # "D:\\file\\text-pdf\\demo1.pdf",

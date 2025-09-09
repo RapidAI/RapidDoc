@@ -21,13 +21,14 @@ from kitty_doc.utils.span_block_fix import fill_spans_in_blocks, fix_discarded_b
 from kitty_doc.utils.span_pre_proc import remove_outside_spans, remove_overlaps_low_confidence_spans, \
     remove_overlaps_min_spans, txt_spans_extract
 from kitty_doc.version import __version__
-from kitty_doc.utils.hash_utils import str_md5
+from kitty_doc.utils.hash_utils import bytes_md5
 
 
 def page_model_info_to_page_info(page_model_info, image_dict, page, image_writer, page_index, ocr_enable=False, formula_enabled=True):
     scale = image_dict["scale"]
     page_pil_img = image_dict["img_pil"]
-    page_img_md5 = str_md5(image_dict["img_base64"])
+    # page_img_md5 = str_md5(image_dict["img_base64"])
+    page_img_md5 = bytes_md5(page_pil_img.tobytes())
     page_w, page_h = map(int, page.get_size())
     magic_model = MagicModel(page_model_info, scale)
 
