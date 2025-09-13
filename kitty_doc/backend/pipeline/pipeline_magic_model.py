@@ -322,6 +322,7 @@ class MagicModel:
             CategoryId.InlineEquation,
             CategoryId.InterlineEquation_YOLO,
             CategoryId.OcrText,
+            CategoryId.CheckBox,
         ]
         """当成span拼接的"""
         for layout_det in layout_dets:
@@ -347,11 +348,17 @@ class MagicModel:
                 #     span['type'] = ContentType.INTERLINE_EQUATION
 
                 elif category_id == CategoryId.InlineEquation:
+                    # 行内公式
                     span['content'] = layout_det.get('latex') or ''
                     span['type'] = ContentType.INLINE_EQUATION
                 elif category_id == CategoryId.InterlineEquation_Layout or category_id == CategoryId.InterlineEquation_YOLO:
+                    # 行间公式
                     span['content'] = layout_det.get('latex') or ''
                     span['type'] = ContentType.INTERLINE_EQUATION
+                elif category_id == CategoryId.CheckBox:
+                    # 复选框
+                    span['content'] = layout_det.get('checkbox') or ''
+                    span['type'] = ContentType.CHECKBOX
                 elif category_id == CategoryId.OcrText:
                     span['content'] = layout_det['text']
                     span['type'] = ContentType.TEXT

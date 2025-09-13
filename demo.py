@@ -220,10 +220,13 @@ if __name__ == '__main__':
     image_suffixes = [".png", ".jpeg", ".jpg"]
 
     doc_path_list = [
-        # "D:\\file\\text-pdf\\比亚迪财报.pdf",
-        "D:\\file\\text-pdf\\示例1-论文模板.pdf",
-        "D:\\file\\text-pdf\\示例1-论文模板.pdf",
+        "D:\\file\\text-pdf\\比亚迪财报.pdf",
+        r"D:\CodeProjects\doc\KittyDoc\github\KittyDoc\tests\checkout_test.png"
+        # "D:\\file\\text-pdf\\示例1-论文模板.pdf",
+        # "D:\\file\\text-pdf\\示例1-论文模板.pdf",
         # "D:\\file\\text-pdf\\示例7-研究报告.pdf",
+        # r'C:\ocr\img\table\ceshi.pdf',
+        # "tests/0a471d47-e428-4e5a-b849-a8aedfe399a0.png",
         # "D:\\file\\text-pdf\\demo1.pdf",
         # "C:\ocr\img\pageddd_5.png",
         # "C:\ocr\img\pages_50_02.png",

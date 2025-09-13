@@ -40,7 +40,7 @@ def fill_spans_in_blocks(blocks, spans, radio):
 
 
 def span_block_type_compatible(span_type, block_type):
-    if span_type in [ContentType.TEXT, ContentType.INLINE_EQUATION]:
+    if span_type in [ContentType.TEXT, ContentType.INLINE_EQUATION, ContentType.CHECKBOX]:
         return block_type in [
             BlockType.TEXT,
             BlockType.TITLE,

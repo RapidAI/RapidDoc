@@ -7,7 +7,9 @@ from collections import defaultdict
 import numpy as np
 
 from .model_init import AtomModelSingleton
+from ...utils.checkbox_det_cls import checkout_predict
 from ...utils.config_reader import get_formula_enable, get_table_enable
+from ...utils.enum_class import CategoryId
 from ...utils.model_utils import crop_img, get_res_list_from_layout_res
 from ...utils.ocr_utils import get_adjusted_mfdetrec_res, get_ocr_result_list, OcrConfidence
 
@@ -30,6 +32,7 @@ class BatchAnalyze:
         self.formula_enable = get_formula_enable(formula_enable)
         self.formula_level = formula_config.get("formula_level", 0) if formula_config else 0
         self.table_enable = get_table_enable(table_enable)
+        self.checkout_enable = True
         self.layout_config = layout_config
         self.ocr_config = ocr_config
         self.formula_config = formula_config
@@ -59,7 +62,7 @@ class BatchAnalyze:
 
         images = [image for image, _, _ in images_with_extra_info]
 
-        # doclayout_yolo
+        # 版面识别
         layout_images = []
         for image_index, image in enumerate(images):
             layout_images.append(image)
@@ -89,12 +92,24 @@ class BatchAnalyze:
                 get_res_list_from_layout_res(layout_res)
             )
 
+            # 复选框检测
+            checkout_res = []
+            if self.checkout_enable:
+                checkout_img = cv2.cvtColor(np.asarray(pil_img), cv2.COLOR_RGB2BGR)
+                checkout_res = checkout_predict(checkout_img)
+                for res in checkout_res:
+                    poly = [res['bbox'][0], res['bbox'][1], res['bbox'][2], res['bbox'][1],
+                                   res['bbox'][2], res['bbox'][3], res['bbox'][0], res['bbox'][3]]
+                    layout_res.append({'bbox': res['bbox'], 'poly': poly, 'category_id': CategoryId.CheckBox,
+                                       'checkbox': res['text'], 'score': 0.9})
+
             ocr_res_list_all_page.append({'ocr_res_list':ocr_res_list,
                                           'lang':_lang,
                                           'ocr_enable':ocr_enable,
                                           'pil_img':pil_img,
                                           'single_page_mfdetrec_res':single_page_mfdetrec_res,
                                           'layout_res':layout_res,
+                                          'checkout_res': checkout_res,
                                           })
 
             for table_res in table_res_list:
@@ -136,8 +151,9 @@ class BatchAnalyze:
                     new_image, useful_list = crop_img(
                         res, ocr_res_list_dict['pil_img'], crop_paste_x=50, crop_paste_y=50
                     )
+                    # OCR检测，跳过公式和复选框
                     adjusted_mfdetrec_res = get_adjusted_mfdetrec_res(
-                        ocr_res_list_dict['single_page_mfdetrec_res'], useful_list
+                        ocr_res_list_dict['single_page_mfdetrec_res'] + ocr_res_list_dict['checkout_res'], useful_list
                     )
 
                     # BGR转换
@@ -260,8 +276,9 @@ class BatchAnalyze:
                     new_image, useful_list = crop_img(
                         res, ocr_res_list_dict['pil_img'], crop_paste_x=50, crop_paste_y=50
                     )
+                    # OCR检测，跳过公式和复选框
                     adjusted_mfdetrec_res = get_adjusted_mfdetrec_res(
-                        ocr_res_list_dict['single_page_mfdetrec_res'], useful_list
+                        ocr_res_list_dict['single_page_mfdetrec_res'] + ocr_res_list_dict['checkout_res'], useful_list
                     )
                     # OCR-det
                     new_image = cv2.cvtColor(np.asarray(new_image), cv2.COLOR_RGB2BGR)

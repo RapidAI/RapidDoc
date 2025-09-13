@@ -22,6 +22,7 @@ class ContentType:
     INTERLINE_EQUATION = 'interline_equation'
     INLINE_EQUATION = 'inline_equation'
     EQUATION = 'equation'
+    CHECKBOX = 'checkbox'
 
 
 class CategoryId:
@@ -40,6 +41,7 @@ class CategoryId:
     OcrText = 15
     LowScoreText = 16
     ImageFootnote = 101
+    CheckBox = 200
 
 
 class MakeMode:

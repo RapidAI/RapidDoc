@@ -280,6 +280,8 @@ def draw_span_bbox(pdf_info, pdf_bytes, out_path, filename):
                 page_inline_equation_list.append(span['bbox'])
         elif span['type'] == ContentType.INTERLINE_EQUATION:
             page_interline_equation_list.append(span['bbox'])
+        elif span['type'] == ContentType.CHECKBOX: # 此处与不换行的行内公式保持一致
+            page_inline_equation_list.append(span['bbox'])
         elif span['type'] == ContentType.IMAGE:
             page_image_list.append(span['bbox'])
         elif span['type'] == ContentType.TABLE:

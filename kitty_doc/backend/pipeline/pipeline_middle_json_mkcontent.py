@@ -162,7 +162,9 @@ def merge_para_with_text(para_block):
             elif span_type == ContentType.INTERLINE_EQUATION:
                 if span.get('content', ''):
                     content = f"\n{display_left_delimiter}\n{span['content']}\n{display_right_delimiter}\n"
-
+            elif span_type == ContentType.CHECKBOX:
+                if span.get('content', ''):
+                    content = span['content']
             content = content.strip()
 
             if content:
@@ -174,7 +176,7 @@ def merge_para_with_text(para_block):
                     else:
                         para_text += f'{content} '
                 else:
-                    if span_type in [ContentType.TEXT, ContentType.INLINE_EQUATION]:
+                    if span_type in [ContentType.TEXT, ContentType.INLINE_EQUATION, ContentType.CHECKBOX]:
                         # 如果span是line的最后一个且末尾带有-连字符，那么末尾不应该加空格,同时应该把-删除
                         if j == len(line['spans'])-1 and span_type == ContentType.TEXT and __is_hyphen_at_line_end(content):
                             para_text += content[:-1]
