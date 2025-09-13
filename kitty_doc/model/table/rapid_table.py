@@ -75,7 +75,7 @@ class RapidTableModel(object):
                                          engine_cfg=engine_cfg or {},)
             self.table_model = RapidTable(input_args)
 
-    def predict(self, image):
+    def predict(self, image, ocr_result=None):
         bgr_image = cv2.cvtColor(np.asarray(image), cv2.COLOR_RGB2BGR)
 
         # First check the overall image aspect ratio (height/width)
@@ -120,14 +120,12 @@ class RapidTableModel(object):
                 bgr_image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
         # Continue with OCR on potentially rotated image
-        # TODO 尝试从pdf中直接读取表格的文本内容
-        ocr_result = self.ocr_engine.ocr(bgr_image)[0]
-        if ocr_result:
-            # ocr_result = [[item[0], escape_html(item[1][0]), item[1][1]] for item in ocr_result if
-            #           len(item) == 2 and isinstance(item[1], tuple)]
-            ocr_result = [list(x) for x in zip(*[[item[0], item[1][0], item[1][1]] for item in ocr_result])]
-        else:
-            ocr_result = None
+        if not ocr_result:
+            ocr_result = self.ocr_engine.ocr(bgr_image)[0]
+            if ocr_result:
+                ocr_result = [list(x) for x in zip(*[[item[0], item[1][0], item[1][1]] for item in ocr_result])]
+            else:
+                ocr_result = None
 
 
         if ocr_result:

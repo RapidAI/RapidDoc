@@ -148,8 +148,9 @@ def doc_analyze(
             f'Batch {index + 1}/{len(batch_images)}: '
             f'{processed_images_count} pages/{len(images_with_extra_info)} pages'
         )
+        pdf_docs = all_pdf_docs[index]
         # TODO 把 pdf_doc 传进去，尝试直接读取pdf表格文本和表格结构
-        batch_results = batch_image_analyze(batch_image, formula_enable, table_enable, layout_config, ocr_config, formula_config, table_config)
+        batch_results = batch_image_analyze(batch_image, pdf_docs, formula_enable, table_enable, layout_config, ocr_config, formula_config, table_config)
         results.extend(batch_results)
 
     # 构建返回结果
@@ -172,6 +173,7 @@ def doc_analyze(
 
 def batch_image_analyze(
         images_with_extra_info: List[Tuple[PIL.Image.Image, bool, str]],
+        pdf_docs=None,
         formula_enable=True,
         table_enable=True,
         layout_config=None,
@@ -227,7 +229,7 @@ def batch_image_analyze(
     #     enable_ocr_det_batch = True
     enable_ocr_det_batch = True
     batch_model = BatchAnalyze(model_manager, batch_ratio, formula_enable, table_enable, enable_ocr_det_batch, layout_config, ocr_config, formula_config, table_config)
-    results = batch_model(images_with_extra_info)
+    results = batch_model(images_with_extra_info, pdf_docs)
 
     clean_memory(get_device())
 

@@ -11,7 +11,10 @@ from ...utils.checkbox_det_cls import checkout_predict
 from ...utils.config_reader import get_formula_enable, get_table_enable
 from ...utils.enum_class import CategoryId
 from ...utils.model_utils import crop_img, get_res_list_from_layout_res
-from ...utils.ocr_utils import get_adjusted_mfdetrec_res, get_ocr_result_list, OcrConfidence
+from ...utils.ocr_utils import get_adjusted_mfdetrec_res, get_ocr_result_list, OcrConfidence, get_ocr_result_list_table
+from ...utils.pdf_text_tool import get_page
+from ...utils.span_pre_proc import txt_spans_extract
+
 
 # YOLO_LAYOUT_BASE_BATCH_SIZE = 8
 # MFR_BASE_BATCH_SIZE = 16
@@ -42,8 +45,9 @@ class BatchAnalyze:
         self.ocr_det_base_batch_size = ocr_config.get("Det.rec_batch_num", 1) if ocr_config else 1 #16
         self.layout_base_batch_size = layout_config.get("batch_num", 1) if layout_config else 1 #8
         self.formula_base_batch_size = formula_config.get("batch_num", 1) if formula_config else 1 #16
+        self.scale = 200 / 72 # dpi=200
 
-    def __call__(self, images_with_extra_info: list) -> list:
+    def __call__(self, images_with_extra_info: list, pdf_docs: list) -> list:
         if len(images_with_extra_info) == 0:
             return []
 
@@ -87,6 +91,8 @@ class BatchAnalyze:
             _, ocr_enable, _lang = images_with_extra_info[index]
             layout_res = images_layout_res[index]
             pil_img = images[index]
+            pdf_doc = pdf_docs[index]
+            page_dict = get_page(pdf_doc)
 
             ocr_res_list, table_res_list, single_page_mfdetrec_res = (
                 get_res_list_from_layout_res(layout_res)
@@ -113,10 +119,14 @@ class BatchAnalyze:
                                           })
 
             for table_res in table_res_list:
-                table_img, _ = crop_img(table_res, pil_img)
+                table_img, useful_list = crop_img(table_res, pil_img)
                 table_res_list_all_page.append({'table_res':table_res,
                                                 'lang':_lang,
                                                 'table_img':table_img,
+                                                'useful_list': useful_list,
+                                                'ocr_enable': ocr_enable,
+                                                'pdf_doc': pdf_doc,
+                                                'page_idx': index,
                                               })
             for latex_res in single_page_mfdetrec_res:
                 latex_img, _ = crop_img(latex_res, pil_img)
@@ -296,31 +306,62 @@ class BatchAnalyze:
 
         # 表格识别 table recognition
         if self.table_enable:
-            for table_res_dict in tqdm(table_res_list_all_page, desc="Table Predict"):
-                _lang = table_res_dict['lang']
-                table_model = atom_model_manager.get_atom_model(
-                    atom_model_name='table',
-                    lang=_lang,
-                    ocr_config=self.ocr_config,
-                    table_config=self.table_config,
-                )
-                html_code, table_cell_bboxes, logic_points, elapse = table_model.predict(table_res_dict['table_img'])
-                # 判断是否返回正常
-                if html_code:
-                    # 检查html_code是否包含'<table>'和'</table>'
-                    if '<table>' in html_code and '</table>' in html_code:
-                        # 选用<table>到</table>的内容，放入table_res_dict['table_res']['html']
-                        start_index = html_code.find('<table>')
-                        end_index = html_code.rfind('</table>') + len('</table>')
-                        table_res_dict['table_res']['html'] = html_code[start_index:end_index]
-                    else:
-                        logger.warning(
-                            'table recognition processing fails, not found expected HTML table end'
+            # 分页分组
+            table_res_list_grouped_page = {}
+            for x in table_res_list_all_page:
+                table_res_list_grouped_page.setdefault(x["page_idx"], []).append(x)
+            # 计算总表格数
+            total_tables = sum(len(tables) for tables in table_res_list_grouped_page.values())
+            with tqdm(total=total_tables, desc="Table Predict") as pbar:
+                for page_idx, table_list in table_res_list_grouped_page.items():
+                    for table_res_dict in table_list:
+                        _lang = table_res_dict['lang']
+                        ocr_result = None
+                        if not table_res_dict['ocr_enable']:
+                            # RapidTable非OCR文本提取 OcrText
+                            pdf_doc = table_res_dict['pdf_doc']
+                            # 进行 OCR-det 识别文字框
+                            ocr_model = atom_model_manager.get_atom_model(
+                                atom_model_name='ocr',
+                                ocr_show_log=False,
+                                det_db_box_thresh=0.3,
+                                lang=_lang,
+                                ocr_config=self.ocr_config,
+                            )
+                            new_table_image = cv2.cvtColor(np.asarray(table_res_dict['table_img']), cv2.COLOR_RGB2BGR)
+                            ocr_res = ocr_model.ocr(new_table_image, rec=False)[0]
+                            if ocr_res:
+                                ocr_spans = get_ocr_result_list_table(ocr_res, table_res_dict['useful_list'], self.scale)
+                                poly = table_res_dict['table_res']['poly']
+                                table_bboxes = [[int(poly[0]/self.scale), int(poly[1]/self.scale), int(poly[4]/self.scale), int(poly[5]/self.scale)
+                                                    , None, None, None,'text', None, None, None, None, 1]]
+                                # 从pdf中提取表格的文本
+                                txt_spans_extract(pdf_doc, ocr_spans, table_res_dict['table_img'], self.scale, table_bboxes,[])
+                                ocr_result = [list(x) for x in zip(*[[item['ori_bbox'], item['content'], item['score']] for item in ocr_spans])]
+                        table_model = atom_model_manager.get_atom_model(
+                            atom_model_name='table',
+                            lang=_lang,
+                            ocr_config=self.ocr_config,
+                            table_config=self.table_config,
                         )
-                else:
-                    logger.warning(
-                        'table recognition processing fails, not get html return'
-                    )
+                        html_code, table_cell_bboxes, logic_points, elapse = table_model.predict(table_res_dict['table_img'], ocr_result=ocr_result)
+                        # 判断是否返回正常
+                        if html_code:
+                            # 检查html_code是否包含'<table>'和'</table>'
+                            if '<table>' in html_code and '</table>' in html_code:
+                                # 选用<table>到</table>的内容，放入table_res_dict['table_res']['html']
+                                start_index = html_code.find('<table>')
+                                end_index = html_code.rfind('</table>') + len('</table>')
+                                table_res_dict['table_res']['html'] = html_code[start_index:end_index]
+                            else:
+                                logger.warning(
+                                    'table recognition processing fails, not found expected HTML table end'
+                                )
+                        else:
+                            logger.warning(
+                                'table recognition processing fails, not get html return'
+                            )
+                        pbar.update(1)  # 每处理一个表格更新一次
 
         # Create dictionaries to store items by language
         need_ocr_lists_by_lang = {}  # Dict of lists for each language

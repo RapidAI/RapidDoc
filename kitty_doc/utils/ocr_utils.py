@@ -397,6 +397,49 @@ def get_ocr_result_list(ocr_res, useful_list, ocr_enable, new_image, lang):
 
     return ocr_result_list
 
+def get_ocr_result_list_table(ocr_res, useful_list, scale):
+    paste_x, paste_y, xmin, ymin, xmax, ymax, new_width, new_height = useful_list
+    ocr_result_list = []
+    for box_ocr_res in ocr_res:
+        p1, p2, p3, p4 = box_ocr_res
+
+        # average_angle_degrees = calculate_angle_degrees(box_ocr_res[0])
+        # if average_angle_degrees > 0.5:
+        poly = [p1, p2, p3, p4]
+
+        if (p3[0] - p1[0]) < OcrConfidence.min_width:
+            # logger.info(f"width too small: {p3[0] - p1[0]}, text: {text}")
+            continue
+
+        if calculate_is_angle(poly):
+            # logger.info(f"average_angle_degrees: {average_angle_degrees}, text: {text}")
+            # 与x轴的夹角超过0.5度，对边界做一下矫正
+            # 计算几何中心
+            x_center = sum(point[0] for point in poly) / 4
+            y_center = sum(point[1] for point in poly) / 4
+            new_height = ((p4[1] - p1[1]) + (p3[1] - p2[1])) / 2
+            new_width = p3[0] - p1[0]
+            p1 = [x_center - new_width / 2, y_center - new_height / 2]
+            p2 = [x_center + new_width / 2, y_center - new_height / 2]
+            p3 = [x_center + new_width / 2, y_center + new_height / 2]
+            p4 = [x_center - new_width / 2, y_center + new_height / 2]
+
+        # Convert the coordinates back to the original coordinate system
+        p1 = [p1[0] - paste_x + xmin, p1[1] - paste_y + ymin]
+        p2 = [p2[0] - paste_x + xmin, p2[1] - paste_y + ymin]
+        p3 = [p3[0] - paste_x + xmin, p3[1] - paste_y + ymin]
+        p4 = [p4[0] - paste_x + xmin, p4[1] - paste_y + ymin]
+
+        ocr_result_list.append({
+            'ori_bbox': box_ocr_res, # OCR-det 的原始坐标
+            'bbox': [int(p1[0] / scale), int(p1[1] / scale), int(p3[0] / scale), int(p3[1] / scale)],
+            'score': 1,
+            'content': '',
+            'type': 'text',
+        })
+
+    return ocr_result_list
+
 
 def calculate_is_angle(poly):
     p1, p2, p3, p4 = poly
