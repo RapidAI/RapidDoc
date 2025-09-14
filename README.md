@@ -98,9 +98,9 @@ pip install onnxruntime-gpu
 
 ## TODO
 
-- [ ] 复选框（checkbox）的检测与识别，包括勾选/未勾选状态
-- [ ] 跨页表格合并
-- [ ] RapidTable非OCR文本提取
+- [x] 复选框识别，包括勾选/未勾选
+- [x] 跨页表格合并
+- [x] 表格非OCR文本提取
 - [ ] 公式识别支持gpu
 - [ ] 版面、表格、公式支持openvino
 
