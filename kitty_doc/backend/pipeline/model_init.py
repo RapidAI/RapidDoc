@@ -12,11 +12,12 @@ from ...model.table.rapid_table import RapidTableModel
 def table_model_init(lang=None, ocr_config=None, table_config=None):
     atom_model_manager = AtomModelSingleton()
     ocr_engine = atom_model_manager.get_atom_model(
-        atom_model_name='ocr',
+        atom_model_name=AtomicModel.OCR,
         det_db_box_thresh=0.5,
         det_db_unclip_ratio=1.6,
         lang=lang,
-        ocr_config=ocr_config
+        ocr_config=ocr_config,
+        enable_merge_det_boxes=False
     )
     table_model = RapidTableModel(ocr_engine, table_config)
     return table_model
@@ -30,8 +31,14 @@ def layout_model_init(layout_config=None):
     model = RapidLayoutModel(layout_config)
     return model
 
-def ocr_model_init(det_db_box_thresh=0.3, lang=None, ocr_config=None, use_dilation=True, det_db_unclip_ratio=1.8,):
-    model = RapidOcrModel(det_db_box_thresh, lang, ocr_config, use_dilation, det_db_unclip_ratio)
+def ocr_model_init(det_db_box_thresh=0.3, lang=None, ocr_config=None, det_db_unclip_ratio=1.8, enable_merge_det_boxes=True):
+    model = RapidOcrModel(
+            det_db_box_thresh=det_db_box_thresh,
+            lang=lang,
+            ocr_config=ocr_config,
+            use_dilation=True,
+            det_db_unclip_ratio=det_db_unclip_ratio,
+            enable_merge_det_boxes=enable_merge_det_boxes,)
     return model
 
 
@@ -50,7 +57,13 @@ class AtomModelSingleton:
         table_model_name = kwargs.get('table_model_name', None)
 
         if atom_model_name in [AtomicModel.OCR]:
-            key = (atom_model_name, lang)
+            key = (
+                atom_model_name,
+                kwargs.get('det_db_box_thresh', 0.3),
+                lang,
+                kwargs.get('det_db_unclip_ratio', 1.8),
+                kwargs.get('enable_merge_det_boxes', True)
+            )
         elif atom_model_name in [AtomicModel.Table]:
             key = (atom_model_name, table_model_name, lang)
         else:
@@ -72,9 +85,11 @@ def atom_model_init(model_name: str, **kwargs):
         )
     elif model_name == AtomicModel.OCR:
         atom_model = ocr_model_init(
-            kwargs.get('det_db_box_thresh'),
+            kwargs.get('det_db_box_thresh', 0.3),
             kwargs.get('lang'),
             kwargs.get('ocr_config'),
+            kwargs.get('det_db_unclip_ratio', 1.8),
+            kwargs.get('enable_merge_det_boxes', True)
         )
     elif model_name == AtomicModel.Table:
         atom_model = table_model_init(

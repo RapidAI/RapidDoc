@@ -5,7 +5,7 @@ from loguru import logger
 from pypdf import PdfReader, PdfWriter, PageObject
 from reportlab.pdfgen import canvas
 
-from .enum_class import BlockType, ContentType
+from .enum_class import BlockType, ContentType, SplitFlag
 
 
 def cal_canvas_rect(page, bbox):
@@ -24,8 +24,12 @@ def cal_canvas_rect(page, bbox):
     actual_width = page_width    # The width of the final PDF display
     actual_height = page_height  # The height of the final PDF display
     
-    rotation = page.get("/Rotate", 0)
-    rotation = rotation % 360
+    rotation_obj = page.get("/Rotate", 0)
+    try:
+        rotation = int(rotation_obj) % 360  # cast rotation to int to handle IndirectObject
+    except (ValueError, TypeError) as e:
+        logger.warning(f"Invalid /Rotate value {rotation_obj!r} on page; defaulting to 0. Error: {e}")
+        rotation = 0
     
     if rotation in [90, 270]:
         # PDF is rotated 90 degrees or 270 degrees, and the width and height need to be swapped
@@ -35,19 +39,19 @@ def cal_canvas_rect(page, bbox):
     rect_w = abs(x1 - x0)
     rect_h = abs(y1 - y0)
     
-    if 270 == rotation:
+    if rotation == 270:
         rect_w, rect_h = rect_h, rect_w
         x0 = actual_height - y1
         y0 = actual_width - x1
-    elif 180 == rotation:
+    elif rotation == 180:
         x0 = page_width - x1
         y0 = y0
-    elif 90 == rotation:
+        # y0 stays the same
+    elif rotation == 90:
         rect_w, rect_h = rect_h, rect_w
         x0, y0 = y0, x0 
     else:
-        # 0 == rotation:
-        x0 = x0
+        # rotation == 0
         y0 = page_height - y1
     
     rect = [x0, y0, rect_w, rect_h]        
@@ -91,16 +95,20 @@ def draw_bbox_with_number(i, bbox_list, page, c, rgb_config, fill_config, draw_b
         c.setFontSize(size=10)
         
         c.saveState()
-        rotation = page.get("/Rotate", 0)
-        rotation = rotation % 360
-    
-        if 0 == rotation:
+        rotation_obj = page.get("/Rotate", 0)
+        try:
+            rotation = int(rotation_obj) % 360  # cast rotation to int to handle IndirectObject
+        except (ValueError, TypeError):
+            logger.warning(f"Invalid /Rotate value: {rotation_obj!r}, defaulting to 0")
+            rotation = 0
+
+        if rotation == 0:
             c.translate(rect[0] + rect[2] + 2, rect[1] + rect[3] - 10)
-        elif 90 == rotation:
+        elif rotation == 90:
             c.translate(rect[0] + 10, rect[1] + rect[3] + 2)
-        elif 180 == rotation:
+        elif rotation == 180:
             c.translate(rect[0] - 2, rect[1] + 10)
-        elif 270 == rotation:
+        elif rotation == 270:
             c.translate(rect[0] + rect[2] - 10, rect[1] - 2)
             
         c.rotate(rotation)
@@ -114,8 +122,7 @@ def draw_layout_bbox(pdf_info, pdf_bytes, out_path, filename):
     dropped_bbox_list = []
     tables_list, tables_body_list = [], []
     tables_caption_list, tables_footnote_list = [], []
-    imgs_list, imgs_body_list, imgs_caption_list = [], [], []
-    imgs_footnote_list = []
+    imgs_list, imgs_body_list, imgs_caption_list, imgs_footnote_list = [], [], [], []
     titles_list = []
     texts_list = []
     interequations_list = []
@@ -145,6 +152,8 @@ def draw_layout_bbox(pdf_info, pdf_bytes, out_path, filename):
                     elif nested_block["type"] == BlockType.TABLE_CAPTION:
                         tables_caption.append(bbox)
                     elif nested_block["type"] == BlockType.TABLE_FOOTNOTE:
+                        if nested_block.get(SplitFlag.CROSS_PAGE, False):
+                            continue
                         tables_footnote.append(bbox)
             elif block["type"] == BlockType.IMAGE:
                 imgs.append(bbox)
@@ -203,6 +212,8 @@ def draw_layout_bbox(pdf_info, pdf_bytes, out_path, filename):
             elif block["type"] in [BlockType.TABLE]:
                 sorted_blocks = sorted(block["blocks"], key=lambda x: table_type_order[x["type"]])
                 for sub_block in sorted_blocks:
+                    if sub_block.get(SplitFlag.CROSS_PAGE, False):
+                        continue
                     bbox = sub_block["bbox"]
                     page_block_list.append(bbox)
 
@@ -264,20 +275,12 @@ def draw_span_bbox(pdf_info, pdf_bytes, out_path, filename):
     image_list = []
     table_list = []
     dropped_list = []
-    next_page_text_list = []
-    next_page_inline_equation_list = []
 
     def get_span_info(span):
         if span['type'] == ContentType.TEXT:
-            if span.get('cross_page', False):
-                next_page_text_list.append(span['bbox'])
-            else:
-                page_text_list.append(span['bbox'])
+            page_text_list.append(span['bbox'])
         elif span['type'] == ContentType.INLINE_EQUATION:
-            if span.get('cross_page', False):
-                next_page_inline_equation_list.append(span['bbox'])
-            else:
-                page_inline_equation_list.append(span['bbox'])
+            page_inline_equation_list.append(span['bbox'])
         elif span['type'] == ContentType.INTERLINE_EQUATION:
             page_interline_equation_list.append(span['bbox'])
         elif span['type'] == ContentType.CHECKBOX: # 此处与不换行的行内公式保持一致
@@ -295,13 +298,6 @@ def draw_span_bbox(pdf_info, pdf_bytes, out_path, filename):
         page_table_list = []
         page_dropped_list = []
 
-        # 将跨页的span放到移动到下一页的列表中
-        if len(next_page_text_list) > 0:
-            page_text_list.extend(next_page_text_list)
-            next_page_text_list.clear()
-        if len(next_page_inline_equation_list) > 0:
-            page_inline_equation_list.extend(next_page_inline_equation_list)
-            next_page_inline_equation_list.clear()
 
         # 构造dropped_list
         for block in page['discarded_blocks']:

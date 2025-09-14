@@ -1,7 +1,7 @@
 import os
 import time
 from typing import List, Tuple
-import PIL.Image
+from PIL import Image
 from loguru import logger
 
 from .model_init import MineruPipelineModel
@@ -149,7 +149,7 @@ def doc_analyze(
             f'{processed_images_count} pages/{len(images_with_extra_info)} pages'
         )
         pdf_docs = all_pdf_docs[index]
-        # TODO 把 pdf_doc 传进去，尝试直接读取pdf表格文本和表格结构
+        # 把 pdf_doc 传进去，尝试直接读取pdf表格文本和表格结构
         batch_results = batch_image_analyze(batch_image, pdf_docs, formula_enable, table_enable, layout_config, ocr_config, formula_config, table_config)
         results.extend(batch_results)
 
@@ -172,7 +172,7 @@ def doc_analyze(
 
 
 def batch_image_analyze(
-        images_with_extra_info: List[Tuple[PIL.Image.Image, bool, str]],
+        images_with_extra_info: List[Tuple[Image.Image, bool, str]],
         pdf_docs=None,
         formula_enable=True,
         table_enable=True,
@@ -180,7 +180,6 @@ def batch_image_analyze(
         ocr_config=None,
         formula_config=None,
         table_config=None,):
-    # os.environ['CUDA_VISIBLE_DEVICES'] = str(idx)
 
     from .batch_analyze import BatchAnalyze
 

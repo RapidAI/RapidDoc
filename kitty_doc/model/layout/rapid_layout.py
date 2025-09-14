@@ -98,6 +98,12 @@ class RapidLayoutModel(object):
                     category_id = self.category_plus_mapping[cla]
                 else:
                     category_id = self.category_dict[cla]
+                # 如果是表格/图片，边界适当扩展（DocLayout模型识别的边框坐标，稍微有一点不全）
+                if category_id in [CategoryId.TableBody, CategoryId.ImageBody]:
+                    # xmin = xmin + 1
+                    # ymin = ymin + 1
+                    xmax = xmax + 3
+                    ymax = ymax + 5
                 temp_results.append({
                     "category_id": category_id,
                     "bbox": (xmin, ymin, xmax, ymax),

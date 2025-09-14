@@ -3,25 +3,40 @@ import cv2
 import copy
 import numpy as np
 from loguru import logger
-from rapidocr import RapidOCR, EngineType, VisRes
+from rapidocr import RapidOCR, EngineType, OCRVersion
 from rapidocr.ch_ppocr_rec import TextRecInput, TextRecOutput
+from rapidocr.ch_ppocr_det import TextDetector
+from rapidocr.ch_ppocr_det.utils import DetPreProcess
 from tqdm import tqdm
 
 from kitty_doc.utils.config_reader import get_device
 from kitty_doc.utils.ocr_utils import check_img, preprocess_image, sorted_boxes, merge_det_boxes, update_det_boxes, get_rotate_crop_image
 import warnings
 
+# 定义新的方法实现
+def new_get_preprocess(self, max_wh: int) -> DetPreProcess:
+    limit_side_len = self.limit_side_len
+    return DetPreProcess(limit_side_len, self.limit_type, self.mean, self.std)
+
+# 绑定到类上，覆盖原方法
+TextDetector.get_preprocess = new_get_preprocess
+
 class RapidOcrModel(object):
-    def __init__(self, det_db_box_thresh, lang, ocr_config, use_dilation=True, det_db_unclip_ratio=1.8):
+    def __init__(self, det_db_box_thresh, lang, ocr_config, use_dilation=True, det_db_unclip_ratio=1.8, enable_merge_det_boxes=True):
         self.drop_score = 0.5
+        self.enable_merge_det_boxes = enable_merge_det_boxes
         device = get_device()
         # 默认配置
         default_params = {
             "engine_type": EngineType.ONNXRUNTIME,
             "Det.engine_type": EngineType.ONNXRUNTIME,
             "Rec.engine_type": EngineType.ONNXRUNTIME,
+            "Det.ocr_version": OCRVersion.PPOCRV5,
+            "Rec.ocr_version": OCRVersion.PPOCRV5,
             "Det.limit_side_len": 960,
             "Det.limit_type": 'max',
+            "Det.std": [0.229, 0.224, 0.225],
+            "Det.mean": [0.485, 0.456, 0.406],
             "Det.box_thresh": det_db_box_thresh,
             "Det.use_dilation": use_dilation,
             "Det.unclip_ratio": det_db_unclip_ratio,
@@ -82,6 +97,7 @@ class RapidOcrModel(object):
             rec=True,
             mfd_res=None,
             tqdm_enable=False,
+            tqdm_desc="OCR-rec Predict",
             ):
         assert isinstance(img, (np.ndarray, list, str, bytes))
         if isinstance(img, list) and det == True:
@@ -116,7 +132,8 @@ class RapidOcrModel(object):
                     dt_boxes = np.array(dt_boxes) # 转为np
                     dt_boxes = sorted_boxes(dt_boxes)
                     # merge_det_boxes 和 update_det_boxes 都会把poly转成bbox再转回poly，因此需要过滤所有倾斜程度较大的文本框
-                    dt_boxes = merge_det_boxes(dt_boxes)
+                    if self.enable_merge_det_boxes:
+                        dt_boxes = merge_det_boxes(dt_boxes)
                     if mfd_res:
                         dt_boxes = update_det_boxes(dt_boxes, mfd_res)
                     tmp_res = [box.tolist() for box in dt_boxes]
@@ -130,7 +147,7 @@ class RapidOcrModel(object):
                         img = preprocess_image(img)
                         img = [img]
                     rec_input = TextRecInput(img=img, return_word_box=False)
-                    rec_result = self.text_recognizer_call(rec_input, tqdm_enable=tqdm_enable)
+                    rec_result = self.text_recognizer_call(rec_input, tqdm_enable=tqdm_enable, tqdm_desc=tqdm_desc)
                     rec_res = list(zip(rec_result.txts, rec_result.scores))
                     ocr_res.append(rec_res)
                 return ocr_res
@@ -157,7 +174,8 @@ class RapidOcrModel(object):
         dt_boxes = sorted_boxes(dt_boxes)
 
         # merge_det_boxes 和 update_det_boxes 都会把poly转成bbox再转回poly，因此需要过滤所有倾斜程度较大的文本框
-        dt_boxes = merge_det_boxes(dt_boxes)
+        if self.enable_merge_det_boxes:
+            dt_boxes = merge_det_boxes(dt_boxes)
 
         if mfd_res:
             dt_boxes = update_det_boxes(dt_boxes, mfd_res)
@@ -182,7 +200,7 @@ class RapidOcrModel(object):
         return filter_boxes, filter_rec_res
 
 
-    def text_recognizer_call(self, args: TextRecInput, tqdm_enable=False) -> TextRecOutput:
+    def text_recognizer_call(self, args: TextRecInput, tqdm_enable=False, tqdm_desc="OCR-rec Predict") -> TextRecOutput:
         """
         复制 TextRecognizer 类 __call__方法，增加进度条显示
         """
@@ -198,7 +216,7 @@ class RapidOcrModel(object):
         rec_res = [("", 0.0)] * img_num
 
         batch_num = self.text_recognizer.rec_batch_num
-        with tqdm(total=img_num, desc='OCR-rec Predict', disable=not tqdm_enable) as pbar:
+        with tqdm(total=img_num, desc=tqdm_desc, disable=not tqdm_enable) as pbar:
             index = 0
             elapse = 0
             for beg_img_no in range(0, img_num, batch_num):

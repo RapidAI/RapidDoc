@@ -10,7 +10,7 @@ from loguru import logger
 from kitty_doc.utils.boxbase import calculate_overlap_area_in_bbox1_area_ratio, calculate_iou, \
     get_minbox_if_overlap_by_ratio
 from kitty_doc.utils.enum_class import BlockType, ContentType
-from kitty_doc.utils.pdf_image_tools import get_crop_img
+from kitty_doc.utils.pdf_image_tools import get_crop_img, get_crop_np_img
 from kitty_doc.utils.pdf_text_tool import get_page
 
 
@@ -120,7 +120,7 @@ def __replace_unicode(text: str):
 
 
 """pdf_text dict方案 char级别"""
-def txt_spans_extract(pdf_page, spans, pil_img, scale, all_bboxes, all_discarded_blocks):
+def txt_spans_extract(pdf_page, spans, input_img, scale, all_bboxes, all_discarded_blocks):
 
     page_dict = get_page(pdf_page)
 
@@ -195,8 +195,11 @@ def txt_spans_extract(pdf_page, spans, pil_img, scale, all_bboxes, all_discarded
 
         for span in need_ocr_spans:
             # 对span的bbox截图再ocr
-            span_pil_img = get_crop_img(span['bbox'], pil_img, scale)
-            span_img = cv2.cvtColor(np.array(span_pil_img), cv2.COLOR_RGB2BGR)
+            span_pil_img = get_crop_np_img(span['bbox'], input_img, scale)
+            if span_pil_img is None or span_pil_img.size == 0:
+                spans.remove(span)
+                continue
+            span_img = cv2.cvtColor(span_pil_img, cv2.COLOR_RGB2BGR)
             # 计算span的对比度，低于0.20的span不进行ocr
             if calculate_contrast(span_img, img_mode='bgr') <= 0.17:
                 spans.remove(span)

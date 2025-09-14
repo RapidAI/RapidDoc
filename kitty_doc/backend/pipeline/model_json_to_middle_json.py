@@ -20,6 +20,7 @@ from kitty_doc.utils.ocr_utils import OcrConfidence
 from kitty_doc.utils.span_block_fix import fill_spans_in_blocks, fix_discarded_block, fix_block_spans
 from kitty_doc.utils.span_pre_proc import remove_outside_spans, remove_overlaps_low_confidence_spans, \
     remove_overlaps_min_spans, txt_spans_extract
+from kitty_doc.utils.table_merge import merge_table
 from kitty_doc.version import __version__
 from kitty_doc.utils.hash_utils import bytes_md5
 
@@ -212,7 +213,6 @@ def result_to_middle_json(model_list, images_list, pdf_doc, image_writer, lang=N
         atom_model_manager = AtomModelSingleton()
         ocr_model = atom_model_manager.get_atom_model(
             atom_model_name='ocr',
-            ocr_show_log=False,
             det_db_box_thresh=0.3,
             lang=lang,
             ocr_config=ocr_config,
@@ -233,6 +233,9 @@ def result_to_middle_json(model_list, images_list, pdf_doc, image_writer, lang=N
 
     """分段"""
     para_split(middle_json["pdf_info"])
+
+    """表格跨页合并"""
+    merge_table(middle_json["pdf_info"])
 
     """llm优化"""
     llm_aided_config = get_llm_aided_config()

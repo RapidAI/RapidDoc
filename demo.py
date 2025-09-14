@@ -17,7 +17,7 @@ from kitty_doc.backend.pipeline.pipeline_analyze import doc_analyze as pipeline_
 from kitty_doc.backend.pipeline.pipeline_middle_json_mkcontent import union_make as pipeline_union_make
 from kitty_doc.backend.pipeline.model_json_to_middle_json import result_to_middle_json as pipeline_result_to_middle_json
 
-from rapidocr import EngineType as OcrEngineType, OCRVersion
+from rapidocr import EngineType as OcrEngineType, OCRVersion, ModelType
 from kitty_doc.model.layout.rapid_layout_self import ModelType as LayoutModelType
 from kitty_doc.model.formula.rapid_formula_self import ModelType as FormulaModelType
 from kitty_doc.model.table.rapid_table_self import ModelType as TableModelType
@@ -60,11 +60,13 @@ def do_parse(
 
 
             # 新增自定义
-            # "engine_type": OcrEngineType.OPENVINO,
+            # "engine_type": OcrEngineType.TORCH,
             # "Det.rec_batch_num": 1,
 
-            "Det.ocr_version": OCRVersion.PPOCRV5,
-            "Rec.ocr_version": OCRVersion.PPOCRV5,
+            # "Det.ocr_version": OCRVersion.PPOCRV5,
+            # "Rec.ocr_version": OCRVersion.PPOCRV5,
+            # "Det.model_type": ModelType.SERVER,
+            # "Rec.model_type": ModelType.SERVER,
         }
 
         formula_config = {
@@ -218,14 +220,16 @@ if __name__ == '__main__':
     # args Table Predict: 100%|██████████| 9/9 [00:37<00:00,  4.14s/it]
     __dir__ = os.path.dirname(os.path.abspath(__file__))
     pdf_files_dir = os.path.join(__dir__, "pdfs")
-    output_dir = os.path.join(__dir__, "output_v5")
+    output_dir = os.path.join(__dir__, "output_v12")
     pdf_suffixes = [".pdf"]
     image_suffixes = [".png", ".jpeg", ".jpg"]
 
     doc_path_list = [
         r"D:\CodeProjects\doc\KittyDoc\github\KittyDoc\tests\checkout_test.png",
         "D:\\file\\text-pdf\\比亚迪财报.pdf",
-        "D:\\file\\text-pdf\\示例1-论文模板.pdf",
+        # "D:\\file\\text-pdf\\比亚迪财报 - 副本1.pdf",
+        # r'D:\file\text-pdf\img\文字文稿123.pdf',
+        # "D:\\file\\text-pdf\\示例1-论文模板.pdf",
         # r'D:\file\text-pdf\img\table_test.pdf'
         # "D:\\file\\text-pdf\\示例1-论文模板.pdf",
         # "D:\\file\\text-pdf\\示例7-研究报告.pdf",
