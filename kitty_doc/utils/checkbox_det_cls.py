@@ -128,21 +128,21 @@ def process_image(image_path, plt_show=False, debug_show=False):
         return None
 
 
-def checkout_predict(image: np.ndarray):
+def checkbox_predict(image: np.ndarray):
     # 复选框检测
     stats, labels, img_bin_final = detect_checkboxes(image)
-    checkout_results = classify_checkboxes(image, stats, img_bin_final)
+    checkbox_results = classify_checkboxes(image, stats, img_bin_final)
 
-    checkout_res = []
-    for checkbox in checkout_results:
+    checkbox_res = []
+    for checkbox in checkbox_results:
         x, y, w, h, label, text = checkbox
         bbox = [x, y, x + w, y + h]
-        checkout_res.append({
+        checkbox_res.append({
             "bbox": bbox,
             "label": label,
             "text": text
         })
-    return checkout_res
+    return checkbox_res
 
 if __name__ == "__main__":
     # image_path = '0a471d47-e428-4e5a-b849-a8aedfe399a0.png' #20 # 0.2702702702702703
@@ -150,7 +150,7 @@ if __name__ == "__main__":
 
     # image_path = 'ce605ac0-00d2-4e5e-8d22-ca646d847ffa.png' # 21  0.275
     # image_path = 'aaaa.png'
-    image_path = '../../tests/checkout_test.png'
+    image_path = '../../tests/checkbox_test.png'
 
     results = process_image(image_path, plt_show=True, debug_show=True)
     if results:

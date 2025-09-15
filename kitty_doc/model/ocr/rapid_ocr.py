@@ -3,7 +3,7 @@ import cv2
 import copy
 import numpy as np
 from loguru import logger
-from rapidocr import RapidOCR, EngineType, OCRVersion
+from rapidocr import RapidOCR, EngineType, OCRVersion, ModelType
 from rapidocr.ch_ppocr_rec import TextRecInput, TextRecOutput
 from rapidocr.ch_ppocr_det import TextDetector
 from rapidocr.ch_ppocr_det.utils import DetPreProcess
@@ -22,7 +22,7 @@ def new_get_preprocess(self, max_wh: int) -> DetPreProcess:
 TextDetector.get_preprocess = new_get_preprocess
 
 class RapidOcrModel(object):
-    def __init__(self, det_db_box_thresh, lang, ocr_config, use_dilation=True, det_db_unclip_ratio=1.8, enable_merge_det_boxes=True):
+    def __init__(self, det_db_box_thresh=0.3, lang=None, ocr_config=None, use_dilation=True, det_db_unclip_ratio=1.8, enable_merge_det_boxes=True):
         self.drop_score = 0.5
         self.enable_merge_det_boxes = enable_merge_det_boxes
         device = get_device()
@@ -33,6 +33,8 @@ class RapidOcrModel(object):
             "Rec.engine_type": EngineType.ONNXRUNTIME,
             "Det.ocr_version": OCRVersion.PPOCRV5,
             "Rec.ocr_version": OCRVersion.PPOCRV5,
+            # "Det.model_type": ModelType.SERVER,
+            # "Rec.model_type": ModelType.SERVER,
             "Det.limit_side_len": 960,
             "Det.limit_type": 'max',
             "Det.std": [0.229, 0.224, 0.225],

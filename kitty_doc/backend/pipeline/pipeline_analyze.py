@@ -3,6 +3,7 @@ import time
 from typing import List, Tuple
 from PIL import Image
 from loguru import logger
+import pypdfium2 as pdfium
 
 from .model_init import MineruPipelineModel
 from kitty_doc.utils.config_reader import get_device
@@ -95,6 +96,7 @@ def doc_analyze(
         ocr_config=None,
         formula_config=None,
         table_config=None,
+        checkbox_config=None,
 ):
     """
     适当调大MIN_BATCH_INFERENCE_SIZE可以提高性能，更大的 MIN_BATCH_INFERENCE_SIZE会消耗更多内存，
@@ -132,7 +134,8 @@ def doc_analyze(
             ))
 
     # 准备批处理
-    images_with_extra_info = [(info[2], info[3], info[4]) for info in all_pages_info]
+    # 把 pdf_doc 传进去，尝试直接读取pdf表格文本和表格结构
+    images_with_extra_info = [(info[2], info[3], info[4], all_pdf_docs[info[0]][info[1]]) for info in all_pages_info]
     batch_size = min_batch_inference_size
     batch_images = [
         images_with_extra_info[i:i + batch_size]
@@ -148,9 +151,7 @@ def doc_analyze(
             f'Batch {index + 1}/{len(batch_images)}: '
             f'{processed_images_count} pages/{len(images_with_extra_info)} pages'
         )
-        pdf_docs = all_pdf_docs[index]
-        # 把 pdf_doc 传进去，尝试直接读取pdf表格文本和表格结构
-        batch_results = batch_image_analyze(batch_image, pdf_docs, formula_enable, table_enable, layout_config, ocr_config, formula_config, table_config)
+        batch_results = batch_image_analyze(batch_image, formula_enable, table_enable, layout_config, ocr_config, formula_config, table_config, checkbox_config)
         results.extend(batch_results)
 
     # 构建返回结果
@@ -172,14 +173,14 @@ def doc_analyze(
 
 
 def batch_image_analyze(
-        images_with_extra_info: List[Tuple[Image.Image, bool, str]],
-        pdf_docs=None,
+        images_with_extra_info: List[Tuple[Image.Image, bool, str, pdfium.PdfPage]],
         formula_enable=True,
         table_enable=True,
         layout_config=None,
         ocr_config=None,
         formula_config=None,
-        table_config=None,):
+        table_config=None,
+        checkbox_config=None,):
 
     from .batch_analyze import BatchAnalyze
 
@@ -227,8 +228,8 @@ def batch_image_analyze(
     # else:
     #     enable_ocr_det_batch = True
     enable_ocr_det_batch = True
-    batch_model = BatchAnalyze(model_manager, batch_ratio, formula_enable, table_enable, enable_ocr_det_batch, layout_config, ocr_config, formula_config, table_config)
-    results = batch_model(images_with_extra_info, pdf_docs)
+    batch_model = BatchAnalyze(model_manager, batch_ratio, formula_enable, table_enable, enable_ocr_det_batch, layout_config, ocr_config, formula_config, table_config, checkbox_config)
+    results = batch_model(images_with_extra_info)
 
     clean_memory(get_device())
 

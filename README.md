@@ -103,6 +103,7 @@ pip install onnxruntime-gpu
 - [x] 表格非OCR文本提取
 - [ ] 公式识别支持gpu
 - [ ] 版面、表格、公式支持openvino
+- [ ] KittyDoc4j（Java版本）
 
 
 ## 🙏 致谢

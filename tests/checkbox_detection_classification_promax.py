@@ -131,7 +131,7 @@ if __name__ == "__main__":
 
     # image_path = 'ce605ac0-00d2-4e5e-8d22-ca646d847ffa.png' # 21  0.275
     # image_path = 'aaaa.png'
-    image_path = 'checkout_test.png'
+    image_path = 'checkbox_test.png'
 
     results = process_image(image_path, plt_show=True, debug_show=True)
     if results:

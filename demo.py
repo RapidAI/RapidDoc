@@ -98,6 +98,10 @@ def do_parse(
             # "wireless_table.model_dir_or_path": "", # 无线表结构模型地址，配置SLANEXT时使用,
         }
 
+        checkbox_config = {
+            "checkbox_enable": True, # 是否识别复选框，默认不识别，基于opencv，有可能会误检
+        }
+
 
         for idx, pdf_bytes in enumerate(pdf_bytes_list):
             new_pdf_bytes = convert_pdf_bytes_to_bytes_by_pypdfium2(pdf_bytes, start_page_id, end_page_id)
@@ -105,7 +109,7 @@ def do_parse(
         # 记录开始时间
         start_time = time.time()
         infer_results, all_image_lists, all_pdf_docs, lang_list, ocr_enabled_list = pipeline_doc_analyze(pdf_bytes_list, p_lang_list, parse_method=parse_method, formula_enable=p_formula_enable,table_enable=p_table_enable,
-                                                                                                         layout_config=layout_config, ocr_config=ocr_config, formula_config=formula_config, table_config=table_config)
+                                                                                                         layout_config=layout_config, ocr_config=ocr_config, formula_config=formula_config, table_config=table_config, checkbox_config=checkbox_config)
 
         for idx, model_list in enumerate(infer_results):
 
@@ -220,12 +224,12 @@ if __name__ == '__main__':
     # args Table Predict: 100%|██████████| 9/9 [00:37<00:00,  4.14s/it]
     __dir__ = os.path.dirname(os.path.abspath(__file__))
     pdf_files_dir = os.path.join(__dir__, "pdfs")
-    output_dir = os.path.join(__dir__, "output_v12")
+    output_dir = os.path.join(__dir__, "output")
     pdf_suffixes = [".pdf"]
     image_suffixes = [".png", ".jpeg", ".jpg"]
 
     doc_path_list = [
-        r"D:\CodeProjects\doc\KittyDoc\github\KittyDoc\tests\checkout_test.png",
+        # r"D:\CodeProjects\doc\KittyDoc\github\KittyDoc\tests\checkbox_test.png",
         "D:\\file\\text-pdf\\比亚迪财报.pdf",
         # "D:\\file\\text-pdf\\比亚迪财报 - 副本1.pdf",
         # r'D:\file\text-pdf\img\文字文稿123.pdf',
