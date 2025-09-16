@@ -31,7 +31,8 @@ if __name__ == '__main__':
         author_email='',  # 作者邮箱
         packages=find_packages() + ["kitty_doc.resources"],  # 包含所有的包
         package_data={
-            "kitty_doc.resources": ["**"],  # 包含magic_pdf.resources目录下的所有文件
+            "kitty_doc.resources": ["**"],  # 包含 kitty_doc/resources 目录下的所有文件
+            "": ["*.yaml"],  # 包含所有包里的 .yaml 文件
         },
         install_requires=parse_requirements('requirements.txt'),  # 项目依赖的第三方库
         # extras_require={

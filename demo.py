@@ -102,7 +102,7 @@ def do_parse(
         }
 
         checkbox_config = {
-            "checkbox_enable": True, # 是否识别复选框，默认不识别，基于opencv，有可能会误检
+            # "checkbox_enable": False, # 是否识别复选框，默认不识别，基于opencv，有可能会误检
         }
 
 

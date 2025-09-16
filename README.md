@@ -50,9 +50,9 @@ KittyDoc 是一个轻量级、专注于文档解析的开源框架，支持 **OC
 
 ## 🛠️ 安装KittyDoc
 
-#### 使用pip安装KittyDoc （暂未发布）
+#### 使用pip安装KittyDoc
 ```bash
-pip install kitty_doc -i https://mirrors.aliyun.com/pypi/simple
+pip install kitty-doc -i https://mirrors.aliyun.com/pypi/simple
 ```
 
 #### 通过源码安装KittyDoc
@@ -101,9 +101,10 @@ os.environ['MINERU_DEVICE_MODE'] = "cuda:1"
 
 ## 📌 TODO
 
-- [x] 复选框识别，包括勾选/未勾选（默认关闭、存在误检）
 - [x] 表格非OCR文本提取
 - [x] 跨页表格合并
+- [x] 复选框识别，使用opencv（默认关闭、opencv识别存在误检）
+- [ ] 复选框识别，使用模型
 - [ ] 四方向分类旋转表格解析 rapid_orientation
 - [ ] 表格内公式提取
 - [ ] 表格内图片提取

@@ -97,7 +97,7 @@ def do_parse(
             # "wireless_table.model_dir_or_path": "", # 无线表结构模型地址，配置SLANEXT时使用,
         }
         checkbox_config = {
-            "checkbox_enable": True, # 是否识别复选框，默认不识别，基于opencv，有可能会误检
+            # "checkbox_enable": False, # 是否识别复选框，默认不识别，基于opencv，有可能会误检
         }
         for idx, pdf_bytes in enumerate(pdf_bytes_list):
             new_pdf_bytes = convert_pdf_bytes_to_bytes_by_pypdfium2(pdf_bytes, start_page_id, end_page_id)
