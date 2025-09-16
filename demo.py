@@ -233,7 +233,7 @@ if __name__ == '__main__':
 
     doc_path_list = [
         # r"D:\CodeProjects\doc\KittyDoc\github\KittyDoc\tests\checkbox_test.png",
-        # "D:\\file\\text-pdf\\示例1-论文模板.pdf",
+        "D:\\file\\text-pdf\\示例1-论文模板.pdf",
         # "D:\\file\\text-pdf\\比亚迪财报.pdf",
         # "D:\\file\\text-pdf\\GBT3620.1-2016.pdf",
         # r'C:\ocr\img\table\3766ae2b506b8f345fcc9eee39b31ac8.png'
