@@ -4,8 +4,11 @@ import json
 import os
 import time
 from pathlib import Path
-os.environ['MINERU_MODEL_SOURCE'] = 'local'
-os.environ['MINERU_TOOLS_CONFIG_JSON'] = os.path.abspath('magic.json') # 配置文件绝对路径
+
+# # 使用默认 GPU（cuda:0）
+# os.environ['MINERU_DEVICE_MODE'] = "cuda"
+# # 或指定 GPU 编号，例如使用第二块 GPU（cuda:1）
+# os.environ['MINERU_DEVICE_MODE'] = "cuda:1"
 
 from loguru import logger
 
@@ -46,7 +49,7 @@ def do_parse(
 
     if backend == "pipeline":
         layout_config = {
-            # "model_type": LayoutModelType.PP_DOCLAYOUT_PLUS_L,
+            "model_type": LayoutModelType.PP_DOCLAYOUT_PLUS_L,
             # "conf_thresh": 0.4,
             # "batch_num": 1,
             # "model_dir_or_path": "C:\ocr\models\ppmodel\layout\PP-DocLayout-L\pp_doclayout_l.onnx",
@@ -54,19 +57,18 @@ def do_parse(
         }
 
         ocr_config = {
-            # "Det.model_path": r"C:\ocr\models\ppmodel\ocr\v4\ch_PP-OCRv4_det_infer\openvino\ch_PP-OCRv4_det_infer.xml",
-            # "Rec.model_path": r"C:\ocr\models\ppmodel\ocr\v4\ch_PP-OCRv4_rec_infer\openvino\ch_PP-OCRv4_rec_infer.xml",
+            # "Det.model_path": r"C:\ocr\models\ppmodel\ocr\v4\ch_PP-OCRv4_det_infer\openvino\ch_PP-OCRv4_det_infer.onnx",
+            # "Rec.model_path": r"C:\ocr\models\ppmodel\ocr\v4\ch_PP-OCRv4_rec_infer\openvino\ch_PP-OCRv4_rec_infer.onnx",
             # "Rec.rec_batch_num": 1,
-
-
-            # 新增自定义
-            # "engine_type": OcrEngineType.TORCH,
-            # "Det.rec_batch_num": 1,
 
             # "Det.ocr_version": OCRVersion.PPOCRV5,
             # "Rec.ocr_version": OCRVersion.PPOCRV5,
             # "Det.model_type": ModelType.SERVER,
             # "Rec.model_type": ModelType.SERVER,
+
+            # 新增的自定义参数
+            # "engine_type": OcrEngineType.TORCH, # 统一设置推理引擎
+            # "Det.rec_batch_num": 1, # Det批处理大小
         }
 
         formula_config = {
@@ -230,8 +232,9 @@ if __name__ == '__main__':
 
     doc_path_list = [
         # r"D:\CodeProjects\doc\KittyDoc\github\KittyDoc\tests\checkbox_test.png",
-        "D:\\file\\text-pdf\\比亚迪财报.pdf",
-        # "D:\\file\\text-pdf\\比亚迪财报 - 副本1.pdf",
+        # "D:\\file\\text-pdf\\比亚迪财报.pdf",
+        "D:\\file\\text-pdf\\GBT3620.1-2016.pdf",
+        # r'C:\ocr\img\table\3766ae2b506b8f345fcc9eee39b31ac8.png'
         # r'D:\file\text-pdf\img\文字文稿123.pdf',
         # "D:\\file\\text-pdf\\示例1-论文模板.pdf",
         # r'D:\file\text-pdf\img\table_test.pdf'

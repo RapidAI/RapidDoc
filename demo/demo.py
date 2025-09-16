@@ -3,7 +3,10 @@ import copy
 import json
 import os
 from pathlib import Path
-
+# # 使用默认 GPU（cuda:0）
+# os.environ['MINERU_DEVICE_MODE'] = "cuda"
+# # 或指定 GPU 编号，例如使用第二块 GPU（cuda:1）
+# os.environ['MINERU_DEVICE_MODE'] = "cuda:1"
 from loguru import logger
 
 from kitty_doc.cli.common import convert_pdf_bytes_to_bytes_by_pypdfium2, prepare_env, read_fn
@@ -50,14 +53,18 @@ def do_parse(
         }
 
         ocr_config = {
-            # "Det.model_path": r"C:\ocr\models\ppmodel\ocr\v4\ch_PP-OCRv4_det_infer\openvino\ch_PP-OCRv4_det_infer.xml",
-            # "Rec.model_path": r"C:\ocr\models\ppmodel\ocr\v4\ch_PP-OCRv4_rec_infer\openvino\ch_PP-OCRv4_rec_infer.xml",
+            # "Det.model_path": r"C:\ocr\models\ppmodel\ocr\v4\ch_PP-OCRv4_det_infer\openvino\ch_PP-OCRv4_det_infer.onnx",
+            # "Rec.model_path": r"C:\ocr\models\ppmodel\ocr\v4\ch_PP-OCRv4_rec_infer\openvino\ch_PP-OCRv4_rec_infer.onnx",
             # "Rec.rec_batch_num": 1,
 
+            # "Det.ocr_version": OCRVersion.PPOCRV5,
+            # "Rec.ocr_version": OCRVersion.PPOCRV5,
+            # "Det.model_type": ModelType.SERVER,
+            # "Rec.model_type": ModelType.SERVER,
 
-            # 新增自定义
-            # "engine_type": OcrEngineType.OPENVINO,
-            # "Det.rec_batch_num": 1,
+            # 新增的自定义参数
+            # "engine_type": OcrEngineType.TORCH, # 统一设置推理引擎
+            # "Det.rec_batch_num": 1, # Det批处理大小
         }
 
         formula_config = {

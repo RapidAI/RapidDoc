@@ -6,7 +6,6 @@ from typing import List, Optional, Union
 import numpy as np
 
 from .logger import Logger
-from .utils import save_img
 
 logger = Logger(logger_name=__name__).get_log()
 

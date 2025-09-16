@@ -3,7 +3,6 @@ from kitty_doc.model.layout.rapid_layout_self import ModelType, RapidLayout, Rap
 from kitty_doc.utils.config_reader import get_device
 from kitty_doc.utils.enum_class import CategoryId
 
-
 class RapidLayoutModel(object):
     def __init__(self, layout_config=None):
         cfg = RapidLayoutInput(model_type=ModelType.PP_DOCLAYOUT_L, conf_thresh=0.4)
@@ -194,5 +193,6 @@ if __name__ == '__main__':
     model = RapidLayout(cfg=cfg)
 
 
-    all_results = model(img_contents=[r'C:\ocr\img\88b41949e122304fe0b98f45c08aaf14.jpg'])
+    all_results = model(img_contents=[r'C:\ocr\img\table\3766ae2b506b8f345fcc9eee39b31ac8.png'])
     print(all_results)
+    all_results[0].vis(r"C:\ocr\aaaaa_vis.png")
