@@ -81,6 +81,7 @@ def do_parse(
         # os.environ['MINERU_MODEL_SOURCE'] = 'local'
 
         table_config = {
+            # "force_ocr": False, # 表格文字，是否强制使用ocr，默认 False 根据 parse_method 来判断是否需要ocr还是从pdf中直接提取文本
             # "model_type": TableModelType.UNET_SLANET_PLUS,  # （默认） 有线表格使用unet，无线表格使用slanet_plus
             # "model_type": TableModelType.UNET_UNITABLE, # 有线表格使用unet，无线表格使用unitable
             # "model_type": TableModelType.SLANEXT,  # 有线表格使用slanext_wired，无线表格使用slanext_wireless
@@ -232,11 +233,11 @@ if __name__ == '__main__':
 
     doc_path_list = [
         # r"D:\CodeProjects\doc\KittyDoc\github\KittyDoc\tests\checkbox_test.png",
+        # "D:\\file\\text-pdf\\示例1-论文模板.pdf",
         # "D:\\file\\text-pdf\\比亚迪财报.pdf",
-        "D:\\file\\text-pdf\\GBT3620.1-2016.pdf",
+        # "D:\\file\\text-pdf\\GBT3620.1-2016.pdf",
         # r'C:\ocr\img\table\3766ae2b506b8f345fcc9eee39b31ac8.png'
         # r'D:\file\text-pdf\img\文字文稿123.pdf',
-        # "D:\\file\\text-pdf\\示例1-论文模板.pdf",
         # r'D:\file\text-pdf\img\table_test.pdf'
         # "D:\\file\\text-pdf\\示例1-论文模板.pdf",
         # "D:\\file\\text-pdf\\示例7-研究报告.pdf",

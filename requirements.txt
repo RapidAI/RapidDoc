@@ -20,9 +20,6 @@ onnxruntime>=1.18.1
 openvino>=2024.6.0
 ftfy>=6.3.1,<7
 matplotlib>=3.10,<4
-json_repair
-#scikit-learn
-#img2table
-# wired_table_rec相关包
-scipy
-Shapely
+shapely>=2.0.7,<3
+scikit-image>=0.25.0,<1.0.0
+beautifulsoup4>=4.13.5,<5

@@ -108,6 +108,7 @@ formula_config = {
 
 |               参数名                |           说明           |         默认值          | 备注 |
 |:--------------------------------:|:----------------------:|:--------------------:|:--:|
+|            force_ocr            |           表格文字是否强制使用ocr           | False | 根据 parse_method 来判断是否需要ocr还是从pdf中直接提取文本 |
 |            model_type            |           模型           | UNET_SLANET_PLUS | 有线表格使用unet，无线表格使用slanet_plus |
 |        model_dir_or_path         |          模型地址          |          None           | 单个模型使用。如SLANET_PLUS、UNITABLE |
 |      cls.model_dir_or_path       |        表格分类模型地址        |         None           |  |
@@ -123,6 +124,7 @@ formula_config = {
 from kitty_doc.model.table.rapid_table_self import ModelType as TableModelType
 
 table_config = {
+    "force_ocr": False, # 表格文字，是否强制使用ocr，默认 False 根据 parse_method 来判断是否需要ocr还是从pdf中直接提取文本
     "model_type": TableModelType.UNET_SLANET_PLUS,  # （默认） 有线表格使用unet，无线表格使用slanet_plus
     #"model_type": TableModelType.UNET_UNITABLE, # 有线表格使用unet，无线表格使用unitable
     #"model_type": TableModelType.SLANEXT,  # 有线表格使用slanext_wired，无线表格使用slanext_wireless

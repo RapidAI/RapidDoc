@@ -37,6 +37,7 @@ class BatchAnalyze:
         self.formula_enable = get_formula_enable(formula_enable)
         self.formula_level = formula_config.get("formula_level", 0) if formula_config else 0
         self.table_enable = get_table_enable(table_enable)
+        self.table_force_ocr = table_config.get("force_ocr", False) if table_config else False
         self.checkbox_enable = checkbox_config.get("checkbox_enable", False) if checkbox_config else False
         self.layout_config = layout_config
         self.ocr_config = ocr_config
@@ -325,7 +326,7 @@ class BatchAnalyze:
                     for table_res_dict in table_list:
                         _lang = table_res_dict['lang']
                         ocr_result = None
-                        if not table_res_dict['ocr_enable']:
+                        if not self.table_force_ocr and not table_res_dict['ocr_enable']:
                             # RapidTable非OCR文本提取 OcrText
                             pdf_doc = table_res_dict['pdf_doc']
                             # 进行 OCR-det 识别文字框

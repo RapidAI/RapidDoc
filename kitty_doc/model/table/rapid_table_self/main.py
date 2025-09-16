@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import numpy as np
 from .wired_table_rec.main import WiredTableInput, WiredTableRecognition
 
-from .table_matcher.table_match_pipeline import TableMatchPipeline
+# from .table_matcher.table_match_pipeline import TableMatchPipeline
 from .model_processor.main import ModelProcessor
 from .table_matcher import TableMatch
 from .utils import (
@@ -43,7 +43,7 @@ class RapidTable:
             self.ocr_engine = self._init_ocr_engine(self.cfg.ocr_params)
 
         self.table_matcher = TableMatch()
-        self.table_matcher_pipeline = TableMatchPipeline()
+        # self.table_matcher_pipeline = TableMatchPipeline()
         self.load_img = LoadImage()
 
     def _init_ocr_engine(self, params: Dict[Any, Any]):
