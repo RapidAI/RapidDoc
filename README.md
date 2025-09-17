@@ -48,18 +48,18 @@ RapidDoc 是一个轻量级、专注于文档解析的开源框架，支持 **OC
   - 除了 OCR 和 PP-DocLayout-M/S 模型，OpenVINO推理会报错，暂时难以解决。[PaddleOCR/issues/16277](https://github.com/PaddlePaddle/PaddleOCR/issues/16277)
 ---
 
-## 🛠️ 安装KittyDoc
+## 🛠️ 安装RapidDoc
 
-#### 使用pip安装KittyDoc
+#### 使用pip安装
 ```bash
 pip install kitty-doc -i https://mirrors.aliyun.com/pypi/simple
 ```
 
-#### 通过源码安装KittyDoc
+#### 通过源码安装
 ```bash
 # 克隆仓库
-git clone https://github.com/hzkitty/KittyDoc.git
-cd KittyDoc
+git clone https://github.com/hzkitty/RapidDoc.git
+cd RapidDoc
 
 # 安装依赖
 pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple
@@ -93,7 +93,7 @@ os.environ['MINERU_DEVICE_MODE'] = "cuda:1"
 
 ## 模型下载
 不指定模型路径，初次运行时，会自动下载
-- [KittyDoc 模型集（版面/公式/表格）](https://www.modelscope.cn/models/hzkitty/KittyDoc)  
+- [RapidDoc 模型集（版面/公式/表格）](https://www.modelscope.cn/models/hzkitty/KittyDoc)  
 - [RapidOCR 模型](https://www.modelscope.cn/models/RapidAI/RapidOCR)  
 - [部分表格模型RapidTable](https://www.modelscope.cn/models/RapidAI/RapidTable) 
 
@@ -110,7 +110,7 @@ os.environ['MINERU_DEVICE_MODE'] = "cuda:1"
 - [ ] 表格内图片提取
 - [ ] 公式识别支持gpu
 - [ ] 版面、表格、公式支持openvino
-- [ ] KittyDoc4j（Java版本）
+- [ ] RapidDoc4j（Java版本）
 
 
 ## 🙏 致谢
