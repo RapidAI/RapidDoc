@@ -1,10 +1,10 @@
-# KittyDoc – 高速文档解析产线
+# RapidDoc – 高速文档解析产线
 
 **基于 [Mineru](https://github.com/opendatalab/MinerU) 二次开发，移除 VLM，专注于 Pipeline 产线下的高效文档解析，在 CPU 上也能保持不错的解析速度。**
 
 ## 😺 项目介绍
 
-KittyDoc 是一个轻量级、专注于文档解析的开源框架，支持 **OCR、版面分析、公式识别、表格识别和阅读顺序恢复** 等多种功能。  
+RapidDoc 是一个轻量级、专注于文档解析的开源框架，支持 **OCR、版面分析、公式识别、表格识别和阅读顺序恢复** 等多种功能。  
 与原框架相比，本项目使用 **[PP-StructureV3](https://www.paddleocr.ai/main/version3.x/pipeline_usage/PP-StructureV3.html) 系列模型**，并完全 **去除对 Paddle 的依赖**，所有模型均已转换为 ONNX，可直接通过 **ONNX Runtime** 或 **OpenVINO**（部分模型）进行高效推理。
 
 ---
