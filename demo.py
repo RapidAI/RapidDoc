@@ -12,18 +12,18 @@ from pathlib import Path
 
 from loguru import logger
 
-from kitty_doc.cli.common import convert_pdf_bytes_to_bytes_by_pypdfium2, prepare_env, read_fn
-from kitty_doc.data.data_reader_writer import FileBasedDataWriter
-from kitty_doc.utils.draw_bbox import draw_layout_bbox, draw_span_bbox
-from kitty_doc.utils.enum_class import MakeMode
-from kitty_doc.backend.pipeline.pipeline_analyze import doc_analyze as pipeline_doc_analyze
-from kitty_doc.backend.pipeline.pipeline_middle_json_mkcontent import union_make as pipeline_union_make
-from kitty_doc.backend.pipeline.model_json_to_middle_json import result_to_middle_json as pipeline_result_to_middle_json
+from rapid_doc.cli.common import convert_pdf_bytes_to_bytes_by_pypdfium2, prepare_env, read_fn
+from rapid_doc.data.data_reader_writer import FileBasedDataWriter
+from rapid_doc.utils.draw_bbox import draw_layout_bbox, draw_span_bbox
+from rapid_doc.utils.enum_class import MakeMode
+from rapid_doc.backend.pipeline.pipeline_analyze import doc_analyze as pipeline_doc_analyze
+from rapid_doc.backend.pipeline.pipeline_middle_json_mkcontent import union_make as pipeline_union_make
+from rapid_doc.backend.pipeline.model_json_to_middle_json import result_to_middle_json as pipeline_result_to_middle_json
 
 from rapidocr import EngineType as OcrEngineType, OCRVersion, ModelType
-from kitty_doc.model.layout.rapid_layout_self import ModelType as LayoutModelType
-from kitty_doc.model.formula.rapid_formula_self import ModelType as FormulaModelType
-from kitty_doc.model.table.rapid_table_self import ModelType as TableModelType
+from rapid_doc.model.layout.rapid_layout_self import ModelType as LayoutModelType
+from rapid_doc.model.formula.rapid_formula_self import ModelType as FormulaModelType
+from rapid_doc.model.table.rapid_table_self import ModelType as TableModelType
 
 
 def do_parse(
@@ -232,7 +232,6 @@ if __name__ == '__main__':
     image_suffixes = [".png", ".jpeg", ".jpg"]
 
     doc_path_list = [
-        # r"D:\CodeProjects\doc\KittyDoc\github\KittyDoc\tests\checkbox_test.png",
         "D:\\file\\text-pdf\\示例1-论文模板.pdf",
         # "D:\\file\\text-pdf\\比亚迪财报.pdf",
         # "D:\\file\\text-pdf\\GBT3620.1-2016.pdf",

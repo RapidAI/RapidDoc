@@ -1,6 +1,6 @@
 import cv2
 
-from kitty_doc.model.ocr.rapid_ocr import RapidOcrModel
+from rapid_doc.model.ocr.rapid_ocr import RapidOcrModel
 import time
 
 

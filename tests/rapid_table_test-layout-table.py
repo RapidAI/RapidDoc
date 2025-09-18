@@ -2,15 +2,15 @@ import time
 import cv2
 import numpy as np
 
-from kitty_doc.cli.common import read_fn
-from kitty_doc.model.table.rapid_table_self.table_cls import TableCls
-from kitty_doc.model.layout.rapid_layout_self import RapidLayoutInput, RapidLayout, ModelType as LayoutModelType
-from kitty_doc.model.table.rapid_table_self import ModelType, RapidTable, RapidTableInput
-from kitty_doc.model.layout.rapid_layout_self import ModelType as LayoutModelType, RapidLayout, RapidLayoutInput
+from rapid_doc.cli.common import read_fn
+from rapid_doc.model.table.rapid_table_self.table_cls import TableCls
+from rapid_doc.model.layout.rapid_layout_self import RapidLayoutInput, RapidLayout, ModelType as LayoutModelType
+from rapid_doc.model.table.rapid_table_self import ModelType, RapidTable, RapidTableInput
+from rapid_doc.model.layout.rapid_layout_self import ModelType as LayoutModelType, RapidLayout, RapidLayoutInput
 from rapid_table import RapidTable
 from rapidocr import RapidOCR
 
-from kitty_doc.utils.pdf_image_tools import load_images_from_pdf
+from rapid_doc.utils.pdf_image_tools import load_images_from_pdf
 
 
 def crop_by_box(img, box, mode="xyxy"):
@@ -73,7 +73,6 @@ ocr_engine = RapidOCR()
 
 table_cls = TableCls()
 # img_path = "https://raw.githubusercontent.com/RapidAI/RapidTable/refs/heads/main/tests/test_files/table.jpg"
-# img_path = r'D:\CodeProjects\doc\KittyDoc\github\KittyDoc\output_plus_l\88b41949e122304fe0b98f45c08aaf14\auto\images\122bbdac0e543c5afc6ab7b04396897ceb4cf42113c0ce05b209d25d7a85f316.jpg'
 # img_path = r'C:\ocr\img\309d3419-570c-4398-b975-7d5c4231a601.png'
 
 

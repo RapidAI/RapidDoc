@@ -1,6 +1,6 @@
 from pathlib import Path
 from setuptools import setup, find_packages
-from kitty_doc.version import __version__
+from rapid_doc.version import __version__
 
 
 def parse_requirements(filename):
@@ -24,14 +24,14 @@ if __name__ == '__main__':
               'README.md').open(encoding='utf-8') as file:
         long_description = file.read()
     setup(
-        name="kitty_doc",  # 项目名
+        name="rapid_doc",  # 项目名
         version=__version__,  # 自动从tag中获取版本号
         license="Apache 2.0",
         author='',  # 作者名
         author_email='',  # 作者邮箱
-        packages=find_packages() + ["kitty_doc.resources"],  # 包含所有的包
+        packages=find_packages() + ["rapid_doc.resources"],  # 包含所有的包
         package_data={
-            "kitty_doc.resources": ["**"],  # 包含 kitty_doc/resources 目录下的所有文件
+            "rapid_doc.resources": ["**"],  # 包含 rapid_doc/resources 目录下的所有文件
             "": ["*.yaml"],  # 包含所有包里的 .yaml 文件
         },
         install_requires=parse_requirements('requirements.txt'),  # 项目依赖的第三方库
@@ -41,10 +41,10 @@ if __name__ == '__main__':
         long_description=long_description,  # 详细描述
         long_description_content_type="text/markdown",  # 如果README是Markdown格式
         project_urls={
-            "Home": "https://github.com/hzkitty",
-            "Repository": "https://github.com/hzkitty/KittyDoc",
+            "Home": "https://github.com/RapidAI",
+            "Repository": "https://github.com/RapidAI/RapidOCR",
         },
-        keywords=["kitty-doc, kitty_doc, onnx, convert, pdf, markdown"],
+        keywords=["rapid-doc, rapid_doc, onnx, convert, pdf, markdown"],
         classifiers=[
             "Programming Language :: Python :: 3.10",
             "Programming Language :: Python :: 3.11",

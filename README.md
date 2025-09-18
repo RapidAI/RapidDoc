@@ -13,7 +13,7 @@ RapidDoc 是一个轻量级、专注于文档解析的开源框架，支持 **OC
 
 > ✨如果该项目对您有帮助，您的star是我不断优化的动力！！！
 >
-> - [github点击前往](https://github.com/hzkitty/KittyDoc)
+> - [github点击前往](https://github.com/RapidAI/RapidDoc)
 > - [gitee点击前往](https://gitee.com/hzkitty/KittyDoc)
 
 ## 👏 项目特点
@@ -36,7 +36,7 @@ RapidDoc 是一个轻量级、专注于文档解析的开源框架，支持 **OC
   - cuda环境默认不使用gpu，公式模型onnx gpu推理会报错，暂时无人解决 [PaddleOCR/issues/15125](https://github.com/PaddlePaddle/PaddleOCR/issues/15125), [PaddleX/issues/4238](https://github.com/PaddlePaddle/PaddleX/issues/4238), [Paddle2ONNX/issues/1593](https://github.com/PaddlePaddle/Paddle2ONNX/issues/1593)
 
 - **表格识别**
-  - 基于 [rapid_table_self](kitty_doc%2Fmodel%2Ftable%2Frapid_table_self) 增强，在原有基础上增强为多模型串联方案：  
+  - 基于 [rapid_table_self](rapid_doc/model/table/rapid_table_self) 增强，在原有基础上增强为多模型串联方案：  
     - **表格分类**（区分有线/无线表格）
     - **SLANeXt** 系列 表结构识别 + 单元格检测
     - **[有线表格识别UNET](https://github.com/RapidAI/TableStructureRec)** + SLANET_plus/UNITABLE（作为无线表格识别）
@@ -52,9 +52,9 @@ RapidDoc 是一个轻量级、专注于文档解析的开源框架，支持 **OC
 
 ## 🛠️ 安装RapidDoc
 
-#### 使用pip安装
+#### 使用pip安装 （暂未发布）
 ```bash
-pip install kitty-doc -i https://mirrors.aliyun.com/pypi/simple
+pip install rapid-doc -i https://mirrors.aliyun.com/pypi/simple
 ```
 
 #### 通过源码安装
@@ -68,14 +68,14 @@ pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple
 ```
 #### 使用gpu推理
 ```bash
-# 在安装完kitty_doc之后，卸载cpu版的onnxruntime
+# 在安装完 rapid_doc 之后，卸载 cpu 版的 onnxruntime
 pip uninstall onnxruntime
 # 这里一定要确定onnxruntime-gpu与GPU对应
 # 可参见https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html#requirements
 pip install onnxruntime-gpu
 ```
 ```python
-# 在 Python 中指定 GPU（必须在导入 kitty_doc 之前设置）
+# 在 Python 中指定 GPU（必须在导入 rapid_doc 之前设置）
 import os
 # 使用默认 GPU（cuda:0）
 os.environ['MINERU_DEVICE_MODE'] = "cuda"

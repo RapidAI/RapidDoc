@@ -1,7 +1,8 @@
 # 参数使用
 
 ```python
-from kitty_doc.backend.pipeline.pipeline_analyze import doc_analyze as pipeline_doc_analyze
+from rapid_doc.backend.pipeline.pipeline_analyze import doc_analyze as pipeline_doc_analyze
+
 
 def doc_analyze(
         pdf_bytes_list,
@@ -19,14 +20,14 @@ def doc_analyze(
 在mineru参数基础上新增了layout_config、ocr_config、formula_config、table_config、checkbox_config参数
 #### 1、使用gpu推理
 ```bash
-# 在安装完kitty_doc之后，卸载cpu版的onnxruntime
+# 在安装完 rapid_doc 之后，卸载 cpu 版的 onnxruntime
 pip uninstall onnxruntime
 # 这里一定要确定onnxruntime-gpu与GPU对应
 # 可参见https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html#requirements
 pip install onnxruntime-gpu
 ```
 ```python
-# 在 Python 中指定 GPU（必须在导入 kitty_doc 之前设置）
+# 在 Python 中指定 GPU（必须在导入 rapid_doc 之前设置）
 import os
 # 使用默认 GPU（cuda:0）
 os.environ['MINERU_DEVICE_MODE'] = "cuda"
@@ -43,8 +44,9 @@ os.environ['MINERU_DEVICE_MODE'] = "cuda:1"
 | batch_num | 批处理大小 |       1        |  |
 | model_dir_or_path | 模型路径  |      None       |  |
 示例：
+
 ```python
-from kitty_doc.model.layout.rapid_layout_self import ModelType as LayoutModelType
+from rapid_doc.model.layout.rapid_layout_self import ModelType as LayoutModelType
 
 layout_config = {
     "model_type": LayoutModelType.PP_DOCLAYOUT_L,
@@ -93,12 +95,13 @@ ocr_config = {
 | batch_num | 批处理大小 |          1           |  |
 | model_dir_or_path | 模型路径  |         None         |  |
 示例：
+
 ```python
-from kitty_doc.model.formula.rapid_formula_self import ModelType as FormulaModelType
+from rapid_doc.model.formula.rapid_formula_self import ModelType as FormulaModelType
 
 formula_config = {
     "model_type": FormulaModelType.PP_FORMULANET_PLUS_S,
-    "formula_level": 1, # 公式识别等级，默认为0，全识别。1:仅识别行间公式，行内公式不识别
+    "formula_level": 1,  # 公式识别等级，默认为0，全识别。1:仅识别行间公式，行内公式不识别
     "batch_num": 1,
     "model_dir_or_path": r"C:\ocr\models\ppmodel\formula\PP-FormulaNet_plus-S\pp_formulanet_plus_s.onnx",
 }
@@ -120,28 +123,29 @@ formula_config = {
 |  wired_table.model_dir_or_path   |       有线表结构模型地址        |         None         | 配置SLANEXT时使用 |
 | wireless_table.model_dir_or_path |       无线表结构模型地址        |         None         | 配置SLANEXT时使用 |
 示例：
+
 ```python
-from kitty_doc.model.table.rapid_table_self import ModelType as TableModelType
+from rapid_doc.model.table.rapid_table_self import ModelType as TableModelType
 
 table_config = {
-    "force_ocr": False, # 表格文字，是否强制使用ocr，默认 False 根据 parse_method 来判断是否需要ocr还是从pdf中直接提取文本
+    "force_ocr": False,  # 表格文字，是否强制使用ocr，默认 False 根据 parse_method 来判断是否需要ocr还是从pdf中直接提取文本
     "model_type": TableModelType.UNET_SLANET_PLUS,  # （默认） 有线表格使用unet，无线表格使用slanet_plus
-    #"model_type": TableModelType.UNET_UNITABLE, # 有线表格使用unet，无线表格使用unitable
-    #"model_type": TableModelType.SLANEXT,  # 有线表格使用slanext_wired，无线表格使用slanext_wireless
+    # "model_type": TableModelType.UNET_UNITABLE, # 有线表格使用unet，无线表格使用unitable
+    # "model_type": TableModelType.SLANEXT,  # 有线表格使用slanext_wired，无线表格使用slanext_wireless
 
-    "model_dir_or_path": "", #单个模型使用。如SLANET_PLUS、UNITABLE
+    "model_dir_or_path": "",  # 单个模型使用。如SLANET_PLUS、UNITABLE
 
-    "cls.model_dir_or_path": "", # 表格分类模型地址
+    "cls.model_dir_or_path": "",  # 表格分类模型地址
 
-    "unet.model_dir_or_path": "", # UNET表格模型地址
+    "unet.model_dir_or_path": "",  # UNET表格模型地址
 
-    "unitable.model_dir_or_path": "", # UNITABLE表格模型地址
-    "slanet_plus.model_dir_or_path": "", # SLANET_PLUS表格模型地址
+    "unitable.model_dir_or_path": "",  # UNITABLE表格模型地址
+    "slanet_plus.model_dir_or_path": "",  # SLANET_PLUS表格模型地址
 
-    "wired_cell.model_dir_or_path": "", # 有线单元格模型地址，配置SLANEXT时使用
-    "wireless_cell.model_dir_or_path": "", # 无线单元格模型地址，配置SLANEXT时使用
-    "wired_table.model_dir_or_path": "", # 有线表结构模型地址，配置SLANEXT时使用
-    "wireless_table.model_dir_or_path": "", # 无线表结构模型地址，配置SLANEXT时使用
+    "wired_cell.model_dir_or_path": "",  # 有线单元格模型地址，配置SLANEXT时使用
+    "wireless_cell.model_dir_or_path": "",  # 无线单元格模型地址，配置SLANEXT时使用
+    "wired_table.model_dir_or_path": "",  # 有线表结构模型地址，配置SLANEXT时使用
+    "wireless_table.model_dir_or_path": "",  # 无线表结构模型地址，配置SLANEXT时使用
 }
 ```
 
