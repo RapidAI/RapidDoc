@@ -84,7 +84,8 @@ class RapidTable:
             )
             table_results = self.table_structure(img, ocr_result=ocr_results)
             return RapidTableOutput(img, table_results.pred_html, table_results.cell_bboxes,
-                                    table_results.logic_points.tolist(), table_results.elapse)
+                                    table_results.logic_points.tolist() if table_results.logic_points is not None else None,
+                                    table_results.elapse)
 
         dt_boxes, rec_res = self.get_ocr_results(img, ocr_results)
         pred_structures, cell_bboxes, logic_points = self.get_table_rec_results(img)

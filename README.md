@@ -2,7 +2,7 @@
 
 **基于 [Mineru](https://github.com/opendatalab/MinerU) 二次开发，移除 VLM，专注于 Pipeline 产线下的高效文档解析，在 CPU 上也能保持不错的解析速度。**
 
-** KittyDoc 已经成为RapidAI开源家族成员**
+**KittyDoc 已经成为RapidAI开源家族成员**
 
 ## 😺 项目介绍
 
@@ -60,7 +60,7 @@ pip install kitty-doc -i https://mirrors.aliyun.com/pypi/simple
 #### 通过源码安装
 ```bash
 # 克隆仓库
-git clone https://github.com/hzkitty/RapidDoc.git
+git clone https://github.com/RapidAI/RapidDoc.git
 cd RapidDoc
 
 # 安装依赖
