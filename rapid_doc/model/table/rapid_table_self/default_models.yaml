@@ -11,11 +11,11 @@ slanet_plus:
   SHA256: d57a942af6a2f57d6a4a0372573c696a2379bf5857c45e2ac69993f3b334514b
 
 slanext_wired:
-  model_dir_or_path: https://www.modelscope.cn/models/hzkitty/KittyDoc/resolve/master/table/SLANeXt_wired/slanext_wired.onnx
+  model_dir_or_path: https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/v1.0.0/table/SLANeXt_wired/slanext_wired.onnx
   SHA256: 05db289f095d4f2b88bf666bae6f56f4371fcc3d643e51dd194fb1416f986563
 
 slanext_wireless:
-  model_dir_or_path: https://www.modelscope.cn/models/hzkitty/KittyDoc/resolve/master/table/SLANeXt_wireless/slanext_wireless.onnx
+  model_dir_or_path: https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/v1.0.0/table/SLANeXt_wireless/slanext_wireless.onnx
   SHA256: e9174b59f1ec98f9b95713ed523e706d0edf59c40057763a694b55e83c6d5b1a
 
 unitable:
