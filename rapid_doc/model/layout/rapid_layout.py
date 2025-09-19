@@ -88,7 +88,7 @@ class RapidLayoutModel(object):
         all_results = self.model(img_contents=images, batch_size=batch_size, tqdm_enable=True)
         for results in all_results:
             layout_res = []
-            boxes, scores, class_names, elapse = results.boxes, results.scores, results.class_names, results.elapse
+            img, boxes, scores, class_names, elapse = results.img, results.boxes, results.scores, results.class_names, results.elapse
 
             temp_results = []
             for xyxy, conf, cla in zip(boxes, scores, class_names):
@@ -99,10 +99,8 @@ class RapidLayoutModel(object):
                     category_id = self.category_dict[cla]
                 # 如果是表格/图片，边界适当扩展（DocLayout模型识别的边框坐标，稍微有一点不全）
                 if category_id in [CategoryId.TableBody, CategoryId.ImageBody]:
-                    # xmin = xmin + 1
-                    # ymin = ymin + 1
-                    xmax = xmax + 3
-                    ymax = ymax + 5
+                    xmax = min(img.shape[1], xmax + 3)
+                    ymax = min(img.shape[0], ymax + 5)
                 temp_results.append({
                     "category_id": category_id,
                     "bbox": (xmin, ymin, xmax, ymax),
