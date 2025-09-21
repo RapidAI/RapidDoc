@@ -67,13 +67,14 @@ class BatchAnalyze:
         )
         atom_model_manager = AtomModelSingleton()
 
-        pil_images = [image for image, _, _, _ in images_with_extra_info]
+        # pil_images = [image for image, _, _, _ in images_with_extra_info]
         pdf_docs = [pdf_doc for _, _, _, pdf_doc in images_with_extra_info]
-        np_images = [np.asarray(image) for image, _, _, _ in images_with_extra_info]
+        np_images = [cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR) for image, _, _, _ in images_with_extra_info]
+
 
         # 版面识别
         images_layout_res += self.model.layout_model.batch_predict(
-            pil_images, self.layout_base_batch_size
+            np_images, self.layout_base_batch_size
         )
 
         # formula_level：公式识别等级，默认为0，全识别。

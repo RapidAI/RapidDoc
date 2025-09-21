@@ -49,7 +49,7 @@ def do_parse(
 
     if backend == "pipeline":
         layout_config = {
-            "model_type": LayoutModelType.PP_DOCLAYOUT_PLUS_L,
+            # "model_type": LayoutModelType.PP_DOCLAYOUT_PLUS_L,
             # "conf_thresh": 0.4,
             # "batch_num": 1,
             # "model_dir_or_path": "C:\ocr\models\ppmodel\layout\PP-DocLayout-L\pp_doclayout_l.onnx",
@@ -232,8 +232,8 @@ if __name__ == '__main__':
     image_suffixes = [".png", ".jpeg", ".jpg"]
 
     doc_path_list = [
-        "D:\\file\\text-pdf\\示例1-论文模板.pdf",
-        # "D:\\file\\text-pdf\\比亚迪财报.pdf",
+        # "D:\\file\\text-pdf\\示例1-论文模板.pdf",
+        "D:\\file\\text-pdf\\比亚迪财报.pdf",
         # "D:\\file\\text-pdf\\GBT3620.1-2016.pdf",
         # r'C:\ocr\img\table\3766ae2b506b8f345fcc9eee39b31ac8.png'
         # r'D:\file\text-pdf\img\文字文稿123.pdf',
@@ -242,7 +242,7 @@ if __name__ == '__main__':
         # "D:\\file\\text-pdf\\示例7-研究报告.pdf",
         # r'C:\ocr\img\table\ceshi.pdf',
         # "tests/0a471d47-e428-4e5a-b849-a8aedfe399a0.png",
-        # "D:\\file\\text-pdf\\demo1.pdf",
+        "D:\\file\\text-pdf\\demo1.pdf",
         # "C:\ocr\img\pageddd_5.png",
         # "C:\ocr\img\pages_50_02.png",
         # "C:\ocr\img\pages_50_04.png",

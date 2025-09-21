@@ -92,7 +92,8 @@ class RapidLayoutModel(object):
 
             temp_results = []
             for xyxy, conf, cla in zip(boxes, scores, class_names):
-                xmin, ymin, xmax, ymax = [int(p) for p in xyxy]
+                # xmin, ymin, xmax, ymax = [int(p) for p in xyxy]
+                xmin, ymin, xmax, ymax = [p for p in xyxy]
                 if self.model_type == ModelType.PP_DOCLAYOUT_PLUS_L:
                     category_id = self.category_plus_mapping[cla]
                 else:
