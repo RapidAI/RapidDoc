@@ -1,0 +1,21 @@
+services:
+  rapid-doc-server:
+    container_name: rapid-doc-server
+    image: volador/rapid-doc:v0.1.0
+    ports:
+      - "8888:8888"
+    environment:
+      - TZ=${TIMEZONE:-UTC}
+      - GOTENBERG_URL=http://gotenberg:3000
+    restart: always
+    depends_on:
+      - gotenberg
+
+  gotenberg:
+    container_name: gotenberg
+    image: gotenberg/gotenberg:8
+    ports:
+      - "3000:3000"
+    environment:
+      - TZ=${TIMEZONE:-UTC}
+    restart: always

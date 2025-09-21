@@ -53,7 +53,7 @@
 
 ## 🛠️ 安装RapidDoc
 
-#### 使用pip安装 （暂未发布）
+#### 使用pip安装
 ```bash
 pip install rapid-doc -i https://mirrors.aliyun.com/pypi/simple
 ```

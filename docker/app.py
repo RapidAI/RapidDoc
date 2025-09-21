@@ -13,7 +13,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 from loguru import logger
 
-from docker.file_converter import ensure_pdf
+from file_converter import ensure_pdf
 from rapid_doc.cli.common import aio_do_parse
 from rapid_doc.utils.language import remove_invalid_surrogates
 from rapid_doc.version import __version__

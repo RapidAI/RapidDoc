@@ -27,8 +27,8 @@ if __name__ == '__main__':
         name="rapid_doc",  # 项目名
         version=__version__,  # 自动从tag中获取版本号
         license="Apache 2.0",
-        author='',  # 作者名
-        author_email='',  # 作者邮箱
+        author='hzkitty',  # 作者名
+        author_email='zhzkitty@163.com',  # 作者邮箱
         packages=find_packages() + ["rapid_doc.resources"],  # 包含所有的包
         package_data={
             "rapid_doc.resources": ["**"],  # 包含 rapid_doc/resources 目录下的所有文件
