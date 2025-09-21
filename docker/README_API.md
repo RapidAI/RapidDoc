@@ -36,7 +36,7 @@ os.environ.set("GOTENBERG_URL", "http://localhost:3000")
 
 **2、使用docker安装**
 
-参考 [docker / README.md](README.md)
+参考 [Docker部署说明](README.md)
 
 ## 运行
 
@@ -51,7 +51,7 @@ uvicorn app:app --host 0.0.0.0 --port 8888
 
 **2、使用docker安装运行**
 
-参考 [docker / README.md](README.md)
+参考 [Docker部署说明](README.md)
 
 服务将在 `http://localhost:8888` 启动，API 文档可通过 `http://localhost:8888/docs` 访问。
 
