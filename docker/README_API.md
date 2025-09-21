@@ -12,6 +12,7 @@
 
 ## 安装
 
+**1、使用pip安装**
 ```bash
 # 安装依赖
 pip install -r requirements.txt
@@ -33,8 +34,13 @@ os.environ.set("GOTENBERG_URL", "http://localhost:3000")
 .123 .602 .abw .bib .bmp .cdr .cgm .cmx .csv .cwk .dbf .dif .doc .docm .docx .dot .dotm .dotx .dxf .emf .eps .epub .fodg .fodp .fods .fodt .fopd .gif .htm .html .hwp .jpeg .jpg .key .ltx .lwp .mcw .met .mml .mw .numbers .odd .odg .odm .odp .ods .odt .otg .oth .otp .ots .ott .pages .pbm .pcd .pct .pcx .pdb .pdf .pgm .png .pot .potm .potx .ppm .pps .ppt .pptm .pptx .psd .psw .pub .pwp .pxl .ras .rtf .sda .sdc .sdd .sdp .sdw .sgl .slk .smf .stc .std .sti .stw .svg .svm .swf .sxc .sxd .sxg .sxi .sxm .sxw .tga .tif .tiff .txt .uof .uop .uos .uot .vdx .vor .vsd .vsdm .vsdx .wb2 .wk1 .wks .wmf .wpd .wpg .wps .xbm .xhtml .xls .xlsb .xlsm .xlsx .xlt .xltm .xltx .xlw .xml .xpm .zabw
 ```
 
+**2、使用docker安装**
+
+参考 [docker / README.md](README.md)
+
 ## 运行
 
+**1、使用pip安装运行**
 ```bash
 # 启动 API 服务
 python app.py
@@ -42,6 +48,10 @@ python app.py
 # 或使用 uvicorn
 uvicorn app:app --host 0.0.0.0 --port 8888
 ```
+
+**2、使用docker安装运行**
+
+参考 [docker / README.md](README.md)
 
 服务将在 `http://localhost:8888` 启动，API 文档可通过 `http://localhost:8888/docs` 访问。
 
