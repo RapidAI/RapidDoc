@@ -10,6 +10,8 @@ RUN apt-get update && \
         fonts-noto-core \
         fonts-noto-cjk \
         fontconfig \
+        wget \
+        curl \
         libgl1 && \
     fc-cache -fv && \
     apt-get clean && \
@@ -22,7 +24,8 @@ WORKDIR /app
 COPY requirements.txt .
 
 # 安装 Python 依赖
-RUN python3 -m pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple --break-system-packages && \
+RUN python3 -m pip install rapid-doc==0.1.0 --no-deps -i https://mirrors.aliyun.com/pypi/simple --break-system-packages && \
+    python3 -m pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple --break-system-packages && \
     python3 -m pip cache purge
 
 # 复制配置文件和脚本（优先复制，利用Docker缓存）
@@ -33,7 +36,10 @@ COPY start_with_env.sh /app/
 RUN chmod +x  start_with_env.sh
 
 # 复制应用代码（最后复制，避免频繁变更影响缓存）
-COPY app.py file_converter.py /app/
+COPY app.py file_converter.py download_models.py download_file.py /app/
+
+## 下载所有模型文件实现完全离线部署
+#RUN python3 download_models.py
 
 # 设置基础环境变量
 ENV PYTHONPATH=/app

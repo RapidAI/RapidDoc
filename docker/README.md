@@ -6,6 +6,10 @@
 
 ```bash
 cd docker
+
+## 下载所有模型文件实现完全离线部署（Dockerfile里如果需要可取消注释）
+#RUN python3 download_models.py
+
 # 1. CPU 模式
 docker build -f Dockerfile -t volador/rapid-doc:v0.1.0 .
 
