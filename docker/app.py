@@ -1,7 +1,8 @@
 import gc
 import json
 import os
-import tempfile
+import traceback
+import tempfile, shutil
 from glob import glob
 from base64 import b64encode
 from pathlib import Path
@@ -13,7 +14,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 from loguru import logger
 
-from file_converter import ensure_pdf
+from file_converter import ensure_pdf, OFFICE_EXTENSIONS
 from rapid_doc.cli.common import aio_do_parse
 from rapid_doc.utils.language import remove_invalid_surrogates
 from rapid_doc.version import __version__
@@ -37,7 +38,8 @@ async def health_check():
 
 # 支持的文件扩展名 - 与官方 API 保持一致
 pdf_suffixes = [".pdf"]
-office_suffixes = [".ppt", ".pptx", ".doc", ".docx"]
+# office_suffixes = [".ppt", ".pptx", ".doc", ".docx"]
+office_suffixes = list(OFFICE_EXTENSIONS)
 image_suffixes = [".png", ".jpg", ".jpeg", ".bmp", ".tiff", ".tif"]
 
 # Removed clean_data_for_json function - now using official API
@@ -129,6 +131,44 @@ def get_infer_result(file_suffix_identifier: str, file_name: str, parse_dir: str
     
     return None
 
+def _convert_value_to_enum(config):
+    """
+      自动将配置 dict 中的字符串枚举（如 "OCRVersion.PPOCRV5"）转换为实际枚举对象。
+      """
+    # ⚡ 如果 config 是空字典，直接返回
+    if not config:
+        return config
+    from rapidocr import EngineType as OCREngineType, OCRVersion, ModelType as OCRModelType, LangDet, LangRec
+    from rapid_doc.model.layout.rapid_layout_self import ModelType as LayoutModelType
+    from rapid_doc.model.formula.rapid_formula_self import ModelType as FormulaModelType
+    from rapid_doc.model.table.rapid_table_self import ModelType as TableModelType
+
+    # 可识别的枚举类映射表（可扩展）
+    enum_map = {
+        "OCREngineType": OCREngineType,
+        "OCRVersion": OCRVersion,
+        "OCRModelType": OCRModelType,
+        "LangDet": LangDet,
+        "LangRec": LangRec,
+        "LayoutModelType": LayoutModelType,
+        "FormulaModelType": FormulaModelType,
+        "TableModelType": TableModelType,
+    }
+
+    def resolve_enum_value(value):
+        """递归解析单个值"""
+        if isinstance(value, str) and "." in value:
+            prefix, member = value.split(".", 1)
+            if prefix in enum_map and hasattr(enum_map[prefix], member):
+                return getattr(enum_map[prefix], member)
+        elif isinstance(value, dict):
+            return {k: resolve_enum_value(v) for k, v in value.items()}
+        elif isinstance(value, list):
+            return [resolve_enum_value(v) for v in value]
+        return value
+
+    return {k: resolve_enum_value(v) for k, v in config.items()}
+
 
 @app.post(
     "/file_parse",
@@ -138,12 +178,17 @@ def get_infer_result(file_suffix_identifier: str, file_name: str, parse_dir: str
 async def file_parse(
     files: List[UploadFile] = File(...),
     output_dir: str = Form("./output"),
+    clear_output_file: bool = Form(False),
     lang_list: List[str] = Form(["ch"]),
     backend: str = Form("pipeline"),
     parse_method: str = Form("auto"),
     formula_enable: bool = Form(True),
     table_enable: bool = Form(True),
-    server_url: Optional[str] = Form(None),
+    layout_config: Optional[str] = Form("{}"),
+    ocr_config: Optional[str] = Form("{}"),
+    formula_config: Optional[str] = Form("{}"),
+    table_config: Optional[str] = Form("{}"),
+    checkbox_config: Optional[str] = Form("{}"),
     return_md: bool = Form(True),
     return_middle_json: bool = Form(False),
     return_model_output: bool = Form(False),
@@ -163,7 +208,6 @@ async def file_parse(
         parse_method: Parsing method (auto, ocr, txt)
         formula_enable: Whether to enable formula parsing
         table_enable: Whether to enable table parsing
-        server_url: Server URL for vlm-sglang-client backend
         return_md: Whether to return markdown content
         return_middle_json: Whether to return middle JSON
         return_model_output: Whether to return model output
@@ -188,16 +232,19 @@ async def file_parse(
                 status_code=400,
             )
 
+        # 把 JSON 字符串转成 dict，默认空 dict
+        layout_config = _convert_value_to_enum(json.loads(layout_config or "{}"))
+        ocr_config = _convert_value_to_enum(json.loads(ocr_config or "{}"))
+        formula_config = _convert_value_to_enum(json.loads(formula_config or "{}"))
+        table_config = _convert_value_to_enum(json.loads(table_config or "{}"))
+        checkbox_config = json.loads(checkbox_config or "{}")
+
         # 创建输出目录
         os.makedirs(output_dir, exist_ok=True)
         
         results = []
         
         for file in files:
-            # 创建临时目录用于文档转换
-            temp_dir = tempfile.mkdtemp(prefix="fastapi_adapter_")
-            pdf_to_process = None
-            temp_pdf_to_delete = None
             # 验证文件扩展名
             file_suffix = Path(file.filename).suffix.lower()
             if file_suffix not in pdf_suffixes + office_suffixes + image_suffixes:
@@ -209,6 +256,9 @@ async def file_parse(
                 content = await file.read()
 
             else:
+                # 创建临时目录用于文档转换
+                temp_dir = tempfile.mkdtemp(prefix="fastapi_adapter_")
+                print(temp_dir)
                 # 调用 ensure_pdf 进行文档转换
                 # 保存上传的文件到临时目录
                 temp_file_path = os.path.join(temp_dir, file.filename)
@@ -217,13 +267,13 @@ async def file_parse(
                 pdf_to_process, temp_pdf_to_delete = ensure_pdf(temp_file_path, temp_dir)
                 if not pdf_to_process:
                     return JSONResponse(
-                        content={"error": f"Failed to process {file.filename}"},
+                        content={"error": f"Failed to convert Office/document to PDF: {file.filename}"},
                         status_code=500,
                     )
                 # 从磁盘读字节
                 with open(pdf_to_process, "rb") as f:
                     content = f.read()
-            
+                shutil.rmtree(temp_dir, ignore_errors=True)
             # 读取文件内容
             file_name = Path(file.filename).stem  # 去掉扩展名
             # 修正：使用完整文件名匹配RapidDoc的输出文件命名格式
@@ -247,7 +297,8 @@ async def file_parse(
                     table_enable=table_enable,
                     start_page_id=start_page_id,
                     end_page_id=end_page_id,
-                    server_url=server_url,
+                    layout_config=layout_config, ocr_config=ocr_config, formula_config=formula_config,
+                    table_config=table_config, checkbox_config=checkbox_config
                 )
                 
                 logger.info(f"Parse completed for {file.filename}")
@@ -309,14 +360,19 @@ async def file_parse(
                 results.append(file_result)
                 
             except Exception as parse_error:
-                logger.error(f"Error parsing {file.filename}: {str(parse_error)}")
+                # logger.error(f"Error parsing {file.filename}: {str(parse_error)}")
+                tb_str = traceback.format_exc()  # 获取完整 traceback 信息
+                logger.error(f"Error parsing {file.filename}:\n{tb_str}")
+
                 results.append({
                     "filename": file.filename,
                     "error": str(parse_error)
                 })
             
-            # 不需要清理临时文件，因为没有保存到磁盘
-        
+            # 是否清理文件
+            if clear_output_file:
+                shutil.rmtree(os.path.join(output_dir, file_basename), ignore_errors=True)
+
         # 返回结果
         response_data = {
             "results": results,

@@ -20,7 +20,7 @@ from rapid_doc.backend.pipeline.pipeline_analyze import doc_analyze as pipeline_
 from rapid_doc.backend.pipeline.pipeline_middle_json_mkcontent import union_make as pipeline_union_make
 from rapid_doc.backend.pipeline.model_json_to_middle_json import result_to_middle_json as pipeline_result_to_middle_json
 
-from rapidocr import EngineType as OcrEngineType, OCRVersion, ModelType
+from rapidocr import EngineType as OCREngineType, OCRVersion, ModelType
 from rapid_doc.model.layout.rapid_layout_self import ModelType as LayoutModelType
 from rapid_doc.model.formula.rapid_formula_self import ModelType as FormulaModelType
 from rapid_doc.model.table.rapid_table_self import ModelType as TableModelType
@@ -48,6 +48,11 @@ def do_parse(
 ):
 
     if backend == "pipeline":
+
+        from rapidocr import EngineType as OCREngineType, OCRVersion, ModelType
+        from rapid_doc.model.layout.rapid_layout_self import ModelType as LayoutModelType
+        from rapid_doc.model.formula.rapid_formula_self import ModelType as FormulaModelType
+        from rapid_doc.model.table.rapid_table_self import ModelType as TableModelType
         layout_config = {
             # "model_type": LayoutModelType.PP_DOCLAYOUT_PLUS_L,
             # "conf_thresh": 0.4,
@@ -61,13 +66,13 @@ def do_parse(
             # "Rec.model_path": r"C:\ocr\models\ppmodel\ocr\v4\ch_PP-OCRv4_rec_infer\openvino\ch_PP-OCRv4_rec_infer.onnx",
             # "Rec.rec_batch_num": 1,
 
-            # "Det.ocr_version": OCRVersion.PPOCRV5,
-            # "Rec.ocr_version": OCRVersion.PPOCRV5,
+            "Det.ocr_version": OCRVersion.PPOCRV5,
+            "Rec.ocr_version": OCRVersion.PPOCRV5,
             # "Det.model_type": ModelType.SERVER,
             # "Rec.model_type": ModelType.SERVER,
 
             # 新增的自定义参数
-            # "engine_type": OcrEngineType.TORCH, # 统一设置推理引擎
+            # "engine_type": OCREngineType.TORCH, # 统一设置推理引擎
             # "Det.rec_batch_num": 1, # Det批处理大小
         }
 
@@ -84,7 +89,7 @@ def do_parse(
             # "force_ocr": False, # 表格文字，是否强制使用ocr，默认 False 根据 parse_method 来判断是否需要ocr还是从pdf中直接提取文本
             # "model_type": TableModelType.UNET_SLANET_PLUS,  # （默认） 有线表格使用unet，无线表格使用slanet_plus
             # "model_type": TableModelType.UNET_UNITABLE, # 有线表格使用unet，无线表格使用unitable
-            # "model_type": TableModelType.SLANEXT,  # 有线表格使用slanext_wired，无线表格使用slanext_wireless
+            "model_type": TableModelType.SLANEXT,  # 有线表格使用slanext_wired，无线表格使用slanext_wireless
 
             # "model_dir_or_path": "", #单个模型使用。如SLANET_PLUS、UNITABLE
 
@@ -227,22 +232,25 @@ if __name__ == '__main__':
     # args Table Predict: 100%|██████████| 9/9 [00:37<00:00,  4.14s/it]
     __dir__ = os.path.dirname(os.path.abspath(__file__))
     pdf_files_dir = os.path.join(__dir__, "pdfs")
-    output_dir = os.path.join(__dir__, "output")
+    output_dir = os.path.join(__dir__, "output888")
     pdf_suffixes = [".pdf"]
     image_suffixes = [".png", ".jpeg", ".jpg"]
 
     doc_path_list = [
-        # "D:\\file\\text-pdf\\示例1-论文模板.pdf",
-        "D:\\file\\text-pdf\\比亚迪财报.pdf",
+        # "D:\\file\\text-pdf\\demo1.pdf",
+        # "D:\\file\\text-pdf\\比亚迪财报.pdf",
         # "D:\\file\\text-pdf\\GBT3620.1-2016.pdf",
         # r'C:\ocr\img\table\3766ae2b506b8f345fcc9eee39b31ac8.png'
         # r'D:\file\text-pdf\img\文字文稿123.pdf',
         # r'D:\file\text-pdf\img\table_test.pdf'
-        # "D:\\file\\text-pdf\\示例1-论文模板.pdf",
+        "D:\\file\\text-pdf\\示例1-论文模板.pdf",
         # "D:\\file\\text-pdf\\示例7-研究报告.pdf",
         # r'C:\ocr\img\table\ceshi.pdf',
         # "tests/0a471d47-e428-4e5a-b849-a8aedfe399a0.png",
-        "D:\\file\\text-pdf\\demo1.pdf",
+        # r"C:\Users\huazhen\Desktop\1 - 副本 (3).pdf",
+        # r"C:\ocr\table\80cac76b6464916570c3cf3b63fa00c8.png",
+        # r"C:\Users\huazhen\Desktop\1.pdf",
+
         # "C:\ocr\img\pageddd_5.png",
         # "C:\ocr\img\pages_50_02.png",
         # "C:\ocr\img\pages_50_04.png",

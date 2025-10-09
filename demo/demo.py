@@ -17,7 +17,7 @@ from rapid_doc.backend.pipeline.pipeline_analyze import doc_analyze as pipeline_
 from rapid_doc.backend.pipeline.pipeline_middle_json_mkcontent import union_make as pipeline_union_make
 from rapid_doc.backend.pipeline.model_json_to_middle_json import result_to_middle_json as pipeline_result_to_middle_json
 
-from rapidocr import EngineType as OcrEngineType
+from rapidocr import EngineType as OCREngineType
 from rapid_doc.model.layout.rapid_layout_self import ModelType as LayoutModelType
 from rapid_doc.model.formula.rapid_formula_self import ModelType as FormulaModelType
 from rapid_doc.model.table.rapid_table_self import ModelType as TableModelType
@@ -63,7 +63,7 @@ def do_parse(
             # "Rec.model_type": ModelType.SERVER,
 
             # 新增的自定义参数
-            # "engine_type": OcrEngineType.TORCH, # 统一设置推理引擎
+            # "engine_type": OCREngineType.TORCH, # 统一设置推理引擎
             # "Det.rec_batch_num": 1, # Det批处理大小
         }
 

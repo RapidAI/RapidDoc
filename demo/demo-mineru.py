@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 
 from loguru import logger
-
+# os.environ['MINERU_MODEL_SOURCE'] = "modelscope"
 from mineru.cli.common import convert_pdf_bytes_to_bytes_by_pypdfium2, prepare_env, read_fn
 from mineru.data.data_reader_writer import FileBasedDataWriter
 from mineru.utils.draw_bbox import draw_layout_bbox, draw_span_bbox

@@ -1,6 +1,7 @@
 # Copyright (c) Opendatalab. All rights reserved.
 import hashlib
 import json
+from enum import Enum
 
 
 def bytes_md5(file_bytes):
@@ -28,3 +29,13 @@ def str_sha256(input_string):
 def dict_md5(d):
     json_str = json.dumps(d, sort_keys=True, ensure_ascii=False)
     return hashlib.md5(json_str.encode('utf-8')).hexdigest()
+
+def make_hashable(value):
+    if isinstance(value, dict):
+        # 递归处理 dict 内的所有值
+        return json.dumps({k: make_hashable(v) for k, v in value.items()}, sort_keys=True)
+    elif isinstance(value, list):
+        return json.dumps([make_hashable(v) for v in value], sort_keys=True)
+    elif isinstance(value, Enum):
+        return value.name  # 或 value.value
+    return value

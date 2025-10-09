@@ -67,7 +67,7 @@ layout_config = {
 
 示例：
 ```python
-from rapidocr import EngineType as OcrEngineType, OCRVersion, ModelType
+from rapidocr import EngineType as OCREngineType, OCRVersion, ModelType
 
 ocr_config = {
     # rapidocr 已有的参数
@@ -81,7 +81,7 @@ ocr_config = {
     "Rec.model_type": ModelType.SERVER,
 
     # 新增的自定义参数
-    "engine_type": OcrEngineType.TORCH, # 统一设置推理引擎
+    "engine_type": OCREngineType.TORCH, # 统一设置推理引擎
     "Det.rec_batch_num": 1, # Det批处理大小
 }
 ```

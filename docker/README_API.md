@@ -65,13 +65,18 @@ uvicorn app:app --host 0.0.0.0 --port 8888
 
 - `files`: 要解析的文件列表（支持 PDF、PNG、JPG、JPEG、BMP、TIFF + 文件转换服务支持的）
 - `output_dir`: 输出目录（默认: `./output`）
-- `lang_list`: 语言列表（默认: `["ch"]`）
-- `backend`: 解析后端（默认: `pipeline`）
-
+- `clear_output_file`: 是否清理输出文件（默认: `false`）
+-
 - `parse_method`: 解析方法（默认: `auto`）
 - `formula_enable`: 是否启用公式解析（默认: `true`）
 - `table_enable`: 是否启用表格解析（默认: `true`）
-- `server_url`: SGLang 服务器地址（vlm-sglang-client 模式必需）
+
+- `layout_config`: 版面识别配置json字符串（默认: `{}`，枚举类型使用字符串会自动映射，如"OCRVersion.PPOCRV5"）
+- `ocr_config`: OCR识别配置json字符串（默认: `{}`）
+- `formula_config`: 公式识别配置json字符串（默认: `{}`）
+- `table_config`: 表格识别配置json字符串（默认: `{}`）
+- `checkbox_config`: 复选框识别配置json字符串（默认: `{}`）
+-
 - `return_md`: 是否返回 Markdown 内容（默认: `true`）
 - `return_middle_json`: 是否返回中间 JSON（默认: `false`）
 - `return_model_output`: 是否返回模型输出（默认: `false`）
@@ -86,15 +91,23 @@ uvicorn app:app --host 0.0.0.0 --port 8888
 # 基础用法 - Pipeline 模式
 curl -X POST "http://localhost:8888/file_parse" \
   -F "files=@document.pdf" \
-  -F "backend=pipeline" \
   -F "return_md=true"
+  
+curl --location --request POST 'http://localhost:8888/file_parse' \
+--form 'files=@document.pdf' \
+--form 'return_md=true' \
+--form 'return_middle_json=true' \
+--form 'return_model_output=true' \
+--form 'return_content_list=true' \
+--form 'return_images=true' \
+--form 'clear_output_file=false' \
+--form 'layout_config="{\"model_type\": \"LayoutModelType.PP_DOCLAYOUT_PLUS_L\"}"'
 
 # 多文件批量处理
 curl -X POST "http://localhost:8888/file_parse" \
   -F "files=@doc1.pdf" \
   -F "files=@doc2.pdf" \
   -F "files=@image.png" \
-  -F "backend=pipeline" \
   -F "return_md=true" \
   -F "return_images=true"
 ```
@@ -117,10 +130,6 @@ curl -X POST "http://localhost:8888/file_parse" \
 }
 ```
 
-## 环境变量
-
-- `MINERU_MODEL_SOURCE`: 模型源（modelscope/huggingface）
-
 ## 与官方 API 的兼容性
 
 本 API 完全基于 RapidDoc 官方的 `aio_do_parse` 函数构建，确保：
@@ -130,20 +139,10 @@ curl -X POST "http://localhost:8888/file_parse" \
 3. **结果一致**: 输出格式与官方 API 保持一致
 4. **性能优化**: 利用官方优化的解析逻辑
 
-## 故障排除
-
-### 模型下载问题
-
-如果遇到模型下载问题，可以设置模型源：
-
-```bash
-export MINERU_MODEL_SOURCE=modelscope  # 或 huggingface
-```
-
 ## 更新日志
 
 ### v0.1.0
-- 基于 RapidDoc 官方 API 重新设计
+- 基于 RapidDoc 的 API 设计
 - 完全兼容官方接口规范
 - 支持多文件批量处理
 - 改进错误处理和用户体验

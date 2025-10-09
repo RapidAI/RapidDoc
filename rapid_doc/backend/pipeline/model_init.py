@@ -7,7 +7,7 @@ from ...model.layout.rapid_layout import RapidLayoutModel
 from ...model.formula.rapid_formula_model import RapidFormulaModel
 from ...model.ocr.rapid_ocr import RapidOcrModel
 from ...model.table.rapid_table import RapidTableModel
-
+from ...utils.hash_utils import make_hashable
 
 def table_model_init(lang=None, ocr_config=None, table_config=None):
     atom_model_manager = AtomModelSingleton()
@@ -52,20 +52,14 @@ class AtomModelSingleton:
         return cls._instance
 
     def get_atom_model(self, atom_model_name: str, **kwargs):
-
-        lang = kwargs.get('lang', None)
-        table_model_name = kwargs.get('table_model_name', None)
-
-        if atom_model_name in [AtomicModel.OCR]:
-            key = (
-                atom_model_name,
-                kwargs.get('det_db_box_thresh', 0.3),
-                lang,
-                kwargs.get('det_db_unclip_ratio', 1.8),
-                kwargs.get('enable_merge_det_boxes', True)
-            )
+        if atom_model_name in [AtomicModel.Layout]:
+            key = (atom_model_name, make_hashable(kwargs.get('layout_config', None)))
+        elif atom_model_name in [AtomicModel.OCR]:
+            key = (atom_model_name, make_hashable(kwargs.get('ocr_config', None)))
         elif atom_model_name in [AtomicModel.Table]:
-            key = (atom_model_name, table_model_name, lang)
+            key = (atom_model_name, make_hashable(kwargs.get('table_config', None)))
+        elif atom_model_name in [AtomicModel.FORMULA]:
+            key = (atom_model_name, make_hashable(kwargs.get('formula_config', None)))
         else:
             key = atom_model_name
 

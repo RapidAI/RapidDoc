@@ -1,13 +1,16 @@
 import os
 import time
+import json
+from enum import Enum
 from typing import List, Tuple
 from PIL import Image
 from loguru import logger
 import pypdfium2 as pdfium
 
 from .model_init import MineruPipelineModel
-from rapid_doc.utils.config_reader import get_device
+from ...utils.config_reader import get_device
 from ...utils.enum_class import ImageType
+from ...utils.hash_utils import make_hashable
 from ...utils.pdf_classify import classify
 from ...utils.pdf_image_tools import load_images_from_pdf
 from ...utils.model_utils import get_vram, clean_memory
@@ -35,7 +38,7 @@ class ModelSingleton:
         formula_config=None,
         table_config=None,
     ):
-        key = (lang, formula_enable, table_enable)
+        key = (lang, formula_enable, table_enable, make_hashable(layout_config), make_hashable(ocr_config), make_hashable(formula_config), make_hashable(table_config))
         if key not in self._models:
             self._models[key] = custom_model_init(
                 lang=lang,
@@ -88,7 +91,7 @@ def custom_model_init(
 
 def doc_analyze(
         pdf_bytes_list,
-        lang_list,
+        lang_list: list[str] = None,
         parse_method: str = 'auto',
         formula_enable=True,
         table_enable=True,
@@ -102,6 +105,8 @@ def doc_analyze(
     适当调大MIN_BATCH_INFERENCE_SIZE可以提高性能，更大的 MIN_BATCH_INFERENCE_SIZE会消耗更多内存，
     可通过环境变量MINERU_MIN_BATCH_INFERENCE_SIZE设置，默认值为384。
     """
+    if lang_list is None:
+        lang_list = ["ch"] * len(pdf_bytes_list)
     min_batch_inference_size = int(os.environ.get('MINERU_MIN_BATCH_INFERENCE_SIZE', 384))
 
     # 收集所有页面信息

@@ -167,6 +167,11 @@ def _process_pipeline(
         parse_method,
         p_formula_enable,
         p_table_enable,
+        layout_config,
+        ocr_config,
+        formula_config,
+        table_config,
+        checkbox_config,
         f_draw_layout_bbox,
         f_draw_span_bbox,
         f_dump_md,
@@ -183,7 +188,9 @@ def _process_pipeline(
     infer_results, all_image_lists, all_pdf_docs, lang_list, ocr_enabled_list = (
         pipeline_doc_analyze(
             pdf_bytes_list, p_lang_list, parse_method=parse_method,
-            formula_enable=p_formula_enable, table_enable=p_table_enable
+            formula_enable=p_formula_enable, table_enable=p_table_enable,
+            layout_config=layout_config, ocr_config=ocr_config, formula_config=formula_config,
+            table_config=table_config, checkbox_config=checkbox_config
         )
     )
 
@@ -223,7 +230,11 @@ def do_parse(
         parse_method="auto",
         formula_enable=True,
         table_enable=True,
-        server_url=None,
+        layout_config=None,
+        ocr_config=None,
+        formula_config=None,
+        table_config=None,
+        checkbox_config=None,
         f_draw_layout_bbox=True,
         f_draw_span_bbox=True,
         f_dump_md=True,
@@ -243,6 +254,7 @@ def do_parse(
         _process_pipeline(
             output_dir, pdf_file_names, pdf_bytes_list, p_lang_list,
             parse_method, formula_enable, table_enable,
+            layout_config, ocr_config, formula_config, table_config, checkbox_config,
             f_draw_layout_bbox, f_draw_span_bbox, f_dump_md, f_dump_middle_json,
             f_dump_model_output, f_dump_orig_pdf, f_dump_content_list, f_make_md_mode
         )
@@ -257,7 +269,11 @@ async def aio_do_parse(
         parse_method="auto",
         formula_enable=True,
         table_enable=True,
-        server_url=None,
+        layout_config=None,
+        ocr_config=None,
+        formula_config=None,
+        table_config=None,
+        checkbox_config=None,
         f_draw_layout_bbox=True,
         f_draw_span_bbox=True,
         f_dump_md=True,
@@ -278,8 +294,9 @@ async def aio_do_parse(
         _process_pipeline(
             output_dir, pdf_file_names, pdf_bytes_list, p_lang_list,
             parse_method, formula_enable, table_enable,
+            layout_config, ocr_config, formula_config, table_config, checkbox_config,
             f_draw_layout_bbox, f_draw_span_bbox, f_dump_md, f_dump_middle_json,
-            f_dump_model_output, f_dump_orig_pdf, f_dump_content_list, f_make_md_mode
+            f_dump_model_output, f_dump_orig_pdf, f_dump_content_list, f_make_md_mode,
         )
 
 

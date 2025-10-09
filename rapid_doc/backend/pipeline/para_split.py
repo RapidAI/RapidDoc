@@ -12,41 +12,61 @@ class ListLineTag:
     IS_LIST_START_LINE = 'is_list_start_line'
     IS_LIST_END_LINE = 'is_list_end_line'
 
-
 def __process_blocks(blocks):
-    # 对所有block预处理
-    # 1.通过title和interline_equation将block分组
-    # 2.bbox边界根据line信息重置
+    """
+    对所有 block 进行预处理:
+    1. 对 text 类型根据 lines 重算 bbox
+    2. 连续 text block 合并成一个 group
+    3. 非 text block (image, title, interline_equation 等) 单独作为 group
+    4. 每个 group 都有 group_type 标记，避免下游误判
+    """
 
     result = []
     current_group = []
 
-    for i in range(len(blocks)):
-        current_block = blocks[i]
+    def flush_current_group():
+        """把 current_group 收集到 result"""
+        nonlocal current_group
+        if current_group:
+            result.append({
+                "group_type": "text",
+                "blocks": current_group
+            })
+            current_group = []
 
-        # 如果当前块是 text 类型
-        if current_block['type'] == 'text':
-            current_block['bbox_fs'] = copy.deepcopy(current_block['bbox'])
-            if 'lines' in current_block and len(current_block['lines']) > 0:
-                current_block['bbox_fs'] = [
-                    min([line['bbox'][0] for line in current_block['lines']]),
-                    min([line['bbox'][1] for line in current_block['lines']]),
-                    max([line['bbox'][2] for line in current_block['lines']]),
-                    max([line['bbox'][3] for line in current_block['lines']]),
+    for i, current_block in enumerate(blocks):
+
+        if current_block["type"] == "text":
+            # 重算 bbox_fs
+            current_block["bbox_fs"] = copy.deepcopy(current_block["bbox"])
+            if "lines" in current_block and len(current_block["lines"]) > 0:
+                current_block["bbox_fs"] = [
+                    min(line["bbox"][0] for line in current_block["lines"]),
+                    min(line["bbox"][1] for line in current_block["lines"]),
+                    max(line["bbox"][2] for line in current_block["lines"]),
+                    max(line["bbox"][3] for line in current_block["lines"]),
                 ]
+            # 累积到当前 text group
             current_group.append(current_block)
 
-        # 检查下一个块是否存在
+        else:
+            # 遇到非 text block，先把前面的 text group flush 掉
+            flush_current_group()
+
+            # 当前 block 单独作为 group
+            result.append({
+                "group_type": current_block["type"],  # image / title / interline_equation 等
+                "blocks": [current_block]
+            })
+
+        # 如果下一个是 title / interline_equation，要切断 text group
         if i + 1 < len(blocks):
             next_block = blocks[i + 1]
-            # 如果下一个块不是 text 类型且是 title 或 interline_equation 类型
-            if next_block['type'] in ['title', 'interline_equation']:
-                result.append(current_group)
-                current_group = []
+            if next_block["type"] in ["title", "interline_equation"]:
+                flush_current_group()
 
-    # 处理最后一个 group
-    if current_group:
-        result.append(current_group)
+    # 收尾，处理残余的 text group
+    flush_current_group()
 
     return result
 
@@ -310,46 +330,41 @@ def __is_list_group(text_blocks_group):
             return False
     return True
 
-
 def __para_merge_page(blocks):
     page_text_blocks_groups = __process_blocks(blocks)
-    for text_blocks_group in page_text_blocks_groups:
-        if len(text_blocks_group) > 0:
-            # 需要先在合并前对所有block判断是否为list or index block
-            for block in text_blocks_group:
-                block_type = __is_list_or_index_block(block)
-                block['type'] = block_type
-                # logger.info(f"{block['type']}:{block}")
 
-        if len(text_blocks_group) > 1:
-            # 在合并前判断这个group 是否是一个 list group
-            is_list_group = __is_list_group(text_blocks_group)
+    for group in page_text_blocks_groups:
+        blocks_in_group = group["blocks"]
+
+        if len(blocks_in_group) > 0 and group["group_type"] == "text":
+            # 只对 text group 判断是否为 list/index
+            for block in blocks_in_group:
+                block_type = __is_list_or_index_block(block)
+                block["type"] = block_type
+
+        if len(blocks_in_group) > 1 and group["group_type"] == "text":
+            # 在合并前判断这个 group 是否是一个 list group
+            is_list_group = __is_list_group(blocks_in_group)
 
             # 倒序遍历
-            for i in range(len(text_blocks_group) - 1, -1, -1):
-                current_block = text_blocks_group[i]
+            for i in range(len(blocks_in_group) - 1, -1, -1):
+                current_block = blocks_in_group[i]
 
-                # 检查是否有前一个块
                 if i - 1 >= 0:
-                    prev_block = text_blocks_group[i - 1]
+                    prev_block = blocks_in_group[i - 1]
 
                     if (
-                        current_block['type'] == 'text'
-                        and prev_block['type'] == 'text'
+                        current_block["type"] == "text"
+                        and prev_block["type"] == "text"
                         and not is_list_group
                     ):
                         __merge_2_text_blocks(current_block, prev_block)
+
                     elif (
-                        current_block['type'] == BlockType.LIST
-                        and prev_block['type'] == BlockType.LIST
-                    ) or (
-                        current_block['type'] == BlockType.INDEX
-                        and prev_block['type'] == BlockType.INDEX
+                        (current_block["type"] == BlockType.LIST and prev_block["type"] == BlockType.LIST)
+                        or (current_block["type"] == BlockType.INDEX and prev_block["type"] == BlockType.INDEX)
                     ):
                         __merge_2_list_blocks(current_block, prev_block)
-
-        else:
-            continue
 
 
 def para_split(page_info_list):
