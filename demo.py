@@ -30,8 +30,6 @@ def do_parse(
     output_dir,  # Output directory for storing parsing results
     pdf_file_names: list[str],  # List of PDF file names to be parsed
     pdf_bytes_list: list[bytes],  # List of PDF bytes to be parsed
-    p_lang_list: list[str],  # List of languages for each PDF, default is 'ch' (Chinese) ['ch', 'ch_server', 'ch_lite', 'en', 'korean', 'japan', 'chinese_cht', 'ta', 'te', 'ka']。
-    backend="pipeline",  # The backend for parsing PDF, default is 'pipeline'
     parse_method="auto",  # The method for parsing PDF, default is 'auto'
     p_formula_enable=True,  # Enable formula parsing
     p_table_enable=True,  # Enable table parsing
@@ -46,143 +44,134 @@ def do_parse(
     start_page_id=0,  # Start page ID for parsing, default is 0
     end_page_id=None,  # End page ID for parsing, default is None (parse all pages until the end of the document)
 ):
+    layout_config = {
+        # "model_type": LayoutModelType.PP_DOCLAYOUT_PLUS_L,
+        # "conf_thresh": 0.4,
+        # "batch_num": 1,
+        # "model_dir_or_path": "C:\ocr\models\ppmodel\layout\PP-DocLayout-L\pp_doclayout_l.onnx",
+        # "model_dir_or_path": r"C:\ocr\models\ppmodel\layout\PP-DocLayout_plus-L\pp_doclayout_plus_l.onnx",
+    }
 
-    if backend == "pipeline":
+    ocr_config = {
+        # "Det.model_path": r"C:\ocr\models\ppmodel\ocr\v4\ch_PP-OCRv4_det_infer\openvino\ch_PP-OCRv4_det_infer.onnx",
+        # "Rec.model_path": r"C:\ocr\models\ppmodel\ocr\v4\ch_PP-OCRv4_rec_infer\openvino\ch_PP-OCRv4_rec_infer.onnx",
+        # "Rec.rec_batch_num": 1,
 
-        from rapidocr import EngineType as OCREngineType, OCRVersion, ModelType
-        from rapid_doc.model.layout.rapid_layout_self import ModelType as LayoutModelType
-        from rapid_doc.model.formula.rapid_formula_self import ModelType as FormulaModelType
-        from rapid_doc.model.table.rapid_table_self import ModelType as TableModelType
-        layout_config = {
-            # "model_type": LayoutModelType.PP_DOCLAYOUT_PLUS_L,
-            # "conf_thresh": 0.4,
-            # "batch_num": 1,
-            # "model_dir_or_path": "C:\ocr\models\ppmodel\layout\PP-DocLayout-L\pp_doclayout_l.onnx",
-            # "model_dir_or_path": r"C:\ocr\models\ppmodel\layout\PP-DocLayout_plus-L\pp_doclayout_plus_l.onnx",
-        }
+        "Det.ocr_version": OCRVersion.PPOCRV5,
+        "Rec.ocr_version": OCRVersion.PPOCRV5,
+        # "Det.model_type": ModelType.SERVER,
+        # "Rec.model_type": ModelType.SERVER,
 
-        ocr_config = {
-            # "Det.model_path": r"C:\ocr\models\ppmodel\ocr\v4\ch_PP-OCRv4_det_infer\openvino\ch_PP-OCRv4_det_infer.onnx",
-            # "Rec.model_path": r"C:\ocr\models\ppmodel\ocr\v4\ch_PP-OCRv4_rec_infer\openvino\ch_PP-OCRv4_rec_infer.onnx",
-            # "Rec.rec_batch_num": 1,
+        # 新增的自定义参数
+        # "engine_type": OCREngineType.TORCH, # 统一设置推理引擎
+        # "Det.rec_batch_num": 1, # Det批处理大小
+    }
 
-            "Det.ocr_version": OCRVersion.PPOCRV5,
-            "Rec.ocr_version": OCRVersion.PPOCRV5,
-            # "Det.model_type": ModelType.SERVER,
-            # "Rec.model_type": ModelType.SERVER,
+    formula_config = {
+        # "model_type": FormulaModelType.PP_FORMULANET_PLUS_S,
+        # "formula_level": 1, # 公式识别等级，默认为0，全识别。1:仅识别行间公式，行内公式不识别
+        # "batch_num": 1,
+        # "model_dir_or_path": r"C:\ocr\models\ppmodel\formula\PP-FormulaNet_plus-S\pp_formulanet_plus_s.onnx",
+    }
 
-            # 新增的自定义参数
-            # "engine_type": OCREngineType.TORCH, # 统一设置推理引擎
-            # "Det.rec_batch_num": 1, # Det批处理大小
-        }
+    # os.environ['MINERU_MODEL_SOURCE'] = 'local'
 
-        formula_config = {
-            # "model_type": FormulaModelType.PP_FORMULANET_PLUS_S,
-            # "formula_level": 1, # 公式识别等级，默认为0，全识别。1:仅识别行间公式，行内公式不识别
-            # "batch_num": 1,
-            # "model_dir_or_path": r"C:\ocr\models\ppmodel\formula\PP-FormulaNet_plus-S\pp_formulanet_plus_s.onnx",
-        }
+    table_config = {
+        # "force_ocr": False, # 表格文字，是否强制使用ocr，默认 False 根据 parse_method 来判断是否需要ocr还是从pdf中直接提取文本
+        # "model_type": TableModelType.UNET_SLANET_PLUS,  # （默认） 有线表格使用unet，无线表格使用slanet_plus
+        # "model_type": TableModelType.UNET_UNITABLE, # 有线表格使用unet，无线表格使用unitable
+        "model_type": TableModelType.SLANEXT,  # 有线表格使用slanext_wired，无线表格使用slanext_wireless
 
-        # os.environ['MINERU_MODEL_SOURCE'] = 'local'
+        # "model_dir_or_path": "", #单个模型使用。如SLANET_PLUS、UNITABLE
 
-        table_config = {
-            # "force_ocr": False, # 表格文字，是否强制使用ocr，默认 False 根据 parse_method 来判断是否需要ocr还是从pdf中直接提取文本
-            # "model_type": TableModelType.UNET_SLANET_PLUS,  # （默认） 有线表格使用unet，无线表格使用slanet_plus
-            # "model_type": TableModelType.UNET_UNITABLE, # 有线表格使用unet，无线表格使用unitable
-            "model_type": TableModelType.SLANEXT,  # 有线表格使用slanext_wired，无线表格使用slanext_wireless
+        # "cls.model_dir_or_path": "", # 表格分类模型地址
 
-            # "model_dir_or_path": "", #单个模型使用。如SLANET_PLUS、UNITABLE
+        # "unet.model_dir_or_path": "", # UNET表格模型地址
 
-            # "cls.model_dir_or_path": "", # 表格分类模型地址
+        # "unitable.model_dir_or_path": "", # UNITABLE表格模型地址
+        # "slanet_plus.model_dir_or_path": "", # SLANET_PLUS表格模型地址
 
-            # "unet.model_dir_or_path": "", # UNET表格模型地址
+        # "wired_cell.model_dir_or_path": "", # 有线单元格模型地址，配置SLANEXT时使用
+        # "wireless_cell.model_dir_or_path": "", # 无线单元格模型地址，配置SLANEXT时使用
+        # "wired_table.model_dir_or_path": "", # 有线表结构模型地址，配置SLANEXT时使用
+        # "wireless_table.model_dir_or_path": "", # 无线表结构模型地址，配置SLANEXT时使用,
+    }
 
-            # "unitable.model_dir_or_path": "", # UNITABLE表格模型地址
-            # "slanet_plus.model_dir_or_path": "", # SLANET_PLUS表格模型地址
-
-            # "wired_cell.model_dir_or_path": "", # 有线单元格模型地址，配置SLANEXT时使用
-            # "wireless_cell.model_dir_or_path": "", # 无线单元格模型地址，配置SLANEXT时使用
-            # "wired_table.model_dir_or_path": "", # 有线表结构模型地址，配置SLANEXT时使用
-            # "wireless_table.model_dir_or_path": "", # 无线表结构模型地址，配置SLANEXT时使用,
-        }
-
-        checkbox_config = {
-            # "checkbox_enable": False, # 是否识别复选框，默认不识别，基于opencv，有可能会误检
-        }
+    checkbox_config = {
+        # "checkbox_enable": False, # 是否识别复选框，默认不识别，基于opencv，有可能会误检
+    }
 
 
-        for idx, pdf_bytes in enumerate(pdf_bytes_list):
-            new_pdf_bytes = convert_pdf_bytes_to_bytes_by_pypdfium2(pdf_bytes, start_page_id, end_page_id)
-            pdf_bytes_list[idx] = new_pdf_bytes
-        # 记录开始时间
-        start_time = time.time()
-        infer_results, all_image_lists, all_pdf_docs, lang_list, ocr_enabled_list = pipeline_doc_analyze(pdf_bytes_list, p_lang_list, parse_method=parse_method, formula_enable=p_formula_enable,table_enable=p_table_enable,
-                                                                                                         layout_config=layout_config, ocr_config=ocr_config, formula_config=formula_config, table_config=table_config, checkbox_config=checkbox_config)
+    for idx, pdf_bytes in enumerate(pdf_bytes_list):
+        new_pdf_bytes = convert_pdf_bytes_to_bytes_by_pypdfium2(pdf_bytes, start_page_id, end_page_id)
+        pdf_bytes_list[idx] = new_pdf_bytes
+    # 记录开始时间
+    start_time = time.time()
+    infer_results, all_image_lists, all_pdf_docs, lang_list, ocr_enabled_list = pipeline_doc_analyze(pdf_bytes_list, parse_method=parse_method, formula_enable=p_formula_enable,table_enable=p_table_enable,
+                                                                                                     layout_config=layout_config, ocr_config=ocr_config, formula_config=formula_config, table_config=table_config, checkbox_config=checkbox_config)
 
-        for idx, model_list in enumerate(infer_results):
+    for idx, model_list in enumerate(infer_results):
 
-            model_json = copy.deepcopy(model_list)
-            pdf_file_name = pdf_file_names[idx]
-            local_image_dir, local_md_dir = prepare_env(output_dir, pdf_file_name, parse_method)
-            image_writer, md_writer = FileBasedDataWriter(local_image_dir), FileBasedDataWriter(local_md_dir)
+        model_json = copy.deepcopy(model_list)
+        pdf_file_name = pdf_file_names[idx]
+        local_image_dir, local_md_dir = prepare_env(output_dir, pdf_file_name, parse_method)
+        image_writer, md_writer = FileBasedDataWriter(local_image_dir), FileBasedDataWriter(local_md_dir)
 
-            images_list = all_image_lists[idx]
-            pdf_doc = all_pdf_docs[idx]
-            _lang = lang_list[idx]
-            _ocr_enable = ocr_enabled_list[idx]
-            middle_json = pipeline_result_to_middle_json(model_list, images_list, pdf_doc, image_writer, _lang, _ocr_enable, p_formula_enable, ocr_config=ocr_config)
-            # 计算总运行时间（单位：秒）
-            print(f"运行时间: {time.time() - start_time}秒")
-            pdf_info = middle_json["pdf_info"]
+        images_list = all_image_lists[idx]
+        pdf_doc = all_pdf_docs[idx]
+        _lang = lang_list[idx]
+        _ocr_enable = ocr_enabled_list[idx]
+        middle_json = pipeline_result_to_middle_json(model_list, images_list, pdf_doc, image_writer, _lang, _ocr_enable, p_formula_enable, ocr_config=ocr_config)
+        # 计算总运行时间（单位：秒）
+        print(f"运行时间: {time.time() - start_time}秒")
+        pdf_info = middle_json["pdf_info"]
 
-            pdf_bytes = pdf_bytes_list[idx]
-            if f_draw_layout_bbox:
-                draw_layout_bbox(pdf_info, pdf_bytes, local_md_dir, f"{pdf_file_name}_layout.pdf")
+        pdf_bytes = pdf_bytes_list[idx]
+        if f_draw_layout_bbox:
+            draw_layout_bbox(pdf_info, pdf_bytes, local_md_dir, f"{pdf_file_name}_layout.pdf")
 
-            if f_draw_span_bbox:
-                draw_span_bbox(pdf_info, pdf_bytes, local_md_dir, f"{pdf_file_name}_span.pdf")
+        if f_draw_span_bbox:
+            draw_span_bbox(pdf_info, pdf_bytes, local_md_dir, f"{pdf_file_name}_span.pdf")
 
-            if f_dump_orig_pdf:
-                md_writer.write(
-                    f"{pdf_file_name}_origin.pdf",
-                    pdf_bytes,
-                )
+        if f_dump_orig_pdf:
+            md_writer.write(
+                f"{pdf_file_name}_origin.pdf",
+                pdf_bytes,
+            )
 
-            if f_dump_md:
-                image_dir = str(os.path.basename(local_image_dir))
-                md_content_str = pipeline_union_make(pdf_info, f_make_md_mode, image_dir)
-                md_writer.write_string(
-                    f"{pdf_file_name}.md",
-                    md_content_str,
-                )
+        if f_dump_md:
+            image_dir = str(os.path.basename(local_image_dir))
+            md_content_str = pipeline_union_make(pdf_info, f_make_md_mode, image_dir)
+            md_writer.write_string(
+                f"{pdf_file_name}.md",
+                md_content_str,
+            )
 
-            if f_dump_content_list:
-                image_dir = str(os.path.basename(local_image_dir))
-                content_list = pipeline_union_make(pdf_info, MakeMode.CONTENT_LIST, image_dir)
-                md_writer.write_string(
-                    f"{pdf_file_name}_content_list.json",
-                    json.dumps(content_list, ensure_ascii=False, indent=4),
-                )
+        if f_dump_content_list:
+            image_dir = str(os.path.basename(local_image_dir))
+            content_list = pipeline_union_make(pdf_info, MakeMode.CONTENT_LIST, image_dir)
+            md_writer.write_string(
+                f"{pdf_file_name}_content_list.json",
+                json.dumps(content_list, ensure_ascii=False, indent=4),
+            )
 
-            if f_dump_middle_json:
-                md_writer.write_string(
-                    f"{pdf_file_name}_middle.json",
-                    json.dumps(middle_json, ensure_ascii=False, indent=4),
-                )
+        if f_dump_middle_json:
+            md_writer.write_string(
+                f"{pdf_file_name}_middle.json",
+                json.dumps(middle_json, ensure_ascii=False, indent=4),
+            )
 
-            if f_dump_model_output:
-                md_writer.write_string(
-                    f"{pdf_file_name}_model.json",
-                    json.dumps(model_json, ensure_ascii=False, indent=4),
-                )
+        if f_dump_model_output:
+            md_writer.write_string(
+                f"{pdf_file_name}_model.json",
+                json.dumps(model_json, ensure_ascii=False, indent=4),
+            )
 
-            logger.info(f"local output dir is {local_md_dir}")
+        logger.info(f"local output dir is {local_md_dir}")
 
 def parse_doc(
         path_list: list[Path],
         output_dir,
-        lang="ch",
-        backend="pipeline",
         method="auto",
         start_page_id=0,  # Start page ID for parsing, default is 0
         end_page_id=None  # End page ID for parsing, default is None (parse all pages until the end of the document)
@@ -191,35 +180,24 @@ def parse_doc(
         Parameter description:
         path_list: List of document paths to be parsed, can be PDF or image files.
         output_dir: Output directory for storing parsing results.
-        lang: Language option, default is 'ch', optional values include['ch', 'ch_server', 'ch_lite', 'en', 'korean', 'japan', 'chinese_cht', 'ta', 'te', 'ka']。
-            Input the languages in the pdf (if known) to improve OCR accuracy.  Optional.
-            Adapted only for the case where the backend is set to "pipeline"
-        backend: the backend for parsing pdf:
-            pipeline: More general.
-            without method specified, pipeline will be used by default.
         method: the method for parsing pdf:
             auto: Automatically determine the method based on the file type.
             txt: Use text extraction method.
             ocr: Use OCR method for image-based PDFs.
             Without method specified, 'auto' will be used by default.
-            Adapted only for the case where the backend is set to "pipeline".
     """
     try:
         file_name_list = []
         pdf_bytes_list = []
-        lang_list = []
         for path in path_list:
             file_name = str(Path(path).stem)
             pdf_bytes = read_fn(path)
             file_name_list.append(file_name)
             pdf_bytes_list.append(pdf_bytes)
-            lang_list.append(lang)
         do_parse(
             output_dir=output_dir,
             pdf_file_names=file_name_list,
             pdf_bytes_list=pdf_bytes_list,
-            p_lang_list=lang_list,
-            backend=backend,
             parse_method=method,
             start_page_id=start_page_id,
             end_page_id=end_page_id
@@ -229,42 +207,13 @@ def parse_doc(
 
 
 if __name__ == '__main__':
-    # args Table Predict: 100%|██████████| 9/9 [00:37<00:00,  4.14s/it]
     __dir__ = os.path.dirname(os.path.abspath(__file__))
-    pdf_files_dir = os.path.join(__dir__, "pdfs")
-    output_dir = os.path.join(__dir__, "output888")
-    pdf_suffixes = [".pdf"]
-    image_suffixes = [".png", ".jpeg", ".jpg"]
+    output_dir = os.path.join(__dir__, "output")
 
     doc_path_list = [
-        # "D:\\file\\text-pdf\\demo1.pdf",
-        # "D:\\file\\text-pdf\\比亚迪财报.pdf",
-        # "D:\\file\\text-pdf\\GBT3620.1-2016.pdf",
-        # r'C:\ocr\img\table\3766ae2b506b8f345fcc9eee39b31ac8.png'
-        # r'D:\file\text-pdf\img\文字文稿123.pdf',
-        # r'D:\file\text-pdf\img\table_test.pdf'
         "D:\\file\\text-pdf\\示例1-论文模板.pdf",
-        # "D:\\file\\text-pdf\\示例7-研究报告.pdf",
-        # r'C:\ocr\img\table\ceshi.pdf',
-        # "tests/0a471d47-e428-4e5a-b849-a8aedfe399a0.png",
-        # r"C:\Users\huazhen\Desktop\1 - 副本 (3).pdf",
-        # r"C:\ocr\table\80cac76b6464916570c3cf3b63fa00c8.png",
-        # r"C:\Users\huazhen\Desktop\1.pdf",
-
-        # "C:\ocr\img\pageddd_5.png",
-        # "C:\ocr\img\pages_50_02.png",
-        # "C:\ocr\img\pages_50_04.png",
-        # "C:\ocr\img\pages_50_49.png",
-        # "D:\\file\\text-pdf\\demo1.pdf",
-        # "C:\\ocr\\pdf\\pages_50.pdf"
-        # "C:\\ocr\\table\\table.jpg"
-        # "D:\CodeProjects\doc\paddleocr-v3\layout\page_2.png"
-        # "demo/pdfs/demo1.pdf",
     ]
-    # """Use pipeline mode if your environment does not support VLM"""
-    # # 记录开始时间
     for doc_path in doc_path_list:
         start_time = time.time()
-        parse_doc([doc_path], output_dir, backend="pipeline")
-        # 计算总运行时间（单位：秒）
-        print(f"总运行时间: {time.time() - start_time}秒")
+        parse_doc([doc_path], output_dir)
+        print(f"运行时间: {time.time() - start_time}秒")
