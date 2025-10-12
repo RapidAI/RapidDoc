@@ -4,7 +4,7 @@ from rapidfuzz import fuzz
 
 from chunk.text_splitters import MarkdownTextSplitter
 
-def get_blocks(middle_json_content):
+def get_blocks_from_middle(middle_json_content):
     try:
         data = middle_json_content
         block_list = []
@@ -135,7 +135,7 @@ if __name__ == '__main__':
         middle_json_content = json.load(f)
 
     start_time = time.time()
-    block_list = get_blocks(middle_json_content)
+    block_list = get_blocks_from_middle(middle_json_content)
     matched_global_indices = set()
     for i, chunk in enumerate(chunk_list):
         position_int_temp = get_bbox_for_chunk(chunk.strip(), block_list, matched_global_indices)

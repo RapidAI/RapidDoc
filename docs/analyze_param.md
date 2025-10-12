@@ -59,10 +59,11 @@ layout_config = {
 #### 3、ocr_config OCR识别参数说明如下：
 在rapidocr配置基础上新增如下参数
 
-|  参数名   |      说明      |                      默认值                       | 备注 |
-| :-------: |:------------:|:----------------------------------------------:|:--:|
-| engine_type  | det和rec的推理引擎 | OPENVINO（cpu）、TORCH（gpu） |  |
-| Det.rec_batch_num |   rec批处理大小   |                       1                        |  |
+|  参数名   |      说明      |                      默认值                       |                                            备注                                            |
+| :-------: |:------------:|:----------------------------------------------:|:----------------------------------------------------------------------------------------:|
+| engine_type  | det和rec的推理引擎 | OPENVINO（cpu）、TORCH（gpu） |                                                                                          |
+| use_det_bbox  | 是否使用ocr的Det定位文本行 | False | 直接使用pdf里的文本bbox，当parse_method="ocr"或parse_method="auto"自动判断为需要ocr时，use_det_bbox会自动变为True |
+| Det.rec_batch_num |   rec批处理大小   |                       1                        |                                                                                          |
 > [ocr_config想更深入了解，请移步rapidocr config.yaml参数解释](https://rapidai.github.io/RapidOCRDocs/install_usage/api/RapidOCR/)
 
 示例：

@@ -57,14 +57,17 @@ def do_parse(
         # "Rec.model_path": r"C:\ocr\models\ppmodel\ocr\v4\ch_PP-OCRv4_rec_infer\openvino\ch_PP-OCRv4_rec_infer.onnx",
         # "Rec.rec_batch_num": 1,
 
-        "Det.ocr_version": OCRVersion.PPOCRV5,
-        "Rec.ocr_version": OCRVersion.PPOCRV5,
+        # "Det.ocr_version": OCRVersion.PPOCRV5,
+        # "Rec.ocr_version": OCRVersion.PPOCRV5,
         # "Det.model_type": ModelType.SERVER,
         # "Rec.model_type": ModelType.SERVER,
 
         # 新增的自定义参数
         # "engine_type": OCREngineType.TORCH, # 统一设置推理引擎
         # "Det.rec_batch_num": 1, # Det批处理大小
+
+        # 是否使用ocr的Det定位文本行，默认False，直接使用pdf里的文本bbox，当parse_method="ocr"或parse_method="auto"自动判断为需要ocr时，use_det_bbox会自动变为True
+        # "use_det_bbox": False
     }
 
     formula_config = {
@@ -212,8 +215,9 @@ if __name__ == '__main__':
 
     doc_path_list = [
         "D:\\file\\text-pdf\\示例1-论文模板.pdf",
+        "D:\\file\\text-pdf\\示例1-论文模板.pdf",
     ]
     for doc_path in doc_path_list:
         start_time = time.time()
         parse_doc([doc_path], output_dir)
-        print(f"运行时间: {time.time() - start_time}秒")
+        print(f"总运行时间: {time.time() - start_time}秒")

@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 from chunk.text_splitters import MarkdownTextSplitter
-from chunk.get_bbox_page_fast import get_blocks, get_bbox_for_chunk
+from chunk.get_bbox_page_fast import get_bbox_for_chunk, get_blocks_from_middle
 from rapid_doc.cli.common import convert_pdf_bytes_to_bytes_by_pypdfium2, prepare_env, read_fn
 from rapid_doc.data.data_reader_writer import FileBasedDataWriter
 from rapid_doc.utils.enum_class import MakeMode
@@ -42,7 +42,9 @@ def do_parse(path_list, output_dir):
         image_dir = str(os.path.basename(local_image_dir))
         md_content_str = pipeline_union_make(pdf_info, MakeMode.MM_MD, image_dir)
 
-        result_list.append((middle_json, md_content_str, image_dir))
+        content_list = pipeline_union_make(pdf_info, MakeMode.CONTENT_LIST, image_dir)
+
+        result_list.append((middle_json, md_content_str, content_list, image_dir))
     return result_list
 
 if __name__ == '__main__':
@@ -54,14 +56,14 @@ if __name__ == '__main__':
     ]
     result_list = do_parse(doc_path_list, output_dir)
 
-    for middle_json_content, markdown_document, _ in result_list:
+    for middle_json_content, markdown_document, content_list, _ in result_list:
         # 分块
         text_splitter = MarkdownTextSplitter(
             chunk_token_num=100, min_chunk_tokens=50
         )
         chunk_list = text_splitter.split_text(markdown_document)
         # 定位分块原始位置
-        block_list = get_blocks(middle_json_content)
+        block_list = get_blocks_from_middle(middle_json_content)
         matched_global_indices = set()
         for i, chunk in enumerate(chunk_list):
             position_int_temp = get_bbox_for_chunk(chunk.strip(), block_list, matched_global_indices)

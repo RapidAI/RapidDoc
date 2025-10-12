@@ -14,7 +14,8 @@ from ...utils.enum_class import CategoryId
 from ...utils.model_utils import crop_img, get_res_list_from_layout_res, clean_vram
 from ...utils.ocr_utils import merge_det_boxes, update_det_boxes, sorted_boxes
 from ...utils.ocr_utils import get_adjusted_mfdetrec_res, get_ocr_result_list, OcrConfidence, get_ocr_result_list_table
-from ...utils.span_pre_proc import txt_spans_extract
+from ...utils.pdf_text_tool import get_page
+from ...utils.span_pre_proc import txt_spans_extract, txt_spans_bbox_extract
 
 
 # YOLO_LAYOUT_BASE_BATCH_SIZE = 8
@@ -49,6 +50,7 @@ class BatchAnalyze:
         self.layout_base_batch_size = layout_config.get("batch_num", 1) if layout_config else 1 #8
         self.formula_base_batch_size = formula_config.get("batch_num", 1) if formula_config else 1 #16
         self.scale = 200 / 72 # dpi=200
+        self.use_det_bbox = ocr_config.get("use_det_bbox", False) if ocr_config else False
 
     def __call__(self, images_with_extra_info: list) -> list:
         if len(images_with_extra_info) == 0:
@@ -92,8 +94,6 @@ class BatchAnalyze:
             _, ocr_enable, _lang, _ = images_with_extra_info[index]
             layout_res = images_layout_res[index]
             np_img = np_images[index]
-            pdf_doc = pdf_docs[index]
-            # page_dict = get_page(pdf_doc)
 
             ocr_res_list, table_res_list, single_page_mfdetrec_res = (
                 get_res_list_from_layout_res(layout_res)
@@ -117,6 +117,7 @@ class BatchAnalyze:
                                           'single_page_mfdetrec_res':single_page_mfdetrec_res,
                                           'layout_res':layout_res,
                                           'checkbox_res':checkbox_res,
+                                          'page_idx': index,
                                           })
 
             for table_res in table_res_list:
@@ -128,14 +129,12 @@ class BatchAnalyze:
                 #
                 # wireless_table_img = get_crop_table_img(scale = 1)
 
-
                 table_img, useful_list = crop_img(table_res, np_img)
                 table_res_list_all_page.append({'table_res':table_res,
                                                 'lang':_lang,
                                                 'table_img':table_img,
                                                 'useful_list': useful_list,
                                                 'ocr_enable': ocr_enable,
-                                                'pdf_doc': pdf_doc,
                                                 'page_idx': index,
                                               })
             for latex_res in single_page_mfdetrec_res:
@@ -158,6 +157,47 @@ class BatchAnalyze:
         # 清理显存
         # clean_vram(self.model.device, vram_threshold=8)
 
+        if not self.use_det_bbox:
+            # 分页分组
+            ocr_res_list_grouped_page = {}
+            for x in ocr_res_list_all_page:
+                ocr_res_list_grouped_page.setdefault(x["page_idx"], []).append(x)
+            # 计算总数
+            total_texts = sum(len(texts) for texts in ocr_res_list_grouped_page.values())
+            with tqdm(total=total_texts, desc="PDF-det Predict") as pbar:
+                for page_idx, text_list in ocr_res_list_grouped_page.items():
+                    if text_list:
+                        pdf_doc = pdf_docs[page_idx]
+                        page_dict = get_page(pdf_doc)
+                    for ocr_res_list_dict in text_list:
+                        _lang = ocr_res_list_dict['lang']
+                        if ocr_res_list_dict['ocr_enable']:
+                            # 需要进行ocr的这里跳过
+                            continue
+                        # 从pdf中获取文本行点位
+                        for res in ocr_res_list_dict['ocr_res_list']:
+                            # res 点位信息
+                            new_image, useful_list = crop_img(
+                                res, ocr_res_list_dict['np_img'], crop_paste_x=50, crop_paste_y=50
+                            )
+                            # 跳过公式和复选框
+                            adjusted_mfdetrec_res = get_adjusted_mfdetrec_res(
+                                ocr_res_list_dict['single_page_mfdetrec_res'] + ocr_res_list_dict['checkbox_res'],
+                                useful_list
+                            )
+                            # PDF-det
+                            bgr_image = cv2.cvtColor(new_image, cv2.COLOR_RGB2BGR)
+                            ocr_res = txt_spans_bbox_extract(page_dict, res, mfd_res=adjusted_mfdetrec_res, scale=self.scale, useful_list=useful_list) # 从pdf中获取文本行点位
+                            # Integration results
+                            if ocr_res:
+                                ocr_result_list = get_ocr_result_list(
+                                    ocr_res, useful_list, ocr_res_list_dict['ocr_enable'], bgr_image, _lang
+                                )
+
+                                ocr_res_list_dict['layout_res'].extend(ocr_result_list)
+                        pbar.update(1)  # 每处理一个更新一次
+
+
         # OCR检测处理
         if self.enable_ocr_det_batch:
             # 批处理模式 - 按语言和分辨率分组
@@ -166,6 +206,9 @@ class BatchAnalyze:
 
             for ocr_res_list_dict in ocr_res_list_all_page:
                 _lang = ocr_res_list_dict['lang']
+                if not self.use_det_bbox and not ocr_res_list_dict['ocr_enable']:
+                    # 从pdf中直接提取文本块点位，且不需要ocr，则跳过
+                    continue
 
                 for res in ocr_res_list_dict['ocr_res_list']:
                     new_image, useful_list = crop_img(
@@ -284,6 +327,9 @@ class BatchAnalyze:
             for ocr_res_list_dict in tqdm(ocr_res_list_all_page, desc="OCR-det Predict"):
                 # Process each area that requires OCR processing
                 _lang = ocr_res_list_dict['lang']
+                if not self.use_det_bbox and not ocr_res_list_dict['ocr_enable']:
+                    # 从pdf中直接提取文本块点位，且不需要ocr，则跳过
+                    continue
                 # Get OCR results for this language's images
                 ocr_model = atom_model_manager.get_atom_model(
                     atom_model_name=AtomicModel.OCR,
@@ -324,12 +370,14 @@ class BatchAnalyze:
             total_tables = sum(len(tables) for tables in table_res_list_grouped_page.values())
             with tqdm(total=total_tables, desc="Table Predict") as pbar:
                 for page_idx, table_list in table_res_list_grouped_page.items():
+                    if not self.table_force_ocr:
+                        pdf_doc = pdf_docs[page_idx]
+                        page_dict = get_page(pdf_doc)
                     for table_res_dict in table_list:
                         _lang = table_res_dict['lang']
                         ocr_result = None
                         if not self.table_force_ocr and not table_res_dict['ocr_enable']:
                             # RapidTable非OCR文本提取 OcrText
-                            pdf_doc = table_res_dict['pdf_doc']
                             # 进行 OCR-det 识别文字框
                             ocr_model = atom_model_manager.get_atom_model(
                                 atom_model_name=AtomicModel.OCR,
@@ -347,7 +395,7 @@ class BatchAnalyze:
                                 table_bboxes = [[int(poly[0]/self.scale), int(poly[1]/self.scale), int(poly[4]/self.scale), int(poly[5]/self.scale)
                                                     , None, None, None,'text', None, None, None, None, 1]]
                                 # 从pdf中提取表格的文本
-                                txt_spans_extract(pdf_doc, ocr_spans, table_res_dict['table_img'], self.scale, table_bboxes,[])
+                                txt_spans_extract(page_dict, ocr_spans, table_res_dict['table_img'], self.scale, table_bboxes,[])
                                 ocr_result = [list(x) for x in zip(*[[item['ori_bbox'], item['content'], item['score']] for item in ocr_spans])]
                         table_model = atom_model_manager.get_atom_model(
                             atom_model_name='table',

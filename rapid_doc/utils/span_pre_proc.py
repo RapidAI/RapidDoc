@@ -10,6 +10,7 @@ from loguru import logger
 from rapid_doc.utils.boxbase import calculate_overlap_area_in_bbox1_area_ratio, calculate_iou, \
     get_minbox_if_overlap_by_ratio
 from rapid_doc.utils.enum_class import BlockType, ContentType
+from rapid_doc.utils.ocr_utils import update_det_boxes, sorted_boxes, merge_det_boxes
 from rapid_doc.utils.pdf_image_tools import get_crop_img, get_crop_np_img
 from rapid_doc.utils.pdf_text_tool import get_page
 
@@ -118,11 +119,53 @@ def __replace_unicode(text: str):
     }
     return re.sub('|'.join(map(re.escape, ligatures.keys())), lambda m: ligatures[m.group()], text)
 
+"""pdf_text bbox提取"""
+def txt_spans_bbox_extract(page_dict, input_res, mfd_res, scale, useful_list):
+    paste_x, paste_y, xmin, ymin, xmax, ymax, new_width, new_height = useful_list
+    poly = input_res['poly']
+    input_res_bbox = [poly[0]/scale, poly[1]/scale, poly[4]/scale, poly[5]/scale]
+
+    page_text_bbox = []
+    for block in page_dict['blocks']:
+        for line in block['lines']:
+            if 0 < abs(line['rotation']) < 90:
+                # 旋转角度在0-90度之间的行，直接跳过
+                continue
+            for span in line['spans']:
+                bbox = span['bbox'].bbox  # 获取坐标框
+                text = span['text']  # 获取文字内容
+                if calculate_text_in_span(bbox, input_res_bbox, text):
+                    page_text_bbox.append(bbox)
+    dt_boxes = []
+    # 转换为和ocr-det一样的格式
+    for bbox in page_text_bbox:
+        bbox = [bbox[0]*scale, bbox[1]*scale, bbox[2]*scale, bbox[3]*scale]
+        p1 = [bbox[0] + paste_x - xmin, bbox[1] + paste_y - ymin]
+        p2 = [bbox[2] + paste_x - xmin, bbox[1] + paste_y - ymin]
+        p3 = [bbox[2] + paste_x - xmin, bbox[3] + paste_y - ymin]
+        p4 = [bbox[0] + paste_x - xmin, bbox[3] + paste_y - ymin]
+        bbox = [p1, p2, p3, p4]
+        dt_boxes.append(bbox)
+
+    # 1. 排序检测框
+    dt_boxes = sorted_boxes(dt_boxes)
+    # 2. 合并相邻检测框
+    dt_boxes = merge_det_boxes(dt_boxes)
+    # 3. 根据公式位置更新检测框
+    if mfd_res:
+        dt_boxes = update_det_boxes(dt_boxes, mfd_res)
+
+    return dt_boxes
+
 
 """pdf_text dict方案 char级别"""
-def txt_spans_extract(pdf_page, spans, input_img, scale, all_bboxes, all_discarded_blocks):
-
-    page_dict = get_page(pdf_page)
+def txt_spans_extract(pdf_page_or_dict, spans, input_img, scale, all_bboxes, all_discarded_blocks):
+    # 判断类型
+    if isinstance(pdf_page_or_dict, dict):
+        page_dict = pdf_page_or_dict
+    else:
+        # 是 pdfium.PdfPage
+        page_dict = get_page(pdf_page_or_dict)
 
     page_all_chars = []
     page_all_lines = []
@@ -285,6 +328,35 @@ def calculate_char_in_span(char_bbox, span_bbox, char, span_height_radio=Span_He
         else:
             return False
 
+def calculate_text_in_span(char_bbox, span_bbox, char):
+    char_center_x = (char_bbox[0] + char_bbox[2]) / 2
+    char_center_y = (char_bbox[1] + char_bbox[3]) / 2
+    span_height = span_bbox[3] - span_bbox[1]
+
+    if (
+        span_bbox[0] < char_center_x < span_bbox[2]
+        and span_bbox[1] < char_center_y < span_bbox[3]
+    ):
+        return True
+    else:
+        # 如果char是LINE_STOP_FLAG，就不用中心点判定，换一种方案（左边界在span区域内，高度判定和之前逻辑一致）
+        # 主要是给结尾符号一个进入span的机会，这个char还应该离span右边界较近
+        if char in LINE_STOP_FLAG:
+            if (
+                (span_bbox[2] - span_height) < char_bbox[0] < span_bbox[2]
+                and char_center_x > span_bbox[0]
+                and span_bbox[1] < char_center_y < span_bbox[3]
+            ):
+                return True
+        elif char in LINE_START_FLAG:
+            if (
+                span_bbox[0] < char_bbox[2] < (span_bbox[0] + span_height)
+                and char_center_x < span_bbox[2]
+                and span_bbox[1] < char_center_y < span_bbox[3]
+            ):
+                return True
+        else:
+            return False
 
 def chars_to_content(span):
     # 检查span中的char是否为空
