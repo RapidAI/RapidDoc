@@ -16,12 +16,33 @@ class DownloadFileInput:
     sha256: Optional[str] = None
 
 
+DEFAULT_MODEL_KEYWORDS = [
+    # layout
+    "pp_doclayout_l.onnx",
+    # formula
+    "pp_formulanet_plus_s.onnx",
+    # ocr
+    "ch_PP-OCRv5_rec_mobile_infer.onnx",
+    "ch_PP-OCRv5_mobile_det.onnx",
+    "ch_ppocr_mobile_v2.0_cls_infer.onnx",
+    "ppocrv5_dict.txt",
+    "FZYTK.TTF",
+    # table
+    "paddle_cls.onnx",
+    "unet.onnx",
+    "slanet-plus.onnx",
+]
+
 class DownloadFile:
     BLOCK_SIZE = 1024  # 1 KiB
     REQUEST_TIMEOUT = 60
 
     @classmethod
-    def run(cls, input_params: DownloadFileInput):
+    def run(cls, input_params: DownloadFileInput, model_source="default"):
+        # 如果是 default 模式，只下载 DEFAULT_MODEL_KEYWORDS 里的文件
+        if model_source == "default" and not any(k in input_params.file_url for k in DEFAULT_MODEL_KEYWORDS):
+            return
+
         save_path = Path(input_params.save_path)
 
         cls._ensure_parent_dir_exists(save_path)

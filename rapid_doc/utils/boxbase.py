@@ -1,5 +1,6 @@
 import math
-
+from typing import List, Dict, Any
+import numpy as np
 
 def is_in(box1, box2) -> bool:
     """box1是否完全在box2里面."""
@@ -201,3 +202,71 @@ def calculate_vertical_projection_overlap_ratio(block1, block2):
     # Proportion of the x-axis covered by the intersection
     # logger.info(f"intersection_length: {intersection_length}, block1_length: {block1_length}")
     return intersection_length / block1_length
+
+
+def merge_adjacent_bboxes(spans: List[Dict[str, Any]], x_gap_ratio: float = 0.6, y_tolerance_ratio: float = 0.8, return_text: bool = False):
+    """
+    合并相邻或重叠的文字框（支持字号差异），基于行中心聚类。
+    """
+    if not spans:
+        return []
+
+    # 排序
+    spans = sorted(spans, key=lambda s: (s['bbox'][1], s['bbox'][0]))
+
+    # 计算中心点与高度
+    for s in spans:
+        y0, y1 = s['bbox'][1], s['bbox'][3]
+        s['_cy'] = (y0 + y1) / 2
+        s['_h'] = y1 - y0
+
+    # ---------- 阶段1：纵向聚类 ----------
+    lines = []
+    for span in spans:
+        assigned = False
+        for line in lines:
+            # 若当前span中心点与已有行中心差 < 平均高度 * 容忍度，则归入同一行
+            avg_h = np.mean([s['_h'] for s in line])
+            line_cy = np.mean([s['_cy'] for s in line])
+            if abs(span['_cy'] - line_cy) < avg_h * y_tolerance_ratio:
+                line.append(span)
+                assigned = True
+                break
+        if not assigned:
+            lines.append([span])
+
+    merged_result = []
+
+    # ---------- 阶段2：行内横向合并 ----------
+    for line in lines:
+        line = sorted(line, key=lambda s: s['bbox'][0])
+        current = line[0].copy()
+
+        for span in line[1:]:
+            ax0, _, ax1, _ = current['bbox']
+            bx0, _, bx1, _ = span['bbox']
+            size_a = current.get('font', {}).get('size', 10)
+            size_b = span.get('font', {}).get('size', 10)
+            size_avg = (size_a + size_b) / 2
+
+            # 容忍字间距或重叠
+            if bx0 - ax1 <= size_avg * x_gap_ratio:
+                x0 = min(current['bbox'][0], span['bbox'][0])
+                y0 = min(current['bbox'][1], span['bbox'][1])
+                x1 = max(current['bbox'][2], span['bbox'][2])
+                y1 = max(current['bbox'][3], span['bbox'][3])
+                if return_text:
+                    current['text'] = current['text'].rstrip() + span['text'].lstrip()
+                current['bbox'] = [x0, y0, x1, y1]
+            else:
+                merged_result.append(current)
+                current = span.copy()
+
+        merged_result.append(current)
+
+    # ---------- 阶段3：清理临时字段 ----------
+    for s in merged_result:
+        s.pop('_cy', None)
+        s.pop('_h', None)
+
+    return merged_result

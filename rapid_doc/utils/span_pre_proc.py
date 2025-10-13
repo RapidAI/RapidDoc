@@ -5,10 +5,9 @@ import statistics
 
 import cv2
 import numpy as np
-from loguru import logger
 
 from rapid_doc.utils.boxbase import calculate_overlap_area_in_bbox1_area_ratio, calculate_iou, \
-    get_minbox_if_overlap_by_ratio
+    get_minbox_if_overlap_by_ratio, merge_adjacent_bboxes
 from rapid_doc.utils.enum_class import BlockType, ContentType
 from rapid_doc.utils.ocr_utils import update_det_boxes, sorted_boxes, merge_det_boxes
 from rapid_doc.utils.pdf_image_tools import get_crop_img, get_crop_np_img
@@ -125,7 +124,7 @@ def txt_spans_bbox_extract(page_dict, input_res, mfd_res, scale, useful_list):
     poly = input_res['poly']
     input_res_bbox = [poly[0]/scale, poly[1]/scale, poly[4]/scale, poly[5]/scale]
 
-    page_text_bbox = []
+    page_text_span = []
     for block in page_dict['blocks']:
         for line in block['lines']:
             if 0 < abs(line['rotation']) < 90:
@@ -135,7 +134,10 @@ def txt_spans_bbox_extract(page_dict, input_res, mfd_res, scale, useful_list):
                 bbox = span['bbox'].bbox  # 获取坐标框
                 text = span['text']  # 获取文字内容
                 if calculate_text_in_span(bbox, input_res_bbox, text):
-                    page_text_bbox.append(bbox)
+                    page_text_span.append(span)
+    # 合并相邻或重叠的文字框
+    page_text_span = merge_adjacent_bboxes(page_text_span)
+    page_text_bbox = [item['bbox'] for item in page_text_span if 'bbox' in item]
     dt_boxes = []
     # 转换为和ocr-det一样的格式
     for bbox in page_text_bbox:
@@ -146,12 +148,7 @@ def txt_spans_bbox_extract(page_dict, input_res, mfd_res, scale, useful_list):
         p4 = [bbox[0] + paste_x - xmin, bbox[3] + paste_y - ymin]
         bbox = [p1, p2, p3, p4]
         dt_boxes.append(bbox)
-
-    # 1. 排序检测框
-    dt_boxes = sorted_boxes(dt_boxes)
-    # 2. 合并相邻检测框
-    dt_boxes = merge_det_boxes(dt_boxes)
-    # 3. 根据公式位置更新检测框
+    # 根据公式位置更新检测框
     if mfd_res:
         dt_boxes = update_det_boxes(dt_boxes, mfd_res)
 

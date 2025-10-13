@@ -1,7 +1,5 @@
 import os
 import time
-import json
-from enum import Enum
 from typing import List, Tuple
 from PIL import Image
 from loguru import logger
@@ -135,12 +133,11 @@ def doc_analyze(
             img_dict = images_list[page_idx]
             all_pages_info.append((
                 pdf_idx, page_idx,
-                img_dict['img_pil'], _ocr_enable, _lang,
+                img_dict['img_pil'], img_dict['scale'], _ocr_enable, _lang,
             ))
 
     # 准备批处理
-    # 把 pdf_doc 传进去，尝试直接读取pdf表格文本和表格结构
-    images_with_extra_info = [(info[2], info[3], info[4], all_pdf_docs[info[0]][info[1]]) for info in all_pages_info]
+    images_with_extra_info = [(info[2], info[3], info[4], info[5], all_pdf_docs[info[0]][info[1]]) for info in all_pages_info]
     batch_size = min_batch_inference_size
     batch_images = [
         images_with_extra_info[i:i + batch_size]
@@ -166,7 +163,7 @@ def doc_analyze(
         infer_results.append([])
 
     for i, page_info in enumerate(all_pages_info):
-        pdf_idx, page_idx, pil_img, _, _ = page_info
+        pdf_idx, page_idx, pil_img, _, _, _ = page_info
         result = results[i]
 
         page_info_dict = {'page_no': page_idx, 'width': pil_img.width, 'height': pil_img.height}
@@ -178,7 +175,7 @@ def doc_analyze(
 
 
 def batch_image_analyze(
-        images_with_extra_info: List[Tuple[Image.Image, bool, str, pdfium.PdfPage]],
+        images_with_extra_info: List[Tuple[Image.Image, float, bool, str, pdfium.PdfPage]],
         formula_enable=True,
         table_enable=True,
         layout_config=None,
@@ -225,13 +222,6 @@ def batch_image_analyze(
             batch_ratio = 1
             logger.info(f'Could not determine GPU memory, using default batch_ratio: {batch_ratio}')
 
-    # # 检测torch的版本号
-    # import torch
-    # from packaging import version
-    # if version.parse(torch.__version__) >= version.parse("2.8.0") or str(device).startswith('mps'):
-    #     enable_ocr_det_batch = False
-    # else:
-    #     enable_ocr_det_batch = True
     enable_ocr_det_batch = True
     batch_model = BatchAnalyze(model_manager, batch_ratio, formula_enable, table_enable, enable_ocr_det_batch, layout_config, ocr_config, formula_config, table_config, checkbox_config)
     results = batch_model(images_with_extra_info)

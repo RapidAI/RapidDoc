@@ -12,7 +12,6 @@ export PYTHONPATH=/app
 export API_PORT=${API_PORT:-8888}
 export STARTUP_WAIT_TIME=${STARTUP_WAIT_TIME:-15}
 export LOG_LEVEL=${LOG_LEVEL:-INFO}
-export VERBOSE=${VERBOSE:-false}
 
 echo "API Port: $API_PORT"
 echo "Log Level: $LOG_LEVEL"

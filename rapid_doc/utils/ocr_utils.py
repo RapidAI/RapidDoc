@@ -373,10 +373,10 @@ def get_ocr_result_list(ocr_res, useful_list, ocr_enable, bgr_image, lang):
             p4 = [x_center - new_width / 2, y_center + new_height / 2]
 
         # Convert the coordinates back to the original coordinate system
-        p1 = [p1[0] - paste_x + xmin, p1[1] - paste_y + ymin]
-        p2 = [p2[0] - paste_x + xmin, p2[1] - paste_y + ymin]
-        p3 = [p3[0] - paste_x + xmin, p3[1] - paste_y + ymin]
-        p4 = [p4[0] - paste_x + xmin, p4[1] - paste_y + ymin]
+        p1 = [float(p1[0] - paste_x + xmin), float(p1[1] - paste_y + ymin)]
+        p2 = [float(p2[0] - paste_x + xmin), float(p2[1] - paste_y + ymin)]
+        p3 = [float(p3[0] - paste_x + xmin), float(p3[1] - paste_y + ymin)]
+        p4 = [float(p4[0] - paste_x + xmin), float(p4[1] - paste_y + ymin)]
 
         if ocr_enable:
             ocr_result_list.append({

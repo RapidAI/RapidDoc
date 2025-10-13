@@ -3,6 +3,8 @@ import json
 import os
 from loguru import logger
 
+from rapid_doc.utils.model_utils import import_package
+
 try:
     import torch
     import torch_npu
@@ -77,6 +79,9 @@ def get_device():
     if device_mode is not None:
         return device_mode
     else:
+        torch_ = import_package("torch")
+        if torch_ is None:
+            return "cpu"
         if torch.cuda.is_available():
             return "cuda"
         elif torch.backends.mps.is_available():

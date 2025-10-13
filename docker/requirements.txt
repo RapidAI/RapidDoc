@@ -1,8 +1,7 @@
 # RapidDoc Web API Dependencies
 
 # Core RapidDoc package
-# 指定 PyTorch 官方 wheel 仓库 （torch==2.3.1+cpu ）
--f https://download.pytorch.org/whl/torch_stable.html
+#-f https://download.pytorch.org/whl/torch_stable.html # 指定 PyTorch 官方 wheel 仓库 （torch==2.3.1+cpu ）
 boto3>=1.28.43
 loguru>=0.6.0
 numpy>=1.21.6
@@ -24,15 +23,13 @@ pydantic>=2.7.2,<2.11
 matplotlib>=3.10,<4
 ftfy>=6.3.1,<7
 shapely>=2.0.7,<3
-#torch>=2.6.0,<3
-#torchvision
-torch==2.3.1+cpu
-torchvision==0.18.1+cpu
+#torch==2.3.1+cpu
+#torchvision==0.18.1+cpu
 onnxruntime>=1.18.0
 openvino>=2024.6.0
 
 tokenizers>=0.13.2
-rapidocr>=3.1.0,<=3.4.1
+rapidocr>=3.1.0,<=3.4.2
 
 
 # FastAPI and web server

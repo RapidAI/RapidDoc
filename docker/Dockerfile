@@ -38,9 +38,6 @@ RUN chmod +x  start_with_env.sh
 # 复制应用代码（最后复制，避免频繁变更影响缓存）
 COPY app.py file_converter.py download_models.py download_file.py /app/
 
-## 下载所有模型文件实现完全离线部署
-#RUN python3 download_models.py
-
 # 设置基础环境变量
 ENV PYTHONPATH=/app
 
@@ -48,7 +45,10 @@ ENV PYTHONPATH=/app
 ENV API_PORT=8888
 ENV STARTUP_WAIT_TIME=15
 ENV LOG_LEVEL=INFO
-ENV VERBOSE=false
+ENV MINERU_DEVICE_MODE=cpu
+ENV MODEL_SOURCE=default
+# 下载默认模型文件实现离线部署
+RUN python3 download_models.py
 
 # 暴露端口（默认端口，可通过环境变量在运行时修改）
 EXPOSE 8888 8888

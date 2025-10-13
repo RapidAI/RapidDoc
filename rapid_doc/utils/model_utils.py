@@ -1,8 +1,6 @@
-import os
-import time
 import gc
 from PIL import Image
-from loguru import logger
+import importlib
 import numpy as np
 
 from rapid_doc.utils.boxbase import get_minbox_if_overlap_by_ratio
@@ -13,6 +11,12 @@ try:
 except ImportError:
     pass
 
+def import_package(name, package=None):
+    try:
+        module = importlib.import_module(name, package=package)
+        return module
+    except ModuleNotFoundError:
+        return None
 
 def crop_img(input_res, input_img, crop_paste_x=0, crop_paste_y=0):
 
@@ -417,34 +421,29 @@ def get_res_list_from_layout_res(layout_res, iou_threshold=0.7, overlap_threshol
 
 def clean_memory(device='cuda'):
     if device == 'cuda':
-        if torch.cuda.is_available():
+        torch_ = import_package("torch")
+        if torch_ and torch.cuda.is_available():
             torch.cuda.empty_cache()
             torch.cuda.ipc_collect()
     elif str(device).startswith("npu"):
-        if torch_npu.npu.is_available():
+        torch_npu_ = import_package("torch_npu")
+        if torch_npu_ and torch_npu.npu.is_available():
             torch_npu.npu.empty_cache()
     elif str(device).startswith("mps"):
-        torch.mps.empty_cache()
+        torch_ = import_package("torch")
+        if torch_:
+            torch.mps.empty_cache()
     gc.collect()
 
 
-def clean_vram(device, vram_threshold=8):
-    total_memory = get_vram(device)
-    if total_memory is not None:
-        total_memory = int(os.getenv('MINERU_VIRTUAL_VRAM_SIZE', round(total_memory)))
-    if total_memory and total_memory <= vram_threshold:
-        gc_start = time.time()
-        clean_memory(device)
-        gc_time = round(time.time() - gc_start, 2)
-        # logger.info(f"gc time: {gc_time}")
-
-
 def get_vram(device):
-    if torch.cuda.is_available() and str(device).startswith("cuda"):
+    torch_ = import_package("torch")
+    if torch_ and torch.cuda.is_available() and str(device).startswith("cuda"):
         total_memory = torch.cuda.get_device_properties(device).total_memory / (1024 ** 3)  # 将字节转换为 GB
         return total_memory
     elif str(device).startswith("npu"):
-        if torch_npu.npu.is_available():
+        torch_npu_ = import_package("torch_npu")
+        if torch_npu_ and torch_npu.npu.is_available():
             total_memory = torch_npu.npu.get_device_properties(device).total_memory / (1024 ** 3)  # 转为 GB
             return total_memory
     else:

@@ -1,4 +1,7 @@
 import time
+from PIL import Image
+import pypdfium2 as pdfium
+from typing import List, Tuple
 
 import cv2
 from loguru import logger
@@ -11,7 +14,7 @@ from .model_list import AtomicModel
 from ...utils.checkbox_det_cls import checkbox_predict
 from ...utils.config_reader import get_formula_enable, get_table_enable
 from ...utils.enum_class import CategoryId
-from ...utils.model_utils import crop_img, get_res_list_from_layout_res, clean_vram
+from ...utils.model_utils import crop_img, get_res_list_from_layout_res
 from ...utils.ocr_utils import merge_det_boxes, update_det_boxes, sorted_boxes
 from ...utils.ocr_utils import get_adjusted_mfdetrec_res, get_ocr_result_list, OcrConfidence, get_ocr_result_list_table
 from ...utils.pdf_text_tool import get_page
@@ -49,10 +52,9 @@ class BatchAnalyze:
         self.ocr_det_base_batch_size = ocr_config.get("Det.rec_batch_num", 1) if ocr_config else 1 #16
         self.layout_base_batch_size = layout_config.get("batch_num", 1) if layout_config else 1 #8
         self.formula_base_batch_size = formula_config.get("batch_num", 1) if formula_config else 1 #16
-        self.scale = 200 / 72 # dpi=200
         self.use_det_bbox = ocr_config.get("use_det_bbox", False) if ocr_config else False
 
-    def __call__(self, images_with_extra_info: list) -> list:
+    def __call__(self, images_with_extra_info: List[Tuple[Image.Image, float, bool, str, pdfium.PdfPage]]) -> list:
         if len(images_with_extra_info) == 0:
             return []
 
@@ -69,9 +71,9 @@ class BatchAnalyze:
         )
         atom_model_manager = AtomModelSingleton()
 
-        # pil_images = [image for image, _, _, _ in images_with_extra_info]
-        pdf_docs = [pdf_doc for _, _, _, pdf_doc in images_with_extra_info]
-        np_images = [cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR) for image, _, _, _ in images_with_extra_info]
+        pdf_docs = [pdf_doc for _, _, _, _, pdf_doc in images_with_extra_info]
+        np_images = [cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR) for image, _, _, _, _ in images_with_extra_info]
+        scale_list = [scale for _, scale, _, _, _ in images_with_extra_info]
 
 
         # 版面识别
@@ -91,7 +93,7 @@ class BatchAnalyze:
         table_res_list_all_page = []
         latex_res_list_all_page = []
         for index in range(len(np_images)):
-            _, ocr_enable, _lang, _ = images_with_extra_info[index]
+            _, _, ocr_enable, _lang, _ = images_with_extra_info[index]
             layout_res = images_layout_res[index]
             np_img = np_images[index]
 
@@ -121,14 +123,6 @@ class BatchAnalyze:
                                           })
 
             for table_res in table_res_list:
-                # def get_crop_table_img(scale):
-                #     crop_xmin, crop_ymin = int(table_res['poly'][0]), int(table_res['poly'][1])
-                #     crop_xmax, crop_ymax = int(table_res['poly'][4]), int(table_res['poly'][5])
-                #     bbox = (int(crop_xmin / scale), int(crop_ymin / scale), int(crop_xmax / scale), int(crop_ymax / scale))
-                #     return get_crop_np_img(bbox, np_img, scale=scale)
-                #
-                # wireless_table_img = get_crop_table_img(scale = 1)
-
                 table_img, useful_list = crop_img(table_res, np_img)
                 table_res_list_all_page.append({'table_res':table_res,
                                                 'lang':_lang,
@@ -169,6 +163,7 @@ class BatchAnalyze:
                     if text_list:
                         pdf_doc = pdf_docs[page_idx]
                         page_dict = get_page(pdf_doc)
+                        scale = scale_list[page_idx]
                     for ocr_res_list_dict in text_list:
                         _lang = ocr_res_list_dict['lang']
                         if ocr_res_list_dict['ocr_enable']:
@@ -187,7 +182,7 @@ class BatchAnalyze:
                             )
                             # PDF-det
                             bgr_image = cv2.cvtColor(new_image, cv2.COLOR_RGB2BGR)
-                            ocr_res = txt_spans_bbox_extract(page_dict, res, mfd_res=adjusted_mfdetrec_res, scale=self.scale, useful_list=useful_list) # 从pdf中获取文本行点位
+                            ocr_res = txt_spans_bbox_extract(page_dict, res, mfd_res=adjusted_mfdetrec_res, scale=scale, useful_list=useful_list) # 从pdf中获取文本行点位
                             # Integration results
                             if ocr_res:
                                 ocr_result_list = get_ocr_result_list(
@@ -373,6 +368,7 @@ class BatchAnalyze:
                     if not self.table_force_ocr:
                         pdf_doc = pdf_docs[page_idx]
                         page_dict = get_page(pdf_doc)
+                        scale = scale_list[page_idx]
                     for table_res_dict in table_list:
                         _lang = table_res_dict['lang']
                         ocr_result = None
@@ -390,12 +386,12 @@ class BatchAnalyze:
                             new_table_image = cv2.cvtColor(table_res_dict['table_img'], cv2.COLOR_RGB2BGR)
                             ocr_res = ocr_model.ocr(new_table_image, rec=False)[0]
                             if ocr_res:
-                                ocr_spans = get_ocr_result_list_table(ocr_res, table_res_dict['useful_list'], self.scale)
+                                ocr_spans = get_ocr_result_list_table(ocr_res, table_res_dict['useful_list'], scale)
                                 poly = table_res_dict['table_res']['poly']
-                                table_bboxes = [[int(poly[0]/self.scale), int(poly[1]/self.scale), int(poly[4]/self.scale), int(poly[5]/self.scale)
+                                table_bboxes = [[int(poly[0]/scale), int(poly[1]/scale), int(poly[4]/scale), int(poly[5]/scale)
                                                     , None, None, None,'text', None, None, None, None, 1]]
                                 # 从pdf中提取表格的文本
-                                txt_spans_extract(page_dict, ocr_spans, table_res_dict['table_img'], self.scale, table_bboxes,[])
+                                txt_spans_extract(page_dict, ocr_spans, table_res_dict['table_img'], scale, table_bboxes,[])
                                 ocr_result = [list(x) for x in zip(*[[item['ori_bbox'], item['content'], item['score']] for item in ocr_spans])]
                         table_model = atom_model_manager.get_atom_model(
                             atom_model_name='table',

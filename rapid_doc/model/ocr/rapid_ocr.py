@@ -28,6 +28,7 @@ class RapidOcrModel(object):
         device = get_device()
         # 默认配置
         default_params = {
+            "Global.use_cls": False,
             "engine_type": EngineType.ONNXRUNTIME,
             "Det.engine_type": EngineType.ONNXRUNTIME,
             "Rec.engine_type": EngineType.ONNXRUNTIME,
