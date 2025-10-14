@@ -1,0 +1,74 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rapid-doc"
+dynamic = ["version"]
+license = { text = "Apache-2.0" }
+description = "A practical tool for converting PDF to Markdown"
+readme = "README.md"
+requires-python = ">=3.10,<3.14"
+keywords = ["rapid-doc, rapid_doc, onnx, convert, pdf, markdown"]
+classifiers = [
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+
+dependencies = [
+    "boto3>=1.28.43",
+    "loguru>=0.6.0",
+    "numpy>=1.21.6",
+    "pdfminer.six==20250506",
+    "tqdm>=4.67.1",
+    "requests",
+    "pypdfium2>=4.30.0",
+    "pypdf>=5.6.0",
+    "reportlab",
+    "pdftext>=0.6.2",
+    "json-repair>=0.46.2",
+    "fast-langdetect>=0.2.3,<0.3.0",
+    "scikit-image>=0.25.0,<1.0.0",
+    "openai>=1.70.0,<2",
+    "beautifulsoup4>=4.13.5,<5",
+    "pydantic>=2.7.2,<2.11",
+    "matplotlib>=3.10,<4",
+    "ftfy>=6.3.1,<7",
+    "shapely>=2.0.7,<3",
+    "tokenizers>=0.13.2",
+    "rapidocr>=3.1.0,<=3.4.2",
+]
+
+[project.optional-dependencies]
+cpu = [
+    "onnxruntime>=1.18.0",
+    "openvino>=2024.6.0",
+]
+
+gpu = [
+    "onnxruntime-gpu",
+    "torch>=2.6.0,<3",
+    "torchvision",
+]
+
+[project.urls]
+homepage = "https://github.com/RapidAI"
+repository = "https://github.com/RapidAI/RapidOCR"
+issues = "https://github.com/RapidAI/RapidOCR/issues"
+
+[tool.setuptools.dynamic]
+version = { attr = "rapid_doc.version.__version__" }
+
+[tool.setuptools.packages.find]
+include = ["rapid_doc*"]
+namespaces = false
+
+[tool.setuptools.package-data]
+"rapid_doc.resources" = ["**"]
+"" = ["*.yaml"]
+
+[tool.setuptools]
+include-package-data = true
+zip-safe = false

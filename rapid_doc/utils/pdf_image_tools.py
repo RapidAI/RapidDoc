@@ -3,11 +3,13 @@ from io import BytesIO
 
 import numpy as np
 import pypdfium2 as pdfium
+import pypdfium2.raw as pdfium_c
 from loguru import logger
 from PIL import Image
 
 from rapid_doc.data.data_reader_writer import FileBasedDataWriter
 from rapid_doc.utils.pdf_reader import image_to_b64str, image_to_bytes, page_to_image
+from . import PyPDFium2Parser
 from .enum_class import ImageType
 from .hash_utils import str_sha256
 
@@ -124,3 +126,51 @@ def images_bytes_to_pdf_bytes(image_bytes):
     pdf_bytes = pdf_buffer.getvalue()
     pdf_buffer.close()
     return pdf_bytes
+
+def get_ori_image(
+        page: pdfium.PdfPage,
+        max_depth: int = 15,
+        render: bool = False,
+        scale_to_original: bool = True,
+) -> list:
+    """
+    从 PDF 中提取所有原始图片
+
+    参数:
+        max_depth: 搜索嵌套图像的最大层数
+        render: 是否渲染图像（考虑 mask / 变换矩阵）
+        scale_to_original: 渲染时是否缩放到原始分辨率
+    """
+    with PyPDFium2Parser.lock:
+        images = list(
+            page.get_objects(filter=(pdfium_c.FPDF_PAGEOBJ_IMAGE,), max_depth=max_depth)
+        )
+    images_list = []
+    for image in images:
+        # === 获取 bbox ===
+        bbox, pil_image = None, None
+        try:
+            bbox = image.get_pos()  # (x, y, width, height)
+            # bbox 是 PDF 页面坐标系，原点在左下角
+        except Exception:
+            pass
+        try:
+            # ❶ 检查是否支持 scale_to_original 参数
+            from inspect import signature
+            sig = signature(image.get_bitmap)
+            kwargs = {}
+            if "render" in sig.parameters:
+                kwargs["render"] = render
+            if "scale_to_original" in sig.parameters:
+                kwargs["scale_to_original"] = scale_to_original
+            pil_image = image.get_bitmap(**kwargs).to_pil()
+        except Exception:
+            pass
+        finally:
+            image.close()
+        if bbox and pil_image:
+            images_list.append({
+                "bbox": bbox,
+                "pil_image": pil_image,
+            })
+    return images_list

@@ -13,7 +13,7 @@ cd docker
 # 1. CPU 模式
 docker build -f Dockerfile -t volador/rapid-doc:v0.1.0 .
 
-# 2. GPU 模式 TODO
+# 2. GPU 模式
 # docker build -f DockerfileGPU -t volador/rapid-doc-gpu:v0.1.0 .
 ```
 
@@ -28,7 +28,7 @@ docker-compose -f docker-compose.yml up -d
 ```
 ### 2. GPU 模式
 ```bash
-# TODO
+docker-compose -f docker-compose-gpu.yml up -d
 ```
 
 ## 服务端口

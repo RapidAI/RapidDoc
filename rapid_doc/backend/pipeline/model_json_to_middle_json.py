@@ -25,12 +25,12 @@ from rapid_doc.version import __version__
 from rapid_doc.utils.hash_utils import bytes_md5
 
 
-def page_model_info_to_page_info(page_model_info, image_dict, page, image_writer, page_index, ocr_enable=False, formula_enabled=True):
+def page_model_info_to_page_info(page_model_info, image_dict, page_dict, image_writer, page_index, ocr_enable=False, formula_enabled=True):
     scale = image_dict["scale"]
     page_pil_img = image_dict["img_pil"]
     # page_img_md5 = str_md5(image_dict["img_base64"])
     page_img_md5 = bytes_md5(page_pil_img.tobytes())
-    page_w, page_h = map(int, page.get_size())
+    page_w, page_h = map(int, page_dict['size'])
     magic_model = MagicModel(page_model_info, scale)
 
     """从magic_model对象中获取后面会用到的区块信息"""
@@ -139,7 +139,7 @@ def page_model_info_to_page_info(page_model_info, image_dict, page, image_writer
         pass
     else:
         """使用新版本的混合ocr方案."""
-        spans = txt_spans_extract(page, spans, page_pil_img, scale, all_bboxes, all_discarded_blocks)
+        spans = txt_spans_extract(page_dict, spans, page_pil_img, scale, all_bboxes, all_discarded_blocks)
 
     """先处理不需要排版的discarded_blocks"""
     discarded_block_with_spans, spans = fill_spans_in_blocks(
@@ -173,17 +173,17 @@ def page_model_info_to_page_info(page_model_info, image_dict, page, image_writer
     return page_info
 
 
-def result_to_middle_json(model_list, images_list, pdf_doc, image_writer, lang=None, ocr_enable=False, formula_enabled=True, ocr_config=None):
+def result_to_middle_json(model_list, images_list, page_dict_list, image_writer, lang=None, ocr_enable=False, formula_enabled=True, ocr_config=None):
     middle_json = {"pdf_info": [], "_backend":"pipeline", "_version_name": __version__}
     formula_enabled = get_formula_enable(formula_enabled)
     for page_index, page_model_info in tqdm(enumerate(model_list), total=len(model_list), desc="Processing pages"):
-        page = pdf_doc[page_index]
+        page_dict = page_dict_list[page_index]
         image_dict = images_list[page_index]
         page_info = page_model_info_to_page_info(
-            page_model_info, image_dict, page, image_writer, page_index, ocr_enable=ocr_enable, formula_enabled=formula_enabled
+            page_model_info, image_dict, page_dict, image_writer, page_index, ocr_enable=ocr_enable, formula_enabled=formula_enabled
         )
         if page_info is None:
-            page_w, page_h = map(int, page.get_size())
+            page_w, page_h = map(int, page_dict['size'])
             page_info = make_page_info_dict([], page_index, page_w, page_h, [])
         middle_json["pdf_info"].append(page_info)
 
@@ -250,7 +250,7 @@ def result_to_middle_json(model_list, images_list, pdf_doc, image_writer, lang=N
                 logger.info(f'llm aided title time: {round(time.time() - llm_aided_title_start_time, 2)}')
 
     """清理内存"""
-    pdf_doc.close()
+    # pdf_doc.close()
     if os.getenv('MINERU_DONOT_CLEAN_MEM') is None and len(model_list) >= 10:
         clean_memory(get_device())
 

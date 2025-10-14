@@ -17,7 +17,7 @@ from rapid_doc.backend.pipeline.pipeline_analyze import doc_analyze as pipeline_
 from rapid_doc.backend.pipeline.pipeline_middle_json_mkcontent import union_make as pipeline_union_make
 from rapid_doc.backend.pipeline.model_json_to_middle_json import result_to_middle_json as pipeline_result_to_middle_json
 
-from rapidocr import EngineType as OCREngineType
+from rapidocr import EngineType as OCREngineType, OCRVersion, ModelType as OCRModelType
 from rapid_doc.model.layout.rapid_layout_self import ModelType as LayoutModelType
 from rapid_doc.model.formula.rapid_formula_self import ModelType as FormulaModelType
 from rapid_doc.model.table.rapid_table_self import ModelType as TableModelType
@@ -43,7 +43,7 @@ def do_parse(
 
 
     layout_config = {
-        # "model_type": LayoutModelType.PP_DOCLAYOUT_L,
+        # "model_type": LayoutModelType.PP_DOCLAYOUT_PLUS_L,
         # "conf_thresh": 0.4,
         # "batch_num": 1,
         # "model_dir_or_path": "C:\ocr\models\ppmodel\layout\PP-DocLayout-L\pp_doclayout_l.onnx"
@@ -56,8 +56,8 @@ def do_parse(
 
         # "Det.ocr_version": OCRVersion.PPOCRV5,
         # "Rec.ocr_version": OCRVersion.PPOCRV5,
-        # "Det.model_type": ModelType.SERVER,
-        # "Rec.model_type": ModelType.SERVER,
+        # "Det.model_type": OCRModelType.SERVER,
+        # "Rec.model_type": OCRModelType.SERVER,
 
         # 新增的自定义参数
         # "engine_type": OCREngineType.TORCH, # 统一设置推理引擎
@@ -100,7 +100,7 @@ def do_parse(
         new_pdf_bytes = convert_pdf_bytes_to_bytes_by_pypdfium2(pdf_bytes, start_page_id, end_page_id)
         pdf_bytes_list[idx] = new_pdf_bytes
 
-    infer_results, all_image_lists, all_pdf_docs, lang_list, ocr_enabled_list = pipeline_doc_analyze(pdf_bytes_list, parse_method=parse_method, formula_enable=formula_enable,table_enable=table_enable
+    infer_results, all_image_lists, all_page_dicts, lang_list, ocr_enabled_list = pipeline_doc_analyze(pdf_bytes_list, parse_method=parse_method, formula_enable=formula_enable,table_enable=table_enable
                                                                                                      ,layout_config=layout_config, ocr_config=ocr_config, formula_config=formula_config, table_config=table_config, checkbox_config=checkbox_config)
 
     for idx, model_list in enumerate(infer_results):
@@ -110,10 +110,10 @@ def do_parse(
         image_writer, md_writer = FileBasedDataWriter(local_image_dir), FileBasedDataWriter(local_md_dir)
 
         images_list = all_image_lists[idx]
-        pdf_doc = all_pdf_docs[idx]
+        pdf_dict = all_page_dicts[idx]
         _lang = lang_list[idx]
         _ocr_enable = ocr_enabled_list[idx]
-        middle_json = pipeline_result_to_middle_json(model_list, images_list, pdf_doc, image_writer, _lang, _ocr_enable, formula_enable, ocr_config=ocr_config)
+        middle_json = pipeline_result_to_middle_json(model_list, images_list, pdf_dict, image_writer, _lang, _ocr_enable, formula_enable, ocr_config=ocr_config)
 
         pdf_info = middle_json["pdf_info"]
 

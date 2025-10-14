@@ -1,3 +1,4 @@
+import os
 import sys
 import hashlib
 from dataclasses import dataclass
@@ -33,6 +34,15 @@ DEFAULT_MODEL_KEYWORDS = [
     "slanet-plus.onnx",
 ]
 
+TORCH_OCR_MODEL = [
+    # ocr
+    "ch_PP-OCRv5_det_mobile_infer.pth",
+    "ch_PP-OCRv5_rec_mobile_infer.pth",
+    "ch_ptocr_mobile_v2.0_cls_infer.pth",
+]
+
+device_mode = os.getenv("MINERU_DEVICE_MODE", "cpu")
+
 class DownloadFile:
     BLOCK_SIZE = 1024  # 1 KiB
     REQUEST_TIMEOUT = 60
@@ -40,8 +50,10 @@ class DownloadFile:
     @classmethod
     def run(cls, input_params: DownloadFileInput, model_source="default"):
         # 如果是 default 模式，只下载 DEFAULT_MODEL_KEYWORDS 里的文件
-        if model_source == "default" and not any(k in input_params.file_url for k in DEFAULT_MODEL_KEYWORDS):
-            return
+        if model_source == "default":
+            default_model = DEFAULT_MODEL_KEYWORDS + TORCH_OCR_MODEL if device_mode.startswith('cuda') else DEFAULT_MODEL_KEYWORDS
+            if not any(k in input_params.file_url for k in default_model):
+                return
 
         save_path = Path(input_params.save_path)
 

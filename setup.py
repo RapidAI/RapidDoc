@@ -42,7 +42,7 @@ if __name__ == '__main__':
         long_description_content_type="text/markdown",  # 如果README是Markdown格式
         project_urls={
             "Home": "https://github.com/RapidAI",
-            "Repository": "https://github.com/RapidAI/RapidOCR",
+            "Repository": "https://github.com/RapidAI/RapidDoc",
         },
         keywords=["rapid-doc, rapid_doc, onnx, convert, pdf, markdown"],
         classifiers=[

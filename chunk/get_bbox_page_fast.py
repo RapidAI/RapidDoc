@@ -1,6 +1,7 @@
 import json
 import time
 from rapidfuzz import fuzz
+from tqdm import tqdm
 
 from chunk.text_splitters import MarkdownTextSplitter
 
@@ -124,21 +125,20 @@ if __name__ == '__main__':
 
     with open(markdown_path, 'r', encoding='utf-8') as f:
         markdown_document = f.read()
-
+    start_time0 = time.time()
     smart_text_splitter = MarkdownTextSplitter(
         chunk_token_num=512, min_chunk_tokens=50
     )
+    print(f"分块时间: {time.time() - start_time0}秒")
     chunk_list = smart_text_splitter.split_text(markdown_document)
 
     mineru_middle_path = r"D:\CodeProjects\doc\RapidAI\RapidDoc\output888\1 - 副本 (3)\auto\1 - 副本 (3)_middle.json"
     with open(mineru_middle_path, 'r', encoding='utf-8') as f:
         middle_json_content = json.load(f)
-
+        print(position_int_temp)
     start_time = time.time()
     block_list = get_blocks_from_middle(middle_json_content)
     matched_global_indices = set()
-    for i, chunk in enumerate(chunk_list):
+    for chunk in tqdm(chunk_list, desc="Chunk-position Predict"):
         position_int_temp = get_bbox_for_chunk(chunk.strip(), block_list, matched_global_indices)
-
-        print(position_int_temp)
     print(f"总运行时间: {time.time() - start_time}秒")

@@ -1,6 +1,5 @@
 import time
 from PIL import Image
-import pypdfium2 as pdfium
 from typing import List, Tuple
 
 import cv2
@@ -11,14 +10,15 @@ import numpy as np
 
 from .model_init import AtomModelSingleton
 from .model_list import AtomicModel
+from ...utils.boxbase import rotate_image_and_boxes
 from ...utils.checkbox_det_cls import checkbox_predict
 from ...utils.config_reader import get_formula_enable, get_table_enable
 from ...utils.enum_class import CategoryId
 from ...utils.model_utils import crop_img, get_res_list_from_layout_res
 from ...utils.ocr_utils import merge_det_boxes, update_det_boxes, sorted_boxes
 from ...utils.ocr_utils import get_adjusted_mfdetrec_res, get_ocr_result_list, OcrConfidence, get_ocr_result_list_table
-from ...utils.pdf_text_tool import get_page
-from ...utils.span_pre_proc import txt_spans_extract, txt_spans_bbox_extract
+from ...utils.span_pre_proc import txt_spans_extract, txt_spans_bbox_extract, txt_spans_bbox_extract_table, \
+    txt_most_angle_extract_table
 
 
 # YOLO_LAYOUT_BASE_BATCH_SIZE = 8
@@ -54,7 +54,7 @@ class BatchAnalyze:
         self.formula_base_batch_size = formula_config.get("batch_num", 1) if formula_config else 1 #16
         self.use_det_bbox = ocr_config.get("use_det_bbox", False) if ocr_config else False
 
-    def __call__(self, images_with_extra_info: List[Tuple[Image.Image, float, bool, str, pdfium.PdfPage]]) -> list:
+    def __call__(self, images_with_extra_info: List[Tuple[Image.Image, float, bool, str, dict]]) -> list:
         if len(images_with_extra_info) == 0:
             return []
 
@@ -71,7 +71,7 @@ class BatchAnalyze:
         )
         atom_model_manager = AtomModelSingleton()
 
-        pdf_docs = [pdf_doc for _, _, _, _, pdf_doc in images_with_extra_info]
+        pdf_dict_list = [pdf_dict for _, _, _, _, pdf_dict in images_with_extra_info]
         np_images = [cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR) for image, _, _, _, _ in images_with_extra_info]
         scale_list = [scale for _, scale, _, _, _ in images_with_extra_info]
 
@@ -161,8 +161,7 @@ class BatchAnalyze:
             with tqdm(total=total_texts, desc="PDF-det Predict") as pbar:
                 for page_idx, text_list in ocr_res_list_grouped_page.items():
                     if text_list:
-                        pdf_doc = pdf_docs[page_idx]
-                        page_dict = get_page(pdf_doc)
+                        page_dict = pdf_dict_list[page_idx]
                         scale = scale_list[page_idx]
                     for ocr_res_list_dict in text_list:
                         _lang = ocr_res_list_dict['lang']
@@ -201,11 +200,11 @@ class BatchAnalyze:
 
             for ocr_res_list_dict in ocr_res_list_all_page:
                 _lang = ocr_res_list_dict['lang']
-                if not self.use_det_bbox and not ocr_res_list_dict['ocr_enable']:
-                    # 从pdf中直接提取文本块点位，且不需要ocr，则跳过
-                    continue
-
                 for res in ocr_res_list_dict['ocr_res_list']:
+                    if not self.use_det_bbox and not ocr_res_list_dict['ocr_enable'] and not res.get('need_ocr_det'):
+                        # 从pdf中直接提取文本块点位，且不需要ocr，且真的提取到框，则跳过
+                        continue
+                    res.pop('need_ocr_det', None)
                     new_image, useful_list = crop_img(
                         res, ocr_res_list_dict['np_img'], crop_paste_x=50, crop_paste_y=50
                     )
@@ -322,9 +321,6 @@ class BatchAnalyze:
             for ocr_res_list_dict in tqdm(ocr_res_list_all_page, desc="OCR-det Predict"):
                 # Process each area that requires OCR processing
                 _lang = ocr_res_list_dict['lang']
-                if not self.use_det_bbox and not ocr_res_list_dict['ocr_enable']:
-                    # 从pdf中直接提取文本块点位，且不需要ocr，则跳过
-                    continue
                 # Get OCR results for this language's images
                 ocr_model = atom_model_manager.get_atom_model(
                     atom_model_name=AtomicModel.OCR,
@@ -334,6 +330,10 @@ class BatchAnalyze:
                     ocr_config=self.ocr_config,
                 )
                 for res in ocr_res_list_dict['ocr_res_list']:
+                    if not self.use_det_bbox and not ocr_res_list_dict['ocr_enable'] and not res.get('need_ocr_det'):
+                        # 从pdf中直接提取文本块点位，且不需要ocr，且真的提取到框，则跳过
+                        continue
+                    res.pop('need_ocr_det', None)
                     new_image, useful_list = crop_img(
                         res, ocr_res_list_dict['np_img'], crop_paste_x=50, crop_paste_y=50
                     )
@@ -366,25 +366,42 @@ class BatchAnalyze:
             with tqdm(total=total_tables, desc="Table Predict") as pbar:
                 for page_idx, table_list in table_res_list_grouped_page.items():
                     if not self.table_force_ocr:
-                        pdf_doc = pdf_docs[page_idx]
-                        page_dict = get_page(pdf_doc)
+                        page_dict = pdf_dict_list[page_idx]
+                        # TODO 1、表格里的图片，生成uuid，并把 pil_image 设置到 table_res_dict['table_res']['fill_pil_image']，等到后面进行保存图片即可
+                        # TODO 2、其他类型的图片，放到 page_dict 里面，等到后面截图的时候，判断是否和原图bbox近似，然后保存
                         scale = scale_list[page_idx]
                     for table_res_dict in table_list:
                         _lang = table_res_dict['lang']
                         ocr_result = None
                         if not self.table_force_ocr and not table_res_dict['ocr_enable']:
-                            # RapidTable非OCR文本提取 OcrText
-                            # 进行 OCR-det 识别文字框
-                            ocr_model = atom_model_manager.get_atom_model(
-                                atom_model_name=AtomicModel.OCR,
-                                ocr_show_log=False,
-                                det_db_box_thresh=0.3,
-                                lang=_lang,
-                                ocr_config=self.ocr_config,
-                                enable_merge_det_boxes=False,
-                            )
-                            new_table_image = cv2.cvtColor(table_res_dict['table_img'], cv2.COLOR_RGB2BGR)
-                            ocr_res = ocr_model.ocr(new_table_image, rec=False)[0]
+                            # TODO 支持表格内公式识别
+                            # TODO 支持表格内的图像进行截图存储
+                            #  （1、文字版：可以使用pypdfium2提取表格内的图片。
+                            #   2、扫描版：版面模型使用PP_DOCLAYOUT_PLUS_L才能识别到表格里的图片）
+                            ocr_res = []
+                            # if not self.use_det_bbox:
+                            #     # 从pdf中直接提取文本块点位（部分表格效果较差暂不考虑），并支持270和90度的表格
+                            #     ocr_res, most_angle = txt_spans_bbox_extract_table(page_dict, table_res_dict, scale=scale)  # 从pdf中获取文本行点位
+                            if not ocr_res:
+                                # RapidTable非OCR文本提取 OcrText
+                                # 进行 OCR-det 识别文字框
+                                ocr_model = atom_model_manager.get_atom_model(
+                                    atom_model_name=AtomicModel.OCR,
+                                    ocr_show_log=False,
+                                    det_db_box_thresh=0.3,
+                                    lang=_lang,
+                                    ocr_config=self.ocr_config,
+                                    enable_merge_det_boxes=False,
+                                )
+                                new_table_image = cv2.cvtColor(table_res_dict['table_img'], cv2.COLOR_RGB2BGR)
+                                ocr_res = ocr_model.ocr(new_table_image, rec=False)[0]
+                                most_angle = txt_most_angle_extract_table(page_dict, table_res_dict, scale=scale) # 从pdf中获取文本行 角度投票
+                                if most_angle in [90, 270]:
+                                    table_res_dict['table_img'], ocr_res = rotate_image_and_boxes(
+                                        np.asarray(table_res_dict["table_img"]),
+                                        ocr_res,
+                                        most_angle
+                                    )
                             if ocr_res:
                                 ocr_spans = get_ocr_result_list_table(ocr_res, table_res_dict['useful_list'], scale)
                                 poly = table_res_dict['table_res']['poly']

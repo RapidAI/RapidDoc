@@ -109,13 +109,18 @@ RapidDoc提供了便捷的docker部署方式，这有助于快速搭建环境并
 
 ## 📌 TODO
 
-- [x] 表格非OCR文本提取
 - [x] 跨页表格合并
 - [x] 复选框识别，使用opencv（默认关闭、opencv识别存在误检）
-- [ ] 修正文档扭曲/模糊/阴影等情况 RapidUnDistort
-- [ ] 四方向分类旋转表格解析 RapidOrientation
+- [x] 提供 fastapi，支持cpu和gpu版本的docker镜像构建
+- [x] 文本型pdf，表格非OCR文本提取
+- [x] 文本型pdf，使用pypdfium2提取文本框bbox
+- [x] 文本型pdf，支持0/90/270度三个方向的表格解析
+- [ ] 文本型pdf，使用pypdfium2提取原始图片（默认截图会导致清晰度降低和图片边界可能丢失部分）
 - [ ] 表格内公式提取
 - [ ] 表格内图片提取
+- 
+- [ ] 修正文档扭曲/模糊/阴影等情况 RapidUnDistort
+- [ ] 四方向分类旋转表格解析 RapidOrientation
 - [ ] 复选框识别，使用模型
 - [ ] 公式识别支持gpu
 - [ ] 版面、表格、公式支持openvino

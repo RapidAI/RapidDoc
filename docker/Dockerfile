@@ -20,13 +20,15 @@ RUN apt-get update && \
 # 设置工作目录
 WORKDIR /app
 
-# 先复制 requirements.txt 以利用 Docker 缓存
-COPY requirements.txt .
-
 # 安装 Python 依赖
+
+COPY requirements.txt .
 RUN python3 -m pip install rapid-doc==0.1.0 --no-deps -i https://mirrors.aliyun.com/pypi/simple --break-system-packages && \
     python3 -m pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple --break-system-packages && \
-    python3 -m pip cache purge
+    python3 -m pip cache purge \
+
+#RUN python3 -m pip install rapid-doc[cpu] -i https://mirrors.aliyun.com/pypi/simple --break-system-packages && \
+#    python3 -m pip cache purge
 
 # 复制配置文件和脚本（优先复制，利用Docker缓存）
 COPY .env.example /app/

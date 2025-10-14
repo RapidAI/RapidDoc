@@ -110,7 +110,7 @@ def do_parse(
         pdf_bytes_list[idx] = new_pdf_bytes
     # 记录开始时间
     start_time = time.time()
-    infer_results, all_image_lists, all_pdf_docs, lang_list, ocr_enabled_list = pipeline_doc_analyze(pdf_bytes_list, parse_method=parse_method, formula_enable=p_formula_enable,table_enable=p_table_enable,
+    infer_results, all_image_lists, all_page_dicts, lang_list, ocr_enabled_list = pipeline_doc_analyze(pdf_bytes_list, parse_method=parse_method, formula_enable=p_formula_enable,table_enable=p_table_enable,
                                                                                                      layout_config=layout_config, ocr_config=ocr_config, formula_config=formula_config, table_config=table_config, checkbox_config=checkbox_config)
 
     for idx, model_list in enumerate(infer_results):
@@ -121,10 +121,10 @@ def do_parse(
         image_writer, md_writer = FileBasedDataWriter(local_image_dir), FileBasedDataWriter(local_md_dir)
 
         images_list = all_image_lists[idx]
-        pdf_doc = all_pdf_docs[idx]
+        pdf_dict= all_page_dicts[idx]
         _lang = lang_list[idx]
         _ocr_enable = ocr_enabled_list[idx]
-        middle_json = pipeline_result_to_middle_json(model_list, images_list, pdf_doc, image_writer, _lang, _ocr_enable, p_formula_enable, ocr_config=ocr_config)
+        middle_json = pipeline_result_to_middle_json(model_list, images_list, pdf_dict, image_writer, _lang, _ocr_enable, p_formula_enable, ocr_config=ocr_config)
         # 计算总运行时间（单位：秒）
         print(f"运行时间: {time.time() - start_time}秒")
         pdf_info = middle_json["pdf_info"]

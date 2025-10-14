@@ -34,10 +34,11 @@ def get_page(
         blocks = get_blocks(lines)
 
         page = {
+            "size": page.get_size(),
             "bbox": page_bbox,
             "width": page_width,
             "height": page_height,
             "rotation": page_rotation,
-            "blocks": blocks
+            "blocks": blocks,
         }
         return page
