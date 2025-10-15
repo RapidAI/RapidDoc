@@ -18,7 +18,7 @@ from ...utils.model_utils import crop_img, get_res_list_from_layout_res
 from ...utils.ocr_utils import merge_det_boxes, update_det_boxes, sorted_boxes
 from ...utils.ocr_utils import get_adjusted_mfdetrec_res, get_ocr_result_list, OcrConfidence, get_ocr_result_list_table
 from ...utils.span_pre_proc import txt_spans_extract, txt_spans_bbox_extract, txt_spans_bbox_extract_table, \
-    txt_most_angle_extract_table
+    txt_most_angle_extract_table, extract_table_fill_image
 
 
 # YOLO_LAYOUT_BASE_BATCH_SIZE = 8
@@ -42,6 +42,7 @@ class BatchAnalyze:
         self.formula_level = formula_config.get("formula_level", 0) if formula_config else 0
         self.table_enable = get_table_enable(table_enable)
         self.table_force_ocr = table_config.get("force_ocr", False) if table_config else False
+        self.skip_text_in_image = table_config.get("skip_text_in_image", True) if table_config else True
         self.checkbox_enable = checkbox_config.get("checkbox_enable", False) if checkbox_config else False
         self.layout_config = layout_config
         self.ocr_config = ocr_config
@@ -98,7 +99,7 @@ class BatchAnalyze:
             np_img = np_images[index]
 
             ocr_res_list, table_res_list, single_page_mfdetrec_res = (
-                get_res_list_from_layout_res(layout_res)
+                get_res_list_from_layout_res(layout_res, np_img)
             )
 
             # 复选框检测
@@ -117,8 +118,8 @@ class BatchAnalyze:
                                           'ocr_enable':ocr_enable,
                                           'np_img':np_img,
                                           'single_page_mfdetrec_res':single_page_mfdetrec_res,
+                                          'checkbox_res': checkbox_res,
                                           'layout_res':layout_res,
-                                          'checkbox_res':checkbox_res,
                                           'page_idx': index,
                                           })
 
@@ -127,6 +128,8 @@ class BatchAnalyze:
                 table_res_list_all_page.append({'table_res':table_res,
                                                 'lang':_lang,
                                                 'table_img':table_img,
+                                                'single_page_mfdetrec_res': single_page_mfdetrec_res,
+                                                'checkbox_res': checkbox_res,
                                                 'useful_list': useful_list,
                                                 'ocr_enable': ocr_enable,
                                                 'page_idx': index,
@@ -367,17 +370,18 @@ class BatchAnalyze:
                 for page_idx, table_list in table_res_list_grouped_page.items():
                     if not self.table_force_ocr:
                         page_dict = pdf_dict_list[page_idx]
-                        # TODO 1、表格里的图片，生成uuid，并把 pil_image 设置到 table_res_dict['table_res']['fill_pil_image']，等到后面进行保存图片即可
-                        # TODO 2、其他类型的图片，放到 page_dict 里面，等到后面截图的时候，判断是否和原图bbox近似，然后保存
                         scale = scale_list[page_idx]
                     for table_res_dict in table_list:
                         _lang = table_res_dict['lang']
+                        useful_list = table_res_dict['useful_list']
+                        # OCR检测，跳过公式和复选框
+                        adjusted_mfdetrec_res = get_adjusted_mfdetrec_res(
+                            table_res_dict['single_page_mfdetrec_res'] + table_res_dict['checkbox_res'],
+                            useful_list, return_text=True
+                        )
+
                         ocr_result = None
                         if not self.table_force_ocr and not table_res_dict['ocr_enable']:
-                            # TODO 支持表格内公式识别
-                            # TODO 支持表格内的图像进行截图存储
-                            #  （1、文字版：可以使用pypdfium2提取表格内的图片。
-                            #   2、扫描版：版面模型使用PP_DOCLAYOUT_PLUS_L才能识别到表格里的图片）
                             ocr_res = []
                             # if not self.use_det_bbox:
                             #     # 从pdf中直接提取文本块点位（部分表格效果较差暂不考虑），并支持270和90度的表格
@@ -394,7 +398,7 @@ class BatchAnalyze:
                                     enable_merge_det_boxes=False,
                                 )
                                 new_table_image = cv2.cvtColor(table_res_dict['table_img'], cv2.COLOR_RGB2BGR)
-                                ocr_res = ocr_model.ocr(new_table_image, rec=False)[0]
+                                ocr_res = ocr_model.ocr(new_table_image, mfd_res=adjusted_mfdetrec_res, rec=False)[0]
                                 most_angle = txt_most_angle_extract_table(page_dict, table_res_dict, scale=scale) # 从pdf中获取文本行 角度投票
                                 if most_angle in [90, 270]:
                                     table_res_dict['table_img'], ocr_res = rotate_image_and_boxes(
@@ -403,7 +407,7 @@ class BatchAnalyze:
                                         most_angle
                                     )
                             if ocr_res:
-                                ocr_spans = get_ocr_result_list_table(ocr_res, table_res_dict['useful_list'], scale)
+                                ocr_spans = get_ocr_result_list_table(ocr_res, useful_list, scale)
                                 poly = table_res_dict['table_res']['poly']
                                 table_bboxes = [[int(poly[0]/scale), int(poly[1]/scale), int(poly[4]/scale), int(poly[5]/scale)
                                                     , None, None, None,'text', None, None, None, None, 1]]
@@ -416,7 +420,9 @@ class BatchAnalyze:
                             ocr_config=self.ocr_config,
                             table_config=self.table_config,
                         )
-                        html_code, table_cell_bboxes, logic_points, elapse = table_model.predict(table_res_dict['table_img'], ocr_result=ocr_result)
+                        # 从pdf里提取表格里的图片
+                        fill_image_res = extract_table_fill_image(page_dict, table_res_dict, scale=scale)
+                        html_code, table_cell_bboxes, logic_points, elapse = table_model.predict(table_res_dict['table_img'], ocr_result, fill_image_res, adjusted_mfdetrec_res, self.skip_text_in_image)
                         # 判断是否返回正常
                         if html_code:
                             # 检查html_code是否包含'<table>'和'</table>'

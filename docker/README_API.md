@@ -76,6 +76,7 @@ uvicorn app:app --host 0.0.0.0 --port 8888
 - `formula_config`: 公式识别配置json字符串（默认: `{}`）
 - `table_config`: 表格识别配置json字符串（默认: `{}`）
 - `checkbox_config`: 复选框识别配置json字符串（默认: `{}`）
+- `image_config`: 图片提取配置json字符串（默认: `{}`）
 -
 - `return_md`: 是否返回 Markdown 内容（默认: `true`）
 - `return_middle_json`: 是否返回中间 JSON（默认: `false`）

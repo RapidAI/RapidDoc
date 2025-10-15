@@ -1,5 +1,4 @@
-import cv2
-from rapid_doc.model.layout.rapid_layout_self import ModelType, RapidLayout, RapidLayoutInput, EngineType
+from rapid_doc.model.layout.rapid_layout_self import ModelType, RapidLayout, RapidLayoutInput
 from rapid_doc.utils.config_reader import get_device
 from rapid_doc.utils.enum_class import CategoryId
 

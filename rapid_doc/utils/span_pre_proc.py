@@ -3,14 +3,16 @@ import collections
 import re
 import math
 import statistics
+import uuid
 from collections import Counter
 
 import cv2
 import numpy as np
 
 from rapid_doc.utils.boxbase import calculate_overlap_area_in_bbox1_area_ratio, calculate_iou, \
-    get_minbox_if_overlap_by_ratio, merge_adjacent_bboxes, rotate_image_and_boxes
+    get_minbox_if_overlap_by_ratio, merge_adjacent_bboxes, rotate_image_and_boxes, is_in
 from rapid_doc.utils.enum_class import BlockType, ContentType
+from rapid_doc.utils.model_utils import crop_img
 from rapid_doc.utils.ocr_utils import update_det_boxes
 from rapid_doc.utils.pdf_image_tools import get_crop_np_img
 from rapid_doc.utils.pdf_text_tool import get_page
@@ -232,6 +234,52 @@ def txt_most_angle_extract_table(page_dict, table_res_dict, scale):
     else:
         most_angle = 0
     return most_angle
+
+
+"""提取表格里的图片"""
+def extract_table_fill_image(page_dict, table_res_dict, scale):
+    input_res = table_res_dict['table_res']
+    ori_image_list = page_dict['ori_image_list']
+    useful_list = table_res_dict['useful_list']
+    layout_image_list = input_res.get('layout_image_list', [])
+
+    paste_x, paste_y, xmin, ymin, xmax, ymax, new_width, new_height = useful_list
+    poly = input_res['poly']
+    input_res_bbox = [poly[0]/scale, poly[1]/scale, poly[4]/scale, poly[5]/scale]
+    image_res = []
+
+    if ori_image_list:
+        for image in ori_image_list:
+            # 找到在表格里的图片
+            bbox = image['bbox']
+            if is_in(bbox, input_res_bbox):
+                # 把坐标转为相对于表格的坐标
+                bbox = [bbox[0] * scale, bbox[1] * scale, bbox[2] * scale, bbox[3] * scale]
+                p1 = [bbox[0] + paste_x - xmin, bbox[1] + paste_y - ymin]
+                p2 = [bbox[2] + paste_x - xmin, bbox[1] + paste_y - ymin]
+                p3 = [bbox[2] + paste_x - xmin, bbox[3] + paste_y - ymin]
+                p4 = [bbox[0] + paste_x - xmin, bbox[3] + paste_y - ymin]
+                image['ocr_bbox'] = [p1, p2, p3, p4]
+                # image['pil_image'].save(f"{image['uuid']}.png")
+                image_res.append(image)
+    if not image_res and layout_image_list:
+        # pypdfium2获取不到图片，使用版面识别的表格里的图片
+        # 把坐标转为相对于表格的坐标
+        for image in layout_image_list:
+            # 把坐标转为相对于表格的坐标
+            bbox = image['poly']
+            bbox = [bbox[0], bbox[1], bbox[4], bbox[5]]
+            p1 = [bbox[0] + paste_x - xmin, bbox[1] + paste_y - ymin]
+            p2 = [bbox[2] + paste_x - xmin, bbox[1] + paste_y - ymin]
+            p3 = [bbox[2] + paste_x - xmin, bbox[3] + paste_y - ymin]
+            p4 = [bbox[0] + paste_x - xmin, bbox[3] + paste_y - ymin]
+            image['bbox'] = bbox
+            image['ocr_bbox'] = [p1, p2, p3, p4]
+            image_res.append(image)
+        # 把image_res放到page_dict里面，方便后续保存图片
+    page_dict['table_fill_image_list'] = image_res
+    table_res_dict['table_res'].pop('layout_image_list', None)
+    return image_res
 
 """pdf_text dict方案 char级别"""
 def txt_spans_extract(pdf_page_or_dict, spans, input_img, scale, all_bboxes, all_discarded_blocks):

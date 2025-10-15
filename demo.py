@@ -45,7 +45,7 @@ def do_parse(
     end_page_id=None,  # End page ID for parsing, default is None (parse all pages until the end of the document)
 ):
     layout_config = {
-        # "model_type": LayoutModelType.PP_DOCLAYOUT_PLUS_L,
+        "model_type": LayoutModelType.PP_DOCLAYOUT_PLUS_L,
         # "conf_thresh": 0.4,
         # "batch_num": 1,
         # "model_dir_or_path": "C:\ocr\models\ppmodel\layout\PP-DocLayout-L\pp_doclayout_l.onnx",
@@ -81,6 +81,8 @@ def do_parse(
 
     table_config = {
         # "force_ocr": False, # 表格文字，是否强制使用ocr，默认 False 根据 parse_method 来判断是否需要ocr还是从pdf中直接提取文本
+        # "skip_text_in_image": True, # 是否跳过表格里图片中的文字（如表格单元格中嵌入的图片、图标、扫描底图等）
+
         # "model_type": TableModelType.UNET_SLANET_PLUS,  # （默认） 有线表格使用unet，无线表格使用slanet_plus
         # "model_type": TableModelType.UNET_UNITABLE, # 有线表格使用unet，无线表格使用unitable
         # "model_type": TableModelType.SLANEXT,  # 有线表格使用slanext_wired，无线表格使用slanext_wireless
@@ -104,6 +106,11 @@ def do_parse(
         # "checkbox_enable": False, # 是否识别复选框，默认不识别，基于opencv，有可能会误检
     }
 
+    image_config = {
+        # 是否提取原始图片（使用 pypdfium2 提取原始图片。截图可能导致清晰度降低和边界丢失，默认关闭）
+        # "extract_original_image": False,
+    }
+
 
     for idx, pdf_bytes in enumerate(pdf_bytes_list):
         new_pdf_bytes = convert_pdf_bytes_to_bytes_by_pypdfium2(pdf_bytes, start_page_id, end_page_id)
@@ -124,7 +131,7 @@ def do_parse(
         pdf_dict= all_page_dicts[idx]
         _lang = lang_list[idx]
         _ocr_enable = ocr_enabled_list[idx]
-        middle_json = pipeline_result_to_middle_json(model_list, images_list, pdf_dict, image_writer, _lang, _ocr_enable, p_formula_enable, ocr_config=ocr_config)
+        middle_json = pipeline_result_to_middle_json(model_list, images_list, pdf_dict, image_writer, _lang, _ocr_enable, p_formula_enable, ocr_config=ocr_config, image_config=image_config)
         # 计算总运行时间（单位：秒）
         print(f"运行时间: {time.time() - start_time}秒")
         pdf_info = middle_json["pdf_info"]

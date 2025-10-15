@@ -20,6 +20,7 @@ class DownloadFileInput:
 DEFAULT_MODEL_KEYWORDS = [
     # layout
     "pp_doclayout_l.onnx",
+    "pp_doclayout_plus_l.onnx"
     # formula
     "pp_formulanet_plus_s.onnx",
     # ocr

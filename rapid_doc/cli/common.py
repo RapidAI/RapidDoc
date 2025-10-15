@@ -172,6 +172,7 @@ def _process_pipeline(
         formula_config,
         table_config,
         checkbox_config,
+        image_config,
         f_draw_layout_bbox,
         f_draw_span_bbox,
         f_dump_md,
@@ -207,7 +208,7 @@ def _process_pipeline(
 
         middle_json = pipeline_result_to_middle_json(
             model_list, images_list, pdf_doc, image_writer,
-            _lang, _ocr_enable, p_formula_enable
+            _lang, _ocr_enable, p_formula_enable, ocr_config=ocr_config, image_config=image_config
         )
 
         pdf_info = middle_json["pdf_info"]
@@ -274,6 +275,7 @@ async def aio_do_parse(
         formula_config=None,
         table_config=None,
         checkbox_config=None,
+        image_config=None,
         f_draw_layout_bbox=True,
         f_draw_span_bbox=True,
         f_dump_md=True,
@@ -294,7 +296,7 @@ async def aio_do_parse(
         _process_pipeline(
             output_dir, pdf_file_names, pdf_bytes_list, p_lang_list,
             parse_method, formula_enable, table_enable,
-            layout_config, ocr_config, formula_config, table_config, checkbox_config,
+            layout_config, ocr_config, formula_config, table_config, checkbox_config, image_config,
             f_draw_layout_bbox, f_draw_span_bbox, f_dump_md, f_dump_middle_json,
             f_dump_model_output, f_dump_orig_pdf, f_dump_content_list, f_make_md_mode,
         )

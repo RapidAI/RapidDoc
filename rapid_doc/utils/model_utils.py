@@ -1,4 +1,6 @@
 import gc
+import uuid
+
 from PIL import Image
 import importlib
 import numpy as np
@@ -345,26 +347,23 @@ def remove_overlaps_low_confidence_blocks(combined_res_list, overlap_threshold=0
     return blocks_to_remove
 
 
-def get_res_list_from_layout_res(layout_res, iou_threshold=0.7, overlap_threshold=0.8, area_threshold=0.8):
+def get_res_list_from_layout_res(layout_res, np_img, iou_threshold=0.7, overlap_threshold=0.8, area_threshold=0.8):
     """Extract OCR, table and other regions from layout results."""
     ocr_res_list = []
     text_res_list = []
     table_res_list = []
     table_indices = []
     single_page_mfdetrec_res = []
+    image_res_list = []
 
     # Categorize regions
     for i, res in enumerate(layout_res):
         category_id = int(res['category_id'])
-
+        if category_id in [3]:  # Image regions
+            image_res_list.append(res)
         if category_id in [8, 13, 14]:  # Formula regions
             res['bbox'] = [int(res['poly'][0]), int(res['poly'][1]), int(res['poly'][4]), int(res['poly'][5])]
             single_page_mfdetrec_res.append(res)
-        # if category_id in [13, 14]:  # Formula regions
-        #     single_page_mfdetrec_res.append({
-        #         "bbox": [int(res['poly'][0]), int(res['poly'][1]),
-        #                  int(res['poly'][4]), int(res['poly'][5])],
-        #     })
         elif category_id in [0, 2, 4, 6, 7, 3]:  # OCR regions
             ocr_res_list.append(res)
         elif category_id == 5:  # Table regions
@@ -415,6 +414,18 @@ def get_res_list_from_layout_res(layout_res, iou_threshold=0.7, overlap_threshol
         # 同时从layout_res中删除
         if block in layout_res:
             layout_res.remove(block)
+    # 找出所有在表格内的图片框
+    for img_idx, img_box in enumerate(image_res_list):
+        for tbl_idx, tbl_box in enumerate(filtered_table_res_list):
+            if is_inside(get_coords_and_area(img_box), get_coords_and_area(tbl_box), overlap_threshold):
+                if 'layout_image_list' not in tbl_box:
+                    tbl_box['layout_image_list'] = []
+                fill_image_dict = {
+                    "uuid": str(uuid.uuid4()),
+                    "poly": img_box['poly'],
+                    'pil_image': numpy_to_pil(crop_img(img_box, np_img)[0]),
+                }
+                tbl_box['layout_image_list'].append(fill_image_dict)
 
     return ocr_res_list, filtered_table_res_list, single_page_mfdetrec_res
 
@@ -448,3 +459,42 @@ def get_vram(device):
             return total_memory
     else:
         return None
+
+def numpy_to_pil(image: np.ndarray) -> Image.Image:
+    """
+    将 numpy.ndarray 转换为 PIL.Image 对象。
+    自动处理灰度图、RGB、RGBA、BGR 等常见情况。
+
+    Args:
+        image (np.ndarray): 输入图像数组（H×W×C 或 H×W）。
+
+    Returns:
+        Image.Image: 转换后的 PIL 图像。
+    """
+    if not isinstance(image, np.ndarray):
+        raise TypeError(f"Expected np.ndarray, got {type(image)}")
+
+    # 检查维度
+    if image.ndim == 2:
+        # 灰度图
+        mode = "L"
+        return Image.fromarray(image.astype(np.uint8), mode=mode)
+
+    elif image.ndim == 3:
+        h, w, c = image.shape
+        if c == 1:
+            # 单通道灰度
+            image = image.squeeze(-1)
+            return Image.fromarray(image.astype(np.uint8), mode="L")
+        elif c == 3:
+            # 默认假设是 OpenCV 的 BGR → 转 RGB
+            image = image[:, :, ::-1]
+            return Image.fromarray(image.astype(np.uint8), mode="RGB")
+        elif c == 4:
+            # RGBA
+            image = image[:, :, ::-1] if image.dtype != np.uint8 else image
+            return Image.fromarray(image.astype(np.uint8), mode="RGBA")
+        else:
+            raise ValueError(f"Unsupported channel count: {c}")
+    else:
+        raise ValueError(f"Unsupported image shape: {image.shape}")

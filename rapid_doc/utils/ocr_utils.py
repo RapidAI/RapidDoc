@@ -310,7 +310,7 @@ def merge_det_boxes(dt_boxes):
     return new_dt_boxes
 
 
-def get_adjusted_mfdetrec_res(single_page_mfdetrec_res, useful_list):
+def get_adjusted_mfdetrec_res(single_page_mfdetrec_res, useful_list, return_text=False):
     paste_x, paste_y, xmin, ymin, xmax, ymax, new_width, new_height = useful_list
     # Adjust the coordinates of the formula area
     adjusted_mfdetrec_res = []
@@ -325,9 +325,13 @@ def get_adjusted_mfdetrec_res(single_page_mfdetrec_res, useful_list):
         if any([x1 < 0, y1 < 0]) or any([x0 > new_width, y0 > new_height]):
             continue
         else:
-            adjusted_mfdetrec_res.append({
-                "bbox": [x0, y0, x1, y1],
-            })
+            return_res = { "bbox": [x0, y0, x1, y1]}
+            if return_text:
+                if mf_res.get('latex'):
+                    return_res["latex"] = mf_res['latex']
+                if mf_res.get('checkbox'):
+                    return_res["checkbox"] = mf_res['checkbox']
+            adjusted_mfdetrec_res.append(return_res)
     return adjusted_mfdetrec_res
 
 

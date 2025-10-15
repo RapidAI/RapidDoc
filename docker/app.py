@@ -189,6 +189,7 @@ async def file_parse(
     formula_config: Optional[str] = Form("{}"),
     table_config: Optional[str] = Form("{}"),
     checkbox_config: Optional[str] = Form("{}"),
+    image_config: Optional[str] = Form("{}"),
     return_md: bool = Form(True),
     return_middle_json: bool = Form(False),
     return_model_output: bool = Form(False),
@@ -238,6 +239,7 @@ async def file_parse(
         formula_config = _convert_value_to_enum(json.loads(formula_config or "{}"))
         table_config = _convert_value_to_enum(json.loads(table_config or "{}"))
         checkbox_config = json.loads(checkbox_config or "{}")
+        image_config = json.loads(image_config or "{}")
 
         # 创建输出目录
         os.makedirs(output_dir, exist_ok=True)
@@ -298,7 +300,7 @@ async def file_parse(
                     start_page_id=start_page_id,
                     end_page_id=end_page_id,
                     layout_config=layout_config, ocr_config=ocr_config, formula_config=formula_config,
-                    table_config=table_config, checkbox_config=checkbox_config
+                    table_config=table_config, checkbox_config=checkbox_config, image_config=image_config,
                 )
                 
                 logger.info(f"Parse completed for {file.filename}")

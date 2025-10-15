@@ -52,8 +52,16 @@ def extract_images_with_bbox(
 
             # === 获取 bbox ===
             try:
-                bbox = image.get_pos()  # (x, y, width, height)
-                # bbox 是 PDF 页面坐标系，原点在左下角
+                x1, y1, x2, y2 = image.get_pos() # PDF 左下角原点坐标
+                page_width, page_height = page.get_size()
+
+                # 转换为左上角原点坐标
+                new_x1 = x1
+                new_x2 = x2
+                new_y1 = page_height - y2
+                new_y2 = page_height - y1
+
+                bbox = (new_x1, new_y1, new_x2, new_y2)
             except Exception:
                 bbox = None
 
@@ -94,7 +102,7 @@ def extract_images_with_bbox(
 
 
 if __name__ == "__main__":
-    pdf_path = r"C:\Users\huazhen\Desktop\1.pdf"
+    pdf_path =  "D:\\file\\text-pdf\\示例1-论文模板.pdf"
     output_dir = "./output_images3"
     Path(output_dir).mkdir(parents=True, exist_ok=True)
 
