@@ -64,7 +64,7 @@ def load_images_from_pdf(
     return images_list, pdf_doc
 
 
-def cut_image(span, ori_image_list, extract_original_image, page_num: int, page_pil_img, return_path, image_writer: FileBasedDataWriter, scale=2):
+def cut_image(span, ori_image_list, extract_original_image, extract_original_image_iou_thresh, page_num: int, page_pil_img, return_path, image_writer: FileBasedDataWriter, scale=2):
     """从第page_num页的page中，根据bbox进行裁剪出一张jpg图片，返回图片路径 save_path：需要同时支持s3和本地,
     图片存放在save_path下，文件名是:
     {page_num}_{bbox[0]}_{bbox[1]}_{bbox[2]}_{bbox[3]}.jpg , bbox内数字取整。"""
@@ -73,7 +73,7 @@ def cut_image(span, ori_image_list, extract_original_image, page_num: int, page_
     if extract_original_image and span['type'] in [ContentType.IMAGE]:
         # 判断是否可以提取原始图片
         for ori_image in ori_image_list:
-            if calculate_iou(bbox, ori_image['bbox']) > 0.9:
+            if calculate_iou(bbox, ori_image['bbox']) >= extract_original_image_iou_thresh:
                 crop_img = ori_image['pil_image']
 
     # 拼接文件名

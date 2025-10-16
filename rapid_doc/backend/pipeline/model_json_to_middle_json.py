@@ -34,6 +34,7 @@ def page_model_info_to_page_info(page_model_info, image_dict, page_dict, image_w
     page_w, page_h = map(int, page_dict['size'])
     magic_model = MagicModel(page_model_info, scale)
     extract_original_image = image_config.get("extract_original_image", False) if image_config else False
+    extract_original_image_iou_thresh = image_config.get("extract_original_image_iou_thresh", 0.9) if image_config else 0.9
     """保存表格里的图片"""
     save_table_fill_image(page_model_info['layout_dets'], page_dict.get('table_fill_image_list', []), page_img_md5, page_index, image_writer)
 
@@ -159,7 +160,7 @@ def page_model_info_to_page_info(page_model_info, image_dict, page_dict, image_w
     for span in spans:
         if span['type'] in [ContentType.IMAGE, ContentType.TABLE, ContentType.INTERLINE_EQUATION]:
             span = cut_image_and_table(
-                span, page_dict['ori_image_list'], extract_original_image, page_pil_img, page_img_md5, page_index, image_writer, scale=scale
+                span, page_dict['ori_image_list'], extract_original_image, extract_original_image_iou_thresh, page_pil_img, page_img_md5, page_index, image_writer, scale=scale
             )
 
     """span填充进block"""

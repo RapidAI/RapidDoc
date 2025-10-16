@@ -20,7 +20,7 @@ from rapid_doc.backend.pipeline.pipeline_analyze import doc_analyze as pipeline_
 from rapid_doc.backend.pipeline.pipeline_middle_json_mkcontent import union_make as pipeline_union_make
 from rapid_doc.backend.pipeline.model_json_to_middle_json import result_to_middle_json as pipeline_result_to_middle_json
 
-from rapidocr import EngineType as OCREngineType, OCRVersion, ModelType
+from rapidocr import EngineType as OCREngineType, OCRVersion, ModelType as OCRModelType
 from rapid_doc.model.layout.rapid_layout_self import ModelType as LayoutModelType
 from rapid_doc.model.formula.rapid_formula_self import ModelType as FormulaModelType
 from rapid_doc.model.table.rapid_table_self import ModelType as TableModelType
@@ -45,7 +45,7 @@ def do_parse(
     end_page_id=None,  # End page ID for parsing, default is None (parse all pages until the end of the document)
 ):
     layout_config = {
-        "model_type": LayoutModelType.PP_DOCLAYOUT_PLUS_L,
+        # "model_type": LayoutModelType.PP_DOCLAYOUT_PLUS_L,
         # "conf_thresh": 0.4,
         # "batch_num": 1,
         # "model_dir_or_path": "C:\ocr\models\ppmodel\layout\PP-DocLayout-L\pp_doclayout_l.onnx",
@@ -59,15 +59,15 @@ def do_parse(
 
         # "Det.ocr_version": OCRVersion.PPOCRV5,
         # "Rec.ocr_version": OCRVersion.PPOCRV5,
-        # "Det.model_type": ModelType.SERVER,
-        # "Rec.model_type": ModelType.SERVER,
+        # "Det.model_type": OCRModelType.SERVER,
+        # "Rec.model_type": OCRModelType.SERVER,
 
         # 新增的自定义参数
         # "engine_type": OCREngineType.TORCH, # 统一设置推理引擎
         # "Det.rec_batch_num": 1, # Det批处理大小
 
-        # 是否使用ocr的Det定位文本行，默认False，直接使用pdf里的文本bbox，当parse_method="ocr"或parse_method="auto"自动判断为需要ocr时，use_det_bbox会自动变为True
-        # "use_det_bbox": False
+        # 文本检测框模式：auto（默认）、txt、ocr
+        # "use_det_mode": 'auto' #（1、txt只会从pypdfium2获取文本框，2、ocr只会从OCR-det获取文本框，3、auto先从pypdfium2获取文本框，提取不到再使用OCR-det提取）
     }
 
     formula_config = {
@@ -82,6 +82,7 @@ def do_parse(
     table_config = {
         # "force_ocr": False, # 表格文字，是否强制使用ocr，默认 False 根据 parse_method 来判断是否需要ocr还是从pdf中直接提取文本
         # "skip_text_in_image": True, # 是否跳过表格里图片中的文字（如表格单元格中嵌入的图片、图标、扫描底图等）
+        # "use_img2table": False, # 是否优先使用img2table库提取表格，需要手动安装（pip install img2table），基于opencv识别准确度不如使用模型，但是速度很快，默认关闭
 
         # "model_type": TableModelType.UNET_SLANET_PLUS,  # （默认） 有线表格使用unet，无线表格使用slanet_plus
         # "model_type": TableModelType.UNET_UNITABLE, # 有线表格使用unet，无线表格使用unitable
@@ -107,8 +108,8 @@ def do_parse(
     }
 
     image_config = {
-        # 是否提取原始图片（使用 pypdfium2 提取原始图片。截图可能导致清晰度降低和边界丢失，默认关闭）
-        # "extract_original_image": False,
+        # "extract_original_image": True, # 是否提取原始图片（使用 pypdfium2 提取原始图片。截图可能导致清晰度降低和边界丢失，默认关闭）
+        # "extract_original_image_iou_thresh": 0.5, # 是否提取原始图片和版面识别的图片，bbox重叠度，默认0.9
     }
 
 

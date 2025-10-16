@@ -76,7 +76,7 @@ class RapidOcrModel(object):
                 default_params['EngineConfig.paddle.use_cuda'] = True
                 default_params['EngineConfig.paddle.gpu_id'] = gpu_id
         default_params.pop('engine_type', None)
-        default_params.pop('use_det_bbox', None)
+        default_params.pop('use_det_mode', None)
         self.ocr_engine = RapidOCR(params=default_params)
         self.text_detector = self.ocr_engine.text_det
         self.text_recognizer = self.ocr_engine.text_rec

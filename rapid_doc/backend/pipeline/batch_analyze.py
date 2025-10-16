@@ -43,6 +43,7 @@ class BatchAnalyze:
         self.table_enable = get_table_enable(table_enable)
         self.table_force_ocr = table_config.get("force_ocr", False) if table_config else False
         self.skip_text_in_image = table_config.get("skip_text_in_image", True) if table_config else True
+        self.use_img2table = table_config.get("use_img2table", False) if table_config else False
         self.checkbox_enable = checkbox_config.get("checkbox_enable", False) if checkbox_config else False
         self.layout_config = layout_config
         self.ocr_config = ocr_config
@@ -53,7 +54,7 @@ class BatchAnalyze:
         self.ocr_det_base_batch_size = ocr_config.get("Det.rec_batch_num", 1) if ocr_config else 1 #16
         self.layout_base_batch_size = layout_config.get("batch_num", 1) if layout_config else 1 #8
         self.formula_base_batch_size = formula_config.get("batch_num", 1) if formula_config else 1 #16
-        self.use_det_bbox = ocr_config.get("use_det_bbox", False) if ocr_config else False
+        self.use_det_mode = ocr_config.get("use_det_mode", 'auto') if ocr_config else 'auto'
 
     def __call__(self, images_with_extra_info: List[Tuple[Image.Image, float, bool, str, dict]]) -> list:
         if len(images_with_extra_info) == 0:
@@ -154,7 +155,7 @@ class BatchAnalyze:
         # 清理显存
         # clean_vram(self.model.device, vram_threshold=8)
 
-        if not self.use_det_bbox:
+        if self.use_det_mode != 'ocr':
             # 分页分组
             ocr_res_list_grouped_page = {}
             for x in ocr_res_list_all_page:
@@ -204,9 +205,14 @@ class BatchAnalyze:
             for ocr_res_list_dict in ocr_res_list_all_page:
                 _lang = ocr_res_list_dict['lang']
                 for res in ocr_res_list_dict['ocr_res_list']:
-                    if not self.use_det_bbox and not ocr_res_list_dict['ocr_enable'] and not res.get('need_ocr_det'):
-                        # 从pdf中直接提取文本块点位，且不需要ocr，且真的提取到框，则跳过
-                        continue
+                    # 仅当整页OCR未启用时，判断是否跳过
+                    if not ocr_res_list_dict['ocr_enable']:
+                        if (
+                                self.use_det_mode == 'txt' or
+                                (self.use_det_mode != 'ocr' and not ocr_res_list_dict['ocr_enable'] and not res.get('need_ocr_det'))
+                        ):
+                            # 从 PDF 中直接提取文本框，无需 OCR，且已提取到框，则跳过
+                            continue
                     res.pop('need_ocr_det', None)
                     new_image, useful_list = crop_img(
                         res, ocr_res_list_dict['np_img'], crop_paste_x=50, crop_paste_y=50
@@ -333,9 +339,14 @@ class BatchAnalyze:
                     ocr_config=self.ocr_config,
                 )
                 for res in ocr_res_list_dict['ocr_res_list']:
-                    if not self.use_det_bbox and not ocr_res_list_dict['ocr_enable'] and not res.get('need_ocr_det'):
-                        # 从pdf中直接提取文本块点位，且不需要ocr，且真的提取到框，则跳过
-                        continue
+                    # 仅当整页OCR未启用时，判断是否跳过
+                    if not ocr_res_list_dict['ocr_enable']:
+                        if (
+                                self.use_det_mode == 'txt' or
+                                (self.use_det_mode != 'ocr' and not ocr_res_list_dict['ocr_enable'] and not res.get('need_ocr_det'))
+                        ):
+                            # 从 PDF 中直接提取文本框，无需 OCR，且已提取到框，则跳过
+                            continue
                     res.pop('need_ocr_det', None)
                     new_image, useful_list = crop_img(
                         res, ocr_res_list_dict['np_img'], crop_paste_x=50, crop_paste_y=50
@@ -368,9 +379,8 @@ class BatchAnalyze:
             total_tables = sum(len(tables) for tables in table_res_list_grouped_page.values())
             with tqdm(total=total_tables, desc="Table Predict") as pbar:
                 for page_idx, table_list in table_res_list_grouped_page.items():
-                    if not self.table_force_ocr:
-                        page_dict = pdf_dict_list[page_idx]
-                        scale = scale_list[page_idx]
+                    page_dict = pdf_dict_list[page_idx]
+                    scale = scale_list[page_idx]
                     for table_res_dict in table_list:
                         _lang = table_res_dict['lang']
                         useful_list = table_res_dict['useful_list']
@@ -383,7 +393,7 @@ class BatchAnalyze:
                         ocr_result = None
                         if not self.table_force_ocr and not table_res_dict['ocr_enable']:
                             ocr_res = []
-                            # if not self.use_det_bbox:
+                            # if self.use_det_mode != 'ocr':
                             #     # 从pdf中直接提取文本块点位（部分表格效果较差暂不考虑），并支持270和90度的表格
                             #     ocr_res, most_angle = txt_spans_bbox_extract_table(page_dict, table_res_dict, scale=scale)  # 从pdf中获取文本行点位
                             if not ocr_res:
@@ -422,7 +432,8 @@ class BatchAnalyze:
                         )
                         # 从pdf里提取表格里的图片
                         fill_image_res = extract_table_fill_image(page_dict, table_res_dict, scale=scale)
-                        html_code, table_cell_bboxes, logic_points, elapse = table_model.predict(table_res_dict['table_img'], ocr_result, fill_image_res, adjusted_mfdetrec_res, self.skip_text_in_image)
+                        html_code, table_cell_bboxes, logic_points, elapse = table_model.predict(table_res_dict['table_img'], ocr_result
+                                                                                                 , fill_image_res, adjusted_mfdetrec_res, self.skip_text_in_image, self.use_img2table)
                         # 判断是否返回正常
                         if html_code:
                             # 检查html_code是否包含'<table>'和'</table>'

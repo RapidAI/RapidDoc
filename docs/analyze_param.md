@@ -59,11 +59,11 @@ layout_config = {
 #### 3、ocr_config OCR识别参数说明如下：
 在rapidocr配置基础上新增如下参数
 
-|  参数名   |      说明      |                      默认值                       |                                            备注                                            |
-| :-------: |:------------:|:----------------------------------------------:|:----------------------------------------------------------------------------------------:|
-| engine_type  | det和rec的推理引擎 | OPENVINO（cpu）、TORCH（gpu） |                                                                                          |
-| use_det_bbox  | 是否使用ocr的Det定位文本行 | False | 直接使用pdf里的文本bbox，当parse_method="ocr"或parse_method="auto"自动判断为需要ocr时，use_det_bbox会自动变为True |
-| Det.rec_batch_num |   rec批处理大小   |                       1                        |                                                                                          |
+|  参数名   |      说明      |                      默认值                       |                                             备注                                              |
+| :-------: |:------------:|:----------------------------------------------:|:-------------------------------------------------------------------------------------------:|
+| engine_type  | det和rec的推理引擎 | OPENVINO（cpu）、TORCH（gpu） |                                                                                             |
+| use_det_mode  | 文本检测框模式：auto（默认）、txt、ocr | auto | 1、txt只会从pypdfium2获取文本框<br/>2、ocr只会从OCR-det获取文本框<br/>3、auto先从pypdfium2获取文本框，提取不到再使用OCR-det提取 |
+| Det.rec_batch_num |   rec批处理大小   |                       1                        |                                                                                             |
 > [ocr_config想更深入了解，请移步rapidocr config.yaml参数解释](https://rapidai.github.io/RapidOCRDocs/install_usage/api/RapidOCR/)
 
 示例：
@@ -71,19 +71,20 @@ layout_config = {
 from rapidocr import EngineType as OCREngineType, OCRVersion, ModelType
 
 ocr_config = {
-    # rapidocr 已有的参数
-    "Det.model_path": r"C:\ocr\models\ppmodel\ocr\v4\ch_PP-OCRv4_det_infer\openvino\ch_PP-OCRv4_det_infer.onnx",
-    "Rec.model_path": r"C:\ocr\models\ppmodel\ocr\v4\ch_PP-OCRv4_rec_infer\openvino\ch_PP-OCRv4_rec_infer.onnx",
-    "Rec.rec_batch_num": 1,
+    # "Det.model_path": r"C:\ocr\models\ppmodel\ocr\v4\ch_PP-OCRv4_det_infer\openvino\ch_PP-OCRv4_det_infer.onnx",
+    # "Rec.model_path": r"C:\ocr\models\ppmodel\ocr\v4\ch_PP-OCRv4_rec_infer\openvino\ch_PP-OCRv4_rec_infer.onnx",
+    # "Rec.rec_batch_num": 1,
 
-    "Det.ocr_version": OCRVersion.PPOCRV5,
-    "Rec.ocr_version": OCRVersion.PPOCRV5,
-    "Det.model_type": ModelType.SERVER,
-    "Rec.model_type": ModelType.SERVER,
+    # "Det.ocr_version": OCRVersion.PPOCRV5,
+    # "Rec.ocr_version": OCRVersion.PPOCRV5,
+    # "Det.model_type": OCRModelType.SERVER,
+    # "Rec.model_type": OCRModelType.SERVER,
 
     # 新增的自定义参数
-    "engine_type": OCREngineType.TORCH, # 统一设置推理引擎
-    "Det.rec_batch_num": 1, # Det批处理大小
+    # "engine_type": OCREngineType.TORCH, # 统一设置推理引擎
+    # "Det.rec_batch_num": 1, # Det批处理大小
+
+    # "use_det_mode": 'auto' # 文本检测框模式：auto（默认）、txt、ocr
 }
 ```
 
@@ -110,20 +111,21 @@ formula_config = {
 
 #### 5、table_config 表格识别参数说明如下：
 
-|               参数名                |                说明                 |         默认值          |                   备注                    |
-|:--------------------------------:|:---------------------------------:|:--------------------:|:---------------------------------------:|
-|            force_ocr            |           表格文字是否强制使用ocr           | False | 根据 parse_method 来判断是否需要ocr还是从pdf中直接提取文本 |
-|            skip_text_in_image            |           是否跳过表格里图片中的文字           | True |       如表格单元格中嵌入的图片、图标、扫描底图等，里面的文字       |
-|            model_type            |                模型                 | UNET_SLANET_PLUS |      有线表格使用unet，无线表格使用slanet_plus       |
-|        model_dir_or_path         |               模型地址                |          None           |      单个模型使用。如SLANET_PLUS、UNITABLE       |
-|      cls.model_dir_or_path       |             表格分类模型地址              |         None           |                                         |
-|      unet.model_dir_or_path      |            UNET表格模型地址             |         None         |                                         |
-|      unitable.model_dir_or_path      |          UNITABLE表格模型地址           |         None         |                                         |
-|      slanet_plus.model_dir_or_path      |         SLANET_PLUS表格模型地址         |         None         |                                         |
-|   wired_cell.model_dir_or_path   |             有线单元格模型地址             |         None         |              配置SLANEXT时使用               |
-| wireless_cell.model_dir_or_path  |             无线单元格模型地址             |         None         |              配置SLANEXT时使用               |
-|  wired_table.model_dir_or_path   |             有线表结构模型地址             |         None         |              配置SLANEXT时使用               |
-| wireless_table.model_dir_or_path |             无线表结构模型地址             |         None         |              配置SLANEXT时使用               |
+|                  参数名                   |                说明                |         默认值          |                   备注                    |
+|:--------------------------------------:|:--------------------------------:|:--------------------:|:---------------------------------------:|
+|               force_ocr                |          表格文字是否强制使用ocr           | False | 根据 parse_method 来判断是否需要ocr还是从pdf中直接提取文本 |
+|         skip_text_in_image             |   是否跳过表格里图片中的文字                  | True |       如表格单元格中嵌入的图片、图标、扫描底图等，里面的文字       |
+|             use_img2table              |       是否优先使用img2table库提取表格       | False |       需要手动安装（pip install img2table），基于opencv识别准确度不如使用模型，但是速度很快，默认关闭       |
+|               model_type               |                模型                | UNET_SLANET_PLUS |      有线表格使用unet，无线表格使用slanet_plus       |
+|           model_dir_or_path            |               模型地址               |          None           |      单个模型使用。如SLANET_PLUS、UNITABLE       |
+|         cls.model_dir_or_path          |             表格分类模型地址             |         None           |                                         |
+|         unet.model_dir_or_path         |            UNET表格模型地址            |         None         |                                         |
+|       unitable.model_dir_or_path       |          UNITABLE表格模型地址          |         None         |                                         |
+|     slanet_plus.model_dir_or_path      |        SLANET_PLUS表格模型地址         |         None         |                                         |
+|      wired_cell.model_dir_or_path      |            有线单元格模型地址             |         None         |              配置SLANEXT时使用               |
+|    wireless_cell.model_dir_or_path     |            无线单元格模型地址             |         None         |              配置SLANEXT时使用               |
+|     wired_table.model_dir_or_path      |            有线表结构模型地址             |         None         |              配置SLANEXT时使用               |
+|    wireless_table.model_dir_or_path    |            无线表结构模型地址             |         None         |              配置SLANEXT时使用               |
 示例：
 
 ```python
@@ -131,6 +133,8 @@ from rapid_doc.model.table.rapid_table_self import ModelType as TableModelType
 
 table_config = {
     "force_ocr": False,  # 表格文字，是否强制使用ocr，默认 False 根据 parse_method 来判断是否需要ocr还是从pdf中直接提取文本
+    "skip_text_in_image": True, # 是否跳过表格里图片中的文字（如表格单元格中嵌入的图片、图标、扫描底图等）
+    "use_img2table": False, # 是否优先使用img2table库提取表格，需要手动安装（pip install img2table），基于opencv识别准确度不如使用模型，但是速度很快，默认关闭
     "model_type": TableModelType.UNET_SLANET_PLUS,  # （默认） 有线表格使用unet，无线表格使用slanet_plus
     # "model_type": TableModelType.UNET_UNITABLE, # 有线表格使用unet，无线表格使用unitable
     # "model_type": TableModelType.SLANEXT,  # 有线表格使用slanext_wired，无线表格使用slanext_wireless
@@ -168,12 +172,13 @@ checkbox_config = {
 |  参数名   |   说明   |  默认值  |                    备注                     |
 | :-------: |:------:|:-----:|:-----------------------------------------:|
 | extract_original_image |  是否提取原始图片  | False | 使用 pypdfium2 提取原始图片。截图可能导致清晰度降低和边界丢失，默认关闭 |
+| extract_original_image_iou_thresh |  原始图片和版面识别的图片，bbox重叠度  |  0.9  |  |
 示例：
 ```python
 from rapid_doc.backend.pipeline.model_json_to_middle_json import result_to_middle_json as pipeline_result_to_middle_json
 image_config = {
-    # 是否提取原始图片（使用 pypdfium2 提取原始图片。默认截图会导致清晰度降低和边界丢失，默认关闭）
-    # "extract_original_image": False,
+    "extract_original_image": True, # 是否提取原始图片（使用 pypdfium2 提取原始图片。截图可能导致清晰度降低和边界丢失，默认关闭）
+    "extract_original_image_iou_thresh": 0.5, # 原始图片和版面识别的图片，bbox重叠度，默认0.9
 }
 middle_json = pipeline_result_to_middle_json(model_list, images_list, pdf_dict, image_writer, _lang, _ocr_enable, p_formula_enable, ocr_config=ocr_config, image_config=image_config)
 ```

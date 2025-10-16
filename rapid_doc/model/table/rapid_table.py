@@ -78,7 +78,7 @@ class RapidTableModel(object):
                                          engine_cfg=engine_cfg or {},)
             self.table_model = RapidTable(input_args)
 
-    def predict(self, image, ocr_result=None, fill_image_res=None, mfd_res=None, skip_text_in_image=True):
+    def predict(self, image, ocr_result=None, fill_image_res=None, mfd_res=None, skip_text_in_image=True, use_img2table=False):
         bgr_image = cv2.cvtColor(np.asarray(image), cv2.COLOR_RGB2BGR)
 
         # First check the overall image aspect ratio (height/width)
@@ -161,10 +161,45 @@ class RapidTableModel(object):
                 ocr_result[2].append(1)
 
         """开始识别表格"""
+        cls = None
+        """使用 img2table 识别"""
+        if use_img2table:
+            try:
+                from rapid_doc.model.table.img2table_self.image import Image
+                from rapid_doc.model.table.img2table_self.RapidOcrTable import RapidOcrTable
+
+                cls, elasp = self.table_cls(image)
+                if cls == "wired":
+                    borderless_tables = False
+                else:
+                    borderless_tables = True
+                opencv_ocr = RapidOcrTable(ocr_result)
+                doc = Image(src=bgr_image)
+                extracted_tables = doc.extract_tables(
+                    ocr=opencv_ocr,
+                    implicit_rows=False,
+                    implicit_columns=False,
+                    borderless_tables=borderless_tables,
+                    min_confidence=50
+                )
+                if extracted_tables:
+                    # print(f"img2table detected {len(extracted_tables)} tables")
+                    html_code = "<html><body>" + extracted_tables[0].html + "</body></html>"
+                    return html_code, None, None, None
+            except ImportError:
+                raise ValueError(
+                    "Could not import img2table python package. "
+                    "Please install it with `pip install img2table`."
+                )
+            except Exception as e:
+                logger.exception(e)
+
+        """使用 rapid_table_self 识别"""
         try:
             image = np.asarray(image)
             if self.model_type == ModelType.SLANEXT:
-                cls, elasp = self.table_cls(image)
+                if not cls:
+                    cls, elasp = self.table_cls(image)
                 if cls == "wired":
                     cell_res = self.wired_table_cell([image])
                     model_runner = (self.wired_table_model)
@@ -174,7 +209,8 @@ class RapidTableModel(object):
                 cell_results = (cell_res[0].boxes, cell_res[0].scores)
                 table_results = model_runner(image, ocr_result, cell_results=cell_results)
             elif self.model_type == ModelType.UNET_SLANET_PLUS or self.model_type == ModelType.UNET_UNITABLE:
-                cls, elasp = self.table_cls(image)
+                if not cls:
+                    cls, elasp = self.table_cls(image)
                 if cls == "wired":
                     table_results = self.wired_table_model(image, ocr_result)
                 else:  # wireless

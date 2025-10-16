@@ -132,7 +132,10 @@ def doc_analyze(
         for pdf_doc in pdf_doc_list:
             # 获取pdf的文字和图片的字典对象
             page_dict = get_page(pdf_doc)
-            page_dict['ori_image_list'] = get_ori_image(pdf_doc)
+            if page_dict['blocks']:
+                page_dict['ori_image_list'] = get_ori_image(pdf_doc) # 从 PDF 中提取所有原始图片
+            else:
+                page_dict['ori_image_list'] = [] # 提取不到文字视为扫描版，不需要提取图片
             pdf_doc.close()
             all_pdf_dict.append(page_dict)
         all_pdf_docs.append(all_pdf_dict)
