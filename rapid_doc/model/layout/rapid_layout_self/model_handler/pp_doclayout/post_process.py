@@ -1,10 +1,10 @@
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 import numpy as np
 
 
 class PPPostProcess:
-    def __init__(self, labels, conf_thres=0.4, iou_thres=0.5):
+    def __init__(self, labels, conf_thres: Union[float, dict] =0.4, iou_thres=0.5):
         self.labels = labels
         self.strides = [8, 16, 32, 64]
         self.conf_thres = conf_thres
@@ -26,13 +26,30 @@ class PPPostProcess:
         Returns:
             Boxes: The post-processed detection boxes.
         """
-
-        expect_boxes = (boxes[:, 1] >= self.conf_thres) & (boxes[:, 0] > -1)
-        boxes = boxes[expect_boxes, :]
-
+        # === 1️⃣ 按置信度阈值过滤 ===
+        if isinstance(self.conf_thres, float):
+            # 单一阈值
+            expect_boxes = (boxes[:, 1] >= self.conf_thres) & (boxes[:, 0] > -1)
+            boxes = boxes[expect_boxes, :]
+        elif isinstance(self.conf_thres, dict):
+            # 每个类别使用不同阈值
+            category_filtered_boxes = []
+            for cat_id in np.unique(boxes[:, 0]):
+                category_boxes = boxes[boxes[:, 0] == cat_id]
+                category_threshold = self.conf_thres.get(int(cat_id), 0.5)
+                selected_indices = (category_boxes[:, 1] >= category_threshold) & (
+                        category_boxes[:, 0] > -1
+                )
+                category_filtered_boxes.append(category_boxes[selected_indices])
+            boxes = (
+                np.vstack(category_filtered_boxes)
+                if category_filtered_boxes
+                else np.array([])
+            )
+        # === 2️⃣ NMS (非极大值抑制) ===
         selected_indices = nms(boxes, iou_same=0.6, iou_diff=0.98)
         boxes = np.array(boxes[selected_indices])
-
+        # === 3️⃣ 过滤大面积 image 框 ===
         filter_large_image = True
         if filter_large_image and len(boxes) > 1 and boxes.shape[1] == 6:
             if img_size[0] > img_size[1]:
@@ -57,7 +74,7 @@ class PPPostProcess:
             if len(filtered_boxes) == 0:
                 filtered_boxes = boxes
             boxes = np.array(filtered_boxes)
-
+        # === 4️⃣ 格式化输出 ===
         if boxes.size == 0:
             return []
 

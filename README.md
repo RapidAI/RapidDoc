@@ -25,9 +25,9 @@
   
 - **版面识别**
   - 模型使用 `PP-DocLayout` 系列 ONNX 模型（plus-L、L、M、S）
-    - **PP-DocLayout_plus-L**：效果最好，速度稍慢 
-    - **PP-DocLayout-L**：速度快，效果也不错，默认使用  
-    - **PP-DocLayout-S**：速度极快，可能存在部分漏检
+    - **PP-DocLayout_plus-L**：效果最好，速度稍慢，默认使用 
+    - **PP-DocLayout-L**：速度快，效果也不错
+    - **PP-DocLayout-S**：速度极快，存在部分漏检
 
 - **公式识别**
   - 使用 `PP-FormulaNet_plus` 系列 ONNX 模型（L、M、S）

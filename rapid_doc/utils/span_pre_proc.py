@@ -255,6 +255,7 @@ def extract_table_fill_image(page_dict, table_res_dict, scale):
             if is_in(bbox, input_res_bbox):
                 # 把坐标转为相对于表格的坐标
                 bbox = [bbox[0] * scale, bbox[1] * scale, bbox[2] * scale, bbox[3] * scale]
+                image['ori_bbox'] = bbox
                 p1 = [bbox[0] + paste_x - xmin, bbox[1] + paste_y - ymin]
                 p2 = [bbox[2] + paste_x - xmin, bbox[1] + paste_y - ymin]
                 p3 = [bbox[2] + paste_x - xmin, bbox[3] + paste_y - ymin]
@@ -269,6 +270,7 @@ def extract_table_fill_image(page_dict, table_res_dict, scale):
             # 把坐标转为相对于表格的坐标
             bbox = image['poly']
             bbox = [bbox[0], bbox[1], bbox[4], bbox[5]]
+            image['ori_bbox'] = bbox
             p1 = [bbox[0] + paste_x - xmin, bbox[1] + paste_y - ymin]
             p2 = [bbox[2] + paste_x - xmin, bbox[1] + paste_y - ymin]
             p3 = [bbox[2] + paste_x - xmin, bbox[3] + paste_y - ymin]

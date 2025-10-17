@@ -442,6 +442,13 @@ class BatchAnalyze:
                                 start_index = html_code.find('<table>')
                                 end_index = html_code.rfind('</table>') + len('</table>')
                                 table_res_dict['table_res']['html'] = html_code[start_index:end_index]
+                                # 把图片里的公式和图片放到span，方便layout画图
+                                latex_boxes = [t["bbox"] for t in table_res_dict['single_page_mfdetrec_res'] + table_res_dict['checkbox_res'] if "bbox" in t]
+                                if latex_boxes:
+                                    table_res_dict['table_res']['latex_boxes'] = [[int(coord / scale) for coord in bbox] for bbox in latex_boxes]
+                                img_boxes = [t["ori_bbox"] for t in fill_image_res if "bbox" in t]
+                                if img_boxes:
+                                    table_res_dict['table_res']['img_boxes'] = [[int(coord / scale) for coord in bbox] for bbox in img_boxes]
                             else:
                                 logger.warning(
                                     'table recognition processing fails, not found expected HTML table end'

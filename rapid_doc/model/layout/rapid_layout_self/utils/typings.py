@@ -10,6 +10,54 @@ from .utils import save_img
 
 logger = Logger(logger_name=__name__).get_log()
 
+PP_DOCLAYOUT_PLUS_L_Threshold = {
+    0: 0.3,   # paragraph_title
+    1: 0.5,   # image
+    2: 0.4,   # text
+    3: 0.5,   # number
+    4: 0.5,   # abstract
+    5: 0.5,   # content
+    6: 0.5,   # figure_table_chart_title
+    7: 0.3,   # formula
+    8: 0.5,   # table
+    9: 0.5,   # reference
+    10: 0.5,  # doc_title
+    11: 0.5,  # footnote
+    12: 0.5,  # header
+    13: 0.5,  # algorithm
+    14: 0.5,  # footer
+    15: 0.45, # seal
+    16: 0.5,  # chart
+    17: 0.5,  # formula_number
+    18: 0.5,  # aside_text
+    19: 0.5,  # reference_content
+}
+
+PP_DOCLAYOUT_L_Threshold = {
+    0: 0.3,    # paragraph_title
+    1: 0.5,    # image
+    2: 0.4,    # text
+    3: 0.5,    # number
+    4: 0.5,    # abstract
+    5: 0.5,    # content
+    6: 0.5,    # figure_title (默认值)
+    7: 0.3,    # formula
+    8: 0.5,    # table
+    9: 0.5,    # table_title (默认值)
+    10: 0.5,   # reference
+    11: 0.5,   # doc_title
+    12: 0.5,   # footnote
+    13: 0.5,   # header
+    14: 0.5,   # algorithm
+    15: 0.5,   # footer
+    16: 0.45,  # seal
+    17: 0.5,   # chart_title (默认值)
+    18: 0.5,   # chart
+    19: 0.5,   # formula_number
+    20: 0.5,   # header_image (默认值)
+    21: 0.5,   # footer_image (默认值)
+    22: 0.5    # aside_text
+}
 
 class ModelType(Enum):
     PP_DOCLAYOUT_PLUS_L = "pp_doclayout_plus_l"
@@ -33,7 +81,7 @@ class RapidLayoutInput:
     engine_type: EngineType = EngineType.ONNXRUNTIME
     engine_cfg: dict = field(default_factory=dict)
 
-    conf_thresh: float = 0.5
+    conf_thresh: Union[float, dict] = 0.5
     iou_thresh: float = 0.5
 
 

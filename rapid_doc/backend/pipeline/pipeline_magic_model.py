@@ -346,6 +346,10 @@ class MagicModel:
                         span['latex'] = latex
                     elif html:
                         span['html'] = html
+                        if layout_det.get('latex_boxes'):
+                            span['latex_boxes'] = layout_det.get('latex_boxes')
+                        elif layout_det.get('img_boxes'):
+                            span['img_boxes'] = layout_det.get('img_boxes')
                     span['type'] = ContentType.TABLE
                 # elif category_id == CategoryId.InlineEquation:
                 #     span['content'] = layout_det['latex']

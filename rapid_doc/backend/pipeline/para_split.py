@@ -1,5 +1,4 @@
 import copy
-from loguru import logger
 from rapid_doc.utils.enum_class import ContentType, BlockType, SplitFlag
 from rapid_doc.utils.language import detect_lang
 

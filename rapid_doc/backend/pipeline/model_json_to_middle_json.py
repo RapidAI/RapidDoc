@@ -2,10 +2,9 @@
 import os
 import time
 
-from loguru import logger
 from tqdm import tqdm
 
-from rapid_doc.utils.config_reader import get_device, get_llm_aided_config, get_formula_enable
+from rapid_doc.utils.config_reader import get_device, get_formula_enable
 from rapid_doc.backend.pipeline.model_init import AtomModelSingleton
 from rapid_doc.backend.pipeline.para_split import para_split
 from rapid_doc.utils.block_pre_proc import prepare_block_bboxes, process_groups
@@ -13,7 +12,6 @@ from rapid_doc.utils.block_sort import sort_blocks_by_bbox
 from rapid_doc.utils.boxbase import calculate_overlap_area_in_bbox1_area_ratio
 from rapid_doc.utils.cut_image import cut_image_and_table
 from rapid_doc.utils.enum_class import ContentType
-from rapid_doc.utils.llm_aided import llm_aided_title
 from rapid_doc.utils.model_utils import clean_memory
 from rapid_doc.backend.pipeline.pipeline_magic_model import MagicModel
 from rapid_doc.utils.ocr_utils import OcrConfidence
@@ -214,7 +212,7 @@ def result_to_middle_json(model_list, images_list, page_dict_list, image_writer,
                     img_crop_list.append(span['np_img'])
                     span.pop('np_img')
     if len(img_crop_list) > 0:
-        start = time.perf_counter()
+        # start = time.perf_counter()
         atom_model_manager = AtomModelSingleton()
         ocr_model = atom_model_manager.get_atom_model(
             atom_model_name='ocr',
@@ -241,18 +239,6 @@ def result_to_middle_json(model_list, images_list, page_dict_list, image_writer,
 
     """表格跨页合并"""
     merge_table(middle_json["pdf_info"])
-
-    """llm优化"""
-    llm_aided_config = get_llm_aided_config()
-
-    if llm_aided_config is not None:
-        """标题优化"""
-        title_aided_config = llm_aided_config.get('title_aided', None)
-        if title_aided_config is not None:
-            if title_aided_config.get('enable', False):
-                llm_aided_title_start_time = time.time()
-                llm_aided_title(middle_json["pdf_info"], title_aided_config)
-                logger.info(f'llm aided title time: {round(time.time() - llm_aided_title_start_time, 2)}')
 
     """清理内存"""
     # pdf_doc.close()

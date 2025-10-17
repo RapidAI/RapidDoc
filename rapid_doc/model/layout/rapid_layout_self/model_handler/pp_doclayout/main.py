@@ -1,5 +1,5 @@
 import time
-from typing import List
+from typing import List, Union
 
 import numpy as np
 
@@ -11,7 +11,7 @@ from .pre_process import PPPreProcess
 from ..utils import ModelType
 
 class PPDocLayoutModelHandler(BaseModelHandler):
-    def __init__(self, labels, conf_thres, iou_thres, session: InferSession, model_type: ModelType):
+    def __init__(self, labels, conf_thres: Union[float, dict], iou_thres, session: InferSession, model_type: ModelType):
         if model_type == ModelType.PP_DOCLAYOUT_PLUS_L:
             target_size = (800, 800)
         elif model_type == ModelType.PP_DOCLAYOUT_S:

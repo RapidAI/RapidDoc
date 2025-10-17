@@ -134,6 +134,8 @@ class RapidTableModel(object):
         # 把图片结果，添加到ocr_result里。uuid作为占位符，后面保存图片时替换
         if fill_image_res:
             for fill_image in fill_image_res:
+                bbox = points_to_bbox(fill_image['ocr_bbox'])
+                cv2.rectangle(bgr_image, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])), (255, 255, 255), thickness=-1) # 填白图像区域，防止表格识别被影响
                 ocr_result[0].append(fill_image['ocr_bbox'])
                 ocr_result[1].append(fill_image['uuid'])
                 ocr_result[2].append(1)
@@ -196,27 +198,26 @@ class RapidTableModel(object):
 
         """使用 rapid_table_self 识别"""
         try:
-            image = np.asarray(image)
             if self.model_type == ModelType.SLANEXT:
                 if not cls:
-                    cls, elasp = self.table_cls(image)
+                    cls, elasp = self.table_cls(bgr_image)
                 if cls == "wired":
-                    cell_res = self.wired_table_cell([image])
+                    cell_res = self.wired_table_cell([bgr_image])
                     model_runner = (self.wired_table_model)
                 else:  # wireless
-                    cell_res = self.wireless_table_cell([image])
+                    cell_res = self.wireless_table_cell([bgr_image])
                     model_runner = (self.wireless_table_model)
                 cell_results = (cell_res[0].boxes, cell_res[0].scores)
-                table_results = model_runner(image, ocr_result, cell_results=cell_results)
+                table_results = model_runner(bgr_image, ocr_result, cell_results=cell_results)
             elif self.model_type == ModelType.UNET_SLANET_PLUS or self.model_type == ModelType.UNET_UNITABLE:
                 if not cls:
-                    cls, elasp = self.table_cls(image)
+                    cls, elasp = self.table_cls(bgr_image)
                 if cls == "wired":
-                    table_results = self.wired_table_model(image, ocr_result)
+                    table_results = self.wired_table_model(bgr_image, ocr_result)
                 else:  # wireless
-                    table_results = self.wireless_table_model(image, ocr_result)
+                    table_results = self.wireless_table_model(bgr_image, ocr_result)
             else:
-                table_results = self.table_model(image, ocr_result)
+                table_results = self.table_model(bgr_image, ocr_result)
 
             html_code = table_results.pred_html
             table_cell_bboxes = table_results.cell_bboxes

@@ -81,12 +81,13 @@ def do_parse(
 
     table_config = {
         # "force_ocr": False, # 表格文字，是否强制使用ocr，默认 False 根据 parse_method 来判断是否需要ocr还是从pdf中直接提取文本
+        # 注：文字版pdf可以使用pypdfium2提取到表格内图片，扫描版或图片需要使用PP_DOCLAYOUT_PLUS_L版面识别模型，才能识别到表格内的图片
         # "skip_text_in_image": True, # 是否跳过表格里图片中的文字（如表格单元格中嵌入的图片、图标、扫描底图等）
         # "use_img2table": False, # 是否优先使用img2table库提取表格，需要手动安装（pip install img2table），基于opencv识别准确度不如使用模型，但是速度很快，默认关闭
 
         # "model_type": TableModelType.UNET_SLANET_PLUS,  # （默认） 有线表格使用unet，无线表格使用slanet_plus
         # "model_type": TableModelType.UNET_UNITABLE, # 有线表格使用unet，无线表格使用unitable
-        # "model_type": TableModelType.SLANEXT,  # 有线表格使用slanext_wired，无线表格使用slanext_wireless
+        # "model_type": TableModelType.SLANETPLUS,  # 有线表格使用slanext_wired，无线表格使用slanext_wireless
 
         # "model_dir_or_path": "", #单个模型使用。如SLANET_PLUS、UNITABLE
 
@@ -107,6 +108,7 @@ def do_parse(
         # "checkbox_enable": False, # 是否识别复选框，默认不识别，基于opencv，有可能会误检
     }
 
+    # 版面识别元素为图片的配置
     image_config = {
         # "extract_original_image": True, # 是否提取原始图片（使用 pypdfium2 提取原始图片。截图可能导致清晰度降低和边界丢失，默认关闭）
         # "extract_original_image_iou_thresh": 0.5, # 是否提取原始图片和版面识别的图片，bbox重叠度，默认0.9

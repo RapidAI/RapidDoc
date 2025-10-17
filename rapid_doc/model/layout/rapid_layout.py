@@ -1,10 +1,11 @@
 from rapid_doc.model.layout.rapid_layout_self import ModelType, RapidLayout, RapidLayoutInput
+from rapid_doc.model.layout.rapid_layout_self.utils.typings import PP_DOCLAYOUT_PLUS_L_Threshold, PP_DOCLAYOUT_L_Threshold
 from rapid_doc.utils.config_reader import get_device
 from rapid_doc.utils.enum_class import CategoryId
 
 class RapidLayoutModel(object):
     def __init__(self, layout_config=None):
-        cfg = RapidLayoutInput(model_type=ModelType.PP_DOCLAYOUT_L, conf_thresh=0.4)
+        cfg = RapidLayoutInput(model_type=ModelType.PP_DOCLAYOUT_PLUS_L, conf_thresh=0.4)
 
         device = get_device()
         if device.startswith('cuda'):
@@ -14,9 +15,16 @@ class RapidLayoutModel(object):
 
         # 如果传入了 layout_config，则用传入配置覆盖默认配置
         if layout_config is not None:
-            if cfg.model_type == ModelType.PP_DOCLAYOUT_S and not layout_config.get("conf_thresh"):
-                # S可能存在部分漏检，自动调低阈值
-                cfg.conf_thresh = 0.2
+            if not layout_config.get("conf_thresh"):
+                if cfg.model_type == ModelType.PP_DOCLAYOUT_PLUS_L:
+                    # PP-DocLayout_plus-L 默认阈值
+                    cfg.conf_thresh = PP_DOCLAYOUT_PLUS_L_Threshold
+                elif cfg.model_type == ModelType.PP_DOCLAYOUT_L:
+                    # S可能存在部分漏检，自动调低阈值
+                    cfg.conf_thresh = PP_DOCLAYOUT_L_Threshold
+                elif cfg.model_type == ModelType.PP_DOCLAYOUT_S:
+                    # S可能存在部分漏检，自动调低阈值
+                    cfg.conf_thresh = 0.2
             # 遍历字典，把传入配置设置到 default_cfg 对象中
             for key, value in layout_config.items():
                 if hasattr(cfg, key):

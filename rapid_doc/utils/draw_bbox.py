@@ -77,8 +77,6 @@ def draw_bbox_without_number(i, bbox_list, page, c, rgb_config, fill_config):
 def draw_bbox_with_number(i, bbox_list, page, c, rgb_config, fill_config, draw_bbox=True):
     new_rgb = [float(color) / 255 for color in rgb_config]
     page_data = bbox_list[i]
-    # 强制转换为 float
-    page_width, page_height = float(page.cropbox[2]), float(page.cropbox[3])
 
     for j, bbox in enumerate(page_data):
         # 确保bbox的每个元素都是float
@@ -191,10 +189,11 @@ def draw_layout_bbox(pdf_info, pdf_bytes, out_path, filename):
         indexs_list.append(indices)
 
     layout_bbox_list = []
-
+    inner_layout_bbox_list = []
     table_type_order = {"table_caption": 1, "table_body": 2, "table_footnote": 3}
     for page in pdf_info:
         page_block_list = []
+        page_inner_list = []
         for block in page["para_blocks"]:
             if block["type"] in [
                 BlockType.TEXT,
@@ -216,8 +215,16 @@ def draw_layout_bbox(pdf_info, pdf_bytes, out_path, filename):
                         continue
                     bbox = sub_block["bbox"]
                     page_block_list.append(bbox)
+                    # 表格内的图片和公式
+                    for line in sub_block.get("lines", []):
+                        for span in line.get("spans", []):
+                            if "img_boxes" in span:
+                                page_inner_list.extend(span["img_boxes"])
+                            if "latex_boxes" in span:
+                                page_inner_list.extend(span["latex_boxes"])
 
         layout_bbox_list.append(page_block_list)
+        inner_layout_bbox_list.append(page_inner_list)
 
     pdf_bytes_io = BytesIO(pdf_bytes)
     pdf_docs = PdfReader(pdf_bytes_io)
@@ -245,6 +252,7 @@ def draw_layout_bbox(pdf_info, pdf_bytes, out_path, filename):
         c = draw_bbox_without_number(i, lists_list, page, c, [40, 169, 92], True)
         c = draw_bbox_without_number(i, indexs_list, page, c, [40, 169, 92], True)
         c = draw_bbox_with_number(i, layout_bbox_list, page, c, [255, 0, 0], False, draw_bbox=False)
+        c = draw_bbox_without_number(i, inner_layout_bbox_list, page, c,  [0, 255, 0], False)
 
         c.save()
         packet.seek(0)
