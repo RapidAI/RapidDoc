@@ -118,10 +118,9 @@ RapidDoc提供了便捷的docker部署方式，这有助于快速搭建环境并
 - [x] 文本型pdf，使用pypdfium2提取原始图片（默认截图会导致清晰度降低和图片边界可能丢失部分）
 - [x] 表格内公式提取
 - [x] 表格内图片提取
-- 
-- [ ] 修正文档扭曲/模糊/阴影等情况 RapidUnDistort
-- [ ] 四方向分类旋转表格解析 RapidOrientation
-- [ ] 复选框识别，使用模型
+- [ ] 支持 PP-DocLayoutV2 版面识别+阅读顺序
+
+
 - [ ] 公式识别支持gpu
 - [ ] 版面、表格、公式支持openvino
 - [ ] RapidDoc4j（Java版本）
