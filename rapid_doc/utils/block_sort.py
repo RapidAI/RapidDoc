@@ -2,10 +2,18 @@
 import copy
 import statistics
 
-from rapid_doc.utils.enum_class import BlockType
-from rapid_doc.model.reading_order.xycut_plus import xycut_plus_sort
+import cv2
+import numpy as np
+from loguru import logger
 
-def sort_blocks_by_bbox(blocks, page_w, page_h, footnote_blocks):
+from rapid_doc.model.reading_order.layout_parsing.setting import blocktype_to_sort_label
+from rapid_doc.model.reading_order.layout_parsing.xycut_plus_v3 import get_layout_parsing_res
+from rapid_doc.utils.enum_class import BlockType, ContentType
+from rapid_doc.model.reading_order.xycut_plus import xycut_plus_sort
+from rapid_doc.utils.ocr_utils import bbox_to_points
+
+
+def sort_blocks_by_bbox(blocks, page_w, page_h, footnote_blocks, page_pil_img):
 
     """获取所有line并计算正文line的高度"""
     line_height = get_line_height(blocks)
@@ -14,7 +22,7 @@ def sort_blocks_by_bbox(blocks, page_w, page_h, footnote_blocks):
     add_lines_to_blocks(blocks, page_w, page_h, line_height, footnote_blocks)
 
     """使用 xycut-plus 对blocks进行排序"""
-    blocks = sort_blocks_by_xycut_plus(blocks)
+    blocks = sort_blocks_by_xycut_plus(blocks, page_pil_img)
 
     """将image和table的block还原回group形式参与后续流程"""
     blocks = revert_group_blocks(blocks)
@@ -122,26 +130,83 @@ def insert_lines_into_block(block_bbox, line_height, page_w, page_h):
     else:
         return [[x0, y0, x1, y1]]
 
-def sort_blocks_by_xycut_plus(fix_blocks):
-    # 使用 xycut-plus进行排序
+def sort_blocks_by_xycut_plus(fix_blocks, page_pil_img):
+    page_image = np.array(page_pil_img)
     block_bboxes = []
+    layout_det_res = []
+    rec_labels, rec_texts, rec_boxes, rec_polys, rec_scores, dt_polys = [],[],[],[],[],[]
     for block in fix_blocks:
         # 如果block['bbox']任意值小于0，将其置为0
         block['bbox'] = [max(0, x) for x in block['bbox']]
-        block_bboxes.append(block['bbox'])
-
         # 删除图表body block中的虚拟line信息, 并用real_lines信息回填
         if block['type'] in [BlockType.IMAGE_BODY, BlockType.TABLE_BODY, BlockType.TITLE, BlockType.INTERLINE_EQUATION]:
             if 'real_lines' in block:
                 block['virtual_lines'] = copy.deepcopy(block['lines'])
                 block['lines'] = copy.deepcopy(block['real_lines'])
                 del block['real_lines']
-    # xycut_plus
-    sorted_indices = xycut_plus_sort(block_bboxes)
-    sorted_boxes = [block_bboxes[i] for i in sorted_indices]
+        block_bboxes.append(block['bbox'])
+        # 统计 lines 中的 spans 的 original_label 出现次数
+        label_counter = {}
+        for line in block.get('lines', []):
+            for span in line.get('spans', []):
+                if span['type'] == ContentType.TEXT:
+                    np_bbox = np.array(span['bbox'], dtype=np.float32)
+                    points = bbox_to_points(span['bbox'])
+                    rec_scores.append(span['score'])
+                    rec_boxes.append(np_bbox)
+                    rec_labels.append(span['type'])
+                    rec_texts.append(span['content'])
+                    dt_polys.append(points)
+                    rec_polys.append(points)
+                original_label = span.get('original_label')
+                if original_label:
+                    label_counter[original_label] = label_counter.get(original_label, 0) + 1
+        # 取出现最多的 original_label
+        if label_counter:
+            most_common_label = max(label_counter, key=label_counter.get)
+        else:
+            # 如果没有任何 original_label，就退回使用 blocktype_to_sort_label
+            most_common_label = blocktype_to_sort_label.get(block['type'], 'unknown')
+        layout_det_res.append({
+            "coordinate": block['bbox'],
+            "label": most_common_label,
+            "score": 1.0,
+        })
 
-    for i, block in enumerate(fix_blocks):
-        block['index'] = sorted_boxes.index(block['bbox'])
+
+    try:
+        # 使用 xycut-plus-v3进行排序
+        layout_det_res = {'boxes': layout_det_res}
+        region_det_res = {'boxes': []}
+        overall_ocr_res = {
+            'rec_labels': rec_labels,
+            'rec_texts': rec_texts,
+            'rec_boxes': np.array(rec_boxes, dtype=np.float32),
+            'rec_polys': rec_polys,
+            'rec_scores': rec_scores,
+            'dt_polys': dt_polys,
+        }
+        parsing_res_list = get_layout_parsing_res(
+            page_image,
+            region_det_res=region_det_res,
+            layout_det_res=layout_det_res,
+            overall_ocr_res=overall_ocr_res,
+            table_res_list=[],
+            seal_res_list=[],
+            chart_res_list=[],
+            formula_res_list=[],
+            text_rec_score_thresh=0,
+        )
+        index_to_order = {parsing_res.index: order for order, parsing_res in enumerate(parsing_res_list)}
+        for i, block in enumerate(fix_blocks):
+            block['index'] = index_to_order.get(i, len(fix_blocks))
+    except Exception as e:
+        logger.exception(e)
+        # 使用 xycut-plus 进行排序
+        sorted_indices = xycut_plus_sort(block_bboxes)
+        sorted_boxes = [block_bboxes[i] for i in sorted_indices]
+        for i, block in enumerate(fix_blocks):
+            block['index'] = sorted_boxes.index(block['bbox'])
 
     # 生成line index
     sorted_blocks = sorted(fix_blocks, key=lambda b: b['index'])

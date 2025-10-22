@@ -335,7 +335,7 @@ def get_adjusted_mfdetrec_res(single_page_mfdetrec_res, useful_list, return_text
     return adjusted_mfdetrec_res
 
 
-def get_ocr_result_list(ocr_res, useful_list, ocr_enable, bgr_image, lang):
+def get_ocr_result_list(ocr_res, useful_list, ocr_enable, bgr_image, lang, original_label):
     paste_x, paste_y, xmin, ymin, xmax, ymax, new_width, new_height = useful_list
     ocr_result_list = []
     ori_im = bgr_image.copy()
@@ -385,6 +385,7 @@ def get_ocr_result_list(ocr_res, useful_list, ocr_enable, bgr_image, lang):
         if ocr_enable:
             ocr_result_list.append({
                 'category_id': 15,
+                'original_label': original_label,
                 'poly': p1 + p2 + p3 + p4,
                 'score': 1,
                 'text': text,
@@ -394,6 +395,7 @@ def get_ocr_result_list(ocr_res, useful_list, ocr_enable, bgr_image, lang):
         else:
             ocr_result_list.append({
                 'category_id': 15,
+                'original_label': original_label,
                 'poly': p1 + p2 + p3 + p4,
                 'score': float(round(score, 2)),
                 'text': text,

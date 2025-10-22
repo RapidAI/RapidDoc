@@ -8,7 +8,7 @@
 
 **本项目所使用的核心模型主要来源于 [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR) 的 [PP-StructureV3](https://www.paddleocr.ai/main/version3.x/pipeline_usage/PP-StructureV3.html) 系列（OCR、版面分析、公式识别、阅读顺序恢复，以及部分表格识别模型），并已全部转换为 ONNX 格式，支持在 CPU/GPU 上高效推理。**
 
-**KittyDoc 已经成为 RapidAI开源家族成员**
+**KittyDoc 已经成为 RapidAI 开源家族成员**
 
 ---
 
@@ -43,8 +43,8 @@
     - **[有线表格识别UNET](https://github.com/RapidAI/TableStructureRec)** + SLANET_plus/UNITABLE（作为无线表格识别）
 
 - **阅读顺序恢复**
-  - 使用 PP-StructureV3 阅读顺序 `xycut++` 算法简化
-  - 速度快且阅读顺序恢复效果不错
+  - 使用 PP-StructureV3 阅读顺序恢复算法（基于xycut算法和版面的结果）
+  - 速度快且阅读顺序恢复效果不错（支持多栏、竖排等复杂版面）
 
 - **推理方式**
   - 所有模型通过 ONNXRuntime 推理，OCR可配置其他推理引擎
@@ -86,6 +86,7 @@ os.environ['MINERU_DEVICE_MODE'] = "cuda:1"
 
 #### 使用docker部署RapidDoc
 RapidDoc提供了便捷的docker部署方式，这有助于快速搭建环境并解决一些棘手的环境兼容问题。
+
 您可以在文档中获取[Docker部署说明](docker/README.md)。
 
 ---
@@ -118,11 +119,13 @@ RapidDoc提供了便捷的docker部署方式，这有助于快速搭建环境并
 - [x] 文本型pdf，使用pypdfium2提取原始图片（默认截图会导致清晰度降低和图片边界可能丢失部分）
 - [x] 表格内公式提取
 - [x] 表格内图片提取
+- [x] 优化阅读顺序，支持多栏、竖排等复杂版面恢复
+- [ ] 版面、表格支持openvino
 - [ ] 支持 PP-DocLayoutV2 版面识别+阅读顺序
-
+- [ ] 支持 PaddleOCR-VL 
 
 - [ ] 公式识别支持gpu
-- [ ] 版面、表格、公式支持openvino
+- [ ] 公式支持openvino
 - [ ] RapidDoc4j（Java版本）
 
 

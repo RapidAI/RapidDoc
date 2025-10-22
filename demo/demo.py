@@ -43,7 +43,7 @@ def do_parse(
 
 
     layout_config = {
-        # "model_type": LayoutModelType.PP_DOCLAYOUT_PLUS_L,
+        "model_type": LayoutModelType.PP_DOCLAYOUT_PLUS_L,
         # "conf_thresh": 0.4,
         # "batch_num": 1,
         # "model_dir_or_path": "C:\ocr\models\ppmodel\layout\PP-DocLayout-L\pp_doclayout_l.onnx"
@@ -68,7 +68,7 @@ def do_parse(
     }
 
     formula_config = {
-        # "model_type": FormulaModelType.PP_FORMULANET_PLUS_S,
+        # "model_type": FormulaModelType.PP_FORMULANET_PLUS_M,
         # "formula_level": 1, # 公式识别等级，默认为0，全识别。1:仅识别行间公式，行内公式不识别
         # "batch_num": 1,
         # "model_dir_or_path": r"C:\ocr\models\ppmodel\formula\PP-FormulaNet_plus-S\pp_formulanet_plus_s.onnx"
@@ -217,13 +217,22 @@ def parse_doc(
 if __name__ == '__main__':
     __dir__ = os.path.dirname(os.path.abspath(__file__))
     pdf_files_dir = os.path.join(__dir__, "pdfs")
+    image_files_dir = os.path.join(__dir__, "images")
     output_dir = os.path.join(__dir__, "output")
+
     pdf_suffixes = [".pdf"]
     image_suffixes = [".png", ".jpeg", ".jpg"]
 
     doc_path_list = []
+
+    # 遍历 pdfs 目录
     for doc_path in Path(pdf_files_dir).glob('*'):
-        if doc_path.suffix in pdf_suffixes + image_suffixes:
+        if doc_path.suffix.lower() in pdf_suffixes:
             doc_path_list.append(doc_path)
+
+    # 遍历 images 目录
+    for img_path in Path(image_files_dir).glob('*'):
+        if img_path.suffix.lower() in image_suffixes:
+            doc_path_list.append(img_path)
 
     parse_doc(doc_path_list, output_dir)

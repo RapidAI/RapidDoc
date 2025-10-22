@@ -373,6 +373,7 @@ class MagicModel:
                 elif category_id == CategoryId.OcrText:
                     span['content'] = layout_det['text']
                     span['type'] = ContentType.TEXT
+                span['original_label'] = layout_det['original_label']
                 all_spans.append(span)
         return remove_duplicate_spans(all_spans)
 

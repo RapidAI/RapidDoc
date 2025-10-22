@@ -43,7 +43,7 @@ class RapidLayoutModel(object):
             "number": CategoryId.Abandon,
             "abstract": CategoryId.Text,
             "content": CategoryId.Text,
-            "figure_title": CategoryId.ImageCaption,
+            "figure_title": CategoryId.Text,
             "formula": CategoryId.InterlineEquation_YOLO,
             "table": CategoryId.TableBody,
             "table_title": CategoryId.TableCaption,
@@ -70,7 +70,7 @@ class RapidLayoutModel(object):
             "number": CategoryId.Abandon,
             "abstract": CategoryId.Text,
             "content": CategoryId.Text,
-            "figure_title": CategoryId.ImageCaption,
+            "figure_title": CategoryId.Text,
             "formula": CategoryId.InterlineEquation_YOLO,
             "table": CategoryId.TableBody,
             "reference": CategoryId.Text,
@@ -111,6 +111,7 @@ class RapidLayoutModel(object):
                     ymax = min(img.shape[0], ymax + 5)
                 temp_results.append({
                     "category_id": category_id,
+                    "original_label": cla,
                     "bbox": (xmin, ymin, xmax, ymax),
                     "score": round(float(conf), 3)
                 })
@@ -122,6 +123,7 @@ class RapidLayoutModel(object):
                 xmin, ymin, xmax, ymax = item["bbox"]
                 layout_res.append({
                     "category_id": item["category_id"],
+                    "original_label": item["original_label"],
                     "poly": [xmin, ymin, xmax, ymin, xmax, ymax, xmin, ymax],
                     "score": item["score"],
                 })
@@ -199,6 +201,6 @@ if __name__ == '__main__':
     model = RapidLayout(cfg=cfg)
 
 
-    all_results = model(img_contents=[r'C:\ocr\img\table\3766ae2b506b8f345fcc9eee39b31ac8.png'])
+    all_results = model(img_contents=[r'f7e21fd7.png'])
     print(all_results)
-    all_results[0].vis(r"C:\ocr\aaaaa_vis.png")
+    all_results[0].vis(r"layout_vis.png")

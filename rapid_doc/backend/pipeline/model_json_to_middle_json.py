@@ -168,7 +168,7 @@ def page_model_info_to_page_info(page_model_info, image_dict, page_dict, image_w
     fix_blocks = fix_block_spans(block_with_spans)
 
     """对block进行排序"""
-    sorted_blocks = sort_blocks_by_bbox(fix_blocks, page_w, page_h, footnote_blocks)
+    sorted_blocks = sort_blocks_by_bbox(fix_blocks, page_w, page_h, footnote_blocks, page_pil_img)
 
     """构造page_info"""
     page_info = make_page_info_dict(sorted_blocks, page_index, page_w, page_h, fix_discarded_blocks)
