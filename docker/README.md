@@ -11,10 +11,10 @@ cd docker
 #RUN python3 download_models.py
 
 # 1. CPU 模式
-docker build -f Dockerfile -t volador/rapid-doc:v0.1.0 .
+docker build -f Dockerfile -t volador/rapid-doc:latest .
 
 # 2. GPU 模式
-# docker build -f DockerfileGPU -t volador/rapid-doc-gpu:v0.1.0 .
+# docker build -f DockerfileGPU -t volador/rapid-doc-gpu:latest .
 ```
 
 

@@ -1,7 +1,7 @@
 services:
   rapid-doc-server:
     container_name: rapid-doc-server
-    image: volador/rapid-doc-gpu:v0.1.0
+    image: volador/rapid-doc-gpu:latest
     deploy:
       resources:
         reservations:

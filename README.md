@@ -55,7 +55,9 @@
 
 #### 使用pip安装
 ```bash
-pip install rapid-doc -i https://mirrors.aliyun.com/pypi/simple
+pip install rapid-doc[cpu] -i https://mirrors.aliyun.com/pypi/simple
+或
+pip install rapid-doc[gpu] -i https://mirrors.aliyun.com/pypi/simple
 ```
 
 #### 通过源码安装
@@ -65,17 +67,15 @@ git clone https://github.com/RapidAI/RapidDoc.git
 cd RapidDoc
 
 # 安装依赖
-pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple
+pip install -e .[cpu] -i https://mirrors.aliyun.com/pypi/simple
+或
+pip install -e .[gpu] -i https://mirrors.aliyun.com/pypi/simple
 ```
 #### 使用gpu推理
-```bash
-# 在安装完 rapid_doc 之后，卸载 cpu 版的 onnxruntime
-pip uninstall onnxruntime
-# 这里一定要确定onnxruntime-gpu与GPU对应
-# 可参见https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html#requirements
-pip install onnxruntime-gpu
-```
 ```python
+# rapid-doc[gpu] 默认安装 onnxruntime-gpu 最新版
+# 需要确定onnxruntime-gpu与GPU对应，参考 https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html#requirements
+
 # 在 Python 中指定 GPU（必须在导入 rapid_doc 之前设置）
 import os
 # 使用默认 GPU（cuda:0）

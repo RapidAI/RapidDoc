@@ -52,6 +52,12 @@ gpu = [
     "torchvision",
 ]
 
+api = [
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
+    "python-multipart>=0.0.6",
+]
+
 [project.urls]
 homepage = "https://github.com/RapidAI"
 repository = "https://github.com/RapidAI/RapidOCR"
@@ -65,8 +71,8 @@ include = ["rapid_doc*"]
 namespaces = false
 
 [tool.setuptools.package-data]
+"rapid_doc" = ["**/*.yaml"]
 "rapid_doc.resources" = ["**"]
-"" = ["*.yaml"]
 
 [tool.setuptools]
 include-package-data = true

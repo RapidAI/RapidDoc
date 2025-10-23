@@ -18,7 +18,7 @@
 pip install -r requirements.txt
 
 # 或者手动安装核心依赖
-pip install rapid-doc==0.1.0 fastapi uvicorn python-multipart
+pip install rapid-doc fastapi uvicorn python-multipart
 ```
 
 **启动文件转换服务（可选）**
@@ -142,7 +142,6 @@ curl -X POST "http://localhost:8888/file_parse" \
 
 ## 更新日志
 
-### v0.1.0
 - 基于 RapidDoc 的 API 设计
 - 完全兼容官方接口规范
 - 支持多文件批量处理
