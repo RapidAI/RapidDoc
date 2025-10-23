@@ -14,14 +14,11 @@
 from __future__ import annotations
 
 import copy
-from PIL import Image
 from typing import List, Dict, Any, Union
 import numpy as np
-from paddlex.inference.models.object_detection.result import DetResult
-from paddlex.inference.pipelines.layout_parsing.setting import BLOCK_SETTINGS, REGION_SETTINGS
-from paddlex.inference.pipelines.layout_parsing.utils import get_sub_regions_ocr_res, get_bbox_intersection, \
+from rapid_doc.model.reading_order.layout_parsing.setting import BLOCK_SETTINGS, REGION_SETTINGS
+from rapid_doc.model.reading_order.layout_parsing.utils import get_sub_regions_ocr_res, get_bbox_intersection, \
     calculate_overlap_ratio, calculate_minimum_enclosing_bbox, shrink_supplement_region_bbox
-from paddlex.inference.pipelines.ocr.result import OCRResult
 
 from rapid_doc.model.layout.rapid_layout_self import RapidLayoutInput, ModelType, RapidLayout
 from rapid_doc.model.reading_order.layout_parsing.layout_objects import LayoutBlock, LayoutRegion
@@ -46,31 +43,22 @@ def sort_layout_parsing_blocks(
 
 def standardized_data(
         image: list,
-        region_det_res: DetResult,
-        layout_det_res: DetResult,
-        overall_ocr_res: OCRResult,
-        formula_res_list: list,
-        text_rec_model: Any,
+        region_det_res,
+        layout_det_res,
+        overall_ocr_res,
         text_rec_score_thresh: Union[float, None] = None,
 ) -> list:
     """
     Retrieves the layout parsing result based on the layout detection result, OCR result, and other recognition results.
     Args:
         image (list): The input image.
-        overall_ocr_res (OCRResult): An object containing the overall OCR results, including detected text boxes and recognized text. The structure is expected to have:
+        overall_ocr_res: An object containing the overall OCR results, including detected text boxes and recognized text. The structure is expected to have:
             - "input_img": The image on which OCR was performed.
             - "dt_boxes": A list of detected text box coordinates.
             - "rec_texts": A list of recognized text corresponding to the detected boxes.
 
-        layout_det_res (DetResult): An object containing the layout detection results, including detected layout boxes and their labels. The structure is expected to have:
+        layout_det_res: An object containing the layout detection results, including detected layout boxes and their labels. The structure is expected to have:
             - "boxes": A list of dictionaries with keys "coordinate" for box coordinates and "block_label" for the type of content.
-
-        table_res_list (list): A list of table detection results, where each item is a dictionary containing:
-            - "block_bbox": The bounding box of the table layout.
-            - "pred_html": The predicted HTML representation of the table.
-
-        formula_res_list (list): A list of formula recognition results.
-        text_rec_model (Any): The text recognition model.
         text_rec_score_thresh (Optional[float], optional): The score threshold for text recognition. Defaults to None.
     Returns:
         list: A list of dictionaries representing the layout parsing result.
@@ -92,9 +80,6 @@ def standardized_data(
         threshold=0.5,
         smaller=True,
     )
-
-    # convert formula_res_list to OCRResult format
-    # convert_formula_res_to_ocr_format(formula_res_list, overall_ocr_res)
 
     # match layout boxes and ocr boxes and get some information for layout_order_config
     for box_idx, box_info in enumerate(layout_det_res["boxes"]):
@@ -171,8 +156,8 @@ def standardized_data(
                     iou = calculate_overlap_ratio(ocr_box, crop_box, "small")
                     if iou > 0.8:
                         overall_ocr_res["rec_texts"][ocr_idx] = ""
-                x1, y1, x2, y2 = [int(i) for i in crop_box]
-                crop_img = np.array(image)[y1:y2, x1:x2]
+                # x1, y1, x2, y2 = [int(i) for i in crop_box]
+                # crop_img = np.array(image)[y1:y2, x1:x2]
                 #crop_img_rec_res = list(text_rec_model([crop_img]))[0]
                 crop_img_dt_poly = get_bbox_intersection(
                     overall_ocr_dt_poly, layout_box, return_format="poly"
@@ -221,46 +206,6 @@ def standardized_data(
                         block_to_ocr_map[box_idx].append(
                             len(overall_ocr_res["rec_texts"]) - 1
                         )
-
-    # use layout bbox to do ocr recognition when there is no matched ocr
-    # for layout_box_idx, overall_ocr_idxes in block_to_ocr_map.items():
-    #     has_text = False
-    #     for idx in overall_ocr_idxes:
-    #         if overall_ocr_res["rec_texts"][idx] != "":
-    #             has_text = True
-    #             break
-    #     if not has_text and layout_det_res["boxes"][layout_box_idx][
-    #         "label"
-    #     ] not in BLOCK_LABEL_MAP.get("vision_labels", []):
-    #         crop_box = layout_det_res["boxes"][layout_box_idx]["coordinate"]
-    #         x1, y1, x2, y2 = [int(i) for i in crop_box]
-    #         crop_img = np.array(image)[y1:y2, x1:x2]
-    #         crop_img_rec_res = list(text_rec_model([crop_img]))[0]
-    #         crop_img_dt_poly = get_bbox_intersection(
-    #             crop_box, crop_box, return_format="poly"
-    #         )
-    #         crop_img_rec_score = crop_img_rec_res["rec_score"]
-    #         crop_img_rec_text = crop_img_rec_res["rec_text"]
-    #         text_rec_score_thresh = (
-    #             text_rec_score_thresh
-    #             if text_rec_score_thresh is not None
-    #             # else (self.general_ocr_pipeline.text_rec_score_thresh)
-    #             else (0)
-    #         )
-    #         if crop_img_rec_score >= text_rec_score_thresh:
-    #             if len(overall_ocr_res["rec_boxes"]) == 0:
-    #                 overall_ocr_res["rec_boxes"] = np.array([crop_box])
-    #             else:
-    #                 overall_ocr_res["rec_boxes"] = np.vstack(
-    #                     (overall_ocr_res["rec_boxes"], crop_box)
-    #                 )
-    #             overall_ocr_res["rec_polys"].append(crop_img_dt_poly)
-    #             overall_ocr_res["rec_scores"].append(crop_img_rec_score)
-    #             overall_ocr_res["rec_texts"].append(crop_img_rec_text)
-    #             overall_ocr_res["rec_labels"].append("text")
-    #             block_to_ocr_map[layout_box_idx].append(
-    #                 len(overall_ocr_res["rec_texts"]) - 1
-    #             )
 
     # when there is no layout detection result but there is ocr result, convert ocr detection result to layout detection result
     if len(layout_det_res["boxes"]) == 0 and len(overall_ocr_res["rec_boxes"]) > 0:
@@ -425,13 +370,9 @@ def standardized_data(
 def get_layout_parsing_objects(
         image: list,
         region_block_ocr_idx_map: dict,
-        region_det_res: DetResult,
-        overall_ocr_res: OCRResult,
-        layout_det_res: DetResult,
-        table_res_list: list,
-        seal_res_list: list,
-        chart_res_list: list,
-        text_rec_model: Any,
+        region_det_res,
+        overall_ocr_res,
+        layout_det_res,
         text_rec_score_thresh: Union[float, None] = None,
 ) -> list:
     """
@@ -439,20 +380,13 @@ def get_layout_parsing_objects(
 
     Args:
         image (list): The input image.
-        overall_ocr_res (OCRResult): An object containing the overall OCR results, including detected text boxes and recognized text. The structure is expected to have:
+        overall_ocr_res: An object containing the overall OCR results, including detected text boxes and recognized text. The structure is expected to have:
             - "input_img": The image on which OCR was performed.
             - "dt_boxes": A list of detected text box coordinates.
             - "rec_texts": A list of recognized text corresponding to the detected boxes.
 
-        layout_det_res (DetResult): An object containing the layout detection results, including detected layout boxes and their labels. The structure is expected to have:
+        layout_det_res: An object containing the layout detection results, including detected layout boxes and their labels. The structure is expected to have:
             - "boxes": A list of dictionaries with keys "coordinate" for box coordinates and "block_label" for the type of content.
-
-        table_res_list (list): A list of table detection results, where each item is a dictionary containing:
-            - "block_bbox": The bounding box of the table layout.
-            - "pred_html": The predicted HTML representation of the table.
-
-        seal_res_list (List): A list of seal detection results. The details of each item depend on the specific application context.
-        text_rec_model (Any): A model for text recognition.
         text_rec_score_thresh (Union[float, None]): The minimum score required for a recognized character to be considered valid. If None, use the default value specified during initialization. Default is None.
 
     Returns:
@@ -461,10 +395,6 @@ def get_layout_parsing_objects(
             - The label as a key with either table HTML or image data and text.
             - "block_bbox": The coordinates of the layout box.
     """
-
-    table_index = 0
-    seal_index = 0
-    chart_index = 0
     layout_parsing_blocks: List[LayoutBlock] = []
 
     for box_idx, box_info in enumerate(layout_det_res["boxes"]):
@@ -475,51 +405,36 @@ def get_layout_parsing_objects(
 
         block = LayoutBlock(label=label, bbox=block_bbox)
 
-        if label == "table" and len(table_res_list) > 0:
-            block.content = table_res_list[table_index]["pred_html"]
-            table_index += 1
-        elif label == "seal" and len(seal_res_list) > 0:
-            block.content = "\n".join(seal_res_list[seal_index]["rec_texts"])
-            seal_index += 1
-        elif label == "chart" and len(chart_res_list) > 0:
-            block.content = chart_res_list[chart_index]
-            chart_index += 1
-        else:
-            if label == "formula":
-                _, ocr_idx_list = get_sub_regions_ocr_res(
-                    overall_ocr_res, [block_bbox], return_match_idx=True
-                )
-                region_block_ocr_idx_map["block_to_ocr_map"][box_idx] = ocr_idx_list
-            else:
-                ocr_idx_list = region_block_ocr_idx_map["block_to_ocr_map"].get(
-                    box_idx, []
-                )
-            for box_no in ocr_idx_list:
-                rec_res["boxes"].append(overall_ocr_res["rec_boxes"][box_no])
-                rec_res["rec_texts"].append(
-                    overall_ocr_res["rec_texts"][box_no],
-                )
-                rec_res["rec_labels"].append(
-                    overall_ocr_res["rec_labels"][box_no],
-                )
-            block.update_text_content(
-                image=image,
-                ocr_rec_res=rec_res,
-                text_rec_model=text_rec_model,
-                text_rec_score_thresh=text_rec_score_thresh,
+        if label == "formula":
+            _, ocr_idx_list = get_sub_regions_ocr_res(
+                overall_ocr_res, [block_bbox], return_match_idx=True
             )
+            region_block_ocr_idx_map["block_to_ocr_map"][box_idx] = ocr_idx_list
+        else:
+            ocr_idx_list = region_block_ocr_idx_map["block_to_ocr_map"].get(
+                box_idx, []
+            )
+        for box_no in ocr_idx_list:
+            rec_res["boxes"].append(overall_ocr_res["rec_boxes"][box_no])
+            rec_res["rec_texts"].append(
+                overall_ocr_res["rec_texts"][box_no],
+            )
+            rec_res["rec_labels"].append(
+                overall_ocr_res["rec_labels"][box_no],
+            )
+        block.update_text_content(
+            image=image,
+            ocr_rec_res=rec_res,
+            text_rec_model=None,
+            text_rec_score_thresh=text_rec_score_thresh,
+        )
 
         if (
                 label
                 in ["seal", "table", "formula", "chart"]
                 + BLOCK_LABEL_MAP["image_labels"]
         ):
-            x_min, y_min, x_max, y_max = list(map(int, block_bbox))
-            img_path = (
-                f"imgs/img_in_{block.label}_box_{x_min}_{y_min}_{x_max}_{y_max}.jpg"
-            )
-            img = Image.fromarray(image[y_min:y_max, x_min:x_max, ::-1])
-            block.image = {"path": img_path, "img": img}
+            block.image = {"path": 'img_path', "img": 'img'}
 
         layout_parsing_blocks.append(block)
 
@@ -544,25 +459,16 @@ def get_layout_parsing_objects(
 
 def get_layout_parsing_res(
         image: list,
-        region_det_res: DetResult,
-        layout_det_res: DetResult,
-        overall_ocr_res: OCRResult,
-        table_res_list: list,
-        seal_res_list: list,
-        chart_res_list: list,
-        formula_res_list: list,
-        text_rec_score_thresh: Union[float, None] = None,
+        region_det_res,
+        layout_det_res,
+        overall_ocr_res,
     ) -> list:
         """
         Retrieves the layout parsing result based on the layout detection result, OCR result, and other recognition results.
         Args:
             image (list): The input image.
-            layout_det_res (DetResult): The detection result containing the layout information of the document.
-            overall_ocr_res (OCRResult): The overall OCR result containing text information.
-            table_res_list (list): A list of table recognition results.
-            seal_res_list (list): A list of seal recognition results.
-            formula_res_list (list): A list of formula recognition results.
-            text_rec_score_thresh (Optional[float], optional): The score threshold for text recognition. Defaults to None.
+            layout_det_res: The detection result containing the layout information of the document.
+            overall_ocr_res: The overall OCR result containing text information.
         Returns:
             list: A list of dictionaries representing the layout parsing result.
         """
@@ -574,9 +480,7 @@ def get_layout_parsing_res(
                 region_det_res=region_det_res,
                 layout_det_res=layout_det_res,
                 overall_ocr_res=overall_ocr_res,
-                formula_res_list=formula_res_list,
-                text_rec_model=None,
-                text_rec_score_thresh=text_rec_score_thresh,
+                text_rec_score_thresh=0,
             )
         )
 
@@ -587,10 +491,6 @@ def get_layout_parsing_res(
             region_det_res=region_det_res,
             overall_ocr_res=overall_ocr_res,
             layout_det_res=layout_det_res,
-            table_res_list=table_res_list,
-            seal_res_list=seal_res_list,
-            chart_res_list=chart_res_list,
-            text_rec_model=None,
             text_rec_score_thresh=0,
         )
 
@@ -612,25 +512,6 @@ if __name__ == '__main__':
     data_list = [list(map(float, box)) for box in all_results[0].boxes]
     # use_region_detection
     import pickle
-    # # 保存到文件
-    # with open(r'C:\ocr\models\ppmodel\layout\PP-DocLayout_plus-L\ResultV2.pkl', 'wb') as f:
-    #     pickle.dump(data, f)
-    # 从文件加载
-    # with open(r'C:\ocr\models\ppmodel\layout\PP-DocLayout_plus-L\data.pkl', 'rb') as f:
-    #     layout_parsing_page = pickle.load(f)
-
-    # with open(r'C:\ocr\models\ppmodel\layout\PP-DocLayout_plus-L\ResultV2.pkl', 'rb') as f:
-    #     ResultV2 = pickle.load(f)
-    #
-    # with open(r'C:\ocr\models\ppmodel\layout\PP-DocLayout_plus-L\parsing_res_list.pkl', 'rb') as f:
-    #     parsing_res_list0 = pickle.load(f)
-
-
-    # with open(r'C:\ocr\models\ppmodel\layout\PP-DocLayout_plus-L\single_img_res.pkl', 'rb') as f:
-    #     single_img_res = pickle.load(f)
-
-#
-
     with open(r"C:\ocr\models\ppmodel\layout\PP-DocLayout_plus-L\overall_ocr_res_v2.pkl", 'rb') as f:
         overall_ocr_res1 = pickle.load(f)
 
@@ -640,9 +521,6 @@ if __name__ == '__main__':
 
 
     overall_ocr_res = keep_rec_fields_dict(overall_ocr_res1)
-
-    # with open(r'C:\ocr\models\ppmodel\layout\PP-DocLayout_plus-L\overall_ocr_resV2.pkl') as f:
-    #     overall_ocr_res = pickle.load(f)
 
     result = all_results[0]
     print(all_results)
@@ -658,19 +536,6 @@ if __name__ == '__main__':
     layout_det_res = {'boxes': layout_det_res}
     region_det_res = {'boxes': []}
 
-    # layout_det_res11 = {'boxes': [{'coordinate': [71.59, 180.24, 517.58, 420.3], 'label': 'text', 'score': 1.0},
-    #            {'coordinate': [73.74, 473.93, 174.35, 490.93], 'label': 'paragraph_title', 'score': 1.0},
-    #            {'coordinate': [73.47, 523.48, 377.57, 542.74], 'label': 'paragraph_title', 'score': 1.0},
-    #            {'coordinate': [71.59, 572.33, 517.16, 934.51], 'label': 'text', 'score': 1.0},
-    #            {'coordinate': [561.38, 180.24, 1006.53, 274.16], 'label': 'text', 'score': 1.0},
-    #            {'coordinate': [563.36, 315.14, 722.1, 336.07], 'label': 'formula', 'score': 1.0},
-    #            {'coordinate': [561.38, 375.23, 1006.95, 809.85], 'label': 'text', 'score': 1.0},
-    #            {'coordinate': [71.59, 939.14, 518.0, 1351.86], 'label': 'text', 'score': 1.0},
-    #            {'coordinate': [562.7, 847.38, 872.24, 901.67], 'label': 'formula', 'score': 1.0},
-    #            {'coordinate': [560.96, 939.14, 1006.53, 1349.76], 'label': 'text', 'score': 1.0}]}
-
-
-
     parsing_res_list = get_layout_parsing_res(
         all_results[0].img,
         # region_det_res=single_img_res['region_det_res'],
@@ -678,11 +543,6 @@ if __name__ == '__main__':
         region_det_res=region_det_res,
         layout_det_res=layout_det_res,
         overall_ocr_res=overall_ocr_res,
-        table_res_list=[],
-        seal_res_list=[],
-        chart_res_list=[],
-        formula_res_list=[],
-        text_rec_score_thresh=0,
     )
 
     index = 1
@@ -691,18 +551,7 @@ if __name__ == '__main__':
             block.order_index = index
             index += 1
 
-
-    # sorted_indices = [block.index for block in parsing_res_list]
-    # sorted_data: List[Dict[str, Any]] = []
-    # for order, idx in enumerate(sorted_indices):
-    #     sorted_data.append({
-    #         "bbox": data_list[idx],
-    #         "reading_order": order,
-    #         "label": "text"
-    #     })
-
     sorted_data: List[Dict[str, Any]] = []
-
     for order, parsing_res in enumerate(parsing_res_list):
         sorted_data.append({
                 "bbox": parsing_res.bbox,
@@ -710,11 +559,8 @@ if __name__ == '__main__':
                 "label": "text"
             })
 
-
     print("=== 阅读顺序排序结果 ===")
     for item in sorted_data:
         print(f"顺序: {item['reading_order']}, 标签: {item['label']}, 边界框: {item['bbox']}")
 
     visualize_reading_order(sorted_data)
-
-    print(parsing_res_list)

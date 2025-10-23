@@ -2,7 +2,6 @@
 import copy
 import statistics
 
-import cv2
 import numpy as np
 from loguru import logger
 
@@ -191,11 +190,6 @@ def sort_blocks_by_xycut_plus(fix_blocks, page_pil_img):
             region_det_res=region_det_res,
             layout_det_res=layout_det_res,
             overall_ocr_res=overall_ocr_res,
-            table_res_list=[],
-            seal_res_list=[],
-            chart_res_list=[],
-            formula_res_list=[],
-            text_rec_score_thresh=0,
         )
         index_to_order = {parsing_res.index: order for order, parsing_res in enumerate(parsing_res_list)}
         for i, block in enumerate(fix_blocks):

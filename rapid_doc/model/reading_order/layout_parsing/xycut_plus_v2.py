@@ -174,15 +174,6 @@ if __name__ == '__main__':
 
     import pickle
 
-    # # 保存为二进制文件
-    # with open(r"C:\ocr\models\ppmodel\layout\PP-DocLayout_plus-L\layout_parsing_page_v2.pkl", "wb") as f:
-    #     pickle.dump(data, f)
-
-    import pickle
-    #
-    # with open(r"C:\ocr\models\ppmodel\layout\PP-DocLayout_plus-L\layout_parsing_page_v2.pkl", "rb") as f:
-    #     layout_parsing_page = pickle.load(f)
-
     cfg = RapidLayoutInput(model_type=ModelType.PP_DOCLAYOUT_L, conf_thresh=0.4)
     model = RapidLayout(cfg=cfg)
     all_results = model(img_contents=[r'13a3fa7b-80b6-4b51-9978-e1ec84988ef1.png'])
@@ -220,42 +211,16 @@ if __name__ == '__main__':
     )
 
     parsing_res_list = sort_layout_parsing_blocks(layout_parsing_page)
-
-    # index = 1
-    # for block in parsing_res_list:
-    #     if block.label in BLOCK_LABEL_MAP["visualize_index_labels"]:
-    #         block.order_index = index
-    #         index += 1
-
-    # 先构造原下标 -> 排序后位置 的映射表
-    # index_to_order = {block.index: order for order, block in enumerate(parsing_res_list)}
     sorted_data: List[Dict[str, Any]] = []
-
     for order, parsing_res in enumerate(parsing_res_list):
         sorted_data.append({
                 "bbox": parsing_res.bbox,
                 "reading_order": order,
                 "label": "text"
             })
-    # # 现在可以得到每个原 data_list 元素在排序后的顺序
-    # # 比如：
-    # sorted_indices = [index_to_order[i] for i in range(len(layout_det_res['boxes']))]
-    # # sorted_indices = [block.index for block in parsing_res_list]
-    # sorted_data: List[Dict[str, Any]] = []
-    # for order, idx in enumerate(sorted_indices):
-    #     sorted_data.append({
-    #         "bbox": layout_det_res['boxes'][idx],
-    #         "reading_order": order,
-    #         "label": "text"
-    #     })
-
 
     print("=== 阅读顺序排序结果 ===")
     for item in sorted_data:
         print(f"顺序: {item['reading_order']}, 标签: {item['label']}, 边界框: {item['bbox']}")
-
-
-
-    print(parsing_res_list)
 
     visualize_reading_order(sorted_data)

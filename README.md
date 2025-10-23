@@ -43,8 +43,8 @@
     - **[有线表格识别UNET](https://github.com/RapidAI/TableStructureRec)** + SLANET_plus/UNITABLE（作为无线表格识别）
 
 - **阅读顺序恢复**
-  - 使用 PP-StructureV3 阅读顺序恢复算法（基于xycut算法和版面的结果）
-  - 速度快且阅读顺序恢复效果不错（支持多栏、竖排等复杂版面）
+  - 使用 PP-StructureV3 阅读顺序恢复算法，基于xycut算法和版面的结果
+  - 速度快效果好，支持多栏、竖排等复杂版面，和V3不开启版面子模块检测效果一致
 
 - **推理方式**
   - 所有模型通过 ONNXRuntime 推理，OCR可配置其他推理引擎
@@ -122,7 +122,7 @@ RapidDoc提供了便捷的docker部署方式，这有助于快速搭建环境并
 - [x] 优化阅读顺序，支持多栏、竖排等复杂版面恢复
 - [ ] 版面、表格支持openvino
 - [ ] 支持 PP-DocLayoutV2 版面识别+阅读顺序
-- [ ] 支持 PaddleOCR-VL 
+- [ ] 支持 PaddleOCR-VL（vlm-http-client模式）
 
 - [ ] 公式识别支持gpu
 - [ ] 公式支持openvino

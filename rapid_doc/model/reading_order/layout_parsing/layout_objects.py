@@ -175,15 +175,17 @@ class TextLine(object):
                 splited_spans.sort(key=lambda span: span.box[sort_index])
                 new_spans = []
                 for span in splited_spans:
-                    bbox = span.box
+                    # bbox = span.box
                     if span.label == "text":
-                        crop_img = ori_image[
-                            int(bbox[1]) : int(bbox[3]),
-                            int(bbox[0]) : int(bbox[2]),
-                        ]
-                        crop_img_rec_res = list(text_rec_model([crop_img]))[0]
-                        crop_img_rec_score = crop_img_rec_res["rec_score"]
-                        crop_img_rec_text = crop_img_rec_res["rec_text"]
+                        # crop_img = ori_image[
+                        #     int(bbox[1]) : int(bbox[3]),
+                        #     int(bbox[0]) : int(bbox[2]),
+                        # ]
+                        # crop_img_rec_res = list(text_rec_model([crop_img]))[0]
+                        # crop_img_rec_score = crop_img_rec_res["rec_score"]
+                        # crop_img_rec_text = crop_img_rec_res["rec_text"]
+                        crop_img_rec_score = 0
+                        crop_img_rec_text = "-"
                         span.text = crop_img_rec_text
                         if crop_img_rec_score < text_rec_score_thresh:
                             continue

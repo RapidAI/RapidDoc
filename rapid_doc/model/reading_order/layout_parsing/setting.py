@@ -29,6 +29,10 @@ REGION_SETTINGS = {
     "split_block_overlap_ratio_threshold": 0.4,
 }
 
+BLOCK_SETTINGS = {
+    "title_conversion_area_ratio_threshold": 0.3,  # update paragraph_title -> doc_title
+}
+
 LINE_SETTINGS = {
     "line_height_iou_threshold": 0.6,  # For line segmentation of OCR results
     "delimiter_map": {

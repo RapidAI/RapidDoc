@@ -12,10 +12,131 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+__all__ = [
+    "get_sub_regions_ocr_res",
+]
+
 import re
 from copy import deepcopy
 from typing import Dict, List, Optional, Tuple, Union
 
+import numpy as np
+
+from .setting import REGION_SETTINGS
+
+
+def convert_points_to_boxes(dt_polys: list) -> np.ndarray:
+    """
+    Converts a list of polygons to a numpy array of bounding boxes.
+
+    Args:
+        dt_polys (list): A list of polygons, where each polygon is represented
+                        as a list of (x, y) points.
+
+    Returns:
+        np.ndarray: A numpy array of bounding boxes, where each box is represented
+                    as [left, top, right, bottom].
+                    If the input list is empty, returns an empty numpy array.
+    """
+
+    if len(dt_polys) > 0:
+        dt_polys_tmp = dt_polys.copy()
+        dt_polys_tmp = np.array(dt_polys_tmp)
+        boxes_left = np.min(dt_polys_tmp[:, :, 0], axis=1)
+        boxes_right = np.max(dt_polys_tmp[:, :, 0], axis=1)
+        boxes_top = np.min(dt_polys_tmp[:, :, 1], axis=1)
+        boxes_bottom = np.max(dt_polys_tmp[:, :, 1], axis=1)
+        dt_boxes = np.array([boxes_left, boxes_top, boxes_right, boxes_bottom])
+        dt_boxes = dt_boxes.T
+    else:
+        dt_boxes = np.array([])
+    return dt_boxes
+
+
+def get_overlap_boxes_idx(src_boxes: np.ndarray, ref_boxes: np.ndarray) -> List:
+    """
+    Get the indices of source boxes that overlap with reference boxes based on a specified threshold.
+
+    Args:
+        src_boxes (np.ndarray): A 2D numpy array of source bounding boxes.
+        ref_boxes (np.ndarray): A 2D numpy array of reference bounding boxes.
+    Returns:
+        match_idx_list (list): A list of indices of source boxes that overlap with reference boxes.
+    """
+    match_idx_list = []
+    src_boxes_num = len(src_boxes)
+    if src_boxes_num > 0 and len(ref_boxes) > 0:
+        for rno in range(len(ref_boxes)):
+            ref_box = ref_boxes[rno]
+            x1 = np.maximum(ref_box[0], src_boxes[:, 0])
+            y1 = np.maximum(ref_box[1], src_boxes[:, 1])
+            x2 = np.minimum(ref_box[2], src_boxes[:, 2])
+            y2 = np.minimum(ref_box[3], src_boxes[:, 3])
+            pub_w = x2 - x1
+            pub_h = y2 - y1
+            match_idx = np.where((pub_w > 3) & (pub_h > 3))[0]
+            match_idx_list.extend(match_idx)
+    return match_idx_list
+
+
+def get_sub_regions_ocr_res(
+    overall_ocr_res,
+    object_boxes: List,
+    flag_within: bool = True,
+    return_match_idx: bool = False,
+):
+    """
+    Filters OCR results to only include text boxes within specified object boxes based on a flag.
+
+    Args:
+        overall_ocr_res: The original OCR result containing all text boxes.
+        object_boxes (list): A list of bounding boxes for the objects of interest.
+        flag_within (bool): If True, only include text boxes within the object boxes. If False, exclude text boxes within the object boxes.
+        return_match_idx (bool): If True, return the list of matching indices.
+
+    Returns:
+        A filtered OCR result containing only the relevant text boxes.
+    """
+    sub_regions_ocr_res = {}
+    sub_regions_ocr_res["rec_polys"] = []
+    sub_regions_ocr_res["rec_texts"] = []
+    sub_regions_ocr_res["rec_scores"] = []
+    sub_regions_ocr_res["rec_boxes"] = []
+
+    overall_text_boxes = overall_ocr_res["rec_boxes"]
+    match_idx_list = get_overlap_boxes_idx(overall_text_boxes, object_boxes)
+    match_idx_list = list(set(match_idx_list))
+    for box_no in range(len(overall_text_boxes)):
+        if flag_within:
+            if box_no in match_idx_list:
+                flag_match = True
+            else:
+                flag_match = False
+        else:
+            if box_no not in match_idx_list:
+                flag_match = True
+            else:
+                flag_match = False
+        if flag_match:
+            sub_regions_ocr_res["rec_polys"].append(
+                overall_ocr_res["rec_polys"][box_no]
+            )
+            sub_regions_ocr_res["rec_texts"].append(
+                overall_ocr_res["rec_texts"][box_no]
+            )
+            sub_regions_ocr_res["rec_scores"].append(
+                overall_ocr_res["rec_scores"][box_no]
+            )
+            sub_regions_ocr_res["rec_boxes"].append(
+                overall_ocr_res["rec_boxes"][box_no]
+            )
+    for key in ["rec_polys", "rec_scores", "rec_boxes"]:
+        sub_regions_ocr_res[key] = np.array(sub_regions_ocr_res[key])
+    return (
+        (sub_regions_ocr_res, match_idx_list)
+        if return_match_idx
+        else sub_regions_ocr_res
+    )
 
 def calculate_projection_overlap_ratio(
     bbox1: List[float],
@@ -107,6 +228,32 @@ def calculate_overlap_ratio(
 
     return inter_area / ref_area
 
+def calculate_minimum_enclosing_bbox(bboxes):
+    """
+    Calculate the minimum enclosing bounding box for a list of bounding boxes.
+
+    Args:
+        bboxes (list): A list of bounding boxes represented as lists of four integers [x1, y1, x2, y2].
+
+    Returns:
+        list: The minimum enclosing bounding box represented as a list of four integers [x1, y1, x2, y2].
+    """
+    if not bboxes:
+        raise ValueError("The list of bounding boxes is empty.")
+
+    # Convert the list of bounding boxes to a NumPy array
+    bboxes_array = np.array(bboxes)
+
+    # Compute the minimum and maximum values along the respective axes
+    min_x = np.min(bboxes_array[:, 0])
+    min_y = np.min(bboxes_array[:, 1])
+    max_x = np.max(bboxes_array[:, 2])
+    max_y = np.max(bboxes_array[:, 3])
+
+    # Return the minimum enclosing bounding box
+    return np.array([min_x, min_y, max_x, max_y])
+
+
 def is_english_letter(char):
     """check if the char is english letter"""
     return bool(re.match(r"^[A-Za-z]$", char))
@@ -143,103 +290,6 @@ def is_non_breaking_punctuation(char):
 
     return char in non_breaking_punctuations
 
-
-def caculate_bbox_area(bbox):
-    """Calculate bounding box area"""
-    x1, y1, x2, y2 = map(float, bbox)
-    area = abs((x2 - x1) * (y2 - y1))
-    return area
-
-
-def caculate_euclidean_dist(point1, point2):
-    """Calculate euclidean distance between two points"""
-    x1, y1 = point1
-    x2, y2 = point2
-    return ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
-
-
-def get_seg_flag(block, prev_block):
-    """Get segment start flag and end flag based on previous block
-
-    Args:
-        block (Block): Current block
-        prev_block (Block): Previous block
-
-    Returns:
-        seg_start_flag (bool): Segment start flag
-        seg_end_flag (bool): Segment end flag
-    """
-
-    seg_start_flag = True
-    seg_end_flag = True
-
-    context_left_coordinate = block.start_coordinate
-    context_right_coordinate = block.end_coordinate
-    seg_start_coordinate = block.seg_start_coordinate
-    seg_end_coordinate = block.seg_end_coordinate
-
-    if prev_block is not None:
-        num_of_prev_lines = prev_block.num_of_lines
-        pre_block_seg_end_coordinate = prev_block.seg_end_coordinate
-        prev_end_space_small = (
-            abs(prev_block.end_coordinate - pre_block_seg_end_coordinate) < 10
-        )
-        prev_lines_more_than_one = num_of_prev_lines > 1
-
-        overlap_blocks = (
-            context_left_coordinate < prev_block.end_coordinate
-            and context_right_coordinate > prev_block.start_coordinate
-        )
-
-        # update context_left_coordinate and context_right_coordinate
-        if overlap_blocks:
-            context_left_coordinate = min(
-                prev_block.start_coordinate, context_left_coordinate
-            )
-            context_right_coordinate = max(
-                prev_block.end_coordinate, context_right_coordinate
-            )
-            prev_end_space_small = (
-                abs(context_right_coordinate - pre_block_seg_end_coordinate) < 10
-            )
-            edge_distance = 0
-        else:
-            edge_distance = abs(block.start_coordinate - prev_block.end_coordinate)
-
-        current_start_space_small = seg_start_coordinate - context_left_coordinate < 10
-
-        if (
-            prev_end_space_small
-            and current_start_space_small
-            and prev_lines_more_than_one
-            and edge_distance < max(prev_block.width, block.width)
-        ):
-            seg_start_flag = False
-    else:
-        if seg_start_coordinate - context_left_coordinate < 10:
-            seg_start_flag = False
-
-    if context_right_coordinate - seg_end_coordinate < 10:
-        seg_end_flag = False
-
-    return seg_start_flag, seg_end_flag
-
-def update_region_box(bbox, region_box):
-    """Update region box with bbox"""
-    if region_box is None:
-        return bbox
-
-    x1, y1, x2, y2 = bbox
-    x1_region, y1_region, x2_region, y2_region = region_box
-
-    x1_region = int(min(x1, x1_region))
-    y1_region = int(min(y1, y1_region))
-    x2_region = int(max(x2, x2_region))
-    y2_region = int(max(y2, y2_region))
-
-    region_box = [x1_region, y1_region, x2_region, y2_region]
-
-    return region_box
 
 def _get_minbox_if_overlap_by_ratio(
     bbox1: Union[List[int], Tuple[int, int, int, int]],
@@ -325,3 +375,238 @@ def remove_overlap_blocks(
         del blocks["boxes"][index]
 
     return blocks
+
+
+def get_bbox_intersection(bbox1, bbox2, return_format="bbox"):
+    """
+    Compute the intersection of two bounding boxes, supporting both 4-coordinate and 8-coordinate formats.
+
+    Args:
+        bbox1 (tuple): The first bounding box, either in 4-coordinate format (x_min, y_min, x_max, y_max)
+                       or 8-coordinate format (x1, y1, x2, y2, x3, y3, x4, y4).
+        bbox2 (tuple): The second bounding box in the same format as bbox1.
+        return_format (str): The format of the output intersection, either 'bbox' or 'poly'.
+
+    Returns:
+        tuple or None: The intersection bounding box in the specified format, or None if there is no intersection.
+    """
+    bbox1 = np.array(bbox1)
+    bbox2 = np.array(bbox2)
+    # Convert both bounding boxes to rectangles
+    rect1 = bbox1 if len(bbox1.shape) == 1 else convert_points_to_boxes([bbox1])[0]
+    rect2 = bbox2 if len(bbox2.shape) == 1 else convert_points_to_boxes([bbox2])[0]
+
+    # Calculate the intersection rectangle
+
+    x_min_inter = max(rect1[0], rect2[0])
+    y_min_inter = max(rect1[1], rect2[1])
+    x_max_inter = min(rect1[2], rect2[2])
+    y_max_inter = min(rect1[3], rect2[3])
+
+    # Check if there is an intersection
+    if x_min_inter >= x_max_inter or y_min_inter >= y_max_inter:
+        return None
+
+    if return_format == "bbox":
+        return np.array([x_min_inter, y_min_inter, x_max_inter, y_max_inter])
+    elif return_format == "poly":
+        return np.array(
+            [
+                [x_min_inter, y_min_inter],
+                [x_max_inter, y_min_inter],
+                [x_max_inter, y_max_inter],
+                [x_min_inter, y_max_inter],
+            ],
+            dtype=np.int16,
+        )
+    else:
+        raise ValueError("return_format must be either 'bbox' or 'poly'.")
+
+
+def shrink_supplement_region_bbox(
+    supplement_region_bbox,
+    ref_region_bbox,
+    image_width,
+    image_height,
+    block_idxes_set,
+    block_bboxes,
+) -> List:
+    """
+    Shrink the supplement region bbox according to the reference region bbox and match the block bboxes.
+
+    Args:
+        supplement_region_bbox (list): The supplement region bbox.
+        ref_region_bbox (list): The reference region bbox.
+        image_width (int): The width of the image.
+        image_height (int): The height of the image.
+        block_idxes_set (set): The indexes of the blocks that intersect with the region bbox.
+        block_bboxes (dict): The dictionary of block bboxes.
+
+    Returns:
+        list: The new region bbox and the matched block idxes.
+    """
+    x1, y1, x2, y2 = supplement_region_bbox
+    x1_prime, y1_prime, x2_prime, y2_prime = ref_region_bbox
+    index_conversion_map = {0: 2, 1: 3, 2: 0, 3: 1}
+    edge_distance_list = [
+        (x1_prime - x1) / image_width,
+        (y1_prime - y1) / image_height,
+        (x2 - x2_prime) / image_width,
+        (y2 - y2_prime) / image_height,
+    ]
+    edge_distance_list_tmp = deepcopy(edge_distance_list)
+    min_distance = min(edge_distance_list)
+    src_index = index_conversion_map[edge_distance_list.index(min_distance)]
+    if len(block_idxes_set) == 0:
+        return supplement_region_bbox, []
+    for _ in range(3):
+        dst_index = index_conversion_map[src_index]
+        tmp_region_bbox = supplement_region_bbox[:]
+        tmp_region_bbox[dst_index] = ref_region_bbox[src_index]
+        iner_block_idxes, split_block_idxes = [], []
+        for block_idx in block_idxes_set:
+            overlap_ratio = calculate_overlap_ratio(
+                tmp_region_bbox, block_bboxes[block_idx], mode="small"
+            )
+            if overlap_ratio > REGION_SETTINGS.get(
+                "match_block_overlap_ratio_threshold", 0.8
+            ):
+                iner_block_idxes.append(block_idx)
+            elif overlap_ratio > REGION_SETTINGS.get(
+                "split_block_overlap_ratio_threshold", 0.4
+            ):
+                split_block_idxes.append(block_idx)
+
+        if len(iner_block_idxes) > 0:
+            if len(split_block_idxes) > 0:
+                for split_block_idx in split_block_idxes:
+                    split_block_bbox = block_bboxes[split_block_idx]
+                    x1, y1, x2, y2 = tmp_region_bbox
+                    x1_prime, y1_prime, x2_prime, y2_prime = split_block_bbox
+                    edge_distance_list = [
+                        (x1_prime - x1) / image_width,
+                        (y1_prime - y1) / image_height,
+                        (x2 - x2_prime) / image_width,
+                        (y2 - y2_prime) / image_height,
+                    ]
+                    max_distance = max(edge_distance_list)
+                    src_index = edge_distance_list.index(max_distance)
+                    dst_index = index_conversion_map[src_index]
+                    tmp_region_bbox[dst_index] = split_block_bbox[src_index]
+                    tmp_region_bbox, iner_idxes = shrink_supplement_region_bbox(
+                        tmp_region_bbox,
+                        ref_region_bbox,
+                        image_width,
+                        image_height,
+                        iner_block_idxes,
+                        block_bboxes,
+                    )
+                    if len(iner_idxes) == 0:
+                        continue
+            matched_bboxes = [block_bboxes[idx] for idx in iner_block_idxes]
+            supplement_region_bbox = calculate_minimum_enclosing_bbox(matched_bboxes)
+            break
+        else:
+            edge_distance_list_tmp.remove(min_distance)
+            min_distance = min(edge_distance_list_tmp)
+            src_index = index_conversion_map[edge_distance_list.index(min_distance)]
+    return supplement_region_bbox, iner_block_idxes
+
+
+def update_region_box(bbox, region_box):
+    """Update region box with bbox"""
+    if region_box is None:
+        return bbox
+
+    x1, y1, x2, y2 = bbox
+    x1_region, y1_region, x2_region, y2_region = region_box
+
+    x1_region = int(min(x1, x1_region))
+    y1_region = int(min(y1, y1_region))
+    x2_region = int(max(x2, x2_region))
+    y2_region = int(max(y2, y2_region))
+
+    region_box = [x1_region, y1_region, x2_region, y2_region]
+
+    return region_box
+
+
+def caculate_bbox_area(bbox):
+    """Calculate bounding box area"""
+    x1, y1, x2, y2 = map(float, bbox)
+    area = abs((x2 - x1) * (y2 - y1))
+    return area
+
+
+def caculate_euclidean_dist(point1, point2):
+    """Calculate euclidean distance between two points"""
+    x1, y1 = point1
+    x2, y2 = point2
+    return ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
+
+
+def get_seg_flag(block, prev_block):
+    """Get segment start flag and end flag based on previous block
+
+    Args:
+        block (Block): Current block
+        prev_block (Block): Previous block
+
+    Returns:
+        seg_start_flag (bool): Segment start flag
+        seg_end_flag (bool): Segment end flag
+    """
+
+    seg_start_flag = True
+    seg_end_flag = True
+
+    context_left_coordinate = block.start_coordinate
+    context_right_coordinate = block.end_coordinate
+    seg_start_coordinate = block.seg_start_coordinate
+    seg_end_coordinate = block.seg_end_coordinate
+
+    if prev_block is not None:
+        num_of_prev_lines = prev_block.num_of_lines
+        pre_block_seg_end_coordinate = prev_block.seg_end_coordinate
+        prev_end_space_small = (
+            abs(prev_block.end_coordinate - pre_block_seg_end_coordinate) < 10
+        )
+        prev_lines_more_than_one = num_of_prev_lines > 1
+
+        overlap_blocks = (
+            context_left_coordinate < prev_block.end_coordinate
+            and context_right_coordinate > prev_block.start_coordinate
+        )
+
+        # update context_left_coordinate and context_right_coordinate
+        if overlap_blocks:
+            context_left_coordinate = min(
+                prev_block.start_coordinate, context_left_coordinate
+            )
+            context_right_coordinate = max(
+                prev_block.end_coordinate, context_right_coordinate
+            )
+            prev_end_space_small = (
+                abs(context_right_coordinate - pre_block_seg_end_coordinate) < 10
+            )
+            edge_distance = 0
+        else:
+            edge_distance = abs(block.start_coordinate - prev_block.end_coordinate)
+
+        current_start_space_small = seg_start_coordinate - context_left_coordinate < 10
+
+        if (
+            prev_end_space_small
+            and current_start_space_small
+            and prev_lines_more_than_one
+            and edge_distance < max(prev_block.width, block.width)
+        ):
+            seg_start_flag = False
+    else:
+        if seg_start_coordinate - context_left_coordinate < 10:
+            seg_start_flag = False
+
+    if context_right_coordinate - seg_end_coordinate < 10:
+        seg_end_flag = False
+
+    return seg_start_flag, seg_end_flag
