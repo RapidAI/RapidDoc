@@ -225,6 +225,7 @@ if __name__ == '__main__':
 
     doc_path_list = [
         "demo/pdfs/示例1-论文模板.pdf",
+        "demo/images/reader_order_05.jpg",
     ]
     for doc_path in doc_path_list:
         start_time = time.time()

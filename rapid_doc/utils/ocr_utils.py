@@ -476,14 +476,14 @@ def get_rotate_crop_image(img, points):
     '''
     assert len(points) == 4, "shape of points must be 4*2"
 
-    if is_bbox_aligned_rect(points):
-        xmin = int(np.min(points[:, 0]))
-        xmax = int(np.max(points[:, 0]))
-        ymin = int(np.min(points[:, 1]))
-        ymax = int(np.max(points[:, 1]))
-        new_img = img[ymin:ymax, xmin:xmax].copy()
-        if new_img.shape[0] > 0 and new_img.shape[1] > 0:
-            return new_img
+    # if is_bbox_aligned_rect(points):
+    #     xmin = int(np.min(points[:, 0]))
+    #     xmax = int(np.max(points[:, 0]))
+    #     ymin = int(np.min(points[:, 1]))
+    #     ymax = int(np.max(points[:, 1]))
+    #     new_img = img[ymin:ymax, xmin:xmax].copy()
+    #     if new_img.shape[0] > 0 and new_img.shape[1] > 0:
+    #         return new_img
 
     img_crop_width = int(
         max(
