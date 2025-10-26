@@ -224,7 +224,7 @@ if __name__ == '__main__':
     output_dir = os.path.join(__dir__, "output")
 
     doc_path_list = [
-        "demo/pdfs/比亚迪财报.pdf",
+        "demo/pdfs/示例1-论文模板.pdf",
     ]
     for doc_path in doc_path_list:
         start_time = time.time()
