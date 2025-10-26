@@ -12,10 +12,11 @@ from rapid_doc.utils import PyPDFium2Parser
 from rapid_doc.data.data_reader_writer import FileBasedDataWriter
 from rapid_doc.utils.draw_bbox import draw_layout_bbox, draw_span_bbox, draw_line_sort_bbox
 from rapid_doc.utils.enum_class import MakeMode
+from rapid_doc.utils.guess_suffix_or_lang import guess_suffix_by_bytes
 from rapid_doc.utils.pdf_image_tools import images_bytes_to_pdf_bytes
 
-pdf_suffixes = [".pdf"]
-image_suffixes = [".png", ".jpeg", ".jpg", ".webp", ".gif"]
+pdf_suffixes = ["pdf"]
+image_suffixes = ["png", "jpeg", "jp2", "webp", "gif", "bmp", "jpg", "tiff"]
 
 
 def read_fn(path):
@@ -23,12 +24,13 @@ def read_fn(path):
         path = Path(path)
     with open(str(path), "rb") as input_file:
         file_bytes = input_file.read()
-        if path.suffix in image_suffixes:
+        file_suffix = guess_suffix_by_bytes(file_bytes, path)
+        if file_suffix in image_suffixes:
             return images_bytes_to_pdf_bytes(file_bytes)
-        elif path.suffix in pdf_suffixes:
+        elif file_suffix in pdf_suffixes:
             return file_bytes
         else:
-            raise Exception(f"Unknown file suffix: {path.suffix}")
+            raise Exception(f"Unknown file suffix: {file_suffix}")
 
 
 def prepare_env(output_dir, pdf_file_name, parse_method):
@@ -38,36 +40,39 @@ def prepare_env(output_dir, pdf_file_name, parse_method):
     os.makedirs(local_md_dir, exist_ok=True)
     return local_image_dir, local_md_dir
 
-
 def convert_pdf_bytes_to_bytes_by_pypdfium2(pdf_bytes, start_page_id=0, end_page_id=None):
-    with PyPDFium2Parser.lock:
-        # 从字节数据加载PDF
-        pdf = pdfium.PdfDocument(pdf_bytes)
+    try:
+        with PyPDFium2Parser.lock:
+            # 从字节数据加载PDF
+            pdf = pdfium.PdfDocument(pdf_bytes)
 
-        # 确定结束页
-        end_page_id = end_page_id if end_page_id is not None and end_page_id >= 0 else len(pdf) - 1
-        if end_page_id > len(pdf) - 1:
-            logger.warning("end_page_id is out of range, use pdf_docs length")
-            end_page_id = len(pdf) - 1
+            # 确定结束页
+            end_page_id = end_page_id if end_page_id is not None and end_page_id >= 0 else len(pdf) - 1
+            if end_page_id > len(pdf) - 1:
+                logger.warning("end_page_id is out of range, use pdf_docs length")
+                end_page_id = len(pdf) - 1
 
-        # 创建一个新的PDF文档
-        output_pdf = pdfium.PdfDocument.new()
+            # 创建一个新的PDF文档
+            output_pdf = pdfium.PdfDocument.new()
 
-        # 选择要导入的页面索引
-        page_indices = list(range(start_page_id, end_page_id + 1))
+            # 选择要导入的页面索引
+            page_indices = list(range(start_page_id, end_page_id + 1))
 
-        # 从原PDF导入页面到新PDF
-        output_pdf.import_pages(pdf, page_indices)
+            # 从原PDF导入页面到新PDF
+            output_pdf.import_pages(pdf, page_indices)
 
-        # 将新PDF保存到内存缓冲区
-        output_buffer = io.BytesIO()
-        output_pdf.save(output_buffer)
+            # 将新PDF保存到内存缓冲区
+            output_buffer = io.BytesIO()
+            output_pdf.save(output_buffer)
 
-        # 获取字节数据
-        output_bytes = output_buffer.getvalue()
+            # 获取字节数据
+            output_bytes = output_buffer.getvalue()
 
-        pdf.close()  # 关闭原PDF文档以释放资源
-        output_pdf.close()  # 关闭新PDF文档以释放资源
+            pdf.close()  # 关闭原PDF文档以释放资源
+            output_pdf.close()  # 关闭新PDF文档以释放资源
+    except Exception as e:
+        logger.warning(f"Error in converting PDF bytes: {e}, Using original PDF bytes.")
+        output_bytes = pdf_bytes
 
     return output_bytes
 
@@ -144,17 +149,10 @@ def _process_output(
         )
 
     if f_dump_model_output:
-        if is_pipeline:
-            md_writer.write_string(
-                f"{pdf_file_name}_model.json",
-                json.dumps(model_output, ensure_ascii=False, indent=4),
-            )
-        else:
-            output_text = ("\n" + "-" * 50 + "\n").join(model_output)
-            md_writer.write_string(
-                f"{pdf_file_name}_model_output.txt",
-                output_text,
-            )
+        md_writer.write_string(
+            f"{pdf_file_name}_model.json",
+            json.dumps(model_output, ensure_ascii=False, indent=4),
+        )
 
     logger.info(f"local output dir is {local_md_dir}")
 

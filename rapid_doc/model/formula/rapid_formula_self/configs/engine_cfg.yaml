@@ -33,3 +33,9 @@ openvino:
     num_streams: -1
     enable_hyper_threading: null
     scheduling_core_type: null
+
+torch:
+    use_cuda: false
+    gpu_id: 0
+    use_npu: false
+    npu_id: 0

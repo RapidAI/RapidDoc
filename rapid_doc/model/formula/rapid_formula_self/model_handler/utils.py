@@ -6,7 +6,7 @@ import numpy as np
 
 from ..utils.download_file import DownloadFile, DownloadFileInput
 from ..utils.logger import Logger
-from ..utils.typings import ModelType
+from ..utils.typings import ModelType, EngineType
 from ..utils.utils import mkdir, read_yaml
 
 
@@ -23,12 +23,12 @@ class ModelProcessor:
     model_map = read_yaml(DEFAULT_MODEL_PATH)
 
     @classmethod
-    def get_model_path(cls, model_type: ModelType) -> str:
-        return cls.get_single_model_path(model_type)
+    def get_model_path(cls, model_type: ModelType, engine_type: EngineType) -> str:
+        return cls.get_single_model_path(model_type, engine_type)
 
     @classmethod
-    def get_single_model_path(cls, model_type: ModelType) -> str:
-        model_info = cls.model_map[model_type.value]
+    def get_single_model_path(cls, model_type: ModelType, engine_type: EngineType) -> str:
+        model_info = cls.model_map[engine_type.value][model_type.value]
         save_model_path = (
             cls.DEFAULT_MODEL_DIR / Path(model_info["model_dir_or_path"]).name
         )
@@ -43,23 +43,18 @@ class ModelProcessor:
         return str(save_model_path)
 
     @classmethod
-    def get_multi_models_dict(cls, model_type: ModelType) -> Dict[str, str]:
-        model_info = cls.model_map[model_type.value]
+    def get_character_path(cls, model_type: ModelType, engine_type: EngineType) -> str:
+        model_info = cls.model_map[engine_type.value][model_type.value]
+        dict_download_url = model_info.get("dict_url")
+        save_model_path = (
+            cls.DEFAULT_MODEL_DIR / Path(dict_download_url).name
+        )
 
-        results = {}
+        download_params = DownloadFileInput(
+            file_url=dict_download_url,
+            save_path=save_model_path,
+            logger=cls.logger,
+        )
+        DownloadFile.run(download_params)
 
-        model_root_dir = model_info["model_dir_or_path"]
-        save_model_dir = cls.DEFAULT_MODEL_DIR / Path(model_root_dir).name
-        for file_name, sha256 in model_info["SHA256"].items():
-            save_path = save_model_dir / file_name
-
-            download_params = DownloadFileInput(
-                file_url=f"{model_root_dir}/{file_name}",
-                sha256=sha256,
-                save_path=save_path,
-                logger=cls.logger,
-            )
-            DownloadFile.run(download_params)
-            results[Path(file_name).stem] = str(save_path)
-
-        return results
+        return str(save_model_path)

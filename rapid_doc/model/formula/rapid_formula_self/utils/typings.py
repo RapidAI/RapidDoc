@@ -19,11 +19,12 @@ class ModelType(Enum):
 class EngineType(Enum):
     ONNXRUNTIME = "onnxruntime"
     # OPENVINO = "openvino"
+    TORCH = "torch"
 
 
 @dataclass
 class RapidFormulaInput:
-    model_type: ModelType = ModelType.PP_FORMULANET_PLUS_S
+    model_type: ModelType = ModelType.PP_FORMULANET_PLUS_M
     model_dir_or_path: Union[str, Path, None] = None
 
     engine_type: EngineType = EngineType.ONNXRUNTIME

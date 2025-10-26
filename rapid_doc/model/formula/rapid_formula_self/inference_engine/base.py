@@ -14,11 +14,11 @@ logger = Logger(logger_name=__name__).get_log()
 
 class InferSession(ABC):
     cur_dir = Path(__file__).resolve().parent.parent
-    MODEL_URL_PATH = cur_dir / "configs" / "default_models.yaml"
+    # MODEL_URL_PATH = cur_dir / "configs" / "default_models.yaml"
     ENGINE_CFG_PATH = cur_dir / "configs" / "engine_cfg.yaml"
 
-    model_info = OmegaConf.load(MODEL_URL_PATH)
-    DEFAULT_MODEL_PATH = cur_dir / "models"
+    # model_info = OmegaConf.load(MODEL_URL_PATH)
+    # DEFAULT_MODEL_PATH = cur_dir / "models"
 
     engine_cfg = OmegaConf.load(ENGINE_CFG_PATH)
 
@@ -72,12 +72,20 @@ def get_engine(engine_type: EngineType):
 
         return OrtInferSession
 
-    if engine_type == EngineType.OPENVINO:
+    # if engine_type == EngineType.OPENVINO:
+    #     if not import_package(engine_type.value):
+    #         raise ImportError(f"{engine_type.value} is not installed")
+    #
+    #     from .openvino import OpenVINOInferSession
+    #
+    #     return OpenVINOInferSession
+
+    if engine_type == EngineType.TORCH:
         if not import_package(engine_type.value):
             raise ImportError(f"{engine_type.value} is not installed")
 
-        from .openvino import OpenVINOInferSession
+        from .torch import TorchInferSession
 
-        return OpenVINOInferSession
+        return TorchInferSession
 
     raise ValueError(f"Unsupported engine: {engine_type.value}")

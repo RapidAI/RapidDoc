@@ -71,7 +71,7 @@ def do_parse(
     }
 
     formula_config = {
-        # "model_type": FormulaModelType.PP_FORMULANET_PLUS_M,
+        "model_type": FormulaModelType.PP_FORMULANET_PLUS_M,
         # "formula_level": 1, # 公式识别等级，默认为0，全识别。1:仅识别行间公式，行内公式不识别
         # "batch_num": 1,
         # "model_dir_or_path": r"C:\ocr\models\ppmodel\formula\PP-FormulaNet_plus-S\pp_formulanet_plus_s.onnx",
@@ -224,7 +224,7 @@ if __name__ == '__main__':
     output_dir = os.path.join(__dir__, "output")
 
     doc_path_list = [
-        "demo/pdfs/demo1.pdf",
+        "demo/pdfs/比亚迪财报.pdf",
     ]
     for doc_path in doc_path_list:
         start_time = time.time()

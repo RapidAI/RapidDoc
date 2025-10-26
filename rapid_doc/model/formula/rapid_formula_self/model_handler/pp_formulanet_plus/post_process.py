@@ -7,6 +7,9 @@ import numpy as np
 from tokenizers import AddedToken
 from tokenizers import Tokenizer as TokenizerFast
 
+from rapid_doc.model.formula.rapid_formula_self.model_handler.pp_formulanet_plus.utils import fix_latex_left_right, \
+    fix_latex_environments, remove_up_commands, remove_unsupported_commands
+
 class PPPostProcess:
     def __init__(self, character_dict):
         self.uni_mer_net_decode = UniMERNetDecode(character_list=character_dict)
@@ -356,8 +359,25 @@ class UniMERNetDecode(object):
         from ftfy import fix_text
 
         text = self.remove_chinese_text_wrapping(text)
+        text = self.fix_latex(text)
         text = fix_text(text)
-        text = self.normalize(text)
+        # text = self.normalize(text)
+        return text
+
+    def fix_latex(self, text: str) -> str:
+        """Fixes LaTeX formatting in a string.
+
+        Args:
+            text (str): String to fix.
+
+        Returns:
+            str: Fixed string.
+        """
+        text = fix_latex_left_right(text, fix_delimiter=False)
+        text = fix_latex_environments(text)
+        text = remove_up_commands(text)
+        text = remove_unsupported_commands(text)
+        # text = self.normalize(text)
         return text
 
     def __call__(

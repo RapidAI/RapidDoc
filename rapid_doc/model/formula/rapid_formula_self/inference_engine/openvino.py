@@ -22,7 +22,7 @@ class OpenVINOInferSession(InferSession):
         core = Core()
 
         if cfg.model_dir_or_path is None:
-            model_path = ModelProcessor.get_model_path(cfg.model_type)
+            model_path = ModelProcessor.get_model_path(cfg.model_type, cfg.engine_type)
         else:
             model_path = Path(cfg.model_dir_or_path)
 

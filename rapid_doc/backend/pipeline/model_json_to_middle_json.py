@@ -4,6 +4,7 @@ import time
 
 from tqdm import tqdm
 
+from rapid_doc.backend.utils import cross_page_table_merge
 from rapid_doc.utils.config_reader import get_device, get_formula_enable
 from rapid_doc.backend.pipeline.model_init import AtomModelSingleton
 from rapid_doc.backend.pipeline.para_split import para_split
@@ -238,7 +239,7 @@ def result_to_middle_json(model_list, images_list, page_dict_list, image_writer,
     para_split(middle_json["pdf_info"])
 
     """表格跨页合并"""
-    merge_table(middle_json["pdf_info"])
+    cross_page_table_merge(middle_json["pdf_info"])
 
     """清理内存"""
     # pdf_doc.close()

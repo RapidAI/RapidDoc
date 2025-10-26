@@ -23,6 +23,7 @@ DEFAULT_MODEL_KEYWORDS = [
     "pp_doclayout_l.onnx",
     # formula
     "pp_formulanet_plus_s.onnx",
+    "pp_formulanet_plus_m.onnx",
     # ocr
     "ch_PP-OCRv5_rec_mobile_infer.onnx",
     "ch_PP-OCRv5_mobile_det.onnx",
@@ -35,11 +36,14 @@ DEFAULT_MODEL_KEYWORDS = [
     "slanet-plus.onnx",
 ]
 
-TORCH_OCR_MODEL = [
+TORCH_MODEL = [
     # ocr
     "ch_PP-OCRv5_det_mobile_infer.pth",
     "ch_PP-OCRv5_rec_mobile_infer.pth",
     "ch_ptocr_mobile_v2.0_cls_infer.pth",
+    # formula
+    "PP-FormulaNet_plus-M.pth",
+    "PP-FormulaNet_plus-M_inference.yml"
 ]
 
 device_mode = os.getenv("MINERU_DEVICE_MODE", "cpu")
@@ -52,7 +56,7 @@ class DownloadFile:
     def run(cls, input_params: DownloadFileInput, model_source="default"):
         # 如果是 default 模式，只下载 DEFAULT_MODEL_KEYWORDS 里的文件
         if model_source == "default":
-            default_model = DEFAULT_MODEL_KEYWORDS + TORCH_OCR_MODEL if device_mode.startswith('cuda') else DEFAULT_MODEL_KEYWORDS
+            default_model = DEFAULT_MODEL_KEYWORDS + TORCH_MODEL if device_mode.startswith('cuda') else DEFAULT_MODEL_KEYWORDS
             if not any(k in input_params.file_url for k in default_model):
                 return
 

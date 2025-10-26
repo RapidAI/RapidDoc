@@ -18,7 +18,7 @@ class RapidFormula:
             cfg = RapidFormulaInput()
 
         if not cfg.model_dir_or_path:
-            cfg.model_dir_or_path = ModelProcessor.get_model_path(cfg.model_type)
+            cfg.model_dir_or_path = ModelProcessor.get_model_path(cfg.model_type, cfg.engine_type)
 
         self.session = get_engine(cfg.engine_type)(cfg)
         self.model_handler = ModelHandler(cfg, self.session)

@@ -1,16 +1,19 @@
-from rapid_doc.model.formula.fix_utils import latex_rm_whitespace
+import time
+
 from rapid_doc.model.formula.rapid_formula_self import ModelType, RapidFormula, RapidFormulaInput, EngineType
 from rapid_doc.utils.config_reader import get_device
 
 class RapidFormulaModel(object):
     def __init__(self, formula_config=None):
-        cfg = RapidFormulaInput(model_type= ModelType.PP_FORMULANET_PLUS_S)
-        # TODO onnxruntime-gpu 公式模型onnx gpu推理会报错 https://github.com/PaddlePaddle/PaddleOCR/issues/15125
-        # device = get_device()
-        # if device.startswith('cuda'):
-        #     device_id = int(device.split(':')[1]) if ':' in device else 0  # GPU 编号
-        #     engine_cfg = {'use_cuda': True, "cuda_ep_cfg.device_id": device_id}
-        #     cfg.engine_cfg = engine_cfg
+        cfg = RapidFormulaInput(model_type=ModelType.PP_FORMULANET_PLUS_M)
+        # TODO cuda环境，默认使用torch推理，公式模型onnx gpu推理会报错
+        device = get_device()
+        if device.startswith('cuda'):
+            device_id = int(device.split(':')[1]) if ':' in device else 0  # GPU 编号
+            engine_cfg = {'use_cuda': True, "gpu_id": device_id}
+            cfg.engine_cfg = engine_cfg
+            cfg.model_type = ModelType.PP_FORMULANET_PLUS_M
+            cfg.engine_type = EngineType.TORCH
         # 如果传入了 formula_config，则用传入配置覆盖默认配置
         if formula_config is not None:
             # 遍历字典，把传入配置设置到 default_cfg 对象中
@@ -33,13 +36,18 @@ class RapidFormulaModel(object):
 
 
 if __name__ == "__main__":
-    cfg = RapidFormulaInput(model_type=ModelType.PP_FORMULANET_PLUS_S)
-    engine_cfg = {'use_cuda': True, "cuda_ep_cfg.device_id": 0}
+    # cfg = RapidFormulaInput(model_type=ModelType.PP_FORMULANET_PLUS_M, engine_type=EngineType.ONNXRUNTIME)
+    cfg = RapidFormulaInput(model_type=ModelType.PP_FORMULANET_PLUS_M, engine_type=EngineType.TORCH)
+
+    # engine_cfg = {'use_cuda': True, "cuda_ep_cfg.device_id": 0} #onnx
+    engine_cfg = {'use_cuda': True, "gpu_id": 0} #torch
     cfg.engine_cfg = engine_cfg
     layout_engine = RapidFormula(cfg=cfg)
 
-    img_path = "failed_47c162a42cc14848a3de7a20945f009d.png"
+    img_path = r"C:\ocr\latex\6.png"
     img_paths = [img_path] * 10
+    start_time = time.time()
     for path in img_paths:
-        results = layout_engine([path])
+        results = layout_engine([path], batch_size=4)
         print(results[0].rec_formula)
+    print(f"总运行时间: {time.time() - start_time}秒")

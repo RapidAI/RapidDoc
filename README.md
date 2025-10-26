@@ -31,10 +31,11 @@
 
 - **公式识别**
   - 使用 `PP-FormulaNet_plus` 系列 ONNX 模型（L、M、S）
-    - **PP-FormulaNet_plus-L**：速度慢  
-    - **PP-FormulaNet_plus-S**：速度最快，默认使用  
+    - **PP-FormulaNet_plus-L**：速度慢，支持onnx  
+    - **PP-FormulaNet_plus-M**：默认使用，支持onnx和torch    
+    - **PP-FormulaNet_plus-S**：速度最快，支持onnx，复杂公式精度不够
   - 支持配置只识别行间公式
-  - cuda环境默认不使用gpu，公式模型onnx gpu推理会报错，暂时无人解决 [PaddleOCR/issues/15125](https://github.com/PaddlePaddle/PaddleOCR/issues/15125), [PaddleX/issues/4238](https://github.com/PaddlePaddle/PaddleX/issues/4238), [Paddle2ONNX/issues/1593](https://github.com/PaddlePaddle/Paddle2ONNX/issues/1593)
+  - cuda环境，默认使用torch推理，公式模型onnx gpu推理会报错，暂时无人解决 [PaddleOCR/issues/15125](https://github.com/PaddlePaddle/PaddleOCR/issues/15125), [PaddleX/issues/4238](https://github.com/PaddlePaddle/PaddleX/issues/4238), [Paddle2ONNX/issues/1593](https://github.com/PaddlePaddle/Paddle2ONNX/issues/1593)
 
 - **表格识别**
   - 基于 [rapid_table_self](rapid_doc/model/table/rapid_table_self) 增强，在原有基础上增强为多模型串联方案：  
@@ -120,11 +121,11 @@ RapidDoc提供了便捷的docker部署方式，这有助于快速搭建环境并
 - [x] 表格内公式提取
 - [x] 表格内图片提取
 - [x] 优化阅读顺序，支持多栏、竖排等复杂版面恢复
+- [x] 公式支持torch推理，可用GPU加速
 - [ ] 版面、表格支持openvino
 - [ ] 支持 PP-DocLayoutV2 版面识别+阅读顺序
 - [ ] 支持 PaddleOCR-VL（vlm-http-client模式）
 
-- [ ] 公式识别支持gpu
 - [ ] 公式支持openvino
 - [ ] RapidDoc4j（Java版本）
 

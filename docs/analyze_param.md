@@ -92,7 +92,7 @@ ocr_config = {
 
 |  参数名   |  说明   |         默认值          | 备注 |
 | :-------: |:-----:|:--------------------:|:--:|
-| model_type |  模型   | PP_FORMULANET_PLUS_S |  |
+| model_type |  模型   | PP_FORMULANET_PLUS_M |  |
 | formula_level  |  公式识别等级   |          0           | 公式识别等级，默认为0，全识别。1:仅识别行间公式，行内公式不识别 |
 | batch_num | 批处理大小 |          1           |  |
 | model_dir_or_path | 模型路径  |         None         |  |
@@ -102,7 +102,7 @@ ocr_config = {
 from rapid_doc.model.formula.rapid_formula_self import ModelType as FormulaModelType
 
 formula_config = {
-    "model_type": FormulaModelType.PP_FORMULANET_PLUS_S,
+    "model_type": FormulaModelType.PP_FORMULANET_PLUS_M,
     "formula_level": 1,  # 公式识别等级，默认为0，全识别。1:仅识别行间公式，行内公式不识别
     "batch_num": 1,
     "model_dir_or_path": r"C:\ocr\models\ppmodel\formula\PP-FormulaNet_plus-S\pp_formulanet_plus_s.onnx",
