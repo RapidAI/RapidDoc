@@ -235,6 +235,17 @@ def txt_most_angle_extract_table(page_dict, table_res_dict, scale):
         most_angle = 0
     return most_angle
 
+"""判断是否是背景图（背景图片里有文字）"""
+def txt_in_ori_image(page_dict, ori_image_bbox):
+    for block in page_dict['blocks']:
+        for line in block['lines']:
+            for span in line['spans']:
+                bbox = span['bbox'].bbox  # 获取坐标框
+                text = span['text']  # 获取文字内容
+                if calculate_text_in_span(bbox, ori_image_bbox, text):
+                    return True
+    return False
+
 
 """提取表格里的图片"""
 def extract_table_fill_image(page_dict, table_res_dict, scale):
@@ -252,7 +263,8 @@ def extract_table_fill_image(page_dict, table_res_dict, scale):
         for image in ori_image_list:
             # 找到在表格里的图片
             bbox = image['bbox']
-            if is_in(bbox, input_res_bbox):
+            # calculate_iou如果大于0.9，这个表格可能是图片
+            if is_in(bbox, input_res_bbox) and calculate_iou(bbox, input_res_bbox) < 0.9:
                 # 把坐标转为相对于表格的坐标
                 bbox = [bbox[0] * scale, bbox[1] * scale, bbox[2] * scale, bbox[3] * scale]
                 image['ori_bbox'] = bbox

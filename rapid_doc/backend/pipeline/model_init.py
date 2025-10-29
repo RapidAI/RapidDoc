@@ -55,7 +55,14 @@ class AtomModelSingleton:
         if atom_model_name in [AtomicModel.Layout]:
             key = (atom_model_name, make_hashable(kwargs.get('layout_config', None)))
         elif atom_model_name in [AtomicModel.OCR]:
-            key = (atom_model_name, make_hashable(kwargs.get('ocr_config', None)))
+            key = (
+                atom_model_name,
+                make_hashable(kwargs.get('ocr_config', None)),
+                kwargs.get('det_db_box_thresh', 0.3),
+                kwargs.get('lang'),
+                kwargs.get('det_db_unclip_ratio', 1.8),
+                kwargs.get('enable_merge_det_boxes', True)
+            )
         elif atom_model_name in [AtomicModel.Table]:
             key = (atom_model_name, make_hashable(kwargs.get('table_config', None)))
         elif atom_model_name in [AtomicModel.FORMULA]:

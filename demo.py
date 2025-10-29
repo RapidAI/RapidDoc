@@ -67,7 +67,7 @@ def do_parse(
         # "Det.rec_batch_num": 1, # Det批处理大小
 
         # 文本检测框模式：auto（默认）、txt、ocr
-        # "use_det_mode": 'auto' #（1、txt只会从pypdfium2获取文本框，2、ocr只会从OCR-det获取文本框，3、auto先从pypdfium2获取文本框，提取不到再使用OCR-det提取）
+        # "use_det_mode": 'auto' #（1、txt只会从pypdfium2获取文本框，保留pdf中的图片，2、ocr只会从OCR-det获取文本框，3、auto先从pypdfium2获取文本框，提取不到再使用OCR-det提取）
     }
 
     formula_config = {
@@ -87,7 +87,7 @@ def do_parse(
 
         # "model_type": TableModelType.UNET_SLANET_PLUS,  # （默认） 有线表格使用unet，无线表格使用slanet_plus
         # "model_type": TableModelType.UNET_UNITABLE, # 有线表格使用unet，无线表格使用unitable
-        # "model_type": TableModelType.SLANETPLUS,  # 有线表格使用slanext_wired，无线表格使用slanext_wireless
+        # "model_type": TableModelType.SLANEXT,  # 有线表格使用slanext_wired，无线表格使用slanext_wireless
 
         # "model_dir_or_path": "", #单个模型使用。如SLANET_PLUS、UNITABLE
 
@@ -224,8 +224,8 @@ if __name__ == '__main__':
     output_dir = os.path.join(__dir__, "output")
 
     doc_path_list = [
-        "demo/pdfs/示例1-论文模板.pdf",
-        "demo/images/reader_order_05.jpg",
+        "demo/pdfs/比亚迪财报.pdf",
+        "demo/pdfs/示例7-研究报告.pdf",
     ]
     for doc_path in doc_path_list:
         start_time = time.time()

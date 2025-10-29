@@ -9,7 +9,7 @@ from pypdfium2 import PdfBitmap, PdfDocument, PdfPage
 
 def page_to_image(
     page: PdfPage,
-    dpi: int = 200,
+    dpi: int = 144, # changed from 200 to 144 （200会导致版面识别结果偶尔不准）
     max_width_or_height: int = 3500,  # changed from 4500 to 3500
 ) -> (Image.Image, float):
     scale = dpi / 72
@@ -60,7 +60,7 @@ def base64_to_pil_image(
 
 def pdf_to_images(
     pdf: str | bytes | PdfDocument,
-    dpi: int = 200,
+    dpi: int = 144,
     max_width_or_height: int = 3500,
     start_page_id: int = 0,
     end_page_id: int | None = None,

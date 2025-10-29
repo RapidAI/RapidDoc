@@ -64,7 +64,7 @@ def do_parse(
         # "Det.rec_batch_num": 1, # Det批处理大小
 
         # 文本检测框模式：auto（默认）、txt、ocr
-        # "use_det_mode": 'auto' #（1、txt只会从pypdfium2获取文本框，2、ocr只会从OCR-det获取文本框，3、auto先从pypdfium2获取文本框，提取不到再使用OCR-det提取）
+        # "use_det_mode": 'auto' #（1、txt只会从pypdfium2获取文本框，保留pdf中的图片，2、ocr只会从OCR-det获取文本框，3、auto先从pypdfium2获取文本框，提取不到再使用OCR-det提取）
     }
 
     formula_config = {

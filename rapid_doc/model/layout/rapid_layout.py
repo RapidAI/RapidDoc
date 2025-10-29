@@ -106,9 +106,9 @@ class RapidLayoutModel(object):
                 else:
                     category_id = self.category_dict[cla]
                 # 如果是表格/图片，边界适当扩展（DocLayout模型识别的边框坐标，稍微有一点不全）
-                if category_id in [CategoryId.TableBody, CategoryId.ImageBody]:
-                    xmax = min(img.shape[1], xmax + 3)
-                    ymax = min(img.shape[0], ymax + 5)
+                # if category_id in [CategoryId.TableBody, CategoryId.ImageBody]:
+                #     xmax = min(img.shape[1], xmax + 3)
+                #     ymax = min(img.shape[0], ymax + 5)
                 temp_results.append({
                     "category_id": category_id,
                     "original_label": cla,
@@ -201,6 +201,6 @@ if __name__ == '__main__':
     model = RapidLayout(cfg=cfg)
 
 
-    all_results = model(img_contents=[r'f7e21fd7.png'])
+    all_results = model(img_contents=[r"D:\file\text-pdf\d3db971d-15d3-4ab7-b2e0-32078b5616ab.png",])
     print(all_results)
     all_results[0].vis(r"layout_vis.png")

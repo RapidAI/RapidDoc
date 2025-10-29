@@ -10,15 +10,16 @@ import numpy as np
 
 from .model_init import AtomModelSingleton
 from .model_list import AtomicModel
-from ...utils.boxbase import rotate_image_and_boxes
+from ...utils.boxbase import rotate_image_and_boxes, is_in
 from ...utils.checkbox_det_cls import checkbox_predict
 from ...utils.config_reader import get_formula_enable, get_table_enable
 from ...utils.enum_class import CategoryId
 from ...utils.model_utils import crop_img, get_res_list_from_layout_res
-from ...utils.ocr_utils import merge_det_boxes, update_det_boxes, sorted_boxes
+from ...utils.ocr_utils import merge_det_boxes, update_det_boxes, sorted_boxes, get_rotate_crop_image
 from ...utils.ocr_utils import get_adjusted_mfdetrec_res, get_ocr_result_list, OcrConfidence, get_ocr_result_list_table
+from ...utils.pdf_image_tools import get_crop_np_img
 from ...utils.span_pre_proc import txt_spans_extract, txt_spans_bbox_extract, txt_spans_bbox_extract_table, \
-    txt_most_angle_extract_table, extract_table_fill_image
+    txt_most_angle_extract_table, extract_table_fill_image, txt_in_ori_image
 
 
 # YOLO_LAYOUT_BASE_BATCH_SIZE = 8
@@ -83,6 +84,9 @@ class BatchAnalyze:
             np_images, self.layout_base_batch_size
         )
 
+        if self.use_det_mode == 'txt':
+            images_layout_res = remove_layout_in_ori_images(images_layout_res, pdf_dict_list, scale_list)
+
         # formula_level：公式识别等级，默认为0，全识别。
         # 如果公式识别等级为 1（只保留行间公式），过滤掉 category_id == 13（inline_formula）
         if self.formula_enable and self.formula_level == 1:
@@ -100,7 +104,7 @@ class BatchAnalyze:
             np_img = np_images[index]
 
             ocr_res_list, table_res_list, single_page_mfdetrec_res = (
-                get_res_list_from_layout_res(layout_res, np_img)
+                get_res_list_from_layout_res(layout_res, np_img, enable_image_ocr=self.use_det_mode != 'txt')
             )
 
             # 复选框检测
@@ -126,6 +130,16 @@ class BatchAnalyze:
 
             for table_res in table_res_list:
                 table_img, useful_list = crop_img(table_res, np_img)
+
+                # def get_crop_table_img(scale):
+                #     crop_xmin, crop_ymin = int(table_res['poly'][0]), int(table_res['poly'][1])
+                #     crop_xmax, crop_ymax = int(table_res['poly'][4]), int(table_res['poly'][5])
+                #     bbox = (int(crop_xmin / scale), int(crop_ymin / scale), int(crop_xmax / scale), int(crop_ymax / scale))
+                #     return get_crop_np_img(bbox, np_img, scale=scale)
+                #
+                # wireless_table_img = get_crop_table_img(scale = 1)
+                # wired_table_img = get_crop_table_img(scale = 10/3)
+
                 table_res_list_all_page.append({'table_res':table_res,
                                                 'lang':_lang,
                                                 'table_img':table_img,
@@ -389,40 +403,53 @@ class BatchAnalyze:
                             useful_list, return_text=True
                         )
 
-                        ocr_result = None
+                        ocr_result = []
+                        # 进行 OCR-det 识别文字框
+                        ocr_model = atom_model_manager.get_atom_model(
+                            atom_model_name=AtomicModel.OCR,
+                            det_db_box_thresh=0.5,
+                            det_db_unclip_ratio=1.6,
+                            lang=_lang,
+                            ocr_config=self.ocr_config,
+                            enable_merge_det_boxes=False,
+                        )
+
+                        bgr_image = cv2.cvtColor(table_res_dict["table_img"], cv2.COLOR_RGB2BGR)
+                        det_res = ocr_model.ocr(bgr_image, mfd_res=adjusted_mfdetrec_res, rec=False)[0]
                         if not self.table_force_ocr and not table_res_dict['ocr_enable']:
-                            ocr_res = []
-                            # if self.use_det_mode != 'ocr':
-                            #     # 从pdf中直接提取文本块点位（部分表格效果较差暂不考虑），并支持270和90度的表格
-                            #     ocr_res, most_angle = txt_spans_bbox_extract_table(page_dict, table_res_dict, scale=scale)  # 从pdf中获取文本行点位
-                            if not ocr_res:
-                                # RapidTable非OCR文本提取 OcrText
-                                # 进行 OCR-det 识别文字框
-                                ocr_model = atom_model_manager.get_atom_model(
-                                    atom_model_name=AtomicModel.OCR,
-                                    ocr_show_log=False,
-                                    det_db_box_thresh=0.3,
-                                    lang=_lang,
-                                    ocr_config=self.ocr_config,
-                                    enable_merge_det_boxes=False,
+                            most_angle = txt_most_angle_extract_table(page_dict, table_res_dict, scale=scale) # 从pdf中获取文本行 角度投票
+                            if most_angle in [90, 270]:
+                                table_res_dict['table_img'], det_res = rotate_image_and_boxes(
+                                    np.asarray(table_res_dict["table_img"]),
+                                    det_res,
+                                    most_angle
                                 )
-                                new_table_image = cv2.cvtColor(table_res_dict['table_img'], cv2.COLOR_RGB2BGR)
-                                ocr_res = ocr_model.ocr(new_table_image, mfd_res=adjusted_mfdetrec_res, rec=False)[0]
-                                most_angle = txt_most_angle_extract_table(page_dict, table_res_dict, scale=scale) # 从pdf中获取文本行 角度投票
-                                if most_angle in [90, 270]:
-                                    table_res_dict['table_img'], ocr_res = rotate_image_and_boxes(
-                                        np.asarray(table_res_dict["table_img"]),
-                                        ocr_res,
-                                        most_angle
-                                    )
-                            if ocr_res:
-                                ocr_spans = get_ocr_result_list_table(ocr_res, useful_list, scale)
+                            if det_res:
+                                ocr_spans = get_ocr_result_list_table(det_res, useful_list, scale)
                                 poly = table_res_dict['table_res']['poly']
                                 table_bboxes = [[int(poly[0]/scale), int(poly[1]/scale), int(poly[4]/scale), int(poly[5]/scale)
                                                     , None, None, None,'text', None, None, None, None, 1]]
                                 # 从pdf中提取表格的文本
                                 txt_spans_extract(page_dict, ocr_spans, table_res_dict['table_img'], scale, table_bboxes,[])
                                 ocr_result = [list(x) for x in zip(*[[item['ori_bbox'], item['content'], item['score']] for item in ocr_spans])]
+                        # # 进行 OCR-rec 识别文字框
+                        if not ocr_result and det_res:
+                            rec_img_list = []
+                            for dt_box in det_res:
+                                rec_img_list.append(
+                                    {
+                                        "cropped_img": get_rotate_crop_image(
+                                            bgr_image, np.asarray(dt_box, dtype=np.float32)
+                                        ),
+                                        "dt_box": np.asarray(dt_box, dtype=np.float32),
+                                    }
+                                )
+                            cropped_img_list = [item["cropped_img"] for item in rec_img_list]
+                            ocr_res_list = ocr_model.ocr(cropped_img_list, det=False, tqdm_enable=False)[0]
+                            for img_dict, ocr_res in zip(rec_img_list, ocr_res_list):
+                                ocr_result.append([img_dict["dt_box"], ocr_res[0], ocr_res[1]])
+                            ocr_result = [list(x) for x in zip(*ocr_result)]
+
                         table_model = atom_model_manager.get_atom_model(
                             atom_model_name='table',
                             lang=_lang,
@@ -431,8 +458,8 @@ class BatchAnalyze:
                         )
                         # 从pdf里提取表格里的图片
                         fill_image_res = extract_table_fill_image(page_dict, table_res_dict, scale=scale)
-                        html_code, table_cell_bboxes, logic_points, elapse = table_model.predict(table_res_dict['table_img'], ocr_result
-                                                                                                 , fill_image_res, adjusted_mfdetrec_res, self.skip_text_in_image, self.use_img2table)
+                        html_code = table_model.predict(table_res_dict['table_img'], ocr_result,
+                                                        fill_image_res, adjusted_mfdetrec_res, self.skip_text_in_image, self.use_img2table)
                         # 判断是否返回正常
                         if html_code:
                             # 检查html_code是否包含'<table>'和'</table>'
@@ -522,3 +549,80 @@ class BatchAnalyze:
                     total_processed += len(img_crop_list)
 
         return images_layout_res
+
+
+def remove_layout_in_ori_images(images_layout_res, pdf_dict_list, scale_list):
+    """
+    移除落在原始图片区域内的 layout_res，
+    对于确实替换掉内容的图片区域，添加一条新的 'image' 类型检测结果。
+    若图片区域中含有文本（背景图），则跳过该图片。
+    """
+    for index, layout_res in enumerate(images_layout_res):
+        ori_image_list = pdf_dict_list[index].get('ori_image_list')
+        scale = scale_list[index]
+
+        if not ori_image_list:
+            continue
+
+        # ✅ 过滤掉包含文本的“背景图”区域
+        valid_ori_images = []
+        for ori in ori_image_list:
+            if txt_in_ori_image(pdf_dict_list[index], ori['bbox']):
+                # 含文本，不视为纯图片，跳过
+                continue
+            valid_ori_images.append(ori)
+
+        if not valid_ori_images:
+            # 没有纯图片，跳过
+            images_layout_res[index] = layout_res
+            continue
+
+        # ✅ 计算所有原图 bbox（已缩放）
+        scaled_ori_bboxes = [
+            [
+                ori['bbox'][0] * scale,
+                ori['bbox'][1] * scale,
+                ori['bbox'][2] * scale,
+                ori['bbox'][3] * scale
+            ]
+            for ori in valid_ori_images
+        ]
+
+        filtered_layout_res = []
+        replaced_ori_bboxes = set()  # 记录被用来替换的图片区域下标
+
+        for res in layout_res:
+            # 保留 category_id==2 的区域
+            if res['category_id'] == 2:
+                filtered_layout_res.append(res)
+                continue
+
+            x1, y1, x2, y2 = res['poly'][0], res['poly'][1], res['poly'][4], res['poly'][5]
+            res_bbox = [int(x1), int(y1), int(x2), int(y2)]
+
+            # 检查是否落入某个图片区域
+            matched_idx = None
+            for idx, ori_bbox in enumerate(scaled_ori_bboxes):
+                if is_in(res_bbox, ori_bbox):
+                    matched_idx = idx
+                    break
+
+            if matched_idx is not None:
+                replaced_ori_bboxes.add(matched_idx)  # 记录该图片区域确实发生替换
+                continue  # 删除该 layout_res
+            filtered_layout_res.append(res)
+
+        # ✅ 只添加被替换掉的图片区域
+        for idx in replaced_ori_bboxes:
+            xmin, ymin, xmax, ymax = map(int, scaled_ori_bboxes[idx])
+            image_res = {
+                "category_id": 3,
+                "original_label": "image",
+                "poly": [xmin, ymin, xmax, ymin, xmax, ymax, xmin, ymax],
+                "score": 1.0,
+            }
+            filtered_layout_res.append(image_res)
+
+        images_layout_res[index] = filtered_layout_res
+
+    return images_layout_res

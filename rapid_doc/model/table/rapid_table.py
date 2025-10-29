@@ -8,6 +8,7 @@ from rapid_doc.backend.pipeline.pipeline_middle_json_mkcontent import inline_lef
 from rapid_doc.model.table.rapid_table_self.table_cls import TableCls
 from rapid_doc.model.table.rapid_table_self import ModelType, RapidTable, RapidTableInput
 from rapid_doc.model.layout.rapid_layout_self import RapidLayoutInput, RapidLayout, ModelType as LayoutModelType
+from rapid_doc.model.table.utils import select_best_table_model
 from rapid_doc.utils.boxbase import is_in
 from rapid_doc.utils.config_reader import get_device
 from rapid_doc.utils.ocr_utils import points_to_bbox, bbox_to_points
@@ -129,8 +130,12 @@ class RapidTableModel(object):
                 ocr_result = [list(x) for x in zip(*[[item[0], item[1][0], item[1][1]] for item in ocr_result])]
             else:
                 ocr_result = None
+            # ori_ocr_res = self.ocr_engine.rapid_ocr(bgr_image)
+            # if ori_ocr_res:
+            #     ocr_result = [ori_ocr_res.boxes, ori_ocr_res.txts, ori_ocr_res.scores]
+
         if not ocr_result:
-            return None, None, None, None
+            return None
         # 把图片结果，添加到ocr_result里。uuid作为占位符，后面保存图片时替换
         if fill_image_res:
             for fill_image in fill_image_res:
@@ -208,23 +213,30 @@ class RapidTableModel(object):
                     cell_res = self.wireless_table_cell([bgr_image])
                     model_runner = (self.wireless_table_model)
                 cell_results = (cell_res[0].boxes, cell_res[0].scores)
-                table_results = model_runner(bgr_image, ocr_result, cell_results=cell_results)
+                html_code = model_runner(bgr_image, ocr_result, cell_results=cell_results).pred_html
             elif self.model_type == ModelType.UNET_SLANET_PLUS or self.model_type == ModelType.UNET_UNITABLE:
+                # if not cls:
+                #     cls, elasp = self.table_cls(bgr_image)
+                # if cls == "wired":
+                #     html_code = self.wired_table_model(bgr_image, ocr_result).pred_html
+                # else:  # wireless
+                #     html_code = self.wireless_table_model(bgr_image, ocr_result).pred_html
+
+                # wired_html_code = self.wired_table_model(bgr_image, ocr_result).pred_html
+                # wireless_html_code = self.wireless_table_model(bgr_image, ocr_result).pred_html
+                # html_code = select_best_table_model(ocr_result, wired_html_code, wireless_html_code)
+
                 if not cls:
                     cls, elasp = self.table_cls(bgr_image)
                 if cls == "wired":
-                    table_results = self.wired_table_model(bgr_image, ocr_result)
+                    wired_html_code = self.wired_table_model(bgr_image, ocr_result).pred_html
+                    wireless_html_code = self.wireless_table_model(bgr_image, ocr_result).pred_html
+                    html_code = select_best_table_model(ocr_result, wired_html_code, wireless_html_code)
                 else:  # wireless
-                    table_results = self.wireless_table_model(bgr_image, ocr_result)
+                    html_code = self.wireless_table_model(bgr_image, ocr_result).pred_html
             else:
-                table_results = self.table_model(bgr_image, ocr_result)
-
-            html_code = table_results.pred_html
-            table_cell_bboxes = table_results.cell_bboxes
-            logic_points = table_results.logic_points
-            elapse = table_results.elapse
-            return html_code, table_cell_bboxes, logic_points, elapse
+                html_code = self.table_model(bgr_image, ocr_result).pred_html
+            return html_code
         except Exception as e:
             logger.exception(e)
-            return None, None, None, None
-
+            return None

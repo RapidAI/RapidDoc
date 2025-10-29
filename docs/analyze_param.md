@@ -62,7 +62,7 @@ layout_config = {
 |  参数名   |      说明      |                      默认值                       |                                             备注                                              |
 | :-------: |:------------:|:----------------------------------------------:|:-------------------------------------------------------------------------------------------:|
 | engine_type  | det和rec的推理引擎 | OPENVINO（cpu）、TORCH（gpu） |                                                                                             |
-| use_det_mode  | 文本检测框模式：auto（默认）、txt、ocr | auto | 1、txt只会从pypdfium2获取文本框<br/>2、ocr只会从OCR-det获取文本框<br/>3、auto先从pypdfium2获取文本框，提取不到再使用OCR-det提取 |
+| use_det_mode  | 文本检测框模式：auto（默认）、txt、ocr | auto | 1、txt只会从pypdfium2获取文本框，保留pdf中的图片<br/>2、ocr只会从OCR-det获取文本框<br/>3、auto先从pypdfium2获取文本框，提取不到再使用OCR-det提取 |
 | Det.rec_batch_num |   rec批处理大小   |                       1                        |                                                                                             |
 > [ocr_config想更深入了解，请移步rapidocr config.yaml参数解释](https://rapidai.github.io/RapidOCRDocs/install_usage/api/RapidOCR/)
 
