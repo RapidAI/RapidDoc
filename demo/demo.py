@@ -19,7 +19,7 @@ from rapid_doc.backend.pipeline.model_json_to_middle_json import result_to_middl
 
 from rapidocr import EngineType as OCREngineType, OCRVersion, ModelType as OCRModelType
 from rapid_doc.model.layout.rapid_layout_self import ModelType as LayoutModelType
-from rapid_doc.model.formula.rapid_formula_self import ModelType as FormulaModelType
+from rapid_doc.model.formula.rapid_formula_self import ModelType as FormulaModelType, EngineType as FormulaEngineType
 from rapid_doc.model.table.rapid_table_self import ModelType as TableModelType
 
 def do_parse(
@@ -69,6 +69,7 @@ def do_parse(
 
     formula_config = {
         "model_type": FormulaModelType.PP_FORMULANET_PLUS_M,
+        # "engine_type": FormulaEngineType.TORCH,
         # "formula_level": 1, # 公式识别等级，默认为0，全识别。1:仅识别行间公式，行内公式不识别
         # "batch_num": 1,
         # "model_dir_or_path": r"C:\ocr\models\ppmodel\formula\PP-FormulaNet_plus-S\pp_formulanet_plus_s.onnx"

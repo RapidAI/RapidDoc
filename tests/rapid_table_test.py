@@ -20,7 +20,7 @@ default_params = {
     "Det.unclip_ratio": 1.8,
 }
 
-ocr_engine = RapidOCR()
+ocr_engine = RapidOCR(params=default_params)
 
 input_args = RapidTableInput(
     model_type=ModelType.UNET

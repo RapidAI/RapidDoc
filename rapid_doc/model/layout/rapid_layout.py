@@ -1,3 +1,5 @@
+import cv2
+
 from rapid_doc.model.layout.rapid_layout_self import ModelType, RapidLayout, RapidLayoutInput
 from rapid_doc.model.layout.rapid_layout_self.utils.typings import PP_DOCLAYOUT_PLUS_L_Threshold, PP_DOCLAYOUT_L_Threshold
 from rapid_doc.utils.config_reader import get_device
@@ -91,6 +93,9 @@ class RapidLayoutModel(object):
 
     def batch_predict(self, images: list, batch_size: int) -> list:
         images_layout_res = []
+        # 把200 DPI缩成144 DPI。（144版面识别效果更好）
+        scale = 144 / 200
+        images = [cv2.resize(img, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA) for img in images]
 
         all_results = self.model(img_contents=images, batch_size=batch_size, tqdm_enable=True)
         for results in all_results:
@@ -121,6 +126,12 @@ class RapidLayoutModel(object):
 
             for item in temp_results:
                 xmin, ymin, xmax, ymax = item["bbox"]
+                # ✅ 还原坐标到200DPI坐标系
+                restore_scale = 200 / 144
+                xmin *= restore_scale
+                ymin *= restore_scale
+                xmax *= restore_scale
+                ymax *= restore_scale
                 layout_res.append({
                     "category_id": item["category_id"],
                     "original_label": item["original_label"],
@@ -129,21 +140,6 @@ class RapidLayoutModel(object):
                 })
             images_layout_res.append(layout_res)
         return images_layout_res
-
-    # def check_inline_formula(self, temp_results):
-    #     """
-    #     判断哪些公式是行内公式（被plain text框完全包含）
-    #     """
-    #     for item in temp_results:
-    #         if item["category_id"] == CategoryId.InterlineEquation_YOLO:  # isolated_formula
-    #             xmin, ymin, xmax, ymax = item["bbox"]
-    #             for other in temp_results:
-    #                 if other["category_id"] == CategoryId.Text:  # plain text
-    #                     oxmin, oymin, oxmax, oymax = other["bbox"]
-    #                     if xmin >= oxmin and ymin >= oymin and xmax <= oxmax and ymax <= oymax:
-    #                         item["category_id"] = CategoryId.InlineEquation # inline_formula
-    #                         break
-    #     return temp_results
 
     def check_inline_formula(self, temp_results):
         """

@@ -22,7 +22,7 @@ from rapid_doc.backend.pipeline.model_json_to_middle_json import result_to_middl
 
 from rapidocr import EngineType as OCREngineType, OCRVersion, ModelType as OCRModelType
 from rapid_doc.model.layout.rapid_layout_self import ModelType as LayoutModelType
-from rapid_doc.model.formula.rapid_formula_self import ModelType as FormulaModelType
+from rapid_doc.model.formula.rapid_formula_self import ModelType as FormulaModelType, EngineType as FormulaEngineType
 from rapid_doc.model.table.rapid_table_self import ModelType as TableModelType
 
 
@@ -45,7 +45,7 @@ def do_parse(
     end_page_id=None,  # End page ID for parsing, default is None (parse all pages until the end of the document)
 ):
     layout_config = {
-        "model_type": LayoutModelType.PP_DOCLAYOUT_PLUS_L,
+        # "model_type": LayoutModelType.PP_DOCLAYOUT_PLUS_L,
         # "conf_thresh": 0.4,
         # "batch_num": 1,
         # "model_dir_or_path": "C:\ocr\models\ppmodel\layout\PP-DocLayout-L\pp_doclayout_l.onnx",
@@ -71,7 +71,8 @@ def do_parse(
     }
 
     formula_config = {
-        "model_type": FormulaModelType.PP_FORMULANET_PLUS_M,
+        # "model_type": FormulaModelType.PP_FORMULANET_PLUS_M,
+        # "engine_type": FormulaEngineType.TORCH,
         # "formula_level": 1, # 公式识别等级，默认为0，全识别。1:仅识别行间公式，行内公式不识别
         # "batch_num": 1,
         # "model_dir_or_path": r"C:\ocr\models\ppmodel\formula\PP-FormulaNet_plus-S\pp_formulanet_plus_s.onnx",
@@ -88,7 +89,7 @@ def do_parse(
         # "model_type": TableModelType.UNET_SLANET_PLUS,  # （默认） 有线表格使用unet，无线表格使用slanet_plus
         # "model_type": TableModelType.UNET_UNITABLE, # 有线表格使用unet，无线表格使用unitable
         # "model_type": TableModelType.SLANEXT,  # 有线表格使用slanext_wired，无线表格使用slanext_wireless
-
+        # "model_type": TableModelType.UNITABLE,
         # "model_dir_or_path": "", #单个模型使用。如SLANET_PLUS、UNITABLE
 
         # "cls.model_dir_or_path": "", # 表格分类模型地址
@@ -226,6 +227,7 @@ if __name__ == '__main__':
     doc_path_list = [
         "demo/pdfs/比亚迪财报.pdf",
         "demo/pdfs/示例7-研究报告.pdf",
+        "demo/images/table_04.png",
     ]
     for doc_path in doc_path_list:
         start_time = time.time()

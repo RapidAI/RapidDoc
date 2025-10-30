@@ -192,7 +192,7 @@ class RapidTableModel(object):
                 if extracted_tables:
                     # print(f"img2table detected {len(extracted_tables)} tables")
                     html_code = "<html><body>" + extracted_tables[0].html + "</body></html>"
-                    return html_code, None, None, None
+                    return html_code
             except ImportError:
                 raise ValueError(
                     "Could not import img2table python package. "
