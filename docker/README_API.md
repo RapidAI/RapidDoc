@@ -83,6 +83,7 @@ uvicorn app:app --host 0.0.0.0 --port 8888
 - `return_model_output`: 是否返回模型输出（默认: `false`）
 - `return_content_list`: 是否返回内容列表（默认: `false`）
 - `return_images`: 是否返回图片（默认: `false`）
+- `response_format_zip`: 是否zip压缩文件（默认: `false`）
 - `start_page_id`: 起始页码（默认: `0`）
 - `end_page_id`: 结束页码（默认: `99999`）
 
@@ -117,17 +118,16 @@ curl -X POST "http://localhost:8888/file_parse" \
 
 ```json
 {
-  "results": [
-    {
-      "filename": "document.pdf",
+  "backend": "pipeline",
+  "version": "x.x.x",
+  "results": {
+    "示例1-论文模板": {
       "md_content": "# 文档标题\n\n文档内容...",
       "content_list": [...],
+      "middle_json": {...},
       "images": {...},
-      "backend": "pipeline"
     }
-  ],
-  "total_files": 1,
-  "successful_files": 1
+  }
 }
 ```
 
@@ -139,11 +139,3 @@ curl -X POST "http://localhost:8888/file_parse" \
 2. **功能完整**: 支持所有官方后端和解析选项
 3. **结果一致**: 输出格式与官方 API 保持一致
 4. **性能优化**: 利用官方优化的解析逻辑
-
-## 更新日志
-
-- 基于 RapidDoc 的 API 设计
-- 完全兼容官方接口规范
-- 支持多文件批量处理
-- 改进错误处理和用户体验
-- 优化依赖管理

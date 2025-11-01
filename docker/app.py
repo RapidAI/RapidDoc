@@ -1,9 +1,11 @@
+import os
 import gc
 import json
-import os
-import traceback
+import re
+import uuid
+import zipfile
 import tempfile, shutil
-from glob import glob
+import glob
 from base64 import b64encode
 from pathlib import Path
 from typing import Optional, List
@@ -11,12 +13,12 @@ from typing import Optional, List
 import uvicorn
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from starlette.background import BackgroundTask
 from loguru import logger
 
 from file_converter import ensure_pdf, OFFICE_EXTENSIONS
 from rapid_doc.cli.common import aio_do_parse
-from rapid_doc.utils.language import remove_invalid_surrogates
 from rapid_doc.version import __version__
 
 app = FastAPI(
@@ -42,13 +44,26 @@ pdf_suffixes = [".pdf"]
 office_suffixes = list(OFFICE_EXTENSIONS)
 image_suffixes = [".png", ".jpg", ".jpeg", ".bmp", ".tiff", ".tif"]
 
-# Removed clean_data_for_json function - now using official API
 
-# Removed init_writers function - now using simpler file handling
+def sanitize_filename(filename: str) -> str:
+    """
+    格式化压缩文件的文件名
+    移除路径遍历字符, 保留 Unicode 字母、数字、._-
+    禁止隐藏文件
+    """
+    sanitized = re.sub(r'[/\\\.]{2,}|[/\\]', '', filename)
+    sanitized = re.sub(r'[^\w.-]', '_', sanitized, flags=re.UNICODE)
+    if sanitized.startswith('.'):
+        sanitized = '_' + sanitized[1:]
+    return sanitized or 'unnamed'
 
-
-# Removed old processing functions - now using official API's aio_do_parse
-
+def cleanup_file(file_path: str) -> None:
+    """清理临时 zip 文件"""
+    try:
+        if os.path.exists(file_path):
+            os.remove(file_path)
+    except Exception as e:
+        logger.warning(f"fail clean file {file_path}: {e}")
 
 def encode_image(image_path: str) -> str:
     """Encode image using base64"""
@@ -56,79 +71,12 @@ def encode_image(image_path: str) -> str:
         return b64encode(f.read()).decode()
 
 
-def get_infer_result(file_suffix_identifier: str, file_name: str, parse_dir: str) -> Optional[str]:
-    """从结果文件中读取推理结果 - 支持嵌套目录查找"""
-    import glob
-    
-    # 首先尝试官方路径格式
-    result_file_path = os.path.join(parse_dir, f"{file_name}{file_suffix_identifier}")
-    logger.info(f"Looking for result file: {result_file_path}")
-    
+def get_infer_result(file_suffix_identifier: str, pdf_name: str, parse_dir: str) -> Optional[str]:
+    """从结果文件中读取推理结果"""
+    result_file_path = os.path.join(parse_dir, f"{pdf_name}{file_suffix_identifier}")
     if os.path.exists(result_file_path):
-        logger.info(f"Found result file: {result_file_path}")
-        try:
-            with open(result_file_path, "r", encoding="utf-8") as fp:
-                content = fp.read()
-                logger.info(f"Read {len(content)} characters from {result_file_path}")
-                return content
-        except Exception as e:
-            logger.error(f"Error reading file {result_file_path}: {e}")
-            return None
-    
-    # 如果官方路径不存在，尝试递归查找
-    logger.warning(f"Result file not found at official path: {result_file_path}")
-    logger.info("Searching recursively in subdirectories...")
-    
-    # 构建文件名模式
-    file_pattern = f"*{file_suffix_identifier}"
-    logger.info(f"Searching for pattern: {file_pattern}")
-    
-    # 递归查找文件
-    found_files = []
-    for root, dirs, files in os.walk(parse_dir):
-        for file in files:
-            if file.endswith(file_suffix_identifier):
-                full_path = os.path.join(root, file)
-                found_files.append(full_path)
-                logger.info(f"Found potential result file: {full_path}")
-    
-    if found_files:
-        # 优先选择包含文件名的文件
-        for file_path in found_files:
-            if file_name in file_path:
-                logger.info(f"Selected result file: {file_path}")
-                try:
-                    with open(file_path, "r", encoding="utf-8") as fp:
-                        content = fp.read()
-                        logger.info(f"Read {len(content)} characters from {file_path}")
-                        return content
-                except Exception as e:
-                    logger.error(f"Error reading file {file_path}: {e}")
-                    continue
-        
-        # 如果没有找到包含文件名的文件，使用第一个找到的文件
-        if found_files:
-            selected_file = found_files[0]
-            logger.info(f"Using first found file: {selected_file}")
-            try:
-                with open(selected_file, "r", encoding="utf-8") as fp:
-                    content = fp.read()
-                    logger.info(f"Read {len(content)} characters from {selected_file}")
-                    return content
-            except Exception as e:
-                logger.error(f"Error reading file {selected_file}: {e}")
-                return None
-    
-    # 如果仍然没有找到，列出目录内容帮助调试
-    logger.warning(f"No result file found for pattern: {file_pattern}")
-    if os.path.exists(parse_dir):
-        logger.info(f"Listing all files in {parse_dir}:")
-        for root, dirs, files in os.walk(parse_dir):
-            for file in files:
-                logger.info(f"  {os.path.join(root, file)}")
-    else:
-        logger.warning(f"Parse directory does not exist: {parse_dir}")
-    
+        with open(result_file_path, "r", encoding="utf-8") as fp:
+            return fp.read()
     return None
 
 def _convert_value_to_enum(config):
@@ -178,7 +126,7 @@ def _convert_value_to_enum(config):
 async def file_parse(
     files: List[UploadFile] = File(...),
     output_dir: str = Form("./output"),
-    clear_output_file: bool = Form(False),
+    clear_output_file: bool = Form(True),
     lang_list: List[str] = Form(["ch"]),
     backend: str = Form("pipeline"),
     parse_method: str = Form("auto"),
@@ -195,6 +143,7 @@ async def file_parse(
     return_model_output: bool = Form(False),
     return_content_list: bool = Form(False),
     return_images: bool = Form(False),
+    response_format_zip: bool = Form(False),
     start_page_id: int = Form(0),
     end_page_id: int = Form(99999),
 ):
@@ -218,20 +167,10 @@ async def file_parse(
         end_page_id: End page ID for parsing
     """
     try:
-        # 验证后端类型
-        supported_backends = ["pipeline"]
-        if backend not in supported_backends:
-            return JSONResponse(
-                content={"error": f"Unsupported backend: {backend}. Supported: {supported_backends}"},
-                status_code=400,
-            )
-
-        # 验证文件
-        if not files:
-            return JSONResponse(
-                content={"error": "No files provided"},
-                status_code=400,
-            )
+        # 创建唯一的输出目录
+        unique_dir = os.path.join(output_dir, str(uuid.uuid4()))
+        os.makedirs(unique_dir, exist_ok=True)
+        logger.info(f"Created unique output directory: {unique_dir}")
 
         # 把 JSON 字符串转成 dict，默认空 dict
         layout_config = _convert_value_to_enum(json.loads(layout_config or "{}"))
@@ -241,11 +180,10 @@ async def file_parse(
         checkbox_config = json.loads(checkbox_config or "{}")
         image_config = json.loads(image_config or "{}")
 
-        # 创建输出目录
-        os.makedirs(output_dir, exist_ok=True)
-        
-        results = []
-        
+        # 处理上传的PDF文件
+        pdf_file_names = []
+        pdf_bytes_list = []
+        # 读取文件内容
         for file in files:
             # 验证文件扩展名
             file_suffix = Path(file.filename).suffix.lower()
@@ -256,13 +194,10 @@ async def file_parse(
                 )
             if file_suffix in pdf_suffixes + image_suffixes:
                 content = await file.read()
-
             else:
                 # 创建临时目录用于文档转换
                 temp_dir = tempfile.mkdtemp(prefix="fastapi_adapter_")
-                print(temp_dir)
-                # 调用 ensure_pdf 进行文档转换
-                # 保存上传的文件到临时目录
+                # 调用 ensure_pdf 进行文档转换，保存上传的文件到临时目录
                 temp_file_path = os.path.join(temp_dir, file.filename)
                 with open(temp_file_path, "wb") as tmp_f:
                     tmp_f.write(await file.read())
@@ -276,118 +211,140 @@ async def file_parse(
                 with open(pdf_to_process, "rb") as f:
                     content = f.read()
                 shutil.rmtree(temp_dir, ignore_errors=True)
-            # 读取文件内容
             file_name = Path(file.filename).stem  # 去掉扩展名
-            # 修正：使用完整文件名匹配RapidDoc的输出文件命名格式
-            file_basename = file.filename  # 保留完整文件名
+            pdf_bytes_list.append(content)
+            pdf_file_names.append(file_name)
 
-            
-            # 使用官方 API 的 aio_do_parse 函数
-            try:
-                logger.info(f"Starting to parse {file.filename} using backend {backend}")
-                logger.info(f"Output directory: {output_dir}")
-                logger.info(f"File name stem: {file_name}")
-                
-                await aio_do_parse(
-                    output_dir=output_dir,
-                    pdf_file_names=[file.filename],
-                    pdf_bytes_list=[content],
-                    p_lang_list=lang_list,
-                    backend=backend,
-                    parse_method=parse_method,
-                    formula_enable=formula_enable,
-                    table_enable=table_enable,
-                    start_page_id=start_page_id,
-                    end_page_id=end_page_id,
-                    layout_config=layout_config, ocr_config=ocr_config, formula_config=formula_config,
-                    table_config=table_config, checkbox_config=checkbox_config, image_config=image_config,
-                )
-                
-                logger.info(f"Parse completed for {file.filename}")
-                # 列出输出目录中的所有文件
-                if os.path.exists(output_dir):
-                    all_files = []
-                    for root, dirs, files in os.walk(output_dir):
-                        for f in files:
-                            all_files.append(os.path.join(root, f))
-                    logger.info(f"Files created in output directory: {all_files}")
-                
-                # 收集结果
-                file_result = {"filename": file.filename}
-                logger.info(f"Collecting results for {file.filename}")
-                
-                if return_md:
-                    md_content = get_infer_result(".md", file_basename, output_dir)
-                    file_result["md_content"] = md_content
-                
-                if return_middle_json:
-                    middle_json_content = get_infer_result("_middle.json", file_basename, output_dir)
-                    if middle_json_content:
-                        file_result["middle_json"] = json.loads(middle_json_content)
-                
-                if return_model_output:
-                    model_json_content = get_infer_result("_model.json", file_basename, output_dir)
-                    if model_json_content:
-                        file_result["model_output"] = json.loads(model_json_content)
-                
-                if return_content_list:
-                    content_list_content = get_infer_result("_content_list.json", file_basename, output_dir)
-                    if content_list_content:
-                        file_result["content_list"] = json.loads(content_list_content)
-                
-                if return_images:
-                    # 在输出目录中查找图像文件 - 支持多种目录结构
-                    image_dirs = [
-                        os.path.join(output_dir, file_basename, "images"),  # 原始路径
-                        os.path.join(output_dir, file_basename, "auto", "images"),  # auto 子目录
-                    ]
-                    
-                    found_images = {}
-                    for image_dir in image_dirs:
-                        if os.path.exists(image_dir):
-                            logger.info(f"Found image directory: {image_dir}")
-                            # 支持多种图片格式
-                            for ext in ["*.jpg", "*.jpeg", "*.png", "*.bmp", "*.tiff", "*.tif"]:
-                                image_paths = glob(os.path.join(image_dir, ext))
-                                for image_path in image_paths:
-                                    image_name = os.path.basename(image_path)
-                                    if image_name not in found_images:  # 避免重复
-                                        found_images[image_name] = f"data:image/jpeg;base64,{encode_image(image_path)}"
-                                        logger.info(f"Added image: {image_name}")
-                    
-                    file_result["images"] = found_images
-                    logger.info(f"Total images found: {len(found_images)}")
-                
-                file_result["backend"] = backend
-                results.append(file_result)
-                
-            except Exception as parse_error:
-                # logger.error(f"Error parsing {file.filename}: {str(parse_error)}")
-                tb_str = traceback.format_exc()  # 获取完整 traceback 信息
-                logger.error(f"Error parsing {file.filename}:\n{tb_str}")
+        # 设置语言列表，确保与文件数量一致
+        actual_lang_list = lang_list
+        if len(actual_lang_list) != len(pdf_file_names):
+            # 如果语言列表长度不匹配，使用第一个语言或默认"ch"
+            actual_lang_list = [actual_lang_list[0] if actual_lang_list else "ch"] * len(pdf_file_names)
 
-                results.append({
-                    "filename": file.filename,
-                    "error": str(parse_error)
-                })
-            
+        # 调用异步处理函数
+        await aio_do_parse(
+                output_dir=unique_dir,
+                pdf_file_names=pdf_file_names,
+                pdf_bytes_list=pdf_bytes_list,
+                p_lang_list=actual_lang_list,
+                backend=backend,
+                parse_method=parse_method,
+                formula_enable=formula_enable,
+                table_enable=table_enable,
+                f_draw_layout_bbox=False,
+                f_draw_span_bbox=False,
+                f_dump_md=return_md,
+                f_dump_middle_json=return_middle_json,
+                f_dump_model_output=return_model_output,
+                f_dump_orig_pdf=False,
+                f_dump_content_list=return_content_list,
+                start_page_id=start_page_id,
+                end_page_id=end_page_id,
+                layout_config = layout_config, ocr_config = ocr_config, formula_config = formula_config,
+                table_config = table_config, checkbox_config = checkbox_config, image_config = image_config,
+            )
+
+        # 根据 response_format_zip 决定返回类型
+        if response_format_zip:
+            zip_fd, zip_path = tempfile.mkstemp(suffix=".zip", prefix="rapid_doc_results_")
+            os.close(zip_fd)
+            with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+                for pdf_name in pdf_file_names:
+                    safe_pdf_name = sanitize_filename(pdf_name)
+                    if backend.startswith("pipeline"):
+                        parse_dir = os.path.join(unique_dir, pdf_name, parse_method)
+                    else:
+                        parse_dir = os.path.join(unique_dir, pdf_name, "vlm")
+
+                    if not os.path.exists(parse_dir):
+                        continue
+
+                    # 写入文本类结果
+                    if return_md:
+                        path = os.path.join(parse_dir, f"{pdf_name}.md")
+                        if os.path.exists(path):
+                            zf.write(path, arcname=os.path.join(safe_pdf_name, f"{safe_pdf_name}.md"))
+
+                    if return_middle_json:
+                        path = os.path.join(parse_dir, f"{pdf_name}_middle.json")
+                        if os.path.exists(path):
+                            zf.write(path, arcname=os.path.join(safe_pdf_name, f"{safe_pdf_name}_middle.json"))
+
+                    if return_model_output:
+                        path = os.path.join(parse_dir, f"{pdf_name}_model.json")
+                        if os.path.exists(path):
+                            zf.write(path, arcname=os.path.join(safe_pdf_name, os.path.basename(path)))
+
+                    if return_content_list:
+                        path = os.path.join(parse_dir, f"{pdf_name}_content_list.json")
+                        if os.path.exists(path):
+                            zf.write(path, arcname=os.path.join(safe_pdf_name, f"{safe_pdf_name}_content_list.json"))
+
+                    # 写入图片
+                    if return_images:
+                        images_dir = os.path.join(parse_dir, "images")
+                        image_paths = glob.glob(os.path.join(glob.escape(images_dir), "*.jpg"))
+                        for image_path in image_paths:
+                            zf.write(image_path,
+                                     arcname=os.path.join(safe_pdf_name, "images", os.path.basename(image_path)))
             # 是否清理文件
             if clear_output_file:
-                shutil.rmtree(os.path.join(output_dir, file_basename), ignore_errors=True)
+                shutil.rmtree(unique_dir, ignore_errors=True)
+            return FileResponse(
+                path=zip_path,
+                media_type="application/zip",
+                filename="results.zip",
+                background=BackgroundTask(cleanup_file, zip_path)
+            )
+        else:
+            # 构建 JSON 结果
+            result_dict = {}
+            for pdf_name in pdf_file_names:
+                result_dict[pdf_name] = {}
+                data = result_dict[pdf_name]
 
-        # 返回结果
-        response_data = {
-            "results": results,
-            "total_files": len(files),
-            "successful_files": len([r for r in results if "error" not in r])
-        }
-        
-        return JSONResponse(response_data, status_code=200)
+                if backend.startswith("pipeline"):
+                    parse_dir = os.path.join(unique_dir, pdf_name, parse_method)
+                else:
+                    parse_dir = os.path.join(unique_dir, pdf_name, "vlm")
+
+                if os.path.exists(parse_dir):
+                    if return_md:
+                        data["md_content"] = get_infer_result(".md", pdf_name, parse_dir)
+                    if return_middle_json:
+                        data["middle_json"] = json.loads(get_infer_result("_middle.json", pdf_name, parse_dir))
+                    if return_model_output:
+                        data["model_output"] = json.loads(get_infer_result("_model.json", pdf_name, parse_dir))
+                    if return_content_list:
+                        data["content_list"] = json.loads(get_infer_result("_content_list.json", pdf_name, parse_dir))
+                    if return_images:
+                        images_dir = os.path.join(parse_dir, "images")
+                        safe_pattern = os.path.join(glob.escape(images_dir), "*.jpg")
+                        image_paths = glob.glob(safe_pattern)
+                        data["images"] = {
+                            os.path.basename(
+                                image_path
+                            ): f"data:image/jpeg;base64,{encode_image(image_path)}"
+                            for image_path in image_paths
+                        }
+            # 是否清理文件
+            if clear_output_file:
+                shutil.rmtree(unique_dir, ignore_errors=True)
+            return JSONResponse(
+                status_code=200,
+                content={
+                    "backend": backend,
+                    "version": __version__,
+                    "results": result_dict
+                }
+            )
 
     except Exception as e:
-        error_message = remove_invalid_surrogates(str(e))
-        logger.error(f"API error: {error_message}")
-        return JSONResponse(content={"error": error_message}, status_code=500)
+        logger.exception(e)
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Failed to process file: {str(e)}"}
+        )
     finally:
         gc.collect()
 
