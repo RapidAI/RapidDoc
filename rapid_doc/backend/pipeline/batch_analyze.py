@@ -10,15 +10,14 @@ import numpy as np
 
 from .model_init import AtomModelSingleton
 from .model_list import AtomicModel
-from ...utils.boxbase import rotate_image_and_boxes, is_in
+from ...utils.boxbase import is_in, rotate_image
 from ...utils.checkbox_det_cls import checkbox_predict
 from ...utils.config_reader import get_formula_enable, get_table_enable
 from ...utils.enum_class import CategoryId
 from ...utils.model_utils import crop_img, get_res_list_from_layout_res
 from ...utils.ocr_utils import merge_det_boxes, update_det_boxes, sorted_boxes, get_rotate_crop_image
 from ...utils.ocr_utils import get_adjusted_mfdetrec_res, get_ocr_result_list, OcrConfidence, get_ocr_result_list_table
-from ...utils.pdf_image_tools import get_crop_np_img
-from ...utils.span_pre_proc import txt_spans_extract, txt_spans_bbox_extract, txt_spans_bbox_extract_table, \
+from ...utils.span_pre_proc import txt_spans_extract, txt_spans_bbox_extract, \
     txt_most_angle_extract_table, extract_table_fill_image, txt_in_ori_image
 
 
@@ -104,7 +103,7 @@ class BatchAnalyze:
             np_img = np_images[index]
 
             ocr_res_list, table_res_list, single_page_mfdetrec_res = (
-                get_res_list_from_layout_res(layout_res, np_img, enable_image_ocr=self.use_det_mode != 'txt')
+                get_res_list_from_layout_res(layout_res, np_img)
             )
 
             # 复选框检测
@@ -130,16 +129,6 @@ class BatchAnalyze:
 
             for table_res in table_res_list:
                 table_img, useful_list = crop_img(table_res, np_img)
-
-                # def get_crop_table_img(scale):
-                #     crop_xmin, crop_ymin = int(table_res['poly'][0]), int(table_res['poly'][1])
-                #     crop_xmax, crop_ymax = int(table_res['poly'][4]), int(table_res['poly'][5])
-                #     bbox = (int(crop_xmin / scale), int(crop_ymin / scale), int(crop_xmax / scale), int(crop_ymax / scale))
-                #     return get_crop_np_img(bbox, np_img, scale=scale)
-                #
-                # wireless_table_img = get_crop_table_img(scale = 1)
-                # wired_table_img = get_crop_table_img(scale = 10/3)
-
                 table_res_list_all_page.append({'table_res':table_res,
                                                 'lang':_lang,
                                                 'table_img':table_img,
@@ -266,28 +255,20 @@ class BatchAnalyze:
 
                 # 按分辨率分组并同时完成padding
                 # RESOLUTION_GROUP_STRIDE = 32
-                RESOLUTION_GROUP_STRIDE = 64  # 定义分辨率分组的步进值
+                RESOLUTION_GROUP_STRIDE = 64
 
                 resolution_groups = defaultdict(list)
                 for crop_info in lang_crop_list:
                     cropped_img = crop_info[0]
                     h, w = cropped_img.shape[:2]
-                    # 使用更大的分组容差，减少分组数量
-                    # 将尺寸标准化到32的倍数
-                    normalized_h = ((h + RESOLUTION_GROUP_STRIDE) // RESOLUTION_GROUP_STRIDE) * RESOLUTION_GROUP_STRIDE  # 向上取整到32的倍数
-                    normalized_w = ((w + RESOLUTION_GROUP_STRIDE) // RESOLUTION_GROUP_STRIDE) * RESOLUTION_GROUP_STRIDE
-                    group_key = (normalized_h, normalized_w)
+                    # 直接计算目标尺寸并用作分组键
+                    target_h = ((h + RESOLUTION_GROUP_STRIDE - 1) // RESOLUTION_GROUP_STRIDE) * RESOLUTION_GROUP_STRIDE
+                    target_w = ((w + RESOLUTION_GROUP_STRIDE - 1) // RESOLUTION_GROUP_STRIDE) * RESOLUTION_GROUP_STRIDE
+                    group_key = (target_h, target_w)
                     resolution_groups[group_key].append(crop_info)
 
                 # 对每个分辨率组进行批处理
-                for group_key, group_crops in tqdm(resolution_groups.items(), desc=f"OCR-det {lang}"):
-
-                    # 计算目标尺寸（组内最大尺寸，向上取整到32的倍数）
-                    max_h = max(crop_info[0].shape[0] for crop_info in group_crops)
-                    max_w = max(crop_info[0].shape[1] for crop_info in group_crops)
-                    target_h = ((max_h + RESOLUTION_GROUP_STRIDE - 1) // RESOLUTION_GROUP_STRIDE) * RESOLUTION_GROUP_STRIDE
-                    target_w = ((max_w + RESOLUTION_GROUP_STRIDE - 1) // RESOLUTION_GROUP_STRIDE) * RESOLUTION_GROUP_STRIDE
-
+                for (target_h, target_w), group_crops in tqdm(resolution_groups.items(), desc=f"OCR-det {lang}"):
                     # 对所有图像进行padding到统一尺寸
                     batch_images = []
                     for crop_info in group_crops:
@@ -295,45 +276,30 @@ class BatchAnalyze:
                         h, w = img.shape[:2]
                         # 创建目标尺寸的白色背景
                         padded_img = np.ones((target_h, target_w, 3), dtype=np.uint8) * 255
-                        # 将原图像粘贴到左上角
                         padded_img[:h, :w] = img
                         batch_images.append(padded_img)
 
                     # 批处理检测
-                    det_batch_size = min(len(batch_images), self.batch_ratio * self.ocr_det_base_batch_size)  # 增加批处理大小
-                    # logger.debug(f"OCR-det batch: {det_batch_size} images, target size: {target_h}x{target_w}")
+                    det_batch_size = min(len(batch_images), self.batch_ratio * self.ocr_det_base_batch_size)
                     # batch_results = ocr_model.text_detector.batch_predict(batch_images, det_batch_size)
                     batch_results = ocr_model.det_batch_predict(batch_images, det_batch_size)
 
                     # 处理批处理结果
-                    for i, (crop_info, (dt_boxes, elapse)) in enumerate(zip(group_crops, batch_results)):
+                    for crop_info, (dt_boxes, _) in zip(group_crops, batch_results):
                         bgr_image, useful_list, ocr_res_list_dict, res, adjusted_mfdetrec_res, _lang = crop_info
 
                         if dt_boxes is not None and len(dt_boxes) > 0:
-                            # 直接应用原始OCR流程中的关键处理步骤
+                            # 处理检测框
+                            dt_boxes_sorted = sorted_boxes(dt_boxes)
+                            dt_boxes_merged = merge_det_boxes(dt_boxes_sorted) if dt_boxes_sorted else []
 
-                            # 1. 排序检测框
-                            if len(dt_boxes) > 0:
-                                dt_boxes_sorted = sorted_boxes(dt_boxes)
-                            else:
-                                dt_boxes_sorted = []
+                            # 根据公式位置更新检测框
+                            dt_boxes_final = (update_det_boxes(dt_boxes_merged, adjusted_mfdetrec_res)
+                                              if dt_boxes_merged and adjusted_mfdetrec_res
+                                              else dt_boxes_merged)
 
-                            # 2. 合并相邻检测框
-                            if dt_boxes_sorted:
-                                dt_boxes_merged = merge_det_boxes(dt_boxes_sorted)
-                            else:
-                                dt_boxes_merged = []
-
-                            # 3. 根据公式位置更新检测框（关键步骤！）
-                            if dt_boxes_merged and adjusted_mfdetrec_res:
-                                dt_boxes_final = update_det_boxes(dt_boxes_merged, adjusted_mfdetrec_res)
-                            else:
-                                dt_boxes_final = dt_boxes_merged
-
-                            # 构造OCR结果格式
-                            ocr_res = [box.tolist() if hasattr(box, 'tolist') else box for box in dt_boxes_final]
-
-                            if ocr_res:
+                            if dt_boxes_final:
+                                ocr_res = [box.tolist() if hasattr(box, 'tolist') else box for box in dt_boxes_final]
                                 ocr_result_list = get_ocr_result_list(
                                     ocr_res, useful_list, ocr_res_list_dict['ocr_enable'], bgr_image, _lang, res['original_label']
                                 )
@@ -413,17 +379,13 @@ class BatchAnalyze:
                             ocr_config=self.ocr_config,
                             enable_merge_det_boxes=False,
                         )
-
+                        # 判断表格里文字是否旋转
+                        most_angle = txt_most_angle_extract_table(page_dict, table_res_dict, scale=scale)  # 从pdf中获取文本行 角度投票
+                        if most_angle in [90, 270]:
+                            rotate_image(table_res_dict, most_angle)
                         bgr_image = cv2.cvtColor(table_res_dict["table_img"], cv2.COLOR_RGB2BGR)
                         det_res = ocr_model.ocr(bgr_image, mfd_res=adjusted_mfdetrec_res, rec=False)[0]
-                        if not self.table_force_ocr and not table_res_dict['ocr_enable']:
-                            most_angle = txt_most_angle_extract_table(page_dict, table_res_dict, scale=scale) # 从pdf中获取文本行 角度投票
-                            if most_angle in [90, 270]:
-                                table_res_dict['table_img'], det_res = rotate_image_and_boxes(
-                                    np.asarray(table_res_dict["table_img"]),
-                                    det_res,
-                                    most_angle
-                                )
+                        if not self.table_force_ocr and not table_res_dict['ocr_enable'] and most_angle == 0:
                             if det_res:
                                 ocr_spans = get_ocr_result_list_table(det_res, useful_list, scale)
                                 poly = table_res_dict['table_res']['poly']
@@ -432,7 +394,7 @@ class BatchAnalyze:
                                 # 从pdf中提取表格的文本
                                 txt_spans_extract(page_dict, ocr_spans, table_res_dict['table_img'], scale, table_bboxes,[])
                                 ocr_result = [list(x) for x in zip(*[[item['ori_bbox'], item['content'], item['score']] for item in ocr_spans])]
-                        # # 进行 OCR-rec 识别文字框
+                        # 进行 OCR-rec 识别文字框
                         if not ocr_result and det_res:
                             rec_img_list = []
                             for dt_box in det_res:

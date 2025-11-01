@@ -64,7 +64,7 @@ def do_parse(
 
         # 新增的自定义参数
         # "engine_type": OCREngineType.TORCH, # 统一设置推理引擎
-        # "Det.rec_batch_num": 1, # Det批处理大小
+        # "Det.rec_batch_num": 8, # Det批处理大小
 
         # 文本检测框模式：auto（默认）、txt、ocr
         # "use_det_mode": 'auto' #（1、txt只会从pypdfium2获取文本框，保留pdf中的图片，2、ocr只会从OCR-det获取文本框，3、auto先从pypdfium2获取文本框，提取不到再使用OCR-det提取）
@@ -226,7 +226,6 @@ if __name__ == '__main__':
 
     doc_path_list = [
         "demo/pdfs/比亚迪财报.pdf",
-        "demo/pdfs/示例7-研究报告.pdf",
         "demo/images/table_04.png",
     ]
     for doc_path in doc_path_list:

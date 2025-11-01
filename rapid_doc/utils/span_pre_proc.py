@@ -10,9 +10,8 @@ import cv2
 import numpy as np
 
 from rapid_doc.utils.boxbase import calculate_overlap_area_in_bbox1_area_ratio, calculate_iou, \
-    get_minbox_if_overlap_by_ratio, merge_adjacent_bboxes, rotate_image_and_boxes, is_in
+    get_minbox_if_overlap_by_ratio, merge_adjacent_bboxes, is_in
 from rapid_doc.utils.enum_class import BlockType, ContentType
-from rapid_doc.utils.model_utils import crop_img
 from rapid_doc.utils.ocr_utils import update_det_boxes
 from rapid_doc.utils.pdf_image_tools import get_crop_np_img
 from rapid_doc.utils.pdf_text_tool import get_page
@@ -159,54 +158,6 @@ def txt_spans_bbox_extract(page_dict, input_res, mfd_res, scale, useful_list):
         # pdf里提取不到，用ocr-det提取
         input_res['need_ocr_det'] = True
     return dt_boxes
-
-"""pdf_text bbox提取（表格里的文字）"""
-def txt_spans_bbox_extract_table(page_dict, table_res_dict, scale):
-    input_res = table_res_dict['table_res']
-    useful_list = table_res_dict['useful_list']
-
-    paste_x, paste_y, xmin, ymin, xmax, ymax, new_width, new_height = useful_list
-    poly = input_res['poly']
-    input_res_bbox = [poly[0]/scale, poly[1]/scale, poly[4]/scale, poly[5]/scale]
-    angles = []  # 所有行的旋转角度
-    page_text_span = []
-    for block in page_dict['blocks']:
-        for line in block['lines']:
-            # if 0 < abs(line['rotation']) < 90:
-            #     # 旋转角度在0-90度之间的行，直接跳过
-            #     continue
-            angle_deg = int(round(line['rotation'] * 180 / math.pi)) % 360
-            for span in line['spans']:
-                bbox = span['bbox'].bbox  # 获取坐标框
-                text = span['text']  # 获取文字内容
-                if calculate_text_in_span(bbox, input_res_bbox, text):
-                    angles.append(angle_deg)
-                    page_text_span.append(span)
-    if angles:
-        angle_counts = Counter(angles)
-        most_angle = angle_counts.most_common(1)[0][0]  # 取最多的角度
-    else:
-        most_angle = 0
-    # page_text_bbox = [item['bbox'].bbox for item in page_text_span]
-    # page_text_span = merge_adjacent_bboxes(page_text_span)
-    page_text_bbox = [item['bbox'] for item in page_text_span if 'bbox' in item]
-    dt_boxes = []
-    # 转换为和ocr-det一样的格式
-    for bbox in page_text_bbox:
-        bbox = [bbox[0]*scale, bbox[1]*scale, bbox[2]*scale, bbox[3]*scale]
-        p1 = [bbox[0] + paste_x - xmin, bbox[1] + paste_y - ymin]
-        p2 = [bbox[2] + paste_x - xmin, bbox[1] + paste_y - ymin]
-        p3 = [bbox[2] + paste_x - xmin, bbox[3] + paste_y - ymin]
-        p4 = [bbox[0] + paste_x - xmin, bbox[3] + paste_y - ymin]
-        bbox = [p1, p2, p3, p4]
-        dt_boxes.append(bbox)
-    if most_angle in [90, 270]:
-        table_res_dict['table_img'], dt_boxes = rotate_image_and_boxes(
-            np.asarray(table_res_dict["table_img"]),
-            dt_boxes,
-            most_angle
-        )
-    return dt_boxes, most_angle
 
 
 """most_angle bbox提取（表格里的文字）"""

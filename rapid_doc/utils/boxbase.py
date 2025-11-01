@@ -272,37 +272,17 @@ def merge_adjacent_bboxes(spans: List[Dict[str, Any]], x_gap_ratio: float = 0.6,
 
     return merged_result
 
-def rotate_image_and_boxes(img, dt_boxes, angle):
+def rotate_image(img_info, angle):
     """
-    将图像和 dt_boxes 根据 angle 旋转到正向
-    :param img: np.ndarray 图像
-    :param dt_boxes: [[p1,p2,p3,p4], ...] 坐标列表
+    将图像根据 angle 旋转到正向
+    :param img_info: np.ndarray 图像
     :param angle: 当前图像方向角度（0, 90, 180, 270）
-    :return: rotated_img, rotated_dt_boxes
     """
-    if angle not in [90, 270]:
-        # 0 或 180 不做特殊处理
-        return img, dt_boxes
-
     # 旋转图像
     if angle == 270:
-        rotated_img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
+        img_info["table_img"] = cv2.rotate(img_info["table_img"], cv2.ROTATE_90_CLOCKWISE)
     elif angle == 90:
-        rotated_img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
-
-    # 同步旋转 dt_boxes
-    h, w = img.shape[:2]
-    rotated_boxes = []
-    for box in dt_boxes:
-        new_box = []
-        for x, y in box:
-            if angle == 90:
-                new_x = y
-                new_y = w - x
-            elif angle == 270:
-                new_x = h - y
-                new_y = x
-            new_box.append([new_x, new_y])
-        rotated_boxes.append(new_box)
-
-    return rotated_img, rotated_boxes
+        img_info["table_img"] = cv2.rotate(img_info["table_img"], cv2.ROTATE_90_COUNTERCLOCKWISE)
+    else:
+        # 180度和0度不做处理
+        pass

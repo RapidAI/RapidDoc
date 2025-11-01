@@ -222,7 +222,7 @@ class MagicModel:
             return reduct_overlap(
                 list(
                     map(
-                        lambda x: {'bbox': x['bbox'], 'score': x['score']},
+                        lambda x: {'bbox': x['bbox'], 'score': x['score'], 'original_label': x.get('original_label')},
                         filter(
                             lambda x: x['category_id'] == subject_category_id,
                             self.__page_model_info['layout_dets'],
@@ -235,7 +235,7 @@ class MagicModel:
             return reduct_overlap(
                 list(
                     map(
-                        lambda x: {'bbox': x['bbox'], 'score': x['score']},
+                        lambda x: {'bbox': x['bbox'], 'score': x['score'], 'original_label': x.get('original_label')},
                         filter(
                             lambda x: x['category_id'] == object_category_id,
                             self.__page_model_info['layout_dets'],

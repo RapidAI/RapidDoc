@@ -347,7 +347,7 @@ def remove_overlaps_low_confidence_blocks(combined_res_list, overlap_threshold=0
     return blocks_to_remove
 
 
-def get_res_list_from_layout_res(layout_res, np_img, iou_threshold=0.7, overlap_threshold=0.8, area_threshold=0.8, enable_image_ocr=True):
+def get_res_list_from_layout_res(layout_res, np_img, iou_threshold=0.7, overlap_threshold=0.8, area_threshold=0.8):
     """Extract OCR, table and other regions from layout results."""
     ocr_res_list = []
     text_res_list = []
@@ -364,7 +364,8 @@ def get_res_list_from_layout_res(layout_res, np_img, iou_threshold=0.7, overlap_
         if category_id in [8, 13, 14]:  # Formula regions
             res['bbox'] = [int(res['poly'][0]), int(res['poly'][1]), int(res['poly'][4]), int(res['poly'][5])]
             single_page_mfdetrec_res.append(res)
-        elif category_id in ([0, 2, 4, 6, 7, 3] if enable_image_ocr else [0, 2, 4, 6, 7]):  # OCR regions
+        # elif category_id in [0, 2, 4, 6, 7, 3]:  # OCR regions # 相信版面结果，图片就是图片，不再尝试转为文本块
+        elif category_id in [0, 2, 4, 6, 7]:  # OCR regions
             ocr_res_list.append(res)
         elif category_id == 5:  # Table regions
             table_res_list.append(res)

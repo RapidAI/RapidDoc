@@ -62,28 +62,28 @@ def page_model_info_to_page_info(page_model_info, image_dict, page_dict, image_w
     if len(maybe_text_image_blocks) > 0:
         for block in maybe_text_image_blocks:
             should_add_to_text_blocks = False
-
-            if ocr_enable:
-                # 找到与当前block重叠的text spans
-                span_in_block_list = [
-                    span for span in spans
-                    if span['type'] == 'text' and
-                       calculate_overlap_area_in_bbox1_area_ratio(span['bbox'], block['bbox']) > 0.7
-                ]
-
-                if len(span_in_block_list) > 0:
-                    # 计算spans总面积
-                    spans_area = sum(
-                        (span['bbox'][2] - span['bbox'][0]) * (span['bbox'][3] - span['bbox'][1])
-                        for span in span_in_block_list
-                    )
-
-                    # 计算block面积
-                    block_area = (block['bbox'][2] - block['bbox'][0]) * (block['bbox'][3] - block['bbox'][1])
-
-                    # 判断是否符合文本图条件
-                    if block_area > 0 and spans_area / block_area > 0.25:
-                        should_add_to_text_blocks = True
+            # 相信版面结果，图片就是图片，不再尝试转为文本块
+            # if ocr_enable and block.get('original_label') != 'chart':
+            #     # 找到与当前block重叠的text spans
+            #     span_in_block_list = [
+            #         span for span in spans
+            #         if span['type'] == 'text' and
+            #            calculate_overlap_area_in_bbox1_area_ratio(span['bbox'], block['bbox']) > 0.7
+            #     ]
+            #
+            #     if len(span_in_block_list) > 0:
+            #         # 计算spans总面积
+            #         spans_area = sum(
+            #             (span['bbox'][2] - span['bbox'][0]) * (span['bbox'][3] - span['bbox'][1])
+            #             for span in span_in_block_list
+            #         )
+            #
+            #         # 计算block面积
+            #         block_area = (block['bbox'][2] - block['bbox'][0]) * (block['bbox'][3] - block['bbox'][1])
+            #
+            #         # 判断是否符合文本图条件
+            #         if block_area > 0 and spans_area / block_area > 0.25:
+            #             should_add_to_text_blocks = True
 
             # 根据条件决定添加到哪个列表
             if should_add_to_text_blocks:
@@ -152,7 +152,7 @@ def page_model_info_to_page_info(page_model_info, image_dict, page_dict, image_w
     fix_discarded_blocks = fix_discarded_block(discarded_block_with_spans)
 
     """如果当前页面没有有效的bbox则跳过"""
-    if len(all_bboxes) == 0:
+    if len(all_bboxes) == 0 and len(fix_discarded_blocks) == 0:
         return None
 
     """对image/table/interline_equation截图"""
