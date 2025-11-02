@@ -42,6 +42,12 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+test = [
+    "rapid-doc[cpu]",
+    "pytest",
+    "fuzzywuzzy"
+]
+
 cpu = [
     "onnxruntime>=1.18.0",
     "openvino>=2024.6.0",
@@ -57,6 +63,13 @@ api = [
     "fastapi>=0.104.0",
     "uvicorn[standard]>=0.24.0",
     "python-multipart>=0.0.6",
+]
+
+core = [
+    "openvino>=2024.6.0",
+    "onnxruntime-gpu",
+    "torch>=2.6.0,<3",
+    "torchvision",
 ]
 
 [project.urls]

@@ -6,6 +6,27 @@ on:
       - v*
 
 jobs:
+
+  unit-testing:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull latest code
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          architecture: 'x64'
+
+      - name: Display Python version
+        run: python -c "import sys; print(sys.version)"
+
+      - name: Unit testings
+        run: |
+          pip install .[test]
+          pytest tests/unittest/test_e2e.py
+
   build-and-publish:
     runs-on: ubuntu-latest
 
