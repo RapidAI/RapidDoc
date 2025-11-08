@@ -41,13 +41,14 @@ class TorchInferSession(InferSession):
         self.predictor.eval()
 
     def _load_arch_config(self, model_path: Path):
-        all_arch_config = OmegaConf.load(DEFAULT_CFG_PATH)
+        all_cfg = OmegaConf.load(DEFAULT_CFG_PATH)
+        name = model_path.stem.lower().replace("-", "_")
 
-        file_name = model_path.stem
-        if file_name not in all_arch_config:
-            raise ValueError(f"architecture {file_name} is not in arch_config.yaml")
+        for k in all_cfg.keys():
+            if k.lower().replace("-", "_") == name:
+                return all_cfg[k]
 
-        return all_arch_config.get(file_name)
+        raise ValueError(f"architecture {model_path.stem} is not in arch_config.yaml")
 
     def _build_and_load_model(self, arch_config, model_path: Path):
         os.environ['RAPID_FORMULA_DEVICE_MODE'] = self.get_device(self.cfg)

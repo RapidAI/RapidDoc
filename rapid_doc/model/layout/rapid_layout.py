@@ -61,7 +61,7 @@ class RapidLayoutModel(object):
             "formula_number": CategoryId.InterlineEquationNumber_Layout,
             "header_image": CategoryId.Abandon,
             "footer_image": CategoryId.Abandon,
-            "aside_text": CategoryId.Text,
+            "aside_text": CategoryId.Abandon,
         }
 
         # PP-DocLayout_plus-L 20个常见的类别
@@ -84,7 +84,7 @@ class RapidLayoutModel(object):
             "seal": CategoryId.Abandon,
             "chart": CategoryId.ImageBody,
             "formula_number": CategoryId.InterlineEquationNumber_Layout,
-            "aside_text": CategoryId.Text,
+            "aside_text": CategoryId.Abandon,
             "reference_content": CategoryId.Text,
         }
 
@@ -93,15 +93,28 @@ class RapidLayoutModel(object):
 
     def batch_predict(self, images: list, batch_size: int) -> list:
         images_layout_res = []
-        # 把200 DPI缩成144 DPI。（144版面识别效果更好）
-        scale = 144 / 200
-        images = [cv2.resize(img, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA) for img in images]
+        processed_images = []
+        scales = []
 
-        all_results = self.model(img_contents=images, batch_size=batch_size, tqdm_enable=True)
-        for results in all_results:
+        # 判断是否需要缩放到144 DPI
+        for img in images:
+            h, w = img.shape[:2]
+            # 以A4纸200DPI为基准，判断是否太大
+            if max(h, w) > 2200:
+                scale = 144 / 200
+                resized = cv2.resize(img, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
+            else:
+                scale = 1.0
+                resized = img
+            processed_images.append(resized)
+            scales.append(scale)
+
+        all_results = self.model(img_contents=processed_images, batch_size=batch_size, tqdm_enable=True)
+        for img_idx, results in enumerate(all_results):
             layout_res = []
             img, boxes, scores, class_names, elapse = results.img, results.boxes, results.scores, results.class_names, results.elapse
-
+            scale = scales[img_idx]
+            restore_scale = 1.0 / scale
             temp_results = []
             for xyxy, conf, cla in zip(boxes, scores, class_names):
                 xmin, ymin, xmax, ymax = [round(float(p), 2) for p in xyxy]
@@ -126,8 +139,6 @@ class RapidLayoutModel(object):
 
             for item in temp_results:
                 xmin, ymin, xmax, ymax = item["bbox"]
-                # ✅ 还原坐标到200DPI坐标系
-                restore_scale = 200 / 144
                 xmin *= restore_scale
                 ymin *= restore_scale
                 xmax *= restore_scale
@@ -197,6 +208,6 @@ if __name__ == '__main__':
     model = RapidLayout(cfg=cfg)
 
 
-    all_results = model(img_contents=[r"D:\file\text-pdf\d3db971d-15d3-4ab7-b2e0-32078b5616ab.png",])
+    all_results = model(img_contents=[r"reader_order_07.png",])
     print(all_results)
     all_results[0].vis(r"layout_vis.png")

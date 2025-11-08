@@ -164,6 +164,14 @@ def get_ori_image(
             x1, y1, x2, y2 = image.get_pos()
             page_width, page_height = page.get_size()
 
+            width = abs(x2 - x1)
+            height = abs(y2 - y1)
+            # 过滤掉“点状”小图像
+            MIN_IMAGE_WIDTH = 5
+            MIN_IMAGE_HEIGHT = 5
+            if width < MIN_IMAGE_WIDTH or height < MIN_IMAGE_HEIGHT:
+                image.close()
+                continue
             # 转换为左上角原点坐标
             new_x1 = x1
             new_x2 = x2

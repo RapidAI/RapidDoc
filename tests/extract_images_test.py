@@ -55,6 +55,15 @@ def extract_images_with_bbox(
                 x1, y1, x2, y2 = image.get_pos() # PDF 左下角原点坐标
                 page_width, page_height = page.get_size()
 
+                width = abs(x2 - x1)
+                height = abs(y2 - y1)
+                # 过滤掉“点状”小图像
+                MIN_IMAGE_WIDTH = 5
+                MIN_IMAGE_HEIGHT = 5
+                if width < MIN_IMAGE_WIDTH or height < MIN_IMAGE_HEIGHT:
+                    image.close()
+                    continue
+
                 # 转换为左上角原点坐标
                 new_x1 = x1
                 new_x2 = x2
@@ -103,7 +112,7 @@ def extract_images_with_bbox(
 
 if __name__ == "__main__":
     pdf_path =  "D:\\file\\text-pdf\\示例1-论文模板.pdf"
-    output_dir = "./output_images3"
+    output_dir = "./output_images"
     Path(output_dir).mkdir(parents=True, exist_ok=True)
 
     result = extract_images_with_bbox(

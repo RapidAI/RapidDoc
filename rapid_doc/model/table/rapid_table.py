@@ -215,17 +215,6 @@ class RapidTableModel(object):
                 cell_results = (cell_res[0].boxes, cell_res[0].scores)
                 html_code = model_runner(bgr_image, ocr_result, cell_results=cell_results).pred_html
             elif self.model_type == ModelType.UNET_SLANET_PLUS or self.model_type == ModelType.UNET_UNITABLE:
-                # if not cls:
-                #     cls, elasp = self.table_cls(bgr_image)
-                # if cls == "wired":
-                #     html_code = self.wired_table_model(bgr_image, ocr_result).pred_html
-                # else:  # wireless
-                #     html_code = self.wireless_table_model(bgr_image, ocr_result).pred_html
-
-                # wired_html_code = self.wired_table_model(bgr_image, ocr_result).pred_html
-                # wireless_html_code = self.wireless_table_model(bgr_image, ocr_result).pred_html
-                # html_code = select_best_table_model(ocr_result, wired_html_code, wireless_html_code)
-
                 if not cls:
                     cls, elasp = self.table_cls(bgr_image)
                 if cls == "wired":
