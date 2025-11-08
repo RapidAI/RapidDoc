@@ -14,6 +14,7 @@ services:
     environment:
       - TZ=${TIMEZONE:-UTC}
       - GOTENBERG_URL=http://gotenberg:3000
+      #- MINERU_DEVICE_MODE=cuda:0
     restart: always
     depends_on:
       - gotenberg

@@ -1,4 +1,3 @@
-import os
 import sys
 from pathlib import Path
 from typing import Union
@@ -9,7 +8,7 @@ from download_file import DownloadFileInput, DownloadFile
 def read_yaml(file_path: Union[str, Path]) -> DictConfig:
     return OmegaConf.load(file_path)
 
-def default_download(models_pkg, configs_pkg, model_source="default"):
+def default_download(models_pkg, configs_pkg):
     # 获取 models 模块的目录
     model_dir = Path(models_pkg.__path__[0])
     # 获取 configs 模块所在目录
@@ -31,7 +30,33 @@ def default_download(models_pkg, configs_pkg, model_source="default"):
                     sha256=sha256,
                     save_path=save_path,
                 )
-                DownloadFile.run(download_params, model_source)
+                DownloadFile.run(download_params)
+        elif model_name in ['onnxruntime', 'torch', 'openvino']:
+            for name, item_model_info in model_info.items():
+                model_dir_or_path = item_model_info["model_dir_or_path"]
+                sha256 = item_model_info["SHA256"]
+                save_model_path = (
+                        model_dir / Path(model_dir_or_path).name
+                )
+                download_params = DownloadFileInput(
+                    file_url=model_dir_or_path,
+                    sha256=sha256,
+                    save_path=save_model_path,
+                )
+                DownloadFile.run(download_params)
+
+                # 如果有字典文件，下载字典
+                dict_download_url = item_model_info.get("dict_url")
+                if dict_download_url:
+                    dict_path = (model_dir / Path(dict_download_url).name)
+                if dict_download_url and not Path(dict_path).exists():
+                    DownloadFile.run(
+                        DownloadFileInput(
+                            file_url=dict_download_url,
+                            sha256=None,
+                            save_path=dict_path,
+                        )
+                    )
         else:
             model_dir_or_path = model_info["model_dir_or_path"]
             sha256 = model_info["SHA256"]
@@ -44,9 +69,9 @@ def default_download(models_pkg, configs_pkg, model_source="default"):
                 sha256=sha256,
                 save_path=save_model_path,
             )
-            DownloadFile.run(download_params, model_source)
+            DownloadFile.run(download_params)
 
-def ocr_download(models_pkg, configs_pkg, model_source="default"):
+def ocr_download(models_pkg, configs_pkg):
     # 获取 models 模块的目录
     model_dir = Path(models_pkg.__path__[0])
     # 获取 configs 模块所在目录
@@ -70,12 +95,12 @@ def ocr_download(models_pkg, configs_pkg, model_source="default"):
                         sha256=font_sha256,
                         save_path=font_save_model_path,
                     )
-                    DownloadFile.run(download_params, model_source)
+                    DownloadFile.run(download_params)
             else:
                 for version, ocr_info in engin_info.items(): # ocr_info为PP-OCRv4层级
                     for det, det_info in ocr_info.items(): # info为det层级
                         for model_name, model_info in det_info.items():
-                            # 如果又字典文件，下载字典
+                            # 如果有字典文件，下载字典
                             dict_download_url = model_info.get("dict_url")
                             if dict_download_url:
                                 dict_path = (model_dir / Path(dict_download_url).name)
@@ -85,7 +110,7 @@ def ocr_download(models_pkg, configs_pkg, model_source="default"):
                                         file_url=dict_download_url,
                                         sha256=None,
                                         save_path=dict_path,
-                                    ),model_source
+                                    )
                                 )
                             # 下载模型
                             model_path = model_dir / Path(model_info["model_dir"]).name
@@ -94,30 +119,28 @@ def ocr_download(models_pkg, configs_pkg, model_source="default"):
                                 sha256=model_info["SHA256"],
                                 save_path=model_path,
                             )
-                            DownloadFile.run(download_params, model_source)
+                            DownloadFile.run(download_params)
 
 def download_pipeline_models():
     """下载Pipeline模型"""
     try:
-        # 下载模型（默认 default / 全部 all）
-        model_source = os.getenv("MODEL_SOURCE", "default")
         # 下载版面识别模型
         logger.info('开始下载版面识别模型...')
         import rapid_doc.model.layout.rapid_layout_self.models as layout_models_pkg
         import rapid_doc.model.layout.rapid_layout_self.configs as layout_configs_pkg
-        default_download(layout_models_pkg, layout_configs_pkg, model_source)
+        default_download(layout_models_pkg, layout_configs_pkg)
 
         # 下载公式识别模型
         logger.info('开始下载公式识别模型...')
         import rapid_doc.model.formula.rapid_formula_self.models as formula_models_pkg
         import rapid_doc.model.formula.rapid_formula_self.configs as formula_configs_pkg
-        default_download(formula_models_pkg, formula_configs_pkg, model_source)
+        default_download(formula_models_pkg, formula_configs_pkg)
 
         # 下载表格识别模型
         logger.info('开始下载表格识别模型...')
         import rapid_doc.model.table.rapid_table_self.models as table_models_pkg
         import rapid_doc.model.table.rapid_table_self as table_configs_pkg
-        default_download(table_models_pkg, table_configs_pkg, model_source)
+        default_download(table_models_pkg, table_configs_pkg)
 
         # 下载表格分类
         logger.info('开始下载表格分类模型...')
@@ -135,7 +158,7 @@ def download_pipeline_models():
         logger.info('开始下载OCR模型...')
         import rapidocr.models as ocr_models_pkg
         import rapidocr as ocr_configs_pkg
-        ocr_download(ocr_models_pkg, ocr_configs_pkg, model_source)
+        ocr_download(ocr_models_pkg, ocr_configs_pkg)
         logger.info('所有模型下载完成: success download')
         return True
     except Exception as e:
