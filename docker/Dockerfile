@@ -21,12 +21,9 @@ RUN apt-get update && \
 WORKDIR /app
 
 # 安装 Python 依赖
-RUN python3 -m pip install -U 'rapid-doc[cpu]' -i https://mirrors.aliyun.com/pypi/simple --break-system-packages && \
-    python3 -m pip install -U 'rapid-doc[api]' -i https://mirrors.aliyun.com/pypi/simple --break-system-packages && \
-    python3 -m pip cache purge \
-
-#RUN python3 -m pip install rapid-doc[cpu] -i https://mirrors.aliyun.com/pypi/simple --break-system-packages && \
-#    python3 -m pip cache purge
+RUN python3 -m pip install 'rapid-doc[cpu]==0.3.0' -i https://pypi.org/simple --break-system-packages && \
+    python3 -m pip install 'rapid-doc[api]==0.3.0' -i https://pypi.org/simple --break-system-packages && \
+    python3 -m pip cache purge
 
 # 复制配置文件和脚本（优先复制，利用Docker缓存）
 COPY .env.example /app/

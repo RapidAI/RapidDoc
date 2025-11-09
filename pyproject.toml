@@ -54,7 +54,7 @@ cpu = [
 ]
 
 gpu = [
-    "onnxruntime-gpu",
+    "onnxruntime-gpu<=1.23.0",
     "torch>=2.6.0,<3",
     "torchvision",
 ]
