@@ -1,14 +1,15 @@
 # RapidDoc 镜像部署指南
 
+镜像已推送至 [Docker Hub](https://hub.docker.com/r/hzkitty/rapid-doc)
+
 ## 镜像构建
+
+如果需要自己构建镜像
 
 ### 执行构建命令
 
 ```bash
 cd docker
-
-## 下载所有模型文件实现完全离线部署（Dockerfile里如果需要可取消注释）
-#RUN python3 download_models.py
 
 # 1. CPU 模式
 docker build -f Dockerfile -t hzkitty/rapid-doc:0.3.0 .

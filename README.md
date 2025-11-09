@@ -88,7 +88,7 @@ os.environ['MINERU_DEVICE_MODE'] = "cuda:1"
 #### 使用docker部署RapidDoc
 RapidDoc提供了便捷的docker部署方式，这有助于快速搭建环境并解决一些棘手的环境兼容问题。
 
-您可以在文档中获取[Docker部署说明](docker/README.md)。
+您可以在文档中获取 [Docker部署说明](docker/README.md)，镜像已推送至 [Docker Hub](https://hub.docker.com/r/hzkitty/rapid-doc)。
 
 ---
 
