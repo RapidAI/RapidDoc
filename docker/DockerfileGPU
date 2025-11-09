@@ -29,8 +29,8 @@ WORKDIR /app
 
 # 安装 Python 依赖
 RUN python3 -m pip install --upgrade pip setuptools wheel && \
-    python3 -m pip install 'rapid-doc[gpu]==0.3.0' -i https://pypi.org/simple && \
-    python3 -m pip install 'rapid-doc[api]==0.3.0' -i https://pypi.org/simple && \
+    python3 -m pip install 'onnxruntime-gpu==1.23.0' -i https://pypi.org/simple && \
+    python3 -m pip install 'rapid-doc[gpu]==0.3.0' 'rapid-doc[api]==0.3.0' -i https://pypi.org/simple && \
     python3 -m pip cache purge
 
 # 复制配置文件和脚本（优先复制，利用Docker缓存）
