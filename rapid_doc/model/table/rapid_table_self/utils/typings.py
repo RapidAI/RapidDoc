@@ -4,7 +4,7 @@
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Dict, Optional, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
 
@@ -17,16 +17,13 @@ class EngineType(Enum):
     TORCH = "torch"
     OPENVINO = "openvino"
 
-
 class ModelType(Enum):
     SLANETPLUS = "slanet_plus"
     UNITABLE = "unitable"
-    SLANEXT_WIRED = "slanext_wired"
-    SLANEXT_WIRELESS = "slanext_wireless"
     UNET = "unet" # 有线表格unet
     UNET_SLANET_PLUS = "unet_slanet_plus"  # 有线表格使用unet，无线表格使用slanet_plus
     UNET_UNITABLE = "unet_unitable"  # 有线表格使用unet，无线表格使用unitable
-    SLANEXT = "slanext" # 有线表格使用slanext_wired，无线表格使用slanext_wireless
+    PADDLE_CLS = "paddle_cls"
 
 
 @dataclass
@@ -43,29 +40,40 @@ class RapidTableInput:
 
 @dataclass
 class RapidTableOutput:
-    img: Optional[np.ndarray] = None
-    pred_html: Optional[str] = None
-    cell_bboxes: Optional[np.ndarray] = None
-    logic_points: Optional[np.ndarray] = None
-    elapse: Optional[float] = None
+    imgs: List[np.ndarray] = field(default_factory=list)
+    pred_htmls: List[str] = field(default_factory=list)
+    cell_bboxes: List[np.ndarray] = field(default_factory=list)
+    logic_points: List[np.ndarray] = field(default_factory=list)
+    elapse: float = 0.0
 
     def vis(
-        self, save_dir: Union[str, Path, None] = None, save_name: Optional[str] = None
-    ) -> np.ndarray:
+        self,
+        save_dir: Union[str, Path],
+        save_name: str,
+        indexes: Tuple[int, ...] = (0,),
+    ) -> List[np.ndarray]:
         vis = VisTable()
 
+        save_dir = Path(save_dir)
         mkdir(save_dir)
-        save_html_path = Path(save_dir) / f"{save_name}.html"
-        save_drawed_path = Path(save_dir) / f"{save_name}_vis.jpg"
-        save_logic_points_path = Path(save_dir) / f"{save_name}_col_row_vis.jpg"
 
-        vis_img = vis(
-            self.img,
-            self.pred_html,
-            self.cell_bboxes,
-            self.logic_points,
-            save_html_path,
-            save_drawed_path,
-            save_logic_points_path,
-        )
-        return vis_img
+        results = []
+        for idx in indexes:
+            save_one_dir = save_dir / str(idx)
+            mkdir(save_one_dir)
+
+            save_html_path = save_one_dir / f"{save_name}.html"
+            save_drawed_path = save_one_dir / f"{save_name}_vis.jpg"
+            save_logic_points_path = save_one_dir / f"{save_name}_col_row_vis.jpg"
+
+            vis_img = vis(
+                self.imgs[idx],
+                self.pred_htmls[idx],
+                self.cell_bboxes[idx],
+                self.logic_points[idx],
+                save_html_path,
+                save_drawed_path,
+                save_logic_points_path,
+            )
+            results.append(vis_img)
+        return results

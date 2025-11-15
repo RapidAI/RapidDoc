@@ -1,11 +1,26 @@
-import copy
-import math
-from typing import Optional, Dict, Any, Tuple
-
+# Copyright (c) 2020 PaddlePaddle Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 import cv2
 import numpy as np
+from typing import Any, Dict, List, Tuple, Optional
+from ...inference_engine.base import get_engine
+from ...utils.typings import EngineType
+
+import copy
+import math
 from skimage import measure
-from .utils.utils import OrtInferSession, resize_img, OpenVINOInferSession
+from .utils.utils import resize_img
 from .utils.utils_table_line_rec import (
     get_table_line,
     final_adjust_lines,
@@ -19,8 +34,8 @@ from .utils.utils_table_recover import (
 )
 
 
-class TSRUnet:
-    def __init__(self, config: Dict):
+class TSRUnetStructurer:
+    def __init__(self, cfg: Dict):
         self.K = 1000
         self.MK = 4000
         self.mean = np.array([123.675, 116.28, 103.53], dtype=np.float32)
@@ -28,8 +43,11 @@ class TSRUnet:
         self.inp_height = 1024
         self.inp_width = 1024
 
-        self.session = OrtInferSession(config)
-        # self.session = OpenVINOInferSession(config)
+        if cfg["engine_type"] is None:
+            cfg["engine_type"] = EngineType.ONNXRUNTIME
+
+        self.session = get_engine(cfg["engine_type"])(cfg)
+        self.cfg = cfg
 
     def __call__(
         self, img: np.ndarray, **kwargs
@@ -72,7 +90,8 @@ class TSRUnet:
         return {"img": images}
 
     def infer(self, input):
-        result = self.session(input["img"][None, ...])[0][0]
+        # result = self.session(input["img"][None, ...])[0][0]
+        result = self.session(input["img"])[0][0]
         result = result[0].astype(np.uint8)
         return result
 

@@ -40,7 +40,6 @@
 - **表格识别**
   - 基于 [rapid_table_self](rapid_doc/model/table/rapid_table_self) 增强，在原有基础上增强为多模型串联方案：  
     - **表格分类**（区分有线/无线表格）
-    - **SLANeXt** 系列 表结构识别 + 单元格检测
     - **[有线表格识别UNET](https://github.com/RapidAI/TableStructureRec)** + SLANET_plus/UNITABLE（作为无线表格识别）
 
 - **阅读顺序恢复**

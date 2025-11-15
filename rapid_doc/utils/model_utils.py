@@ -20,6 +20,19 @@ def import_package(name, package=None):
     except ModuleNotFoundError:
         return None
 
+def check_openvino():
+    """
+    检查当前环境是否支持 OpenVINO
+    """
+    try:
+        from openvino.runtime import Core
+        core = Core()
+        devices = core.available_devices
+        return bool(devices)
+    except Exception as e:
+        print(f"OpenVINO 可用性检查出错: {e}")
+        return False
+
 def crop_img(input_res, input_img, crop_paste_x=0, crop_paste_y=0):
 
     crop_xmin, crop_ymin = int(input_res['poly'][0]), int(input_res['poly'][1])

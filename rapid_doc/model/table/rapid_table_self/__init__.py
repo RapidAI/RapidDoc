@@ -3,4 +3,3 @@
 # @Contact: liekkaskono@163.com
 from .main import RapidTable, RapidTableInput
 from .utils import EngineType, ModelType, VisTable
-from .utils.typings import EngineType, ModelType, RapidTableInput

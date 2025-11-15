@@ -124,17 +124,17 @@ def ocr_download(models_pkg, configs_pkg):
 def download_pipeline_models():
     """下载Pipeline模型"""
     try:
-        # 下载版面识别模型
-        logger.info('开始下载版面识别模型...')
-        import rapid_doc.model.layout.rapid_layout_self.models as layout_models_pkg
-        import rapid_doc.model.layout.rapid_layout_self.configs as layout_configs_pkg
-        default_download(layout_models_pkg, layout_configs_pkg)
-
-        # 下载公式识别模型
-        logger.info('开始下载公式识别模型...')
-        import rapid_doc.model.formula.rapid_formula_self.models as formula_models_pkg
-        import rapid_doc.model.formula.rapid_formula_self.configs as formula_configs_pkg
-        default_download(formula_models_pkg, formula_configs_pkg)
+        # # 下载版面识别模型
+        # logger.info('开始下载版面识别模型...')
+        # import rapid_doc.model.layout.rapid_layout_self.models as layout_models_pkg
+        # import rapid_doc.model.layout.rapid_layout_self.configs as layout_configs_pkg
+        # default_download(layout_models_pkg, layout_configs_pkg)
+        #
+        # # 下载公式识别模型
+        # logger.info('开始下载公式识别模型...')
+        # import rapid_doc.model.formula.rapid_formula_self.models as formula_models_pkg
+        # import rapid_doc.model.formula.rapid_formula_self.configs as formula_configs_pkg
+        # default_download(formula_models_pkg, formula_configs_pkg)
 
         # 下载表格识别模型
         logger.info('开始下载表格识别模型...')
@@ -142,24 +142,12 @@ def download_pipeline_models():
         import rapid_doc.model.table.rapid_table_self as table_configs_pkg
         default_download(table_models_pkg, table_configs_pkg)
 
-        # 下载表格分类
-        logger.info('开始下载表格分类模型...')
-        from rapid_doc.model.table.rapid_table_self.table_cls.main import KEY_TO_MODEL_URL as TABLE_CLS_KEY_TO_MODEL_URL
-        from rapid_doc.model.table.rapid_table_self.table_cls.utils.download_model import DownloadModel as TABLE_CLS_DownloadModel
-        TABLE_CLS_DownloadModel.download(TABLE_CLS_KEY_TO_MODEL_URL.get('paddle'))
-
-        # 下载有线表格
-        logger.info('开始下载有线表格模型...')
-        from rapid_doc.model.table.rapid_table_self.wired_table_rec.main import KEY_TO_MODEL_URL as UNET_KEY_TO_MODEL_URL
-        from rapid_doc.model.table.rapid_table_self.wired_table_rec.utils.download_model import DownloadModel as UNET_DownloadModel
-        UNET_DownloadModel.download(UNET_KEY_TO_MODEL_URL.get('unet'))
-
-        # 下载OCR模型
-        logger.info('开始下载OCR模型...')
-        import rapidocr.models as ocr_models_pkg
-        import rapidocr as ocr_configs_pkg
-        ocr_download(ocr_models_pkg, ocr_configs_pkg)
-        logger.info('所有模型下载完成: success download')
+        # # 下载OCR模型
+        # logger.info('开始下载OCR模型...')
+        # import rapidocr.models as ocr_models_pkg
+        # import rapidocr as ocr_configs_pkg
+        # ocr_download(ocr_models_pkg, ocr_configs_pkg)
+        # logger.info('所有模型下载完成: success download')
         return True
     except Exception as e:
         logger.error(f'模型下载失败: {e}')

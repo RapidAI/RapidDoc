@@ -25,7 +25,6 @@ class LoadImage:
             raise LoadImageError(
                 f"The img type {type(img)} does not in {InputType.__args__}"
             )
-
         origin_img_type = type(img)
         img = self.load_img(img)
         img = self.convert_img(img, origin_img_type)
@@ -60,10 +59,8 @@ class LoadImage:
     def img_to_ndarray(self, img: Image.Image) -> np.ndarray:
         if img.mode == "1":
             img = img.convert("L")
-            # return np.array(img)
-        # return np.array(img)
-        return cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2BGR)
-
+            return np.array(img)
+        return np.array(img)
 
     def convert_img(self, img: np.ndarray, origin_img_type: Any) -> np.ndarray:
         if img.ndim == 2:

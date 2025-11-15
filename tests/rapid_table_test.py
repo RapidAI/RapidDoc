@@ -30,7 +30,7 @@ img_path = r"https://raw.githubusercontent.com/RapidAI/RapidTable/refs/heads/mai
 ocr_engine = RapidOCR(params=default_params)
 
 input_args = RapidTableInput(
-    model_type=ModelType.SLANETPLUS,
+    model_type=ModelType.UNET,
     # engine_type=TableEngineType.OPENVINO
 )
 table_engine = RapidTable(input_args)

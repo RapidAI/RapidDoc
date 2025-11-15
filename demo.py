@@ -23,7 +23,7 @@ from rapid_doc.backend.pipeline.model_json_to_middle_json import result_to_middl
 from rapidocr import EngineType as OCREngineType, OCRVersion, ModelType as OCRModelType
 from rapid_doc.model.layout.rapid_layout_self import ModelType as LayoutModelType
 from rapid_doc.model.formula.rapid_formula_self import ModelType as FormulaModelType, EngineType as FormulaEngineType
-from rapid_doc.model.table.rapid_table_self import ModelType as TableModelType
+from rapid_doc.model.table.rapid_table_self import ModelType as TableModelType, EngineType as TableEngineType
 
 
 def do_parse(
@@ -88,7 +88,6 @@ def do_parse(
 
         # "model_type": TableModelType.UNET_SLANET_PLUS,  # （默认） 有线表格使用unet，无线表格使用slanet_plus
         # "model_type": TableModelType.UNET_UNITABLE, # 有线表格使用unet，无线表格使用unitable
-        # "model_type": TableModelType.SLANEXT,  # 有线表格使用slanext_wired，无线表格使用slanext_wireless
         # "model_type": TableModelType.UNITABLE,
         # "model_dir_or_path": "", #单个模型使用。如SLANET_PLUS、UNITABLE
 
@@ -99,10 +98,7 @@ def do_parse(
         # "unitable.model_dir_or_path": "", # UNITABLE表格模型地址
         # "slanet_plus.model_dir_or_path": "", # SLANET_PLUS表格模型地址
 
-        # "wired_cell.model_dir_or_path": "", # 有线单元格模型地址，配置SLANEXT时使用
-        # "wireless_cell.model_dir_or_path": "", # 无线单元格模型地址，配置SLANEXT时使用
-        # "wired_table.model_dir_or_path": "", # 有线表结构模型地址，配置SLANEXT时使用
-        # "wireless_table.model_dir_or_path": "", # 无线表结构模型地址，配置SLANEXT时使用,
+        # "engine_type": TableEngineType.ONNXRUNTIME,  # 统一设置推理引擎
     }
 
     checkbox_config = {
@@ -225,8 +221,9 @@ if __name__ == '__main__':
     output_dir = os.path.join(__dir__, "output")
 
     doc_path_list = [
+        "demo/pdfs/示例1-论文模板.pdf",
         "demo/pdfs/比亚迪财报.pdf",
-        "demo/images/table_04.png",
+        "demo/images/table_05.png",
     ]
     for doc_path in doc_path_list:
         start_time = time.time()

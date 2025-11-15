@@ -12,6 +12,9 @@ def count_table_cells_physical(html_code):
     return td_count + th_count
 
 def select_best_table_model(ocr_result, wired_html_code, wireless_html_code):
+    wired_html_code = wired_html_code or ""
+    wireless_html_code = wireless_html_code or ""
+
     wired_len = count_table_cells_physical(wired_html_code)
     wireless_len = count_table_cells_physical(wireless_html_code)
     # 计算两种模型检测的单元格数量差异

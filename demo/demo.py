@@ -85,7 +85,6 @@ def do_parse(
 
         # "model_type": TableModelType.UNET_SLANET_PLUS,  # （默认） 有线表格使用unet，无线表格使用slanet_plus
         # "model_type": TableModelType.UNET_UNITABLE, # 有线表格使用unet，无线表格使用unitable
-        # "model_type": TableModelType.SLANEXT,  # 有线表格使用slanext_wired，无线表格使用slanext_wireless
 
         # "model_dir_or_path": "", #单个模型使用。如SLANET_PLUS、UNITABLE
 
@@ -96,10 +95,7 @@ def do_parse(
         # "unitable.model_dir_or_path": "", # UNITABLE表格模型地址
         # "slanet_plus.model_dir_or_path": "", # SLANET_PLUS表格模型地址
 
-        # "wired_cell.model_dir_or_path": "", # 有线单元格模型地址，配置SLANEXT时使用
-        # "wireless_cell.model_dir_or_path": "", # 无线单元格模型地址，配置SLANEXT时使用
-        # "wired_table.model_dir_or_path": "", # 有线表结构模型地址，配置SLANEXT时使用
-        # "wireless_table.model_dir_or_path": "", # 无线表结构模型地址，配置SLANEXT时使用,
+        # "engine_type": TableEngineType.ONNXRUNTIME,  # 统一设置推理引擎
     }
 
     checkbox_config = {

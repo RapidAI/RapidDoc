@@ -1,4 +1,5 @@
 from rapid_doc.model.ocr.ocr_patch import apply_ocr_patch
+
 # 应用所有 OCR 相关补丁
 apply_ocr_patch()
 
@@ -12,6 +13,7 @@ from rapidocr.ch_ppocr_rec import TextRecInput, TextRecOutput
 from tqdm import tqdm
 
 from rapid_doc.utils.config_reader import get_device
+from rapid_doc.utils.model_utils import check_openvino
 from rapid_doc.utils.ocr_utils import check_img, preprocess_image, sorted_boxes, merge_det_boxes, update_det_boxes, get_rotate_crop_image
 import warnings
 
@@ -43,7 +45,7 @@ class RapidOcrModel(object):
         engine_type = ocr_config.get('engine_type') if ocr_config else None
 
         # CPU 上优先使用 OpenVINO（如果可用且用户未指定 engine_type）
-        if device.startswith('cpu') and self.check_openvino() and not engine_type:
+        if device.startswith('cpu') and check_openvino() and not engine_type:
             default_params["Det.engine_type"] = EngineType.OPENVINO
             default_params["Rec.engine_type"] = EngineType.OPENVINO
             default_params["Cls.engine_type"] = EngineType.OPENVINO
@@ -75,19 +77,6 @@ class RapidOcrModel(object):
         self.text_detector = self.ocr_engine.text_det
         self.text_recognizer = self.ocr_engine.text_rec
         self.rec_batch_num = self.text_recognizer.rec_batch_num
-
-    def check_openvino(self):
-        """
-        检查当前环境是否支持 OpenVINO
-        """
-        try:
-            from openvino.runtime import Core
-            core = Core()
-            devices = core.available_devices
-            return bool(devices)
-        except Exception as e:
-            print(f"OpenVINO 可用性检查出错: {e}")
-            return False
 
     def ocr(self,
             img,

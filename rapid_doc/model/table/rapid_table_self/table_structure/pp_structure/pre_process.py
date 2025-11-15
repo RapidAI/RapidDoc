@@ -8,25 +8,33 @@ import numpy as np
 
 
 class TablePreprocess:
-    def __init__(self, model_type):
-        if "slanext" in model_type.value.lower():
-            self.max_len = 512
-        else:
-            self.max_len = 488
+    def __init__(self, max_len: int = 488):
+        self.max_len = max_len
 
         self.std = np.array([0.229, 0.224, 0.225])
         self.mean = np.array([0.485, 0.456, 0.406])
         self.scale = 1 / 255.0
 
-    def __call__(self, img: np.ndarray) -> Tuple[np.ndarray, List[float]]:
-        img, shape_list = self.resize_image(img)
-        img = self.normalize(img)
-        img, shape_list = self.pad_img(img, shape_list)
-        img = self.to_chw(img)
+    def __call__(
+        self, img_list: List[np.ndarray]
+    ) -> Tuple[List[np.ndarray], np.ndarray]:
+        if isinstance(img_list, np.ndarray):
+            img_list = [img_list]
 
-        img = np.expand_dims(img, axis=0)
-        shape_list = np.expand_dims(shape_list, axis=0)
-        return img, shape_list
+        processed_imgs, shape_lists = [], []
+        for img in img_list:
+            if img is None:
+                continue
+
+            img_processed, shape_list = self.resize_image(img)
+            img_processed = self.normalize(img_processed)
+            img_processed, shape_list = self.pad_img(img_processed, shape_list)
+            img_processed = self.to_chw(img_processed)
+
+            processed_imgs.append(img_processed)
+            shape_lists.append(shape_list)
+
+        return processed_imgs, np.array(shape_lists)
 
     def resize_image(self, img: np.ndarray) -> Tuple[np.ndarray, List[float]]:
         h, w = img.shape[:2]

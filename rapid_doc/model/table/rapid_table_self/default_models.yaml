@@ -10,14 +10,6 @@ slanet_plus:
   model_dir_or_path: https://www.modelscope.cn/models/RapidAI/RapidTable/resolve/v2.0.0/slanet-plus.onnx
   SHA256: d57a942af6a2f57d6a4a0372573c696a2379bf5857c45e2ac69993f3b334514b
 
-slanext_wired:
-  model_dir_or_path: https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/v1.0.0/table/SLANeXt_wired/slanext_wired.onnx
-  SHA256: 05db289f095d4f2b88bf666bae6f56f4371fcc3d643e51dd194fb1416f986563
-
-slanext_wireless:
-  model_dir_or_path: https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/v1.0.0/table/SLANeXt_wireless/slanext_wireless.onnx
-  SHA256: e9174b59f1ec98f9b95713ed523e706d0edf59c40057763a694b55e83c6d5b1a
-
 unitable:
   model_dir_or_path: https://www.modelscope.cn/models/RapidAI/RapidTable/resolve/v2.0.0/unitable
   SHA256:
@@ -25,3 +17,10 @@ unitable:
     decoder.pth: fa342ef3de259576a01a5545ede804208ef35a124935e30df4768e6708dcb6cb
     vocab.json: 05037d02c48d106639bc90284aa847e5e2151d4746b3f5efe1628599efbd668a
 
+unet:
+  model_dir_or_path: https://www.modelscope.cn/models/RapidAI/RapidTable/resolve/master/unet.onnx
+  SHA256: 0ea48d3a17e35ef5c2e498a5e799566073234d39b1079ca21d9f4fafe73c6d20
+
+paddle_cls:
+  model_dir_or_path: https://www.modelscope.cn/models/RapidAI/RapidTable/resolve/master/table_cls/paddle_cls.onnx
+  SHA256: 21c801f0c403cf960f9f1ccaecf506585b3b98421208033755b9e67cd2371492
