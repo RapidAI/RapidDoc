@@ -1,3 +1,7 @@
+from rapid_doc.model.ocr.ocr_patch import apply_ocr_patch
+# 应用所有 OCR 相关补丁
+apply_ocr_patch()
+
 import time
 import cv2
 import copy
@@ -5,21 +9,11 @@ import numpy as np
 from loguru import logger
 from rapidocr import RapidOCR, EngineType, OCRVersion, ModelType
 from rapidocr.ch_ppocr_rec import TextRecInput, TextRecOutput
-from rapidocr.ch_ppocr_det import TextDetector
-from rapidocr.ch_ppocr_det.utils import DetPreProcess
 from tqdm import tqdm
 
 from rapid_doc.utils.config_reader import get_device
 from rapid_doc.utils.ocr_utils import check_img, preprocess_image, sorted_boxes, merge_det_boxes, update_det_boxes, get_rotate_crop_image
 import warnings
-
-# 定义新的方法实现
-def new_get_preprocess(self, max_wh: int) -> DetPreProcess:
-    limit_side_len = self.limit_side_len
-    return DetPreProcess(limit_side_len, self.limit_type, self.mean, self.std)
-
-# 绑定到类上，覆盖原方法
-TextDetector.get_preprocess = new_get_preprocess
 
 class RapidOcrModel(object):
     def __init__(self, det_db_box_thresh=0.3, lang=None, ocr_config=None, use_dilation=True, det_db_unclip_ratio=1.8, enable_merge_det_boxes=True):
