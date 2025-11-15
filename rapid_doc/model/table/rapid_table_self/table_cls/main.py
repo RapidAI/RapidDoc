@@ -7,7 +7,7 @@ import cv2
 import numpy as np
 
 from .utils.download_model import DownloadModel
-from .utils.utils import InputType, LoadImage, OrtInferSession
+from .utils.utils import InputType, LoadImage, OrtInferSession, OpenVINOInferSession
 
 
 class ModelType(Enum):
@@ -61,6 +61,7 @@ class TableCls:
 class PaddleCls:
     def __init__(self, model_path):
         self.table_cls = OrtInferSession(model_path)
+        # self.table_cls = OpenVINOInferSession(model_path)
         self.inp_h = 224
         self.inp_w = 224
         self.resize_short = 256

@@ -1,7 +1,7 @@
 import pypdfium2 as pdfium
 
 # 打开 PDF 文件
-pdf = pdfium.PdfDocument("D:\\file\\text-pdf\\示例1-论文模板.pdf")
+pdf = pdfium.PdfDocument(r"D:\file\text-pdf\a-practical-guide-to-building-agents.pdf")
 
 # 遍历每一页
 for i in range(len(pdf)):

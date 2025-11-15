@@ -209,7 +209,10 @@ class BatchAnalyze:
                 _lang = ocr_res_list_dict['lang']
                 for res in ocr_res_list_dict['ocr_res_list']:
                     # 仅当整页OCR未启用时，判断是否跳过
+                    ocr_enable = ocr_res_list_dict['ocr_enable']
                     if not ocr_res_list_dict['ocr_enable']:
+                        if res.get('need_ocr_det'):
+                            ocr_enable = True
                         if (
                                 self.use_det_mode == 'txt' or
                                 (self.use_det_mode != 'ocr' and not ocr_res_list_dict['ocr_enable'] and not res.get('need_ocr_det'))
@@ -229,7 +232,7 @@ class BatchAnalyze:
                     bgr_image = cv2.cvtColor(new_image, cv2.COLOR_RGB2BGR)
 
                     all_cropped_images_info.append((
-                        bgr_image, useful_list, ocr_res_list_dict, res, adjusted_mfdetrec_res, _lang
+                        bgr_image, useful_list, ocr_res_list_dict, res, adjusted_mfdetrec_res, _lang, ocr_enable
                     ))
 
             # 按语言分组
@@ -286,7 +289,7 @@ class BatchAnalyze:
 
                     # 处理批处理结果
                     for crop_info, (dt_boxes, _) in zip(group_crops, batch_results):
-                        bgr_image, useful_list, ocr_res_list_dict, res, adjusted_mfdetrec_res, _lang = crop_info
+                        bgr_image, useful_list, ocr_res_list_dict, res, adjusted_mfdetrec_res, _lang, ocr_enable = crop_info
 
                         if dt_boxes is not None and len(dt_boxes) > 0:
                             # 处理检测框
@@ -301,7 +304,7 @@ class BatchAnalyze:
                             if dt_boxes_final:
                                 ocr_res = [box.tolist() if hasattr(box, 'tolist') else box for box in dt_boxes_final]
                                 ocr_result_list = get_ocr_result_list(
-                                    ocr_res, useful_list, ocr_res_list_dict['ocr_enable'], bgr_image, _lang, res['original_label']
+                                    ocr_res, useful_list, ocr_enable, bgr_image, _lang, res['original_label']
                                 )
 
                                 ocr_res_list_dict['layout_res'].extend(ocr_result_list)
@@ -320,7 +323,10 @@ class BatchAnalyze:
                 )
                 for res in ocr_res_list_dict['ocr_res_list']:
                     # 仅当整页OCR未启用时，判断是否跳过
+                    ocr_enable = ocr_res_list_dict['ocr_enable']
                     if not ocr_res_list_dict['ocr_enable']:
+                        if res.get('need_ocr_det'):
+                            ocr_enable = True
                         if (
                                 self.use_det_mode == 'txt' or
                                 (self.use_det_mode != 'ocr' and not ocr_res_list_dict['ocr_enable'] and not res.get('need_ocr_det'))
@@ -344,7 +350,7 @@ class BatchAnalyze:
                     # Integration results
                     if ocr_res:
                         ocr_result_list = get_ocr_result_list(
-                            ocr_res, useful_list, ocr_res_list_dict['ocr_enable'],bgr_image, _lang, res['original_label']
+                            ocr_res, useful_list, ocr_enable, bgr_image, _lang, res['original_label']
                         )
                         ocr_res_list_dict['layout_res'].extend(ocr_result_list)
 

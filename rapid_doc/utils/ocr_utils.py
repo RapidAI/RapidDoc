@@ -1,5 +1,7 @@
 # Copyright (c) Opendatalab. All rights reserved.
 import copy
+import math
+
 import cv2
 import numpy as np
 
@@ -92,6 +94,11 @@ def alpha_to_color(img, alpha_color=(255, 255, 255)):
 def preprocess_image(_image):
     alpha_color = (255, 255, 255)
     _image = alpha_to_color(_image, alpha_color)
+
+    # OCR预处理优化
+    # gray = cv2.cvtColor(_image, cv2.COLOR_BGR2GRAY)
+    # _, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    # _image = cv2.cvtColor(binary, cv2.COLOR_GRAY2BGR)
     return _image
 
 
@@ -334,8 +341,27 @@ def get_adjusted_mfdetrec_res(single_page_mfdetrec_res, useful_list, return_text
             adjusted_mfdetrec_res.append(return_res)
     return adjusted_mfdetrec_res
 
+def is_mostly_tilted(ocr_res, threshold=1.0):
+    """分析 OCR 检测框是否整体倾斜"""
+    angles = []
+    for poly in ocr_res:
+        p0, p1 = poly[0], poly[1]
+        dx = p1[0] - p0[0]
+        dy = p1[1] - p0[1]
+        angle_deg = abs(math.degrees(math.atan2(dy, dx))) % 180
+        angles.append(round(angle_deg, 2))
+    if not angles:
+        return False
+    # 取平均角度而不是众数
+    avg_angle = sum(angles) / len(angles)
+    avg_angle = round(avg_angle, 2)
+    mostly_tilted = abs(avg_angle) > threshold and abs(avg_angle - 180) > threshold
+    return mostly_tilted
 
 def get_ocr_result_list(ocr_res, useful_list, ocr_enable, bgr_image, lang, original_label):
+    if not ocr_enable and is_mostly_tilted(ocr_res):
+        # 非ocr时，如果文字倾斜，则强制走ocr
+        ocr_enable = True
     paste_x, paste_y, xmin, ymin, xmax, ymax, new_width, new_height = useful_list
     ocr_result_list = []
     ori_im = bgr_image.copy()

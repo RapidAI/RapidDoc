@@ -5,7 +5,7 @@ from typing import Optional, Dict, Any, Tuple
 import cv2
 import numpy as np
 from skimage import measure
-from .utils.utils import OrtInferSession, resize_img
+from .utils.utils import OrtInferSession, resize_img, OpenVINOInferSession
 from .utils.utils_table_line_rec import (
     get_table_line,
     final_adjust_lines,
@@ -29,6 +29,7 @@ class TSRUnet:
         self.inp_width = 1024
 
         self.session = OrtInferSession(config)
+        # self.session = OpenVINOInferSession(config)
 
     def __call__(
         self, img: np.ndarray, **kwargs

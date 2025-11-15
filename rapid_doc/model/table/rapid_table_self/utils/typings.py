@@ -15,6 +15,7 @@ from .vis import VisTable
 class EngineType(Enum):
     ONNXRUNTIME = "onnxruntime"
     TORCH = "torch"
+    OPENVINO = "openvino"
 
 
 class ModelType(Enum):
