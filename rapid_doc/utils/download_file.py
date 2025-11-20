@@ -59,8 +59,12 @@ class DownloadFile:
 
     @classmethod
     def run(cls, input_params: DownloadFileInput):
-
-        default_model = GPU_MODEL if device_mode.startswith('cuda') else CPU_MODEL
+        if device_mode.startswith('cuda') or device_mode.startswith('npu'):
+            default_model = GPU_MODEL
+        elif device_mode == 'all':
+            default_model = set(GPU_MODEL + CPU_MODEL)
+        else:
+            default_model = CPU_MODEL
         if not any(k in input_params.file_url for k in default_model):
             return
 

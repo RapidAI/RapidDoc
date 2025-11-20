@@ -1,7 +1,14 @@
+import os
 import time
+from pathlib import Path
 
 from rapid_doc.model.formula.rapid_formula_self import ModelType, RapidFormula, RapidFormulaInput, EngineType
 from rapid_doc.utils.config_reader import get_device
+from rapid_doc.model.formula.rapid_formula_self.model_handler import ModelProcessor
+models_dir = os.getenv('MINERU_MODELS_DIR', None)
+if models_dir:
+    # 从指定的文件夹内寻找模型文件
+    ModelProcessor.DEFAULT_MODEL_DIR = Path(models_dir)
 
 class RapidFormulaModel(object):
     def __init__(self, formula_config=None):
@@ -11,6 +18,12 @@ class RapidFormulaModel(object):
         if device.startswith('cuda'):
             device_id = int(device.split(':')[1]) if ':' in device else 0  # GPU 编号
             engine_cfg = {'use_cuda': True, "gpu_id": device_id}
+            cfg.engine_cfg = engine_cfg
+            cfg.model_type = ModelType.PP_FORMULANET_PLUS_M
+            cfg.engine_type = EngineType.TORCH
+        elif device.startswith('npu'):
+            device_id = int(device.split(':')[1]) if ':' in device else 0  # npu 编号
+            engine_cfg = {'use_npu': True, "npu_id": device_id}
             cfg.engine_cfg = engine_cfg
             cfg.model_type = ModelType.PP_FORMULANET_PLUS_M
             cfg.engine_type = EngineType.TORCH

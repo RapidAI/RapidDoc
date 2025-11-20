@@ -14,11 +14,7 @@ logger = Logger(logger_name=__name__).get_log()
 
 class InferSession(ABC):
     cur_dir = Path(__file__).resolve().parent.parent
-    MODEL_URL_PATH = cur_dir / "configs" / "default_models.yaml"
     ENGINE_CFG_PATH = cur_dir / "configs" / "engine_cfg.yaml"
-
-    model_info = OmegaConf.load(MODEL_URL_PATH)
-    DEFAULT_MODEL_PATH = cur_dir / "models"
 
     engine_cfg = OmegaConf.load(ENGINE_CFG_PATH)
 

@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Dict
 
 from ..utils.download_file import DownloadFile, DownloadFileInput
 from ..utils.logger import Logger
@@ -38,25 +37,3 @@ class ModelProcessor:
         DownloadFile.run(download_params)
 
         return str(save_model_path)
-
-    @classmethod
-    def get_multi_models_dict(cls, model_type: ModelType) -> Dict[str, str]:
-        model_info = cls.model_map[model_type.value]
-
-        results = {}
-
-        model_root_dir = model_info["model_dir_or_path"]
-        save_model_dir = cls.DEFAULT_MODEL_DIR / Path(model_root_dir).name
-        for file_name, sha256 in model_info["SHA256"].items():
-            save_path = save_model_dir / file_name
-
-            download_params = DownloadFileInput(
-                file_url=f"{model_root_dir}/{file_name}",
-                sha256=sha256,
-                save_path=save_path,
-                logger=cls.logger,
-            )
-            DownloadFile.run(download_params)
-            results[Path(file_name).stem] = str(save_path)
-
-        return results

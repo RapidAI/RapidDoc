@@ -9,7 +9,8 @@ from pathlib import Path
 # os.environ['MINERU_DEVICE_MODE'] = "cuda"
 # # 或指定 GPU 编号，例如使用第二块 GPU（cuda:1）
 # os.environ['MINERU_DEVICE_MODE'] = "cuda:1"
-
+# # 模型文件存储目录
+# os.environ['MINERU_MODELS_DIR'] = r'D:\CodeProjects\doc\RapidAI\models' #模型文件存储目录，如果不设置会默认下载到rapid_doc项目里面
 from loguru import logger
 
 from rapid_doc.cli.common import convert_pdf_bytes_to_bytes_by_pypdfium2, prepare_env, read_fn

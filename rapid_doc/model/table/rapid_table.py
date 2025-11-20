@@ -1,7 +1,8 @@
-import html
-
+import os
 import cv2
+import html
 import numpy as np
+from pathlib import Path
 from loguru import logger
 
 from rapid_doc.backend.pipeline.pipeline_middle_json_mkcontent import inline_left_delimiter, inline_right_delimiter
@@ -12,7 +13,11 @@ from rapid_doc.utils.boxbase import is_in
 from rapid_doc.utils.config_reader import get_device
 from rapid_doc.utils.model_utils import check_openvino
 from rapid_doc.utils.ocr_utils import points_to_bbox, bbox_to_points
-
+from rapid_doc.model.table.rapid_table_self.model_processor.main import ModelProcessor
+models_dir = os.getenv('MINERU_MODELS_DIR', None)
+if models_dir:
+    # 从指定的文件夹内寻找模型文件
+    ModelProcessor.DEFAULT_MODEL_DIR = Path(models_dir)
 
 def escape_html(input_string):
     """Escape HTML Entities."""
@@ -28,6 +33,9 @@ class RapidTableModel(object):
         if device.startswith('cuda'):
             device_id = int(device.split(':')[1]) if ':' in device else 0  # GPU 编号
             engine_cfg = {'use_cuda': True, "cuda_ep_cfg.device_id": device_id}
+        elif device.startswith('npu'):
+            device_id = int(device.split(':')[1]) if ':' in device else 0  # npu 编号
+            engine_cfg = {'use_cann': True, "cann_ep_cfg.device_id": device_id}
         engine_cfg = engine_cfg or {}
         self.model_type = table_config.get("model_type", ModelType.UNET_SLANET_PLUS)
         self.ocr_engine = ocr_engine
@@ -41,35 +49,35 @@ class RapidTableModel(object):
         if self.model_type == ModelType.UNET_SLANET_PLUS:
             cls_input_args = RapidTableInput(model_type=ModelType.PADDLE_CLS, engine_type=self.engine_type,
                                             model_dir_or_path=table_config.get("paddle_cls.model_dir_or_path"),
-                                            engine_cfg=engine_cfg, )
+                                            engine_cfg=engine_cfg, use_ocr=False)
             self.table_cls = TableCls(cls_input_args)
             wired_input_args = RapidTableInput(model_type=ModelType.UNET, engine_type=self.engine_type,
                                                model_dir_or_path=table_config.get("unet.model_dir_or_path"),
-                                               engine_cfg=engine_cfg, )
+                                               engine_cfg=engine_cfg, use_ocr=False)
             self.wired_table_model = RapidTable(wired_input_args)
             wireless_input_args = RapidTableInput(model_type=ModelType.SLANETPLUS, engine_type=self.engine_type,
                                                   model_dir_or_path=table_config.get("slanet_plus.model_dir_or_path"),
-                                                  engine_cfg=engine_cfg, )
+                                                  engine_cfg=engine_cfg, use_ocr=False)
             self.wireless_table_model = RapidTable(wireless_input_args)
         elif self.model_type == ModelType.UNET_UNITABLE:
             cls_input_args = RapidTableInput(model_type=ModelType.PADDLE_CLS, engine_type=self.engine_type,
                                             model_dir_or_path=table_config.get("paddle_cls.model_dir_or_path"),
-                                            engine_cfg=engine_cfg, )
+                                            engine_cfg=engine_cfg, use_ocr=False)
             self.table_cls = TableCls(cls_input_args)
             wired_input_args = RapidTableInput(model_type=ModelType.UNET, engine_type=self.engine_type,
                                                model_dir_or_path=table_config.get("unet.model_dir_or_path"),
-                                               engine_cfg=engine_cfg, )
+                                               engine_cfg=engine_cfg, use_ocr=False)
             self.wired_table_model = RapidTable(wired_input_args)
             wireless_input_args = RapidTableInput(model_type=ModelType.UNITABLE, engine_type=EngineType.TORCH,
                                                   model_dir_or_path=table_config.get("unitable.model_dir_or_path"),
-                                                  engine_cfg=engine_cfg, )
+                                                  engine_cfg=engine_cfg, use_ocr=False)
             self.wireless_table_model = RapidTable(wireless_input_args)
         else:
             if self.model_type == ModelType.UNITABLE:
                 self.engine_type = EngineType.TORCH
             input_args = RapidTableInput(model_type=self.model_type, engine_type=self.engine_type,
                                          model_dir_or_path=table_config.get("model_dir_or_path"),
-                                         engine_cfg=engine_cfg,)
+                                         engine_cfg=engine_cfg, use_ocr=False)
             self.table_model = RapidTable(input_args)
 
     def predict(self, image, ocr_result=None, fill_image_res=None, mfd_res=None, skip_text_in_image=True, use_img2table=False):

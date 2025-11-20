@@ -18,6 +18,15 @@ def doc_analyze(
 )
 ```
 在mineru参数基础上新增了layout_config、ocr_config、formula_config、table_config、checkbox_config参数
+
+#### 0、环境变量
+```bash
+# 用于指定推理设备。支持cpu/cuda/cuda:0/npu等设备类型
+os.environ['MINERU_DEVICE_MODE'] = "cpu"
+
+# 模型文件存储目录。如果不设置会默认下载到rapid_doc项目里面
+os.environ['MINERU_MODELS_DIR'] = r'D:\CodeProjects\doc\RapidAI\models'
+```
 #### 1、使用gpu推理
 ```bash
 # 在安装完 rapid_doc 之后，卸载 cpu 版的 onnxruntime

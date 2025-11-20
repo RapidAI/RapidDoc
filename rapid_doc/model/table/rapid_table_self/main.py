@@ -106,12 +106,6 @@ class RapidTable:
                 pred_structures, cell_bboxes = self.table_structure(imgs)
                 logic_points = self.table_matcher.decode_logic_points(pred_structures)
 
-                if not self.cfg.use_ocr:
-                    results.imgs.extend(imgs)
-                    results.cell_bboxes.extend(cell_bboxes)
-                    results.logic_points.extend(logic_points)
-                    continue
-
                 dt_boxes, rec_res = self.get_ocr_results(imgs, start_i, end_i, ocr_results)
                 pred_htmls = self.table_matcher(
                     pred_structures, cell_bboxes, dt_boxes, rec_res
@@ -154,6 +148,9 @@ class RapidTable:
                 dt_boxes, rec_res = format_ocr_results(ocr_result, img_h, img_w)
                 batch_dt_boxes.append(dt_boxes)
                 batch_rec_res.append(rec_res)
+            return batch_dt_boxes, batch_rec_res
+
+        if not self.cfg.use_ocr:
             return batch_dt_boxes, batch_rec_res
 
         for img in tqdm(imgs, desc="OCR"):

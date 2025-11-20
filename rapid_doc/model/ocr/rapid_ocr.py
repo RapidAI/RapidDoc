@@ -3,10 +3,13 @@ from rapid_doc.model.ocr.ocr_patch import apply_ocr_patch
 # 应用所有 OCR 相关补丁
 apply_ocr_patch()
 
-import time
+import os
 import cv2
 import copy
+import time
+import warnings
 import numpy as np
+from pathlib import Path
 from loguru import logger
 from rapidocr import RapidOCR, EngineType, OCRVersion, ModelType
 from rapidocr.ch_ppocr_rec import TextRecInput, TextRecOutput
@@ -15,7 +18,11 @@ from tqdm import tqdm
 from rapid_doc.utils.config_reader import get_device
 from rapid_doc.utils.model_utils import check_openvino
 from rapid_doc.utils.ocr_utils import check_img, preprocess_image, sorted_boxes, merge_det_boxes, update_det_boxes, get_rotate_crop_image
-import warnings
+from rapidocr.inference_engine.base import InferSession
+models_dir = os.getenv('MINERU_MODELS_DIR', None)
+if models_dir:
+    # 从指定的文件夹内寻找模型文件
+    InferSession.DEFAULT_MODEL_PATH = Path(models_dir)
 
 class RapidOcrModel(object):
     def __init__(self, det_db_box_thresh=0.3, lang=None, ocr_config=None, use_dilation=True, det_db_unclip_ratio=1.8, enable_merge_det_boxes=True):
@@ -48,7 +55,9 @@ class RapidOcrModel(object):
         if device.startswith('cpu') and check_openvino() and not engine_type:
             default_params["Det.engine_type"] = EngineType.OPENVINO
             default_params["Rec.engine_type"] = EngineType.OPENVINO
-            default_params["Cls.engine_type"] = EngineType.OPENVINO
+        if engine_type == EngineType.TORCH:
+            default_params["Det.engine_type"] = EngineType.TORCH
+            default_params["Rec.engine_type"] = EngineType.TORCH
 
         # 如果传入了 ocr_config，则覆盖参数
         if ocr_config is not None:
@@ -61,16 +70,18 @@ class RapidOcrModel(object):
                 default_params["Det.engine_type"] = EngineType.TORCH
                 default_params["Rec.engine_type"] = EngineType.TORCH
             gpu_id = int(device.split(':')[1]) if ':' in device else 0 # GPU 编号
-            if default_params.get('Det.engine_type') == EngineType.ONNXRUNTIME:
-                default_params['EngineConfig.onnxruntime.use_cuda'] = True
-                default_params['EngineConfig.onnxruntime.cuda_ep_cfg.device_id'] = gpu_id
-                # default_params['EngineConfig.onnxruntime.cuda_ep_cfg.cudnn_conv_algo_search'] = "DEFAULT"
-            elif default_params.get('Det.engine_type') == EngineType.TORCH:
+            if default_params.get('Det.engine_type') == EngineType.TORCH:
                 default_params['EngineConfig.torch.use_cuda'] = True
                 default_params['EngineConfig.torch.gpu_id'] = gpu_id
-            elif default_params.get('Det.engine_type') == EngineType.PADDLE:
-                default_params['EngineConfig.paddle.use_cuda'] = True
-                default_params['EngineConfig.paddle.gpu_id'] = gpu_id
+        elif device.startswith('npu'):
+            if not engine_type:
+                # npu 环境默认使用 torch
+                default_params["Det.engine_type"] = EngineType.TORCH
+                default_params["Rec.engine_type"] = EngineType.TORCH
+            npu_id = int(device.split(':')[1]) if ':' in device else 0  # npu 编号
+            if default_params.get('Det.engine_type') == EngineType.TORCH:
+                default_params['EngineConfig.torch.use_npu'] = True
+                default_params['EngineConfig.torch.npu_id'] = npu_id
         default_params.pop('engine_type', None)
         default_params.pop('use_det_mode', None)
         self.ocr_engine = RapidOCR(params=default_params)

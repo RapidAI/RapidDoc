@@ -1,9 +1,16 @@
+import os
 import cv2
+from pathlib import Path
 
 from rapid_doc.model.layout.rapid_layout_self import ModelType, RapidLayout, RapidLayoutInput
 from rapid_doc.model.layout.rapid_layout_self.utils.typings import PP_DOCLAYOUT_PLUS_L_Threshold, PP_DOCLAYOUT_L_Threshold
 from rapid_doc.utils.config_reader import get_device
 from rapid_doc.utils.enum_class import CategoryId
+from rapid_doc.model.layout.rapid_layout_self.model_handler import ModelProcessor
+models_dir = os.getenv('MINERU_MODELS_DIR', None)
+if models_dir:
+    # 从指定的文件夹内寻找模型文件
+    ModelProcessor.DEFAULT_MODEL_DIR = Path(models_dir)
 
 class RapidLayoutModel(object):
     def __init__(self, layout_config=None):
@@ -14,7 +21,10 @@ class RapidLayoutModel(object):
             device_id = int(device.split(':')[1]) if ':' in device else 0  # GPU 编号
             engine_cfg = {'use_cuda': True, "cuda_ep_cfg.device_id": device_id}
             cfg.engine_cfg = engine_cfg
-
+        elif device.startswith('npu'):
+            device_id = int(device.split(':')[1]) if ':' in device else 0  # npu 编号
+            engine_cfg = {'use_cann': True, "cann_ep_cfg.device_id": device_id}
+            cfg.engine_cfg = engine_cfg
         # 如果传入了 layout_config，则用传入配置覆盖默认配置
         if layout_config is not None:
             if not layout_config.get("conf_thresh"):
@@ -32,6 +42,7 @@ class RapidLayoutModel(object):
                 if hasattr(cfg, key):
                     setattr(cfg, key, value)
                     setattr(cfg, key, value)
+
         self.model = RapidLayout(cfg=cfg)
         self.model_type = cfg.model_type
         self.doclayout_yolo_list = ['title', 'plain text', 'abandon', 'figure', 'figure_caption', 'table', 'table_caption', 'table_footnote', 'isolate_formula', 'formula_caption',

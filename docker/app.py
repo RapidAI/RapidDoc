@@ -88,7 +88,7 @@ def _convert_value_to_enum(config):
         return config
     from rapidocr import EngineType as OCREngineType, OCRVersion, ModelType as OCRModelType, LangDet, LangRec
     from rapid_doc.model.layout.rapid_layout_self import ModelType as LayoutModelType
-    from rapid_doc.model.formula.rapid_formula_self import ModelType as FormulaModelType
+    from rapid_doc.model.formula.rapid_formula_self import ModelType as FormulaModelType, EngineType as FormulaEngineType
     from rapid_doc.model.table.rapid_table_self import ModelType as TableModelType
 
     # 可识别的枚举类映射表（可扩展）
@@ -100,6 +100,7 @@ def _convert_value_to_enum(config):
         "LangRec": LangRec,
         "LayoutModelType": LayoutModelType,
         "FormulaModelType": FormulaModelType,
+        "FormulaEngineType": FormulaEngineType,
         "TableModelType": TableModelType,
     }
 
