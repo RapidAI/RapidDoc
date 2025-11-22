@@ -12,7 +12,6 @@ from rapid_doc.utils import PyPDFium2Parser
 from rapid_doc.data.data_reader_writer import FileBasedDataWriter
 from rapid_doc.utils.draw_bbox import draw_layout_bbox, draw_span_bbox, draw_line_sort_bbox
 from rapid_doc.utils.enum_class import MakeMode
-from rapid_doc.utils.guess_suffix_or_lang import guess_suffix_by_bytes
 from rapid_doc.utils.pdf_image_tools import images_bytes_to_pdf_bytes
 from rapid_doc.utils.pdf_page_id import get_end_page_id
 
@@ -26,7 +25,7 @@ def read_fn(path):
         path = Path(path)
     with open(str(path), "rb") as input_file:
         file_bytes = input_file.read()
-        file_suffix = guess_suffix_by_bytes(file_bytes, path)
+        file_suffix = path.suffix[1:].lower()
         if file_suffix in image_suffixes:
             return images_bytes_to_pdf_bytes(file_bytes)
         elif file_suffix in pdf_suffixes:

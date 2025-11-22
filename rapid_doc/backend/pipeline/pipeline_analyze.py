@@ -216,8 +216,12 @@ def batch_image_analyze(
             ) from e
 
     if str(device).startswith('npu') or str(device).startswith('cuda'):
-        vram = get_vram(device)
-        if vram is not None:
+        if str(device).startswith('npu'):
+            # onnxruntime-cann要在torch-npu之前初始化
+            vram = int(os.getenv('MINERU_VIRTUAL_VRAM_SIZE', -1))
+        else:
+            vram = get_vram(device)
+        if vram is not None and vram > 0:
             gpu_memory = int(os.getenv('MINERU_VIRTUAL_VRAM_SIZE', round(vram)))
             if gpu_memory >= 16:
                 batch_ratio = 16

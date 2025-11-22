@@ -38,7 +38,7 @@ dependencies = [
     "shapely>=2.0.7,<3",
     "tokenizers>=0.13.2",
     "rapidocr>=3.1.0,<=3.4.2",
-    "magika>=0.6.2,<0.7.0",
+#    "magika>=0.6.2,<0.7.0",
 ]
 
 [project.optional-dependencies]
@@ -67,8 +67,21 @@ api = [
 
 core = [
     "openvino>=2024.6.0",
-    "onnxruntime-gpu",
+    "onnxruntime-gpu<=1.23.0",
     "torch>=2.6.0,<3",
+    "torchvision",
+]
+
+npu = [
+    "decorator",
+    "attrs",
+    "psutil",
+    "cloudpickle",
+    "ml-dtypes",
+    "tornado",
+    "onnxruntime-cann==1.22.0",
+    "torch==2.5.1",
+    "torch-npu==2.5.1",
     "torchvision",
 ]
 

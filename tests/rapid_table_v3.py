@@ -32,7 +32,7 @@ table_engine = RapidTable(input_args)
 
 img_paths = [
     "https://raw.githubusercontent.com/RapidAI/RapidTable/refs/heads/main/tests/test_files/table.jpg",
-    'table_05.png'
+    # 'table_05.png'
     ]
 ocr_results_list = []
 for img in img_paths:

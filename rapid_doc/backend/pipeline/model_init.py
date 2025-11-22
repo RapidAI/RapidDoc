@@ -1,5 +1,3 @@
-import os
-
 from loguru import logger
 
 from .model_list import AtomicModel
@@ -124,6 +122,13 @@ class MineruPipelineModel:
         )
         atom_model_manager = AtomModelSingleton()
 
+        # 初始化layout模型
+        self.layout_model = atom_model_manager.get_atom_model(
+            atom_model_name=AtomicModel.Layout,
+            device=self.device,
+            layout_config=self.layout_config,
+        )
+
         if self.apply_formula:
             # 初始化公式解析模型
             self.formula_model = atom_model_manager.get_atom_model(
@@ -132,12 +137,6 @@ class MineruPipelineModel:
                 formula_config=self.formula_config,
             )
 
-        # 初始化layout模型
-        self.layout_model = atom_model_manager.get_atom_model(
-            atom_model_name=AtomicModel.Layout,
-            device=self.device,
-            layout_config=self.layout_config,
-        )
         # 初始化ocr
         self.ocr_model = atom_model_manager.get_atom_model(
             atom_model_name=AtomicModel.OCR,
