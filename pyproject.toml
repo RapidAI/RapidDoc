@@ -73,12 +73,10 @@ core = [
 ]
 
 npu = [
+    "numpy>=1.21.6,<2",
     "decorator",
     "attrs",
     "psutil",
-    "cloudpickle",
-    "ml-dtypes",
-    "tornado",
     "onnxruntime-cann==1.22.0",
     "torch==2.5.1",
     "torch-npu==2.5.1",
