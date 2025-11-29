@@ -19,10 +19,12 @@ from rapid_doc.utils.config_reader import get_device
 from rapid_doc.utils.model_utils import check_openvino
 from rapid_doc.utils.ocr_utils import check_img, preprocess_image, sorted_boxes, merge_det_boxes, update_det_boxes, get_rotate_crop_image
 from rapidocr.inference_engine.base import InferSession
-models_dir = os.getenv('MINERU_MODELS_DIR', None)
+models_dir = os.getenv('RAPID_MODELS_DIR', None)
 if models_dir:
     # 从指定的文件夹内寻找模型文件
     InferSession.DEFAULT_MODEL_PATH = Path(models_dir)
+    from rapidocr.ch_ppocr_rec import main as rec_main
+    rec_main.DEFAULT_MODEL_PATH = Path(models_dir)
 
 class RapidOcrModel(object):
     def __init__(self, det_db_box_thresh=0.3, lang=None, ocr_config=None, use_dilation=True, det_db_unclip_ratio=1.8, enable_merge_det_boxes=True):

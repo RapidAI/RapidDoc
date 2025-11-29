@@ -6,6 +6,7 @@ from ..inference_engine.base import InferSession
 from ..utils.logger import Logger
 from ..utils.typings import RapidLayoutInput, RapidLayoutOutput
 from .pp_doclayout import PPDocLayoutModelHandler
+from .doc_layout import DocLayoutModelHandler
 
 
 class ModelHandler:
@@ -21,6 +22,13 @@ class ModelHandler:
             return PPDocLayoutModelHandler(
                 session.characters, cfg.conf_thresh, cfg.iou_thresh, session, cfg.model_type
             )
+
+        if model_type.startswith("doclayout"):
+            return DocLayoutModelHandler(
+                session.characters, cfg.conf_thresh, cfg.iou_thresh, session
+            )
+
+        raise ValueError(f"{model_type.value} is not supported!")
 
     def __call__(self, img_list: List[np.ndarray]) -> List[RapidLayoutOutput]:
         return self.model_processors(img_list)

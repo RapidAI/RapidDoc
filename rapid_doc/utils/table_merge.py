@@ -1,8 +1,8 @@
 # Copyright (c) Opendatalab. All rights reserved.
 
-from loguru import logger
 from bs4 import BeautifulSoup
 
+from rapid_doc.backend.pipeline.pipeline_middle_json_mkcontent import merge_para_with_text
 from rapid_doc.utils.enum_class import BlockType, SplitFlag
 
 

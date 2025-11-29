@@ -1,8 +1,6 @@
-import os
 import cv2
 import html
 import numpy as np
-from pathlib import Path
 from loguru import logger
 
 from rapid_doc.backend.pipeline.pipeline_middle_json_mkcontent import inline_left_delimiter, inline_right_delimiter
@@ -13,11 +11,6 @@ from rapid_doc.utils.boxbase import is_in
 from rapid_doc.utils.config_reader import get_device
 from rapid_doc.utils.model_utils import check_openvino
 from rapid_doc.utils.ocr_utils import points_to_bbox, bbox_to_points
-from rapid_doc.model.table.rapid_table_self.model_processor.main import ModelProcessor
-models_dir = os.getenv('MINERU_MODELS_DIR', None)
-if models_dir:
-    # 从指定的文件夹内寻找模型文件
-    ModelProcessor.DEFAULT_MODEL_DIR = Path(models_dir)
 
 def escape_html(input_string):
     """Escape HTML Entities."""

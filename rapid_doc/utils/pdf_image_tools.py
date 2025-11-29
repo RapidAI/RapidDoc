@@ -20,6 +20,7 @@ from rapid_doc.utils import PyPDFium2Parser
 from rapid_doc.utils.boxbase import calculate_iou
 
 from concurrent.futures import ProcessPoolExecutor, TimeoutError as FuturesTimeoutError
+import multiprocessing
 
 
 def pdf_page_to_image(page: pdfium.PdfPage, dpi=200, image_type=ImageType.PIL) -> dict:
@@ -74,8 +75,13 @@ def load_images_from_pdf(
         TimeoutError: 当转换超时时抛出
     """
     pdf_doc = pdfium.PdfDocument(pdf_bytes)
-    if is_windows_environment():
-        # Windows 环境下不使用多进程
+
+    concurrency_enabled = os.getenv('MINERU_PDF_CONCURRENCY_ENABLED', 'true')
+    # 检测是否为 Windows 环境
+    # 检测是否为守护进程 (Daemon) Celery 的 worker 进程通常是 daemon，无法再创建子进程
+    if (concurrency_enabled.lower() not in ['true', '1', 'yes'] or
+            is_windows_environment() or multiprocessing.current_process().daemon):
+        # 不使用多进程
         return load_images_from_pdf_core(
             pdf_bytes,
             dpi,

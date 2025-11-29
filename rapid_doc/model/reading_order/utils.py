@@ -123,49 +123,101 @@ def remove_overlap_blocks(
     return bboxes, dropped_boxes
 
 
-def visualize_reading_order(blocks: List[Dict[str, Any]], image_path: str = "layout_res_out.png", figsize=(12, 16)):
-    """
-    可视化阅读顺序
+from typing import Optional, Tuple
 
-    参数:
-        blocks: 带有阅读顺序的区块列表
-        image_path: 输出图像路径
-        figsize: 图像大小
-    """
-    if not blocks:
-        print("No blocks to visualize")
-        return
+import cv2
+import numpy as np
 
-    # 计算页面大小
-    max_x = max([block["bbox"][2] for block in blocks])
-    max_y = max([block["bbox"][3] for block in blocks])
+class VisReadOrder:
+    @classmethod
+    def draw_order(
+        cls,
+        image: np.ndarray,
+        boxes: Optional[np.ndarray],
+        order_indexes: Optional[np.ndarray],
+        mask_alpha=0.3,
+    ) -> Optional[np.ndarray]:
+        if boxes is None or order_indexes is None:
+            return None
 
-    # 创建图像
-    fig, ax = plt.subplots(figsize=figsize)
-    ax.set_xlim(0, max_x)
-    ax.set_ylim(max_y, 0)  # 反转y轴，使得原点在左上角
+        det_img = image.copy()
 
-    # 绘制每个区块
-    for block in blocks:
-        x1, y1, x2, y2 = block["bbox"]
-        width = x2 - x1
-        height = y2 - y1
+        img_height, img_width = image.shape[:2]
+        font_size = min([img_height, img_width]) * 0.0006
+        text_thickness = int(min([img_height, img_width]) * 0.001)
 
-        # 获取区块颜色
-        color = "white"
+        det_img = cls.draw_masks(det_img, boxes, mask_alpha)
 
-        # 绘制矩形
-        rect = patches.Rectangle((x1, y1), width, height, linewidth=1,
-                                 edgecolor="black", facecolor=color, alpha=0.5)
-        ax.add_patch(rect)
+        for box, order_index in zip(boxes, order_indexes):
+            color = cls.get_color()
 
-        # 添加标签和阅读顺序
-        ax.text(x1 + width / 2, y1 + height / 2,
-                f"{block['reading_order']}\n{block['label']}",
-                ha="center", va="center", fontsize=8)
+            cls.draw_box(det_img, box, color)
+            caption = f"{order_index}"
+            cls.draw_text(det_img, caption, box, color, font_size, text_thickness)
 
-    # 保存图像
-    plt.title("Document Reading Order Visualization")
-    plt.savefig(image_path, dpi=300, bbox_inches="tight")
-    plt.close()
-    print(f"Visualization saved to {image_path}")
+        return det_img
+
+    @staticmethod
+    def draw_box(
+        image: np.ndarray,
+        box: np.ndarray,
+        color: Tuple[int, int, int] = (0, 0, 255),
+        thickness: int = 2,
+    ) -> np.ndarray:
+        x1, y1, x2, y2 = box.astype(int)
+        return cv2.rectangle(image, (x1, y1), (x2, y2), color, thickness)
+
+    @staticmethod
+    def draw_text(
+        image: np.ndarray,
+        text: str,
+        box: np.ndarray,
+        color: Tuple[int, int, int] = (0, 0, 255),
+        font_size: float = 0.001,
+        text_thickness: int = 2,
+    ) -> np.ndarray:
+        x1, y1, x2, y2 = box.astype(int)
+        (tw, th), _ = cv2.getTextSize(
+            text=text,
+            fontFace=cv2.FONT_HERSHEY_SIMPLEX,
+            fontScale=font_size,
+            thickness=text_thickness,
+        )
+        th = int(th * 1.2)
+
+        cv2.rectangle(image, (x1, y1), (x1 + tw, y1 - th), color, -1)
+
+        return cv2.putText(
+            image,
+            text,
+            (x1, y1),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            font_size,
+            (255, 255, 255),
+            text_thickness,
+            cv2.LINE_AA,
+        )
+
+    @classmethod
+    def draw_masks(
+        cls,
+        image: np.ndarray,
+        boxes: np.ndarray,
+        mask_alpha: float = 0.3,
+    ) -> np.ndarray:
+        mask_img = image.copy()
+        for box in boxes:
+            color = cls.get_color()
+            x1, y1, x2, y2 = box.astype(int)
+            cv2.rectangle(mask_img, (x1, y1), (x2, y2), color, -1)
+
+        return cv2.addWeighted(mask_img, mask_alpha, image, 1 - mask_alpha, 0)
+
+    @staticmethod
+    def get_color():
+        colors = (
+            np.random.randint(0, 255),
+            np.random.randint(0, 255),
+            np.random.randint(0, 255),
+        )
+        return colors

@@ -14,7 +14,7 @@
 from __future__ import annotations
 
 import copy
-from typing import List, Dict, Any, Union
+from typing import List, Union
 import numpy as np
 from rapid_doc.model.reading_order.layout_parsing.setting import BLOCK_SETTINGS, REGION_SETTINGS
 from rapid_doc.model.reading_order.layout_parsing.utils import get_sub_regions_ocr_res, get_bbox_intersection, \
@@ -26,7 +26,6 @@ from rapid_doc.model.reading_order.layout_parsing.setting import BLOCK_LABEL_MAP
 from rapid_doc.model.reading_order.layout_parsing.utils import update_region_box, caculate_bbox_area, \
     remove_overlap_blocks
 from rapid_doc.model.reading_order.layout_parsing.xycut_enhanced import xycut_enhanced
-from rapid_doc.model.reading_order.utils import visualize_reading_order
 
 
 def sort_layout_parsing_blocks(
@@ -506,21 +505,40 @@ def get_layout_parsing_res(
 
 if __name__ == '__main__':
 
-    cfg = RapidLayoutInput(model_type=ModelType.PP_DOCLAYOUT_PLUS_L, conf_thresh=0.4)
+    def get_overall_ocr_res(img):
+
+        from rapidocr import RapidOCR
+        from rapid_doc.utils.ocr_utils import points_to_bbox
+
+        ocr_engine = RapidOCR()
+        ori_ocr_res = ocr_engine(img, use_cls=False, use_rec=False)
+
+        # rec_texts = ori_ocr_res.txts
+        rec_texts = ["test_txt"] * len(ori_ocr_res.boxes)
+        rec_boxes = [points_to_bbox(pts) for pts in ori_ocr_res.boxes]
+        rec_scores = ori_ocr_res.scores
+
+        rec_polys = ori_ocr_res.boxes.tolist()
+        dt_polys = rec_polys
+        rec_labels = ["text"] * len(ori_ocr_res.boxes)
+
+        # use_region_detection
+        overall_ocr_res = {
+            'rec_labels': rec_labels,
+            'rec_texts': rec_texts,
+            'rec_boxes': np.array(rec_boxes, dtype=np.float32),
+            'rec_polys': rec_polys,
+            'rec_scores': rec_scores,
+            'dt_polys': dt_polys,
+        }
+        return overall_ocr_res
+
+    cfg = RapidLayoutInput(model_type=ModelType.PP_DOCLAYOUT_PLUS_L)
     model = RapidLayout(cfg=cfg)
-    all_results = model(img_contents=[r'13a3fa7b-80b6-4b51-9978-e1ec84988ef1.png'])
-    data_list = [list(map(float, box)) for box in all_results[0].boxes]
-    # use_region_detection
-    import pickle
-    with open(r"C:\ocr\models\ppmodel\layout\PP-DocLayout_plus-L\overall_ocr_res_v2.pkl", 'rb') as f:
-        overall_ocr_res1 = pickle.load(f)
 
-    def keep_rec_fields_dict(data: dict):
-        keep_keys = {"rec_labels", "rec_texts", "rec_boxes", "rec_polys", "rec_scores", "dt_polys"}
-        return {k: v for k, v in data.items() if k in keep_keys}
-
-
-    overall_ocr_res = keep_rec_fields_dict(overall_ocr_res1)
+    img_path= r"C:\ocr\img\c1c47001-30ba-4fa8-b9ff-6a16b12d008f.png"
+    all_results = model(img_contents=[img_path])
+    # all_results[0].vis(r"453897009-46be64ca-3adb-471c-a43d-0226fee10f73_vis.png")
 
     result = all_results[0]
     print(all_results)
@@ -535,32 +553,27 @@ if __name__ == '__main__':
 
     layout_det_res = {'boxes': layout_det_res}
     region_det_res = {'boxes': []}
+    overall_ocr_res = get_overall_ocr_res(all_results[0].img)
 
     parsing_res_list = get_layout_parsing_res(
         all_results[0].img,
-        # region_det_res=single_img_res['region_det_res'],
-        # layout_det_res=single_img_res['layout_det_res'],
         region_det_res=region_det_res,
         layout_det_res=layout_det_res,
         overall_ocr_res=overall_ocr_res,
     )
 
-    index = 1
-    for block in parsing_res_list:
-        if block.label in BLOCK_LABEL_MAP["visualize_index_labels"]:
-            block.order_index = index
-            index += 1
+    index_to_order = {parsing_res.index: order for order, parsing_res in enumerate(parsing_res_list)}
+    for i, block in enumerate(layout_det_res['boxes']):
+        block['index'] = index_to_order.get(i, len(layout_det_res))
 
-    sorted_data: List[Dict[str, Any]] = []
-    for order, parsing_res in enumerate(parsing_res_list):
-        sorted_data.append({
-                "bbox": parsing_res.bbox,
-                "reading_order": order,
-                "label": "text"
-            })
+    # 可视化阅读顺序
+    from rapid_doc.model.reading_order.utils import VisReadOrder
+    from rapid_doc.model.layout.rapid_layout_self.utils.utils import save_img
 
-    print("=== 阅读顺序排序结果 ===")
-    for item in sorted_data:
-        print(f"顺序: {item['reading_order']}, 标签: {item['label']}, 边界框: {item['bbox']}")
-
-    visualize_reading_order(sorted_data)
+    indexes = [box["index"] for box in layout_det_res["boxes"]]
+    vis_img = VisReadOrder.draw_order(
+        all_results[0].img,
+        np.array(all_results[0].boxes),
+        np.array(indexes),
+    )
+    save_img("layout_res_out_v3.png", vis_img)

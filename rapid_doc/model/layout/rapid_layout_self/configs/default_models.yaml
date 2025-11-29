@@ -14,6 +14,10 @@ pp_doclayout_s:
   model_dir_or_path: https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/v1.0.0/layout/PP-DocLayout-S/pp_doclayout_s.onnx
   SHA256: 0ae97252feb0d64ee2c70ee0449ec9de4b08140056f32ce3c725c16ca50142e4
 
+doclayout_docstructbench:
+  model_dir_or_path: https://www.modelscope.cn/models/RapidAI/RapidLayout/resolve/v1.0.0/onnx/doclayout/doclayout_yolo_docstructbench_imgsz1024.onnx
+  SHA256: 3b452baef10ecabd615491bc82cc4d49475fbc2cd7a8e535044f2c6bb28fb9fe
+
 rt_detr_l_wired_table_cell_det:
   model_dir_or_path: https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/v1.0.0/table/RT-DETR-L_wired_table_cell_det/rt_detr_l_wired_table_cell_det.onnx
   SHA256: d0996593ce241ecc4ea08811a858a2ac1a7e438e3260f98562010fd8efc6951e

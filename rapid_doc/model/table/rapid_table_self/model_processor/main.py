@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 # @Author: SWHL
 # @Contact: liekkaskono@163.com
+import os
 from pathlib import Path
 from typing import Dict, Union
 
@@ -14,7 +15,7 @@ class ModelProcessor:
     root_dir = cur_dir.parent
     DEFAULT_MODEL_PATH = root_dir / "default_models.yaml"
 
-    DEFAULT_MODEL_DIR = root_dir / "models"
+    DEFAULT_MODEL_DIR = Path(os.getenv('RAPID_MODELS_DIR', root_dir / "models"))
     mkdir(DEFAULT_MODEL_DIR)
 
     model_map = read_yaml(DEFAULT_MODEL_PATH)

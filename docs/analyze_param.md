@@ -25,7 +25,7 @@ def doc_analyze(
 os.environ['MINERU_DEVICE_MODE'] = "cpu"
 
 # 模型文件存储目录。如果不设置会默认下载到rapid_doc项目里面
-os.environ['MINERU_MODELS_DIR'] = r'D:\CodeProjects\doc\RapidAI\models'
+os.environ['RAPID_MODELS_DIR'] = r'D:\CodeProjects\doc\RapidAI\models'
 ```
 #### 1、使用gpu推理
 ```bash
@@ -99,13 +99,14 @@ ocr_config = {
 
 #### 4、formula_config 公式识别参数说明如下：
 
-|  参数名   |  说明   |         默认值          |                备注                 |
-| :-------: |:-----:|:--------------------:|:---------------------------------:|
-| model_type |  模型   | PP_FORMULANET_PLUS_M |                                   |
-| engine_type  | 推理引擎 | ONNXRUNTIME（cpu）、TORCH（gpu） |  torch仅支持PP_FORMULANET_PLUS_M模型   |
-| formula_level  |  公式识别等级   |          0           | 公式识别等级，默认为0，全识别。1:仅识别行间公式，行内公式不识别 |
-| batch_num | 批处理大小 |          1           |                                   |
-| model_dir_or_path | 模型路径  |         None         |                                   |
+|  参数名   |    说明    |         默认值          |                备注                 |
+| :-------: |:--------:|:--------------------:|:---------------------------------:|
+| model_type |    模型    | PP_FORMULANET_PLUS_M |                                   |
+| engine_type  |   推理引擎   | ONNXRUNTIME（cpu）、TORCH（gpu） |  torch仅支持PP_FORMULANET_PLUS_M模型   |
+| formula_level  |  公式识别等级  |          0           | 公式识别等级，默认为0，全识别。1:仅识别行间公式，行内公式不识别 |
+| batch_num |  批处理大小   |          1           |                                   |
+| model_dir_or_path |   模型路径   |         None         |                 不设置自动下载                  |
+| dict_keys_path | yml字典路径  |         None         |         torch推理使用，不设置自动下载         |
 示例：
 
 ```python

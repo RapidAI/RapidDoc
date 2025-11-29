@@ -1,14 +1,7 @@
-import os
 import time
-from pathlib import Path
 
 from rapid_doc.model.formula.rapid_formula_self import ModelType, RapidFormula, RapidFormulaInput, EngineType
 from rapid_doc.utils.config_reader import get_device
-from rapid_doc.model.formula.rapid_formula_self.model_handler import ModelProcessor
-models_dir = os.getenv('MINERU_MODELS_DIR', None)
-if models_dir:
-    # 从指定的文件夹内寻找模型文件
-    ModelProcessor.DEFAULT_MODEL_DIR = Path(models_dir)
 
 class RapidFormulaModel(object):
     def __init__(self, formula_config=None):

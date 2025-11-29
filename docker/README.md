@@ -72,4 +72,4 @@ curl -X POST "http://localhost:8888/parse" \
 |--------|--------|------|
 | `STARTUP_WAIT_TIME` | `15` | 启动等待时间（秒） |
 | `LOG_LEVEL` | `INFO` | 日志级别 |
-| `MINERU_MODELS_DIR` | `/app/models` | 模型文件存储目录 |
+| `RAPID_MODELS_DIR` | `/app/models` | 模型文件存储目录 |

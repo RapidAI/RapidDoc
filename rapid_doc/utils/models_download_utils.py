@@ -131,7 +131,7 @@ def ocr_download(mineru_models_dir, models_pkg, configs_pkg):
 def download_pipeline_models():
     """下载Pipeline模型"""
     try:
-        mineru_models_dir = os.getenv('MINERU_MODELS_DIR', None)
+        mineru_models_dir = os.getenv('RAPID_MODELS_DIR', None)
 
         # 下载版面识别模型
         logger.info('开始下载版面识别模型...')
@@ -163,7 +163,7 @@ def download_pipeline_models():
         return False
 
 if __name__ == '__main__':
-    # os.environ['MINERU_MODELS_DIR'] = r'D:\CodeProjects\doc\RapidAI\models' #模型文件存储目录，如果不设置会默认下载到rapid_doc项目里面
+    # os.environ['RAPID_MODELS_DIR'] = r'D:\CodeProjects\doc\RapidAI\models' #模型文件存储目录，如果不设置会默认下载到rapid_doc项目里面
     os.environ["MINERU_DEVICE_MODE"] = "cpu" # cpu、cuda、npu、all（all只是用来下载）
     success = download_pipeline_models()
     sys.exit(0 if success else 1)

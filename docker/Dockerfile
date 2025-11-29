@@ -43,7 +43,7 @@ ENV API_PORT=8888
 ENV STARTUP_WAIT_TIME=15
 ENV LOG_LEVEL=INFO
 ENV MINERU_DEVICE_MODE=cpu
-ENV MINERU_MODELS_DIR=/app/models
+ENV RAPID_MODELS_DIR=/app/models
 # 下载默认模型文件实现离线部署
 RUN python3 download_models.py
 

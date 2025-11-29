@@ -1,16 +1,10 @@
-import os
 import cv2
-from pathlib import Path
 
 from rapid_doc.model.layout.rapid_layout_self import ModelType, RapidLayout, RapidLayoutInput
-from rapid_doc.model.layout.rapid_layout_self.utils.typings import PP_DOCLAYOUT_PLUS_L_Threshold, PP_DOCLAYOUT_L_Threshold
+from rapid_doc.model.layout.rapid_layout_self.utils.typings import PP_DOCLAYOUT_PLUS_L_Threshold, \
+    PP_DOCLAYOUT_L_Threshold
 from rapid_doc.utils.config_reader import get_device
 from rapid_doc.utils.enum_class import CategoryId
-from rapid_doc.model.layout.rapid_layout_self.model_handler import ModelProcessor
-models_dir = os.getenv('MINERU_MODELS_DIR', None)
-if models_dir:
-    # 从指定的文件夹内寻找模型文件
-    ModelProcessor.DEFAULT_MODEL_DIR = Path(models_dir)
 
 class RapidLayoutModel(object):
     def __init__(self, layout_config=None):
@@ -25,8 +19,12 @@ class RapidLayoutModel(object):
             device_id = int(device.split(':')[1]) if ':' in device else 0  # npu 编号
             engine_cfg = {'use_cann': True, "cann_ep_cfg.device_id": device_id}
             cfg.engine_cfg = engine_cfg
+            cfg.model_type = ModelType.DOCLAYOUT_DOCSTRUCTBENCH
+            cfg.conf_thresh = 0.2
         # 如果传入了 layout_config，则用传入配置覆盖默认配置
         if layout_config is not None:
+            if layout_config.get("model_type"):
+                cfg.model_type = layout_config.get("model_type")
             if not layout_config.get("conf_thresh"):
                 if cfg.model_type == ModelType.PP_DOCLAYOUT_PLUS_L:
                     # PP-DocLayout_plus-L 默认阈值
@@ -36,6 +34,9 @@ class RapidLayoutModel(object):
                     cfg.conf_thresh = PP_DOCLAYOUT_L_Threshold
                 elif cfg.model_type == ModelType.PP_DOCLAYOUT_S:
                     # S可能存在部分漏检，自动调低阈值
+                    cfg.conf_thresh = 0.2
+                elif cfg.model_type == ModelType.DOCLAYOUT_DOCSTRUCTBENCH:
+                    # 可能存在部分漏检，自动调低阈值
                     cfg.conf_thresh = 0.2
             # 遍历字典，把传入配置设置到 default_cfg 对象中
             for key, value in layout_config.items():
@@ -132,6 +133,11 @@ class RapidLayoutModel(object):
                 # xmin, ymin, xmax, ymax = [p for p in xyxy]
                 if self.model_type == ModelType.PP_DOCLAYOUT_PLUS_L:
                     category_id = self.category_plus_mapping[cla]
+                elif self.model_type == ModelType.DOCLAYOUT_DOCSTRUCTBENCH:
+                    if cla == 'isolate_formula':
+                        category_id = 14
+                    else:
+                        category_id = self.doclayout_yolo_list.index(cla)
                 else:
                     category_id = self.category_dict[cla]
                 # 如果是表格/图片，边界适当扩展（DocLayout模型识别的边框坐标，稍微有一点不全）

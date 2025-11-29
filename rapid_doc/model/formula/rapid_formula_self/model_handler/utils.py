@@ -1,8 +1,5 @@
+import os
 from pathlib import Path
-from typing import Dict
-
-import cv2
-import numpy as np
 
 from ..utils.download_file import DownloadFile, DownloadFileInput
 from ..utils.logger import Logger
@@ -17,7 +14,7 @@ class ModelProcessor:
     root_dir = cur_dir.parent
     DEFAULT_MODEL_PATH = root_dir / "configs" / "default_models.yaml"
 
-    DEFAULT_MODEL_DIR = root_dir / "models"
+    DEFAULT_MODEL_DIR = Path(os.getenv('RAPID_MODELS_DIR', root_dir / "models"))
     mkdir(DEFAULT_MODEL_DIR)
 
     model_map = read_yaml(DEFAULT_MODEL_PATH)

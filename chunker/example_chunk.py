@@ -1,8 +1,8 @@
 import os
 from pathlib import Path
 
-from chunk.text_splitters import MarkdownTextSplitter
-from chunk.get_bbox_page_fast import get_bbox_for_chunk, get_blocks_from_middle
+from chunker.text_splitters import MarkdownTextSplitter
+from chunker.get_bbox_page_fast import get_bbox_for_chunk, get_blocks_from_middle
 from rapid_doc.cli.common import convert_pdf_bytes_to_bytes_by_pypdfium2, prepare_env, read_fn
 from rapid_doc.data.data_reader_writer import FileBasedDataWriter
 from rapid_doc.utils.enum_class import MakeMode

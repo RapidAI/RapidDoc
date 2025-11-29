@@ -26,6 +26,7 @@ class EngineType(Enum):
 class RapidFormulaInput:
     model_type: ModelType = ModelType.PP_FORMULANET_PLUS_M
     model_dir_or_path: Union[str, Path, None] = None
+    dict_keys_path: Union[str, Path, None] = None #yml字典路径（torch使用）
 
     engine_type: EngineType = EngineType.ONNXRUNTIME
     engine_cfg: dict = field(default_factory=dict)

@@ -3,7 +3,7 @@ import time
 from rapidfuzz import fuzz
 from tqdm import tqdm
 
-from chunk.text_splitters import MarkdownTextSplitter
+from chunker.text_splitters import MarkdownTextSplitter
 
 def get_blocks_from_middle(middle_json_content):
     try:

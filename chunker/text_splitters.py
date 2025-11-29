@@ -39,12 +39,13 @@ def num_tokens_from_string(string: str) -> int:
 
 class MarkdownTextSplitter:
 
-    def __init__(self, chunk_token_num=512, min_chunk_tokens=50) -> None:
+    def __init__(self, chunk_token_num=512, min_chunk_tokens=50, max_table_tokens=8000) -> None:
         """Create a new TextSplitter."""
         self.chunk_token_num = chunk_token_num
         self.min_chunk_tokens = min_chunk_tokens
+        self.max_table_tokens = max_table_tokens
 
-    def split_text(self, txt):
+    def split_text(self, txt) -> list[str]:
         """
         基于 markdown-it-py AST 的智能分块方法，解决 RAG Markdown 文件分块问题：
         1. 基于语义切分（使用 AST）
@@ -83,6 +84,22 @@ class MarkdownTextSplitter:
                 current_tokens = 0
 
             if chunk_data:
+                # 兼容：html_block 返回的是多个 segment
+                if isinstance(chunk_data, list):
+                    for seg in chunk_data:
+                        seg_tokens = num_tokens_from_string(seg)
+                        # 仍然遵循 chunk_token_num 限制
+                        if (current_tokens + seg_tokens > self.chunk_token_num and
+                                current_chunk and current_tokens >= self.min_chunk_tokens):
+
+                            chunk_content = self._finalize_ast_chunk(current_chunk, context_stack)
+                            if chunk_content.strip():
+                                chunks.append(chunk_content)
+                            current_chunk = []
+                            current_tokens = 0
+                        current_chunk.append(seg)
+                        current_tokens += seg_tokens
+                    continue
                 chunk_tokens = num_tokens_from_string(chunk_data)
 
                 # 检查是否需要分块
@@ -154,6 +171,13 @@ class MarkdownTextSplitter:
             # 分隔符
             content = "---"
             should_break = True
+
+        elif node_type == "html_block":
+            # 判断是否是 HTML 表格
+            if node.content.strip().startswith("<table"):
+                # 若表格过大，则进行拆分
+                table_segments = self._split_html_table_if_needed(node.content)
+                return table_segments, True  # 强制断块
 
         else:
             # 其他类型节点
@@ -269,6 +293,65 @@ class MarkdownTextSplitter:
         # 例如，如果chunk没有标题，可以考虑添加父级标题作为上下文
 
         return chunk_content
+
+    def _split_html_table_if_needed(self, html_table: str):
+        """
+        如果 HTML 表格超过 max_table_tokens，则按行拆分成多个较小表格，
+        每个表格保持 HTML 合法性。
+        返回：分段后的 HTML 表格列表
+        """
+        total_tokens = num_tokens_from_string(html_table)
+
+        if total_tokens <= self.max_table_tokens:
+            return [html_table]  # 不需要拆分
+
+        # --- 解析行 <tr> ---
+        import re
+        rows = re.findall(r"<tr.*?>.*?</tr>", html_table, flags=re.S)
+
+        if not rows:
+            return [html_table]  # 如果没解析到行，不拆
+
+        # 提取表头（如果存在）
+        header = ""
+        body_rows = rows
+
+        # 检测第一行是否为表头（简单判断 th 是否出现）
+        if "<th" in rows[0]:
+            header = rows[0]
+            body_rows = rows[1:]
+
+        table_segments = []
+        current_rows = []
+        current_tokens = 0
+
+        for row in body_rows:
+            row_tokens = num_tokens_from_string(row)
+
+            # 新表格的 token 超出限制 → 保存前一个，开启新表格
+            if current_rows and current_tokens + row_tokens > self.max_table_tokens:
+                html_seg = self._build_html_table(header, current_rows)
+                table_segments.append(html_seg)
+                current_rows = []
+                current_tokens = 0
+
+            current_rows.append(row)
+            current_tokens += row_tokens
+
+        # 最后一个块
+        if current_rows:
+            html_seg = self._build_html_table(header, current_rows)
+            table_segments.append(html_seg)
+
+        return table_segments
+
+    def _build_html_table(self, header, body_rows):
+        table = ["<table>"]
+        if header:
+            table.append(header)
+        table.extend(body_rows)
+        table.append("</table>")
+        return "".join(table)
 
 
 if __name__ == '__main__':

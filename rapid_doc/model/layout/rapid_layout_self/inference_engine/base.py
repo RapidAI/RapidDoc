@@ -23,7 +23,7 @@ class InferSession(ABC):
         pass
 
     @abstractmethod
-    def __call__(self, input_content: np.ndarray, scale_factor: np.ndarray) -> np.ndarray:
+    def __call__(self, input_content: np.ndarray, scale_factor: np.ndarray = None) -> np.ndarray:
         pass
 
     @staticmethod

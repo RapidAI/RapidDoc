@@ -11,10 +11,8 @@ import yaml
 from omegaconf import OmegaConf
 
 from ..model_handler import ModelProcessor
-# from rapidocr.networks.architectures.base_model import BaseModel
 
 from ..networks.architectures.base_model import BaseModel
-from ..utils.download_file import DownloadFile, DownloadFileInput
 from ..utils.logger import Logger
 from ..utils.utils import mkdir
 from .base import InferSession
@@ -125,8 +123,10 @@ class TorchInferSession(InferSession):
         return self.get_character_list()
 
     def get_character_list(self, key: str = "character") -> Dict[str, Any]:
-        infer_yaml_path = ModelProcessor.get_character_path(self.cfg.model_type, self.cfg.engine_type)
-        with open(infer_yaml_path, "r", encoding="utf-8") as yaml_file:
+        dict_path = self.cfg.dict_keys_path
+        if not dict_path or (not Path(dict_path).exists()):
+            dict_path = ModelProcessor.get_character_path(self.cfg.model_type, self.cfg.engine_type)
+        with open(dict_path, "r", encoding="utf-8") as yaml_file:
             data = yaml.load(yaml_file, Loader=yaml.FullLoader)
             return data["PostProcess"]["character_dict"]
 

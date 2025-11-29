@@ -1,9 +1,6 @@
 from rapid_doc.model.layout.rapid_layout_self import ModelType, RapidLayout, RapidLayoutInput
 import numpy as np
-from typing import Any, List, Dict
-
-from rapid_doc.model.reading_order.utils import remove_overlap_blocks, visualize_reading_order
-
+from typing import List
 
 def projection_by_bboxes(boxes: np.ndarray, axis: int) -> np.ndarray:
     """
@@ -322,14 +319,13 @@ def xycut_plus_sort(bboxes: List, direction: str = None) -> List[int]:
 
 # 测试xycut++算法
 if __name__ == "__main__":
-    cfg = RapidLayoutInput(model_type=ModelType.PP_DOCLAYOUT_L, conf_thresh=0.5,
-                           model_dir_or_path="C:\ocr\models\ppmodel\layout\PP-DocLayout-L\pp_doclayout_l.onnx")
+    cfg = RapidLayoutInput(model_type=ModelType.PP_DOCLAYOUT_PLUS_L)
     layout_engine = RapidLayout(cfg=cfg)
 
-    img_path = r"C:\ocr\453897009-46be64ca-3adb-471c-a43d-0226fee10f73.png"
-    results = layout_engine([img_path])
-    results[0].vis(r"C:\ocr\453897009-46be64ca-3adb-471c-a43d-0226fee10f73_vis.png")
-    data_list = [list(map(float, box)) for box in results[0].boxes]
+    img_path= r"C:\ocr\img\c1c47001-30ba-4fa8-b9ff-6a16b12d008f.png"
+    all_results = layout_engine([img_path])
+    # all_results[0].vis(r"453897009-46be64ca-3adb-471c-a43d-0226fee10f73_vis.png")
+    data_list = [list(map(float, box)) for box in all_results[0].boxes]
 
     # data_list, _ = remove_overlap_blocks(
     #     data_list,
@@ -337,32 +333,32 @@ if __name__ == "__main__":
     #     smaller=True,
     # )
 
-    # 对data_list进行阅读顺序排序
-    res = []
+    result = all_results[0]
     sorted_indices = xycut_plus_sort(data_list)
 
-    sorted_data: List[Dict[str, Any]] = []
-    for order, idx in enumerate(sorted_indices):
-        sorted_data.append({
-            "bbox": data_list[idx],
-            "reading_order": order,
-            "label": "text"
-        })
+    layout_det_res = [
+        {
+            "coordinate": box,
+            "label": result.class_names[idx],
+            "score": result.scores[idx],
+        }
+        for idx, box in enumerate(result.boxes)
+    ]
 
+    layout_det_res = {'boxes': layout_det_res}
 
-    print("=== 阅读顺序排序结果 ===")
-    for item in sorted_data:
-        print(f"顺序: {item['reading_order']}, 标签: {item['label']}, 边界框: {item['bbox']}")
+    sorted_boxes = [data_list[i] for i in sorted_indices]
+    for i, block in enumerate(layout_det_res['boxes']):
+        block['index'] = sorted_boxes.index(block["coordinate"])
 
-    visualize_reading_order(sorted_data)
+    # 可视化阅读顺序
+    from rapid_doc.model.reading_order.utils import VisReadOrder
+    from rapid_doc.model.layout.rapid_layout_self.utils.utils import save_img
 
-    print("\n=== 按标签分组的阅读顺序 ===")
-    label_groups = {}
-    for item in sorted_data:
-        label = item['label']
-        if label not in label_groups:
-            label_groups[label] = []
-        label_groups[label].append(item['reading_order'])
-
-    for label, orders in label_groups.items():
-        print(f"{label}: {orders}")
+    indexes = [box["index"] for box in layout_det_res["boxes"]]
+    vis_img = VisReadOrder.draw_order(
+        all_results[0].img,
+        np.array(all_results[0].boxes),
+        np.array(indexes),
+    )
+    save_img("layout_res_out.png", vis_img)

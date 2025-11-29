@@ -8,7 +8,7 @@ from pathlib import Path
 # # 或指定 GPU 编号，例如使用第二块 GPU（cuda:1）
 # os.environ['MINERU_DEVICE_MODE'] = "cuda:1"
 # # 模型文件存储目录
-# os.environ['MINERU_MODELS_DIR'] = r'D:\CodeProjects\doc\RapidAI\models' #模型文件存储目录，如果不设置会默认下载到rapid_doc项目里面
+# os.environ['RAPID_MODELS_DIR'] = r'D:\CodeProjects\doc\RapidAI\models' #模型文件存储目录，如果不设置会默认下载到rapid_doc项目里面
 from loguru import logger
 
 from rapid_doc.cli.common import convert_pdf_bytes_to_bytes_by_pypdfium2, prepare_env, read_fn
@@ -74,7 +74,8 @@ def do_parse(
         # "engine_type": FormulaEngineType.TORCH,
         # "formula_level": 1, # 公式识别等级，默认为0，全识别。1:仅识别行间公式，行内公式不识别
         # "batch_num": 1,
-        # "model_dir_or_path": r"C:\ocr\models\ppmodel\formula\PP-FormulaNet_plus-S\pp_formulanet_plus_s.onnx"
+        # "model_dir_or_path": r"C:\ocr\models\ppmodel\formula\PP-FormulaNet_plus-S\pp_formulanet_plus_s.onnx",
+        # "dict_keys_path": "D:\CodeProjects\doc\RapidAI\pp_formulanet_plus_m_inference.yml", #yml字典路径（torch使用）
     }
 
     # os.environ['MINERU_MODEL_SOURCE'] = 'local'

@@ -39,6 +39,8 @@ class UnetTableRecognition:
                 pred_htmls.append("")
                 cell_bboxes.append([])
                 logic_points_list.append([])
+                # logging.warning("polygons is None.")
+                continue
 
             try:
                 table_res, logi_points = self.table_recover(
