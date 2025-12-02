@@ -1,7 +1,7 @@
 services:
   rapid-doc-server:
     container_name: rapid-doc-server
-    image: hzkitty/rapid-doc:0.5.0-gpu
+    image: hzkitty/rapid-doc:0.5.1-gpu
     deploy:
       resources:
         reservations:
