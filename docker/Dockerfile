@@ -33,7 +33,7 @@ COPY start_with_env.sh /app/
 RUN chmod +x  start_with_env.sh
 
 # 复制应用代码（最后复制，避免频繁变更影响缓存）
-COPY app.py file_converter.py download_models.py /app/
+COPY app.py file_converter.py download_models.py models_download_utils.py /app/
 
 # 设置基础环境变量
 ENV PYTHONPATH=/app

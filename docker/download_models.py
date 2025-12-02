@@ -4,7 +4,8 @@ Model download script for Docker build
 Downloads pipeline models for offline deployment
 """
 import sys
-from rapid_doc.utils.models_download_utils import download_pipeline_models
+
+from models_download_utils import download_pipeline_models
 
 if __name__ == '__main__':
     # os.environ['RAPID_MODELS_DIR'] = r'D:\CodeProjects\doc\RapidAI\models' #模型文件存储目录
