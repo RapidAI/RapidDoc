@@ -86,15 +86,19 @@ def do_parse(
         # "skip_text_in_image": True, # 是否跳过表格里图片中的文字（如表格单元格中嵌入的图片、图标、扫描底图等）
         # "use_img2table": False, # 是否优先使用img2table库提取表格，需要手动安装（pip install img2table），基于opencv识别准确度不如使用模型，但是速度很快，默认关闭
 
+        # "model_type": TableModelType.SLANETPLUS,
         # "model_type": TableModelType.UNET_SLANET_PLUS,  # （默认） 有线表格使用unet，无线表格使用slanet_plus
         # "model_type": TableModelType.UNET_UNITABLE, # 有线表格使用unet，无线表格使用unitable
-
+        # "model_type": TableModelType.UNITABLE,
         # "model_dir_or_path": "", #单个模型使用。如SLANET_PLUS、UNITABLE
 
+        # "use_word_box": True, # 使用单字坐标匹配单元格，默认 True
+        # "use_compare_table": False,  # 启用表格结果比较（同时跑有线/无线并比对），默认 False
+        # "table_formula_enable": False, # 表格内公式识别
+        # "table_image_enable": False, # 表格内图片识别
+        # "cls.model_type": TableModelType.Q_CLS, # 表格分类模型
         # "cls.model_dir_or_path": "", # 表格分类模型地址
-
         # "unet.model_dir_or_path": "", # UNET表格模型地址
-
         # "unitable.model_dir_or_path": "", # UNITABLE表格模型地址
         # "slanet_plus.model_dir_or_path": "", # SLANET_PLUS表格模型地址
 

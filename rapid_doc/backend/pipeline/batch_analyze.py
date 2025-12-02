@@ -14,7 +14,7 @@ from ...utils.boxbase import is_in, rotate_image
 from ...utils.checkbox_det_cls import checkbox_predict
 from ...utils.config_reader import get_formula_enable, get_table_enable
 from ...utils.enum_class import CategoryId
-from ...utils.model_utils import crop_img, get_res_list_from_layout_res
+from ...utils.model_utils import crop_img, get_res_list_from_layout_res, clean_vram
 from ...utils.ocr_utils import merge_det_boxes, update_det_boxes, sorted_boxes, get_rotate_crop_image
 from ...utils.ocr_utils import get_adjusted_mfdetrec_res, get_ocr_result_list, OcrConfidence, get_ocr_result_list_table
 from ...utils.span_pre_proc import txt_spans_extract, txt_spans_bbox_extract, \
@@ -41,20 +41,23 @@ class BatchAnalyze:
         self.formula_enable = get_formula_enable(formula_enable)
         self.formula_level = formula_config.get("formula_level", 0) if formula_config else 0
         self.table_enable = get_table_enable(table_enable)
-        self.table_force_ocr = table_config.get("force_ocr", False) if table_config else False
-        self.skip_text_in_image = table_config.get("skip_text_in_image", True) if table_config else True
-        self.use_img2table = table_config.get("use_img2table", False) if table_config else False
         self.checkbox_enable = checkbox_config.get("checkbox_enable", False) if checkbox_config else False
         self.layout_config = layout_config
         self.ocr_config = ocr_config
         self.formula_config = formula_config
-        self.table_config = table_config
         self.model_manager = model_manager
         self.enable_ocr_det_batch = ocr_config.get("Det.rec_batch_num", 1) > 1 if ocr_config else False
         self.ocr_det_base_batch_size = ocr_config.get("Det.rec_batch_num", 1) if ocr_config else 1 #16
         self.layout_base_batch_size = layout_config.get("batch_num", 1) if layout_config else 1 #8
         self.formula_base_batch_size = formula_config.get("batch_num", 1) if formula_config else 1 #16
         self.use_det_mode = ocr_config.get("use_det_mode", 'auto') if ocr_config else 'auto'
+        self.table_config = table_config
+        self.table_force_ocr = table_config.get("force_ocr", False) if table_config else False
+        self.skip_text_in_image = table_config.get("skip_text_in_image", True) if table_config else True
+        self.use_img2table = table_config.get("use_img2table", False) if table_config else False
+        self.table_use_word_box = table_config.get("use_word_box", True) if table_config else True
+        self.table_formula_enable = table_config.get("table_formula_enable", True) if table_config else True
+        self.table_image_enable = table_config.get("table_image_enable", True) if table_config else True
 
     def __call__(self, images_with_extra_info: List[Tuple[Image.Image, float, bool, str, dict]]) -> list:
         if len(images_with_extra_info) == 0:
@@ -156,7 +159,7 @@ class BatchAnalyze:
                     logger.warning('latex recognition processing fails, not get latex return')
 
         # 清理显存
-        # clean_vram(self.model.device, vram_threshold=8)
+        clean_vram(self.model.device, vram_threshold=8)
 
         if self.use_det_mode != 'ocr':
             # 分页分组
@@ -370,10 +373,12 @@ class BatchAnalyze:
                         _lang = table_res_dict['lang']
                         useful_list = table_res_dict['useful_list']
                         # OCR检测，跳过公式和复选框
-                        adjusted_mfdetrec_res = get_adjusted_mfdetrec_res(
-                            table_res_dict['single_page_mfdetrec_res'] + table_res_dict['checkbox_res'],
-                            useful_list, return_text=True
-                        )
+                        adjusted_mfdetrec_res = None
+                        if self.table_formula_enable:
+                            adjusted_mfdetrec_res = get_adjusted_mfdetrec_res(
+                                table_res_dict['single_page_mfdetrec_res'] + table_res_dict['checkbox_res'],
+                                useful_list, return_text=True
+                            )
 
                         ocr_result = []
                         # 进行 OCR-det 识别文字框
@@ -398,8 +403,16 @@ class BatchAnalyze:
                                 table_bboxes = [[int(poly[0]/scale), int(poly[1]/scale), int(poly[4]/scale), int(poly[5]/scale)
                                                     , None, None, None,'text', None, None, None, None, 1]]
                                 # 从pdf中提取表格的文本
-                                txt_spans_extract(page_dict, ocr_spans, table_res_dict['table_img'], scale, table_bboxes,[])
-                                ocr_result = [list(x) for x in zip(*[[item['ori_bbox'], item['content'], item['score']] for item in ocr_spans])]
+                                txt_spans_extract(page_dict, ocr_spans, table_res_dict['table_img'], scale, table_bboxes,[]
+                                                  , return_word_box=self.table_use_word_box, useful_list=table_res_dict['useful_list'])
+                                if self.table_use_word_box:
+                                    ocr_result = [list(col) for col in zip(*(
+                                            (w[2], w[0], w[1])
+                                            for group in [item.get('word_result') for item in ocr_spans]
+                                            for w in group
+                                        ))]
+                                else:
+                                    ocr_result = [list(x) for x in zip(*[[item['ori_bbox'], item['content'], item['score']] for item in ocr_spans])]
                         # 进行 OCR-rec 识别文字框
                         if not ocr_result and det_res:
                             rec_img_list = []
@@ -413,9 +426,13 @@ class BatchAnalyze:
                                     }
                                 )
                             cropped_img_list = [item["cropped_img"] for item in rec_img_list]
-                            ocr_res_list = ocr_model.ocr(cropped_img_list, det=False, tqdm_enable=False)[0]
+                            ocr_res_list = ocr_model.ocr(cropped_img_list, det=False, tqdm_enable=False
+                                                         , return_word_box=self.table_use_word_box, ori_img=bgr_image, dt_boxes=det_res)[0]
                             for img_dict, ocr_res in zip(rec_img_list, ocr_res_list):
-                                ocr_result.append([img_dict["dt_box"], ocr_res[0], ocr_res[1]])
+                                if self.table_use_word_box:
+                                    ocr_result.extend([[word_result[2], word_result[0], word_result[1]] for word_result in ocr_res[2]])
+                                else:
+                                    ocr_result.append([img_dict["dt_box"], ocr_res[0], ocr_res[1]])
                             ocr_result = [list(x) for x in zip(*ocr_result)]
 
                         table_model = atom_model_manager.get_atom_model(
@@ -425,7 +442,10 @@ class BatchAnalyze:
                             table_config=self.table_config,
                         )
                         # 从pdf里提取表格里的图片
-                        fill_image_res = extract_table_fill_image(page_dict, table_res_dict, scale=scale)
+                        fill_image_res = []
+                        if self.table_image_enable:
+                            fill_image_res = extract_table_fill_image(page_dict, table_res_dict, scale=scale)
+                        table_res_dict['table_res'].pop('layout_image_list', None)
                         html_code = table_model.predict(table_res_dict['table_img'], ocr_result,
                                                         fill_image_res, adjusted_mfdetrec_res, self.skip_text_in_image, self.use_img2table)
                         # 判断是否返回正常
@@ -452,6 +472,9 @@ class BatchAnalyze:
                                 'table recognition processing fails, not get html return'
                             )
                         pbar.update(1)  # 每处理一个表格更新一次
+
+        # 清理显存
+        clean_vram(self.model.device, vram_threshold=8)
 
         # OCR rec
         # Create dictionaries to store items by language

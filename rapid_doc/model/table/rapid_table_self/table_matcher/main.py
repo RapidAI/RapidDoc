@@ -146,7 +146,8 @@ class TableMatch:
                             continue
 
                         if i != len(matched_index[td_index]) - 1 and " " != content[-1]:
-                            content += " "
+                            # content += " " #用字符级别的框，每个字符都会多空格
+                            content += ""
                     end_html.extend(content)
 
                 if b_with:

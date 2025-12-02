@@ -22,9 +22,11 @@ class UnetTableRecognition:
         self, ori_imgs: List[np.ndarray], ocr_results,
         **kwargs,
     ):
+        need_ocr = True
         col_threshold = 15
         row_threshold = 10
         if kwargs:
+            need_ocr = kwargs.get("need_ocr", True)
             col_threshold = kwargs.get("col_threshold", 15)
             row_threshold = kwargs.get("row_threshold", 10)
 
@@ -51,7 +53,7 @@ class UnetTableRecognition:
                     polygons[:, 3, :].copy(),
                     polygons[:, 1, :].copy(),
                 )
-                if not self.cfg['use_ocr']:
+                if not need_ocr:
                     sorted_polygons, idx_list = sorted_ocr_boxes(
                         [box_4_2_poly_to_box_4_1(box) for box in polygons]
                     )

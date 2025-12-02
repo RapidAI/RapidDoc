@@ -243,11 +243,11 @@ def extract_table_fill_image(page_dict, table_res_dict, scale):
             image_res.append(image)
         # 把image_res放到page_dict里面，方便后续保存图片
     page_dict['table_fill_image_list'] = image_res
-    table_res_dict['table_res'].pop('layout_image_list', None)
+    # table_res_dict['table_res'].pop('layout_image_list', None)
     return image_res
 
 """pdf_text dict方案 char级别"""
-def txt_spans_extract(pdf_page_or_dict, spans, input_img, scale, all_bboxes, all_discarded_blocks):
+def txt_spans_extract(pdf_page_or_dict, spans, input_img, scale, all_bboxes, all_discarded_blocks, return_word_box=False, useful_list=None):
     # 判断类型
     if isinstance(pdf_page_or_dict, dict):
         page_dict = pdf_page_or_dict
@@ -319,7 +319,7 @@ def txt_spans_extract(pdf_page_or_dict, spans, input_img, scale, all_bboxes, all
             span['chars'] = []
             new_spans.append(span)
 
-    need_ocr_spans = fill_char_in_spans(new_spans, page_all_chars, median_span_height)
+    need_ocr_spans = fill_char_in_spans(new_spans, page_all_chars, median_span_height, return_word_box, useful_list, scale)
 
     """对未填充的span进行ocr"""
     if len(need_ocr_spans) > 0:
@@ -343,7 +343,7 @@ def txt_spans_extract(pdf_page_or_dict, spans, input_img, scale, all_bboxes, all
     return spans
 
 
-def fill_char_in_spans(spans, all_chars, median_span_height):
+def fill_char_in_spans(spans, all_chars, median_span_height, return_word_box=False, useful_list=None, scale=None):
     # 简单从上到下排一下序
     spans = sorted(spans, key=lambda x: x['bbox'][1])
 
@@ -369,7 +369,7 @@ def fill_char_in_spans(spans, all_chars, median_span_height):
 
     need_ocr_spans = []
     for span in spans:
-        chars_to_content(span)
+        chars_to_content(span, return_word_box, useful_list, scale)
         # 有的span中虽然没有字但有一两个空的占位符，用宽高和content长度过滤
         if len(span['content']) * span['height'] < span['width'] * 0.5:
             # logger.info(f"maybe empty span: {len(span['content'])}, {span['height']}, {span['width']}")
@@ -446,7 +446,7 @@ def calculate_text_in_span(char_bbox, span_bbox, char):
         else:
             return False
 
-def chars_to_content(span):
+def chars_to_content(span, return_word_box=False, useful_list=None, scale=None):
     # 检查span中的char是否为空
     if len(span['chars']) == 0:
         pass
@@ -460,22 +460,40 @@ def chars_to_content(span):
         median_width = statistics.median(char_widths)
 
         content = ''
+        word_result = []
         for char in span['chars']:
-
             # 如果下一个char的x0和上一个char的x1距离超过0.25个字符宽度，则需要在中间插入一个空格
             char1 = char
             char2 = span['chars'][span['chars'].index(char) + 1] if span['chars'].index(char) + 1 < len(span['chars']) else None
-            if char2 and char2['bbox'][0] - char1['bbox'][2] > median_width * 0.25 and char['char'] != ' ' and char2['char'] != ' ':
-                content += f"{char['char']} "
+            if not return_word_box and char2 and char2['bbox'][0] - char1['bbox'][2] > median_width * 0.25 and char['char'] != ' ' and char2['char'] != ' ':
+                new_char = f"{char['char']} "
             else:
-                content += char['char']
+                new_char = char['char']
+            content += new_char
+            if return_word_box:
+                word_result.append((new_char, 1 , pdf_txt_bbox_to_table_ocr_bbox(char['bbox'].bbox, useful_list, scale)))
 
         content = __replace_unicode(content)
         content = __replace_ligatures(content)
         content = __replace_ligatures(content)
         span['content'] = content.strip()
-
+        if return_word_box:
+            span['word_result'] = word_result
     del span['chars']
+
+
+"""pdf_text bbox转为相对表格的坐标"""
+def pdf_txt_bbox_to_table_ocr_bbox(bbox, useful_list, scale):
+    paste_x, paste_y, xmin, ymin, xmax, ymax, new_width, new_height = useful_list
+
+    bbox = [bbox[0]*scale, bbox[1]*scale, bbox[2]*scale, bbox[3]*scale]
+    # bbox = [bbox[0], bbox[1], bbox[2], bbox[3]]
+    p1 = [bbox[0] + paste_x - xmin, bbox[1] + paste_y - ymin]
+    p2 = [bbox[2] + paste_x - xmin, bbox[1] + paste_y - ymin]
+    p3 = [bbox[2] + paste_x - xmin, bbox[3] + paste_y - ymin]
+    p4 = [bbox[0] + paste_x - xmin, bbox[3] + paste_y - ymin]
+    bbox = [p1, p2, p3, p4]
+    return bbox
 
 
 def calculate_contrast(img, img_mode) -> float:

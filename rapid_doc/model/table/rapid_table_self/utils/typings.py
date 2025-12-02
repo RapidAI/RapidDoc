@@ -24,6 +24,7 @@ class ModelType(Enum):
     UNET_SLANET_PLUS = "unet_slanet_plus"  # 有线表格使用unet，无线表格使用slanet_plus
     UNET_UNITABLE = "unet_unitable"  # 有线表格使用unet，无线表格使用unitable
     PADDLE_CLS = "paddle_cls"
+    Q_CLS = "q_cls"
 
 
 @dataclass

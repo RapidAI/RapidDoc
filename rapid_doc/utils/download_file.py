@@ -29,6 +29,7 @@ CPU_MODEL = [
     "FZYTK.TTF",
     # table
     "paddle_cls.onnx",
+    "q_cls.onnx",
     "unet.onnx",
     "slanet-plus.onnx",
 ]
@@ -47,6 +48,7 @@ GPU_MODEL = [
     "FZYTK.TTF",
     # table
     "paddle_cls.onnx",
+    "q_cls.onnx",
     "unet.onnx",
     "slanet-plus.onnx",
 ]
@@ -66,6 +68,7 @@ NPU_MODEL = [
     "FZYTK.TTF",
     # table
     "paddle_cls.onnx",
+    "q_cls.onnx",
     "unet.onnx",
     "slanet-plus.onnx",
 ]

@@ -114,7 +114,7 @@ def load_images_from_pdf(
 
             page_ranges.append((range_start, range_end))
 
-        # logger.debug(f"PDF to images using {actual_threads} processes, page ranges: {page_ranges}")
+        logger.info(f"PDF to images using {actual_threads} processes, page ranges: {page_ranges}")
 
         with ProcessPoolExecutor(max_workers=actual_threads) as executor:
             # 提交所有任务

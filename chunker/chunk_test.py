@@ -1,6 +1,7 @@
 import json
 from chunker.text_splitters import MarkdownTextSplitter, num_tokens_from_string
 from chunker.get_bbox_page_fast import get_bbox_for_chunk, get_blocks_from_middle
+import re
 from bs4 import BeautifulSoup
 
 def clean_text_for_embedding(text: str) -> str:
@@ -9,6 +10,7 @@ def clean_text_for_embedding(text: str) -> str:
     - 移除所有 <img> 标签
     - HTML 表格 → 纯文本表格（| 分隔）
     - 移除其他 HTML 标签
+    - 连续的多余点替换为固定的三个点 "..."
     - 压缩所有空白为单个空格
     """
     if not text:
@@ -18,7 +20,7 @@ def clean_text_for_embedding(text: str) -> str:
 
     # 移除所有 <img> 标签
     for img in soup.find_all("img"):
-        img.decompose()  # 直接删除
+        img.decompose()
 
     # 处理 HTML 表格
     tables = soup.find_all("table")
@@ -40,10 +42,14 @@ def clean_text_for_embedding(text: str) -> str:
     # 移除所有剩余 HTML 标签
     text = soup.get_text(separator=" ")
 
+    # 替换连续的点为 "..."
+    text = re.sub(r"\.{4,}", "...", text)
+
     # 压缩所有空白，包括换行、tab
     text = " ".join(text.split())
 
     return text.strip()
+
 
 if __name__ == '__main__':
 
@@ -56,7 +62,7 @@ if __name__ == '__main__':
 
     # 分块
     text_splitter = MarkdownTextSplitter(
-        chunk_token_num=1024, min_chunk_tokens=200
+        chunk_token_num=512, min_chunk_tokens=50
     )
     chunk_list = text_splitter.split_text(markdown_document)
 
@@ -64,7 +70,7 @@ if __name__ == '__main__':
     max_chunk = None
 
     for chunk in chunk_list:
-        tokens = num_tokens_from_string(chunk)
+        tokens = num_tokens_from_string(clean_text_for_embedding(chunk))
         if tokens > max_tokens:
             max_tokens = tokens
             max_chunk = chunk

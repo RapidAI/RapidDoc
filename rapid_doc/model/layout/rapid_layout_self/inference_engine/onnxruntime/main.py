@@ -81,8 +81,7 @@ class OrtInferSession(InferSession):
 
     @property
     def characters(self):
-        # return self.get_character_list()
-        return ['paragraph_title', 'image', 'text', 'number', 'abstract', 'content', 'figure_title', 'formula', 'table', 'reference', 'doc_title', 'footnote', 'header', 'algorithm', 'footer', 'seal', 'chart', 'formula_number', 'aside_text', 'reference_content']
+        return self.get_character_list()
 
     def get_character_list(self, key: str = "character") -> List[str]:
         meta_dict = self.session.get_modelmeta().custom_metadata_map

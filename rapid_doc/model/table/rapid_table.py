@@ -1,5 +1,4 @@
 import cv2
-import html
 import numpy as np
 from loguru import logger
 
@@ -11,10 +10,6 @@ from rapid_doc.utils.boxbase import is_in
 from rapid_doc.utils.config_reader import get_device
 from rapid_doc.utils.model_utils import check_openvino
 from rapid_doc.utils.ocr_utils import points_to_bbox, bbox_to_points
-
-def escape_html(input_string):
-    """Escape HTML Entities."""
-    return html.escape(input_string)
 
 
 class RapidTableModel(object):
@@ -30,6 +25,10 @@ class RapidTableModel(object):
             device_id = int(device.split(':')[1]) if ':' in device else 0  # npu 编号
             engine_cfg = {'use_cann': True, "cann_ep_cfg.device_id": device_id}
         engine_cfg = engine_cfg or {}
+        # 如果传入了 engine_cfg，则覆盖参数
+        if table_config.get('engine_cfg'):
+            engine_cfg = table_config.get('engine_cfg')
+        self.use_compare_table = table_config.get('use_compare_table') if table_config else False
         self.model_type = table_config.get("model_type", ModelType.UNET_SLANET_PLUS)
         self.ocr_engine = ocr_engine
 
@@ -40,8 +39,8 @@ class RapidTableModel(object):
             self.engine_type = EngineType.OPENVINO
 
         if self.model_type == ModelType.UNET_SLANET_PLUS:
-            cls_input_args = RapidTableInput(model_type=ModelType.PADDLE_CLS, engine_type=self.engine_type,
-                                            model_dir_or_path=table_config.get("paddle_cls.model_dir_or_path"),
+            cls_input_args = RapidTableInput(model_type=table_config.get("cls.model_type", ModelType.Q_CLS), engine_type=self.engine_type,
+                                            model_dir_or_path=table_config.get("cls.model_dir_or_path"),
                                             engine_cfg=engine_cfg, use_ocr=False)
             self.table_cls = TableCls(cls_input_args)
             wired_input_args = RapidTableInput(model_type=ModelType.UNET, engine_type=self.engine_type,
@@ -53,8 +52,8 @@ class RapidTableModel(object):
                                                   engine_cfg=engine_cfg, use_ocr=False)
             self.wireless_table_model = RapidTable(wireless_input_args)
         elif self.model_type == ModelType.UNET_UNITABLE:
-            cls_input_args = RapidTableInput(model_type=ModelType.PADDLE_CLS, engine_type=self.engine_type,
-                                            model_dir_or_path=table_config.get("paddle_cls.model_dir_or_path"),
+            cls_input_args = RapidTableInput(model_type=table_config.get("cls.model_type", ModelType.Q_CLS), engine_type=self.engine_type,
+                                            model_dir_or_path=table_config.get("cls.model_dir_or_path"),
                                             engine_cfg=engine_cfg, use_ocr=False)
             self.table_cls = TableCls(cls_input_args)
             wired_input_args = RapidTableInput(model_type=ModelType.UNET, engine_type=self.engine_type,
@@ -205,10 +204,12 @@ class RapidTableModel(object):
                 if cls == "wired":
                     wired_pred = self.wired_table_model(bgr_image, ocr_result).pred_htmls
                     wired_html_code = wired_pred[0] if len(wired_pred) > 0 else None
-
-                    wireless_pred = self.wireless_table_model(bgr_image, ocr_result).pred_htmls
-                    wireless_html_code = wireless_pred[0] if len(wireless_pred) > 0 else None
-                    html_code = select_best_table_model(ocr_result[0], wired_html_code, wireless_html_code)
+                    if self.use_compare_table:
+                        wireless_pred = self.wireless_table_model(bgr_image, ocr_result).pred_htmls
+                        wireless_html_code = wireless_pred[0] if len(wireless_pred) > 0 else None
+                        html_code = select_best_table_model(ocr_result[0], wired_html_code, wireless_html_code)
+                    else:
+                        html_code = wired_html_code
                 else:  # wireless
                     html = self.wireless_table_model(bgr_image, ocr_result).pred_htmls
                     html_code = html[0] if len(html) > 0 else None

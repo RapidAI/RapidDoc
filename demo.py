@@ -10,7 +10,7 @@ from pathlib import Path
 # # 或指定 GPU 编号，例如使用第二块 GPU（cuda:1）
 # os.environ['MINERU_DEVICE_MODE'] = "cuda:1"
 # # 模型文件存储目录
-os.environ['RAPID_MODELS_DIR'] = r'D:\CodeProjects\doc\RapidAI\models' #模型文件存储目录，如果不设置会默认下载到rapid_doc项目里面
+# os.environ['RAPID_MODELS_DIR'] = r'D:\CodeProjects\doc\RapidAI\models' #模型文件存储目录，如果不设置会默认下载到rapid_doc项目里面
 from loguru import logger
 
 from rapid_doc.cli.common import convert_pdf_bytes_to_bytes_by_pypdfium2, prepare_env, read_fn
@@ -87,15 +87,19 @@ def do_parse(
         # "skip_text_in_image": True, # 是否跳过表格里图片中的文字（如表格单元格中嵌入的图片、图标、扫描底图等）
         # "use_img2table": False, # 是否优先使用img2table库提取表格，需要手动安装（pip install img2table），基于opencv识别准确度不如使用模型，但是速度很快，默认关闭
 
+        # "model_type": TableModelType.SLANETPLUS,
         # "model_type": TableModelType.UNET_SLANET_PLUS,  # （默认） 有线表格使用unet，无线表格使用slanet_plus
         # "model_type": TableModelType.UNET_UNITABLE, # 有线表格使用unet，无线表格使用unitable
         # "model_type": TableModelType.UNITABLE,
         # "model_dir_or_path": "", #单个模型使用。如SLANET_PLUS、UNITABLE
 
+        # "use_word_box": True, # 使用单字坐标匹配单元格，默认 True
+        # "use_compare_table": False,  # 启用表格结果比较（同时跑有线/无线并比对），默认 False
+        # "table_formula_enable": False, # 表格内公式识别
+        # "table_image_enable": False, # 表格内图片识别
+        # "cls.model_type": TableModelType.PADDLE_CLS, # 表格分类模型
         # "cls.model_dir_or_path": "", # 表格分类模型地址
-
         # "unet.model_dir_or_path": "", # UNET表格模型地址
-
         # "unitable.model_dir_or_path": "", # UNITABLE表格模型地址
         # "slanet_plus.model_dir_or_path": "", # SLANET_PLUS表格模型地址
 
@@ -103,7 +107,7 @@ def do_parse(
     }
 
     checkbox_config = {
-        # "checkbox_enable": False, # 是否识别复选框，默认不识别，基于opencv，有可能会误检
+        # "checkbox_enable": True, # 是否识别复选框，默认不识别，基于opencv，有可能会误检
     }
 
     # 版面识别元素为图片的配置
@@ -224,7 +228,8 @@ if __name__ == '__main__':
     doc_path_list = [
         "demo/pdfs/示例1-论文模板.pdf",
         "demo/pdfs/比亚迪财报.pdf",
-        "demo/images/table_05.png",
+        # "demo/images/table_10.png",
+        # "demo/pdfs/示例1-论文模板.pdf",
     ]
     for doc_path in doc_path_list:
         start_time = time.time()

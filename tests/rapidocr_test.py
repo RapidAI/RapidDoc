@@ -20,22 +20,22 @@ default_params = {
     # "Global.use_cls": False,
     "Det.engine_type": EngineType.ONNXRUNTIME,
     "Rec.engine_type": EngineType.ONNXRUNTIME,
-    # "Det.ocr_version": OCRVersion.PPOCRV5,
-    # "Rec.ocr_version": OCRVersion.PPOCRV5,
+    "Det.ocr_version": OCRVersion.PPOCRV5,
+    "Rec.ocr_version": OCRVersion.PPOCRV5,
     # "Det.model_type": ModelType.SERVER,
     # "Rec.model_type": ModelType.SERVER,
-    # "Det.limit_side_len": 960,
-    # "Det.limit_type": 'max',
-    # "Det.std": [0.229, 0.224, 0.225],
-    # "Det.mean": [0.485, 0.456, 0.406],
-    # "Det.box_thresh": 0.3,
-    # "Det.use_dilation": True,
-    # "Det.unclip_ratio": 1.8,
+    "Det.limit_side_len": 960,
+    "Det.limit_type": 'max',
+    "Det.std": [0.229, 0.224, 0.225],
+    "Det.mean": [0.485, 0.456, 0.406],
+    "Det.box_thresh": 0.3,
+    "Det.use_dilation": True,
+    "Det.unclip_ratio": 1.6,
 }
 
-engine = RapidOCR()
+engine = RapidOCR(params=default_params)
 
-img_url = "0fe4a77764426a660d5fa6b3493e2238.png"
+img_url = "b896a7ebfc79e0a7916429bb58b7791c25e2c79f83817f9a94decc6cbd844de2.jpg"
 
 
 def preprocess_image(image_path):
@@ -59,7 +59,6 @@ def preprocess_image(image_path):
     return processed
 
 # result = engine(preprocess_image(img_url))
-result = engine(img_url)
-print(result)
+result = engine(img_url, return_word_box=False)
 
-result.vis("vis_result10.jpg")
+result.vis("vis_result.jpg")

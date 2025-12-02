@@ -222,9 +222,11 @@ if __name__ == '__main__':
     # r"C:\ocr\models\ppmodel\layout\PP-DocLayout-M\openvino\pp_doclayout_m.xml"
 
     cfg = RapidLayoutInput(model_type=ModelType.PP_DOCLAYOUT_PLUS_L, conf_thresh=0.4)
+    # engine_cfg = {'use_cuda': True, "cuda_ep_cfg.device_id": 0, "cuda_ep_cfg.gpu_mem_limit": 2 * 1024 * 1024 * 1024,}
+    # cfg.engine_cfg = engine_cfg
     model = RapidLayout(cfg=cfg)
 
+    all_results = model(img_contents=[r"D:\file\image\39b0975cc0d2ea44e01a2541f8e15ca.jpg",])
 
-    all_results = model(img_contents=[r"reader_order_07.png",])
     print(all_results)
     all_results[0].vis(r"layout_vis.png")

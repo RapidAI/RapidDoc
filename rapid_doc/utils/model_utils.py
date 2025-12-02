@@ -1,9 +1,12 @@
+import os
+import time
 import gc
 import uuid
 
 from PIL import Image
 import importlib
 import numpy as np
+from loguru import logger
 
 from rapid_doc.utils.boxbase import get_minbox_if_overlap_by_ratio
 
@@ -459,6 +462,17 @@ def clean_memory(device='cuda'):
         if torch_:
             torch.mps.empty_cache()
     gc.collect()
+
+def clean_vram(device, vram_threshold=8):
+    vram_threshold = int(os.getenv('MINERU_VRAM_THRESHOLD', vram_threshold))
+    total_memory = get_vram(device)
+    if total_memory is not None:
+        total_memory = int(os.getenv('MINERU_VIRTUAL_VRAM_SIZE', round(total_memory)))
+    if total_memory and total_memory <= vram_threshold:
+        gc_start = time.time()
+        clean_memory(device)
+        gc_time = round(time.time() - gc_start, 2)
+        logger.info(f"gc time: {gc_time}")
 
 
 def get_vram(device):

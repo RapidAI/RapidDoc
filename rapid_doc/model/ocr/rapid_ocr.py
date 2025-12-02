@@ -1,3 +1,5 @@
+from rapidocr.ch_ppocr_det import TextDetOutput
+
 from rapid_doc.model.ocr.ocr_patch import apply_ocr_patch
 
 # 应用所有 OCR 相关补丁
@@ -98,6 +100,9 @@ class RapidOcrModel(object):
             mfd_res=None,
             tqdm_enable=False,
             tqdm_desc="OCR-rec Predict",
+            return_word_box=False,
+            ori_img=None,
+            dt_boxes=None,
             ):
         assert isinstance(img, (np.ndarray, list, str, bytes))
         if isinstance(img, list) and det == True:
@@ -146,9 +151,16 @@ class RapidOcrModel(object):
                     if not isinstance(img, list):
                         img = preprocess_image(img)
                         img = [img]
-                    rec_input = TextRecInput(img=img, return_word_box=False)
+                    rec_input = TextRecInput(img=img, return_word_box=return_word_box)
                     rec_result = self.text_recognizer_call(rec_input, tqdm_enable=tqdm_enable, tqdm_desc=tqdm_desc)
-                    rec_res = list(zip(rec_result.txts, rec_result.scores))
+                    if return_word_box and ori_img is not None and dt_boxes:
+                        op_record = {'padding_1': {'left': 0, 'top': 0}, 'preprocess': {'ratio_h': 1.0, 'ratio_w': 1.0}}
+                        raw_h, raw_w = ori_img.shape[:2]
+                        dt_boxes_np = [np.array(box, dtype=np.float32) for box in dt_boxes]
+                        word_results = self.ocr_engine.calc_word_boxes(img, TextDetOutput(boxes=dt_boxes_np), rec_result, op_record, raw_h, raw_w)
+                        rec_res = list(zip(rec_result.txts, rec_result.scores, word_results))
+                    else:
+                        rec_res = list(zip(rec_result.txts, rec_result.scores))
                     ocr_res.append(rec_res)
                 return ocr_res
 

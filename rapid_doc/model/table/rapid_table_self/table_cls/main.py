@@ -3,6 +3,7 @@ from typing import Optional, Union, List
 
 import cv2
 import numpy as np
+from PIL import Image
 from dataclasses import asdict
 
 from tqdm import tqdm
@@ -17,12 +18,17 @@ class TableCls:
     def __init__(self, cfg: Optional[RapidTableInput] = None):
         if cfg is None:
             cfg = RapidTableInput()
-        cfg.model_type = ModelType.PADDLE_CLS
+        if not cfg.model_type:
+            cfg.model_type = ModelType.Q_CLS
 
         if not cfg.model_dir_or_path and cfg.model_type is not None:
             cfg.model_dir_or_path = ModelProcessor.get_model_path(cfg.model_type)
 
-        self.table_engine = PaddleCls(asdict(cfg))
+        if cfg.model_type == ModelType.Q_CLS:
+            self.table_engine = QanythingCls(asdict(cfg))
+        elif cfg.model_type == ModelType.PADDLE_CLS:
+            self.table_engine = PaddleCls(asdict(cfg))
+
         self.load_img = LoadImage()
 
     def __call__(self, img_contents: Union[List[InputType], InputType], batch_size: int = 1, tqdm_enable=False):
@@ -89,3 +95,48 @@ class PaddleCls:
         pred_output = self.session(img)[0]
         pred_idxs = list(np.argmax(pred_output, axis=1))
         return [self.cls[idx] for idx in pred_idxs]
+
+
+class QanythingCls:
+    def __init__(self, cfg):
+        if cfg["engine_type"] is None:
+            cfg["engine_type"] = EngineType.ONNXRUNTIME
+        self.session = get_engine(cfg["engine_type"])(cfg)
+        self.inp_h = 224
+        self.inp_w = 224
+        self.mean = np.array([0.485, 0.456, 0.406], dtype=np.float32)
+        self.std = np.array([0.229, 0.224, 0.225], dtype=np.float32)
+        self.cls = {0: "wired", 1: "wireless"}
+
+    def preprocess(self, img):
+        img = cv2.cvtColor(img.copy(), cv2.COLOR_BGR2RGB)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        img = np.stack((img,) * 3, axis=-1)  # gray → 3 channel
+        img = Image.fromarray(np.uint8(img))
+        img = img.resize((self.inp_w, self.inp_h))  # 注意：PIL resize 是 (W,H)
+        img = np.array(img, dtype=np.float32) / 255.0
+        img -= self.mean
+        img /= self.std
+        img = img.transpose(2, 0, 1)  # HWC → CHW
+        return img   # 不再添加 batch 维度
+
+    def batch_preprocess(self, imgs):
+        """支持 TableCls 批量"""
+        res_imgs = [self.preprocess(img) for img in imgs]
+        x = np.stack(res_imgs, axis=0).astype(np.float32)  # → (N, 3, H, W)
+        return x
+
+    def __call__(self, img_batch):
+        """
+        img_batch shape: (N, 3, H, W)
+        """
+        output = self.session(img_batch)[0]  # (N, num_classes)
+
+        # softmax
+        predict = np.exp(output - np.max(output, axis=1, keepdims=True))
+        predict /= np.sum(predict, axis=1, keepdims=True)
+
+        # batch argmax
+        pred_idxs = np.argmax(predict, axis=1).tolist()
+
+        return [self.cls[int(idx)] for idx in pred_idxs]

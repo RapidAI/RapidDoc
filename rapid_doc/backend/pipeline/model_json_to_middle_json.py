@@ -10,7 +10,6 @@ from rapid_doc.backend.pipeline.model_init import AtomModelSingleton
 from rapid_doc.backend.pipeline.para_split import para_split
 from rapid_doc.utils.block_pre_proc import prepare_block_bboxes, process_groups
 from rapid_doc.utils.block_sort import sort_blocks_by_bbox
-from rapid_doc.utils.boxbase import calculate_overlap_area_in_bbox1_area_ratio
 from rapid_doc.utils.cut_image import cut_image_and_table
 from rapid_doc.utils.enum_class import ContentType
 from rapid_doc.utils.model_utils import clean_memory
@@ -20,7 +19,6 @@ from rapid_doc.utils.pdf_image_tools import save_table_fill_image
 from rapid_doc.utils.span_block_fix import fill_spans_in_blocks, fix_discarded_block, fix_block_spans
 from rapid_doc.utils.span_pre_proc import remove_outside_spans, remove_overlaps_low_confidence_spans, \
     remove_overlaps_min_spans, txt_spans_extract
-from rapid_doc.utils.table_merge import merge_table
 from rapid_doc.version import __version__
 from rapid_doc.utils.hash_utils import bytes_md5
 

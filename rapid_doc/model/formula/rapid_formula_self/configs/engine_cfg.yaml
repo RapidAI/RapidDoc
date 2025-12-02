@@ -10,6 +10,7 @@ onnxruntime:
     cuda_ep_cfg:
         device_id: 0
         arena_extend_strategy: "kNextPowerOfTwo"
+        gpu_mem_limit: 21474836480 # 20 * 1024 * 1024 * 1024
         cudnn_conv_algo_search: "EXHAUSTIVE"
         do_copy_in_default_stream: true
 
@@ -20,7 +21,7 @@ onnxruntime:
     cann_ep_cfg:
         device_id: 0
         arena_extend_strategy: "kNextPowerOfTwo"
-        npu_mem_limit:  21474836480 # 20 * 1024 * 1024 * 1024
+        npu_mem_limit: 21474836480 # 20 * 1024 * 1024 * 1024
         op_select_impl_mode: "high_performance"
         optypelist_for_implmode: "Gelu"
         enable_cann_graph: true
