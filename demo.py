@@ -229,10 +229,7 @@ if __name__ == '__main__':
     doc_path_list = [
         "demo/pdfs/示例1-论文模板.pdf",
         "demo/pdfs/比亚迪财报.pdf",
-        # "demo/images/table_10.png",
-        # "demo/pdfs/示例1-论文模板.pdf",
-
-        r"D:\file\text-pdf\图+模糊字 2.pdf"
+        "demo/images/table_10.png",
     ]
     for doc_path in doc_path_list:
         start_time = time.time()
