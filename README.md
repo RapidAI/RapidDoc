@@ -130,12 +130,10 @@ RapidDoc提供了便捷的docker部署方式，这有助于快速搭建环境并
 - [x] 表格内图片提取
 - [x] 优化阅读顺序，支持多栏、竖排等复杂版面恢复
 - [x] 公式支持torch推理，可用GPU加速
-- [ ] 版面、表格支持openvino
-- [ ] 支持 PP-DocLayoutV2 版面识别+阅读顺序
-- [ ] 支持 PaddleOCR-VL（vlm-http-client模式）
-
+- [x] 表格支持openvino
+- [ ] 版面支持openvino
 - [ ] 公式支持openvino
-- [ ] RapidDoc4j（Java版本）
+- [ ] 支持 PP-DocLayoutV2 版面识别+阅读顺序
 
 
 ## 🙏 致谢

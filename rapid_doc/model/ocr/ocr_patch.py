@@ -77,8 +77,15 @@ def patch_torch_ocr():
     from rapid_doc.model.ocr.torch import TorchInferSession
     rapidocr_torch.TorchInferSession = TorchInferSession
 
+def patch_openvino_ocr():
+    """优化 openvino OCR 推理，使用异步推理替代同步，修复并发识别报错"""
+    # 替换 rapidocr 的 OpenVINOInferSession
+    from rapidocr.inference_engine import openvino as rapidocr_openvino
+    from rapid_doc.model.ocr.openvino import OpenVINOInferSession
+    rapidocr_openvino.OpenVINOInferSession = OpenVINOInferSession
 
 def apply_ocr_patch():
     """统一入口：应用所有 OCR 相关补丁"""
     patch_text_detector()
     patch_torch_ocr()
+    patch_openvino_ocr()

@@ -1,8 +1,14 @@
+# -*- encoding: utf-8 -*-
+# @Author: SWHL
+# @Contact: liekkaskono@163.com
 import os
 import traceback
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict
+
 import numpy as np
+from omegaconf import DictConfig
+
 try:
     import openvino as ov
     from openvino.runtime import Core
@@ -11,26 +17,41 @@ except ImportError:
         "openvino is not installed. Please install it with: pip install openvino"
     )
 
-from ..model_processor.main import ModelProcessor
-from ..utils.logger import Logger
-from .base import InferSession
+from rapidocr.utils.download_file import DownloadFile, DownloadFileInput
+from rapidocr.utils.log import logger
+from rapidocr.inference_engine.base import FileInfo, InferSession
 
 
 class OpenVINOInferSession(InferSession):
-    def __init__(self, cfg):
+    def __init__(self, cfg: DictConfig):
         super().__init__(cfg)
-        self.logger = Logger(logger_name=__name__).get_log()
+        self.logger = logger
 
         core = Core()
 
-        if cfg["model_dir_or_path"] is None:
-            model_path = ModelProcessor.get_model_path(cfg['model_type'])
-        else:
-            model_path = Path(cfg["model_dir_or_path"])
+        model_path = cfg.get("model_path", None)
+        if model_path is None:
+            model_info = self.get_model_url(
+                FileInfo(
+                    engine_type=cfg.engine_type,
+                    ocr_version=cfg.ocr_version,
+                    task_type=cfg.task_type,
+                    lang_type=cfg.lang_type,
+                    model_type=cfg.model_type,
+                )
+            )
+            model_path = self.DEFAULT_MODEL_PATH / Path(model_info["model_dir"]).name
+            download_params = DownloadFileInput(
+                file_url=model_info["model_dir"],
+                sha256=model_info["SHA256"],
+                save_path=model_path,
+                logger=self.logger,
+            )
+            DownloadFile.run(download_params)
 
-        self._verify_model(model_path)
-        self.model_path = model_path
         self.logger.info(f"Using {model_path}")
+        model_path = Path(model_path)
+        self._verify_model(model_path)
 
         self.model = core.read_model(model=str(model_path))
         self.input_tensor = self.model.inputs[0]
@@ -45,9 +66,9 @@ class OpenVINOInferSession(InferSession):
         )
         self.infer_request = self.compiled_model.create_infer_request()
 
-    def _init_config(self, cfg) -> Dict[Any, Any]:
+    def _init_config(self, cfg: DictConfig) -> Dict[Any, Any]:
         config = {}
-        engine_cfg = cfg['engine_cfg']
+        engine_cfg = cfg.get("engine_cfg", {})
 
         infer_num_threads = engine_cfg.get("inference_num_threads", -1)
         if infer_num_threads != -1 and 1 <= infer_num_threads <= os.cpu_count():
@@ -90,38 +111,15 @@ class OpenVINOInferSession(InferSession):
             self.infer_request.start_async()
             self.infer_request.wait()  # 等待推理完成
 
-            outputs = []
-            for output_tensor in self.output_tensors:
-                output_tensor_name = output_tensor.get_any_name()
-                output = self.infer_request.get_tensor(output_tensor_name).data
-                outputs.append(output)
-
-            return outputs
-
+            output_tensor_name = self.output_tensors[0].get_any_name()
+            output = self.infer_request.get_tensor(output_tensor_name).data
+            return output
         except Exception as e:
             error_info = traceback.format_exc()
             raise OpenVIONError(error_info) from e
 
-    def get_input_names(self) -> List[str]:
-        return [tensor.get_any_name() for tensor in self.model.inputs]
-
-    def get_output_names(self) -> List[str]:
-        return [tensor.get_any_name() for tensor in self.model.outputs]
-
-    @property
-    def characters(self):
-        return self.get_character_list()
-
-    def get_character_list(self, key: str = "character") -> List[str]:
-        val = self.model.get_rt_info()["framework"][key]
-        return val.value.splitlines()
-
     def have_key(self, key: str = "character") -> bool:
-        try:
-            rt_info = self.model.get_rt_info()
-            return key in rt_info
-        except:
-            return False
+        return False
 
 
 class OpenVIONError(Exception):

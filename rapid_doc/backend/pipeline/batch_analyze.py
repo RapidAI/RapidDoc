@@ -58,6 +58,7 @@ class BatchAnalyze:
         self.table_use_word_box = table_config.get("use_word_box", True) if table_config else True
         self.table_formula_enable = table_config.get("table_formula_enable", True) if table_config else True
         self.table_image_enable = table_config.get("table_image_enable", True) if table_config else True
+        self.table_extract_original_image = table_config.get("extract_original_image", False) if table_config else False
 
     def __call__(self, images_with_extra_info: List[Tuple[Image.Image, float, bool, str, dict]]) -> list:
         if len(images_with_extra_info) == 0:
@@ -398,21 +399,31 @@ class BatchAnalyze:
                         det_res = ocr_model.ocr(bgr_image, mfd_res=adjusted_mfdetrec_res, rec=False)[0]
                         if not self.table_force_ocr and not table_res_dict['ocr_enable'] and most_angle == 0:
                             if det_res:
-                                ocr_spans = get_ocr_result_list_table(det_res, useful_list, scale)
-                                poly = table_res_dict['table_res']['poly']
-                                table_bboxes = [[int(poly[0]/scale), int(poly[1]/scale), int(poly[4]/scale), int(poly[5]/scale)
-                                                    , None, None, None,'text', None, None, None, None, 1]]
-                                # 从pdf中提取表格的文本
-                                txt_spans_extract(page_dict, ocr_spans, table_res_dict['table_img'], scale, table_bboxes,[]
-                                                  , return_word_box=self.table_use_word_box, useful_list=table_res_dict['useful_list'])
-                                if self.table_use_word_box:
-                                    ocr_result = [list(col) for col in zip(*(
+                                try:
+                                    ocr_spans = get_ocr_result_list_table(det_res, useful_list, scale)
+                                    poly = table_res_dict['table_res']['poly']
+                                    table_bboxes = [[int(poly[0] / scale), int(poly[1] / scale), int(poly[4] / scale), int(poly[5] / scale)
+                                                        , None, None, None, 'text', None, None, None, None, 1]]
+                                    # 从pdf中提取表格的文本
+                                    txt_spans_extract(page_dict, ocr_spans, table_res_dict['table_img'], scale, table_bboxes, []
+                                                      , return_word_box=self.table_use_word_box, useful_list=table_res_dict['useful_list'])
+                                    if self.table_use_word_box:
+                                        filtered = [
                                             (w[2], w[0], w[1])
-                                            for group in [item.get('word_result') for item in ocr_spans]
+                                            for item in ocr_spans
+                                            for group in [item.get('word_result')]
+                                            if group
                                             for w in group
-                                        ))]
-                                else:
-                                    ocr_result = [list(x) for x in zip(*[[item['ori_bbox'], item['content'], item['score']] for item in ocr_spans])]
+                                            if w and w[2] != ""
+                                        ]
+                                    else:
+                                        filtered = [
+                                            [item['ori_bbox'], item['content'], item['score']]
+                                            for item in ocr_spans if item.get('content')
+                                        ]
+                                    ocr_result = [list(x) for x in zip(*filtered)] if filtered else []
+                                except:
+                                    logger.warning('table ocr_result get from pdf error')
                         # 进行 OCR-rec 识别文字框
                         if not ocr_result and det_res:
                             rec_img_list = []
@@ -444,7 +455,7 @@ class BatchAnalyze:
                         # 从pdf里提取表格里的图片
                         fill_image_res = []
                         if self.table_image_enable:
-                            fill_image_res = extract_table_fill_image(page_dict, table_res_dict, scale=scale)
+                            fill_image_res = extract_table_fill_image(page_dict, table_res_dict, scale, self.table_extract_original_image)
                         table_res_dict['table_res'].pop('layout_image_list', None)
                         html_code = table_model.predict(table_res_dict['table_img'], ocr_result,
                                                         fill_image_res, adjusted_mfdetrec_res, self.skip_text_in_image, self.use_img2table)

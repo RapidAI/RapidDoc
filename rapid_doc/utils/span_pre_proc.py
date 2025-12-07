@@ -199,7 +199,7 @@ def txt_in_ori_image(page_dict, ori_image_bbox):
 
 
 """提取表格里的图片"""
-def extract_table_fill_image(page_dict, table_res_dict, scale):
+def extract_table_fill_image(page_dict, table_res_dict, scale, table_extract_original_image):
     input_res = table_res_dict['table_res']
     ori_image_list = page_dict['ori_image_list']
     useful_list = table_res_dict['useful_list']
@@ -210,7 +210,7 @@ def extract_table_fill_image(page_dict, table_res_dict, scale):
     input_res_bbox = [poly[0]/scale, poly[1]/scale, poly[4]/scale, poly[5]/scale]
     image_res = []
 
-    if ori_image_list:
+    if table_extract_original_image and ori_image_list:
         for image in ori_image_list:
             # 找到在表格里的图片
             bbox = image['bbox']
@@ -242,7 +242,10 @@ def extract_table_fill_image(page_dict, table_res_dict, scale):
             image['ocr_bbox'] = [p1, p2, p3, p4]
             image_res.append(image)
         # 把image_res放到page_dict里面，方便后续保存图片
-    page_dict['table_fill_image_list'] = image_res
+    if not page_dict.get('table_fill_image_list'):
+        page_dict['table_fill_image_list'] = image_res
+    else:
+        page_dict['table_fill_image_list'].extend(image_res)
     # table_res_dict['table_res'].pop('layout_image_list', None)
     return image_res
 

@@ -97,6 +97,7 @@ def do_parse(
         # "use_compare_table": False,  # 启用表格结果比较（同时跑有线/无线并比对），默认 False
         # "table_formula_enable": False, # 表格内公式识别
         # "table_image_enable": False, # 表格内图片识别
+        # "extract_original_image": False # 是否提取表格内原始图片，默认 False
         # "cls.model_type": TableModelType.PADDLE_CLS, # 表格分类模型
         # "cls.model_dir_or_path": "", # 表格分类模型地址
         # "unet.model_dir_or_path": "", # UNET表格模型地址
@@ -230,6 +231,8 @@ if __name__ == '__main__':
         "demo/pdfs/比亚迪财报.pdf",
         # "demo/images/table_10.png",
         # "demo/pdfs/示例1-论文模板.pdf",
+
+        r"D:\file\text-pdf\图+模糊字 2.pdf"
     ]
     for doc_path in doc_path_list:
         start_time = time.time()

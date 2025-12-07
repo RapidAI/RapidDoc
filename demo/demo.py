@@ -96,6 +96,7 @@ def do_parse(
         # "use_compare_table": False,  # 启用表格结果比较（同时跑有线/无线并比对），默认 False
         # "table_formula_enable": False, # 表格内公式识别
         # "table_image_enable": False, # 表格内图片识别
+        # "extract_original_image": False # 是否提取表格内原始图片，默认 False
         # "cls.model_type": TableModelType.Q_CLS, # 表格分类模型
         # "cls.model_dir_or_path": "", # 表格分类模型地址
         # "unet.model_dir_or_path": "", # UNET表格模型地址
