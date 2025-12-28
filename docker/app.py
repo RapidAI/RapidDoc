@@ -326,11 +326,10 @@ async def file_parse(
                         data["content_list"] = json.loads(get_infer_result("_content_list.json", pdf_name, parse_dir))
                     if return_images:
                         images_dir = os.path.join(parse_dir, "images")
-                        safe_pattern = [
-                            os.path.join(glob.escape(images_dir), "*.jpg"),
-                            os.path.join(glob.escape(images_dir), "*.png")
-                        ]
-                        image_paths = glob.glob(safe_pattern)
+                        image_paths = (
+                                glob.glob(os.path.join(glob.escape(images_dir), "*.jpg")) +
+                                glob.glob(os.path.join(glob.escape(images_dir), "*.png"))
+                        )
                         data["images"] = {
                             os.path.basename(
                                 image_path
