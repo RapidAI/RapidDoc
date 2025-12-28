@@ -1,12 +1,24 @@
 import os
-import onnx
 import traceback
 from pathlib import Path
 from typing import Any, Dict, List
-
 import numpy as np
+from importlib.metadata import version
+from packaging.version import Version
 
-from openvino.runtime import Core
+try:
+    import openvino as ov
+    from openvino.runtime import Core
+except ImportError:
+    raise ImportError(
+        "openvino is not installed. Please install it with: pip install openvino"
+    )
+openvino_version = Version(version("openvino"))
+if openvino_version < Version("2025.4.0"):
+    raise ImportError(
+        f"openvino version must be >= 2025.4.0, but found {openvino_version}. "
+        "Please upgrade with: pip install -U openvino"
+    )
 
 from ..model_handler.utils import ModelProcessor
 from ..utils.logger import Logger
@@ -30,16 +42,18 @@ class OpenVINOInferSession(InferSession):
         self.model_path = model_path
         self.logger.info(f"Using {model_path}")
 
-        self.onnx_model = onnx.load(self.model_path)  # 读取 ONNX 文件
+        self.model = core.read_model(model=str(model_path))
+        self.input_tensor = self.model.inputs[0]
+        self.output_tensors = self.model.outputs
 
-        config = self._init_config(cfg)
-        core.set_property("CPU", config)
-
-        model_onnx = core.read_model(model_path)
-
-        compile_model = core.compile_model(model=model_onnx, device_name="CPU")
-        # self.session = compile_model.create_infer_request()
-        self.session = compile_model
+        device = 'CPU'
+        ov_config = self._init_config(cfg)
+        self.compiled_model = core.compile_model(
+            self.model,
+            device,
+            ov_config,
+        )
+        self.infer_request = self.compiled_model.create_infer_request()
 
     def _init_config(self, cfg: RapidLayoutInput) -> Dict[Any, Any]:
         config = {}
@@ -77,42 +91,59 @@ class OpenVINOInferSession(InferSession):
         return config
 
     def __call__(self, input_content: np.ndarray, scale_factor: np.ndarray = None) -> Any:
-        if scale_factor is not None:
-            if 'im_shape' in self.get_input_names():
-                im_shape = np.array([[input_content.shape[-2], input_content.shape[-1]]], dtype=np.float32)
-                input_dict = dict(zip(self.get_input_names(), [im_shape, input_content, scale_factor]))
-            else:
-                input_dict = dict(zip(self.get_input_names(), [input_content, scale_factor]))
-        else:
-            input_dict = dict(zip(self.get_input_names(), [input_content]))
         try:
-            result = self.session(input_dict)
-            return [result[out] for out in self.session.outputs]
+            if scale_factor is not None:
+                input_names = self.get_input_names()
+                for name in input_names:
+                    if name == "image":
+                        self.infer_request.set_tensor(name, ov.Tensor(input_content))
+                    elif name == "scale_factor":
+                        self.infer_request.set_tensor(name, ov.Tensor(scale_factor))
+                    elif name == "im_shape":
+                        h, w = input_content.shape[-2:]
+                        im_shape = np.array([[h, w]], dtype=np.float32)
+                        self.infer_request.set_tensor(name, ov.Tensor(im_shape))
+            else:
+                input_tensor_name = self.input_tensor.get_any_name()
+                self.infer_request.set_tensor(input_tensor_name, ov.Tensor(input_content))
+
+            # self.infer_request.infer()
+            # 使用异步推理替代同步 infer()
+            self.infer_request.start_async()
+            self.infer_request.wait()  # 等待推理完成
+
+            outputs = []
+            for output_tensor in self.output_tensors:
+                output_tensor_name = output_tensor.get_any_name()
+                output = self.infer_request.get_tensor(output_tensor_name).data
+                outputs.append(output)
+
+            return outputs
 
         except Exception as e:
             error_info = traceback.format_exc()
             raise OpenVIONError(error_info) from e
 
     def get_input_names(self) -> List[str]:
-        return [inp.any_name for inp in self.session.inputs]
+        return [tensor.get_any_name() for tensor in self.model.inputs]
 
     def get_output_names(self) -> List[str]:
-        return [inp.any_name for inp in self.session.outputs]
+        return [tensor.get_any_name() for tensor in self.model.outputs]
 
     @property
-    def characters(self) -> List[str]:
+    def characters(self):
         return self.get_character_list()
 
     def get_character_list(self, key: str = "character") -> List[str]:
-
-        meta_dict = {p.key: p.value for p in self.onnx_model.metadata_props}
-        if key not in meta_dict:
-            return []
-        return meta_dict[key].splitlines()
+        val = self.model.get_rt_info()["framework"][key]
+        return val.value.splitlines()
 
     def have_key(self, key: str = "character") -> bool:
-        meta_dict = {p.key: p.value for p in self.onnx_model.metadata_props}
-        return key in meta_dict
+        try:
+            rt_info = self.model.get_rt_info()
+            return key in rt_info
+        except:
+            return False
 
 
 class OpenVIONError(Exception):
