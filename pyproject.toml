@@ -64,6 +64,17 @@ api = [
     "python-multipart>=0.0.6",
 ]
 
+word = [
+    "python-docx>=0.8.10",
+    "pypandoc-binary",
+]
+
+html = [
+    "markdown-it-py",
+    "mdit-py-plugins",
+    "pygments",
+]
+
 gradio = [
     "gradio>=5.34,<6",
     "gradio-pdf>=0.0.22",

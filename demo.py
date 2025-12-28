@@ -41,6 +41,8 @@ def do_parse(
     f_dump_model_output=True,  # Whether to dump model output files
     f_dump_orig_pdf=True,  # Whether to dump original PDF files
     f_dump_content_list=True,  # Whether to dump content list files
+    f_dump_md_html=True,  # Whether to convert markdown to HTML
+    f_dump_md_docx=True,  # Whether to convert markdown to docx (via Pandoc)
     f_make_md_mode=MakeMode.MM_MD,  # The mode for making markdown content, default is MM_MD
     start_page_id=0,  # Start page ID for parsing, default is 0
     end_page_id=None,  # End page ID for parsing, default is None (parse all pages until the end of the document)
@@ -162,6 +164,38 @@ def do_parse(
                 f"{pdf_file_name}.md",
                 md_content_str,
             )
+
+            # ===================== Markdown 转 HTML =====================
+            if f_dump_md_html and md_content_str:
+                try:
+                    from rapid_doc.utils.markdown_to_html import markdown_to_html
+                    html_path = os.path.join(local_md_dir, f"{pdf_file_name}.html")
+                    markdown_to_html(
+                        md_content_str,
+                        output_path=html_path,
+                        title=pdf_file_name,
+                        image_base_path=local_md_dir,  # 图片相对于md目录
+                        embed_images=False,  # 不嵌入图片，保持引用
+                    )
+                except ImportError as e:
+                    logger.warning(f"Markdown转HTML失败: {e}")
+                except Exception as e:
+                    logger.error(f"Markdown转HTML失败: {e}")
+
+            # ===================== Markdown 转 docx (via Pandoc) =====================
+            if f_dump_md_docx and md_content_str:
+                try:
+                    from rapid_doc.utils.markdown_to_word import markdown_to_docx
+                    md_docx_path = os.path.join(local_md_dir, f"{pdf_file_name}_md.docx")
+                    markdown_to_docx(
+                        md_content_str,
+                        output_path=md_docx_path,
+                        image_base_path=local_md_dir,  # 图片相对于md目录
+                    )
+                except ImportError as e:
+                    logger.warning(f"Markdown转docx失败: {e}")
+                except Exception as e:
+                    logger.error(f"Markdown转docx失败: {e}")
 
         if f_dump_content_list:
             image_dir = str(os.path.basename(local_image_dir))
