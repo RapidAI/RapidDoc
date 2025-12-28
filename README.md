@@ -2,7 +2,7 @@
 
 ## 😺 项目介绍
 
-**RapidDoc 是一个轻量级、专注于文档解析的开源框架，支持 **OCR、版面分析、公式识别、表格识别和阅读顺序恢复** 等多种功能。**
+**RapidDoc 是一个轻量级、专注于文档解析的开源框架，支持 **OCR、版面分析、公式识别、表格识别和阅读顺序恢复** 等多种功能，支持将复杂 PDF 文档转换为 Markdown、JSON、WORD、HTML 多种格式**
 
 **框架基于 [Mineru](https://github.com/opendatalab/MinerU) 二次开发，移除 VLM，专注于 Pipeline 产线下的高效文档解析，在 CPU 上也能保持不错的解析速度。**
 
@@ -24,8 +24,9 @@
   - CPU 下默认使用 OpenVINO，GPU 下默认使用 torch
   
 - **版面识别**
-  - 模型使用 `PP-DocLayout` 系列 ONNX 模型（plus-L、L、M、S）
-    - **PP-DocLayout_plus-L**：效果最好，速度稍慢，默认使用 
+  - 模型使用 `PP-DocLayout` 系列 ONNX 模型（v2、plus-L、L、M、S）
+    - **PP-DocLayoutV2**：PaddleOCR-VL使用的版面模型，自带阅读顺序
+    - **PP-DocLayout_plus-L**：效果好运行稳定，默认使用 
     - **PP-DocLayout-L**：速度快，效果也不错
     - **PP-DocLayout-S**：速度极快，存在部分漏检
 
@@ -50,6 +51,291 @@
   - 所有模型通过 ONNXRuntime 推理，OCR可配置其他推理引擎
   - 除了 OCR 和 PP-DocLayout-M/S 模型，OpenVINO推理会报错，暂时难以解决。[PaddleOCR/issues/16277](https://github.com/PaddlePaddle/PaddleOCR/issues/16277)
 ---
+
+## 基准测试结果
+
+### 1. OmniDocBench
+
+以下是RapidDoc在 OmniDocBench 上的评估结果。Pipeline 模型使用 PP-DocLayout_plus-L、PP-OCRv5-mobile、PP-FormulaNet_plus-M、UNET_SLANET_PLUS。
+<table style="width:100%; border-collapse: collapse;">
+    <caption>Comprehensive evaluation of document parsing on OmniDocBench (v1.5)</caption>
+    <thead>
+        <tr>
+            <th>Model Type</th>
+            <th>Methods</th>
+            <th>Size</th>
+            <th>Overall&#x2191;</th>
+            <th>Text<sup>Edit</sup>&#x2193;</th>
+            <th>Formula<sup>CDM</sup>&#x2191;</th>
+            <th>Table<sup>TEDS</sup>&#x2191;</th>
+            <th>Table<sup>TEDS-S</sup>&#x2191;</th>
+            <th>Read Order<sup>Edit</sup>&#x2193;</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td rowspan="16"><strong>Specialized</strong><br><strong>VLMs</strong></td>
+            <td>PaddleOCR-VL</td>
+            <td>0.9B</td>
+            <td><strong>92.86</strong></td>
+            <td><strong>0.035</strong></td>
+            <td><strong>91.22</strong></td>
+            <td><strong>90.89</strong></td>
+            <td><strong>94.76</strong></td>
+            <td><strong>0.043</strong></td>
+        </tr>
+            <td>MinerU2.5</td>
+            <td>1.2B</td>
+            <td><ins>90.67</ins></td>
+            <td><ins>0.047</ins></td>
+            <td><ins>88.46</ins></td>
+            <td><ins>88.22</ins></td>
+            <td><ins>92.38</ins></td>
+            <td><ins>0.044</ins></td>
+        </tr>
+        <tr>
+            <td>MonkeyOCR-pro-3B</td>
+            <td>3B</td>
+            <td>88.85</td>
+            <td>0.075</td>
+            <td>87.25</td>
+            <td>86.78</td>
+            <td>90.63</td>
+            <td>0.128</td>
+        </tr>
+        <tr>
+            <td>OCRVerse</td>
+            <td>4B</td>
+            <td>88.56</td>
+            <td>0.058</td>
+            <td>86.91</td>
+            <td>84.55</td>
+            <td>88.45</td>
+            <td>0.071</td>
+        </tr>
+        <tr>
+            <td>dots.ocr</td>
+            <td>3B</td>
+            <td>88.41</td>
+            <td>0.048</td>
+            <td>83.22</td>
+            <td>86.78</td>
+            <td>90.62</td>
+            <td>0.053</td>
+        </tr>
+        <tr>
+            <td>MonkeyOCR-3B</td>
+            <td>3B</td>
+            <td>87.13</td>
+            <td>0.075</td>
+            <td>87.45</td>
+            <td>81.39</td>
+            <td>85.92</td>
+            <td>0.129</td>
+        </tr>
+        <tr>
+            <td>Deepseek-OCR</td>
+            <td>3B</td>
+            <td>87.01</td>
+            <td>0.073</td>
+            <td>83.37</td>
+            <td>84.97</td>
+            <td>88.80</td>
+            <td>0.086</td>
+        </tr>
+        <tr>
+            <td>MonkeyOCR-pro-1.2B</td>
+            <td>1.2B</td>
+            <td>86.96</td>
+            <td>0.084</td>
+            <td>85.02</td>
+            <td>84.24</td>
+            <td>89.02</td>
+            <td>0.130</td>
+        </tr>
+        <tr>
+            <td>Nanonets-OCR-s</td>
+            <td>3B</td>
+            <td>85.59</td>
+            <td>0.093</td>
+            <td>85.90</td>
+            <td>80.14</td>
+            <td>85.57</td>
+            <td>0.108</td>
+        </tr>
+        <tr>
+            <td>MinerU2-VLM</td>
+            <td>0.9B</td>
+            <td>85.56</td>
+            <td>0.078</td>
+            <td>80.95</td>
+            <td>83.54</td>
+            <td>87.66</td>
+            <td>0.086</td>
+        </tr>
+        <tr>
+            <td>olmOCR</td>
+            <td>7B</td>
+            <td>81.79</td>
+            <td>0.096</td>
+            <td>86.04</td>
+            <td>68.92</td>
+            <td>74.77</td>
+            <td>0.121</td>
+        </tr>
+        <tr>
+            <td>Dolphin-1.5</td>
+            <td>0.3B</td>
+            <td>83.21</td>
+            <td>0.092</td>
+            <td>80.78</td>
+            <td>78.06</td>
+            <td>84.10</td>
+            <td>0.080</td>
+        </tr>
+        <tr>
+            <td>POINTS-Reader</td>
+            <td>3B</td>
+            <td>80.98</td>
+            <td>0.134</td>
+            <td>79.20</td>
+            <td>77.13</td>
+            <td>81.66</td>
+            <td>0.145</td>
+        </tr>
+        <tr>
+            <td>Mistral OCR</td>
+            <td>-</td>
+            <td>78.83</td>
+            <td>0.164</td>
+            <td>82.84</td>
+            <td>70.03</td>
+            <td>78.04</td>
+            <td>0.144</td>
+        </tr>
+        <tr>
+            <td>OCRFlux</td>
+            <td>3B</td>
+            <td>74.82</td>
+            <td>0.193</td>
+            <td>68.03</td>
+            <td>75.75</td>
+            <td>80.23</td>
+            <td>0.202</td>
+        </tr>
+        <tr>
+            <td>Dolphin</td>
+            <td>0.3B</td>
+            <td>74.67</td>
+            <td>0.125</td>
+            <td>67.85</td>
+            <td>68.70</td>
+            <td>77.77</td>
+            <td>0.124</td>
+        </tr>
+        <tr>
+            <td rowspan="6"><strong>General</strong><br><strong>VLMs</strong></td>
+            <td>Qwen3-VL-235B-A22B-Instruct</td>
+            <td>235B</td>
+            <td>89.15</td>
+            <td>0.069</td>
+            <td>88.14</td>
+            <td>86.21</td>
+            <td>90.55</td>
+            <td>0.068</td>
+        </tr>
+            <td>Gemini-2.5 Pro</td>
+            <td>-</td>
+            <td>88.03</td>
+            <td>0.075</td>
+            <td>85.82</td>
+            <td>85.71</td>
+            <td>90.29</td>
+            <td>0.097</td>
+        </tr>
+        <tr>
+            <td>Qwen2.5-VL</td>
+            <td>72B</td>
+            <td>87.02</td>
+            <td>0.094</td>
+            <td>88.27</td>
+            <td>82.15</td>
+            <td>86.22</td>
+            <td>0.102</td>
+        </tr>
+        <tr>
+            <td>InternVL3.5</td>
+            <td>241B</td>
+            <td>82.67</td>
+            <td>0.142</td>
+            <td>87.23</td>
+            <td>75.00</td>
+            <td>81.28</td>
+            <td>0.125</td>
+        </tr>
+        <tr>
+            <td>InternVL3</td>
+            <td>78B</td>
+            <td>80.33</td>
+            <td>0.131</td>
+            <td>83.42</td>
+            <td>70.64</td>
+            <td>77.74</td>
+            <td>0.113</td>
+        </tr>
+        <tr>
+            <td>GPT-4o</td>
+            <td>-</td>
+            <td>75.02</td>
+            <td>0.217</td>
+            <td>79.70</td>
+            <td>67.07</td>
+            <td>76.09</td>
+            <td>0.148</td>
+        </tr>
+        <tr>
+            <td rowspan="4"><strong>Pipeline</strong><br><strong>Tools</strong></td>
+            <td>PP-StructureV3</td>
+            <td>-</td>
+            <td>86.73</td>
+            <td>0.073</td>
+            <td>85.79</td>
+            <td>81.68</td>
+            <td>89.48</td>
+            <td>0.073</td>
+        </tr>
+        <tr>
+            <td><strong>RapidDoc</strong></td>
+            <td>-</td>
+            <td>85.25</td>
+            <td>0.085</td>
+            <td>85.19</td>
+            <td>79.07</td>
+            <td>86.35</td>
+            <td>0.114</td>
+        </tr>
+        <tr>
+            <td>Mineru2-pipeline</td>
+            <td>-</td>
+            <td>75.51</td>
+            <td>0.209</td>
+            <td>76.55</td>
+            <td>70.90</td>
+            <td>79.11</td>
+            <td>0.225</td>
+        </tr>
+        <tr>
+            <td>Marker-1.8.2</td>
+            <td>-</td>
+            <td>71.30</td>
+            <td>0.206</td>
+            <td>76.66</td>
+            <td>57.88</td>
+            <td>71.17</td>
+            <td>0.250</td>
+        </tr>
+    </tbody>
+</table>
 
 ## 🛠️ 安装RapidDoc
 
@@ -126,14 +412,14 @@ RapidDoc提供了便捷的docker部署方式，这有助于快速搭建环境并
 - [x] 文本型pdf，使用pypdfium2提取文本框bbox
 - [x] 文本型pdf，支持0/90/270度三个方向的表格解析
 - [x] 文本型pdf，使用pypdfium2提取原始图片（默认截图会导致清晰度降低和图片边界可能丢失部分）
-- [x] 表格内公式提取
-- [x] 表格内图片提取
+- [x] 表格内公式提取，表格内图片提取
 - [x] 优化阅读顺序，支持多栏、竖排等复杂版面恢复
 - [x] 公式支持torch推理，可用GPU加速
-- [x] 表格支持openvino
-- [ ] 版面支持openvino
+- [x] 版面、表格模型支持openvino
+- [x] markdown转docx、html
+- [x] 支持 PP-DocLayoutV2 版面识别+阅读顺序
+- [x] OmniDocBench评测
 - [ ] 公式支持openvino
-- [ ] 支持 PP-DocLayoutV2 版面识别+阅读顺序
 
 
 ## 🙏 致谢
