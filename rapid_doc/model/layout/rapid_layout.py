@@ -151,15 +151,15 @@ class RapidLayoutModel(object):
             else:
                 scale = 1.0
                 resized = img
-            import uuid
-            cv2.imwrite(rf"C:\ocr\img\test\output-images\{uuid.uuid4().hex}.png", resized)
+            # import uuid
+            # cv2.imwrite(rf"C:\ocr\img\test\output-images\{uuid.uuid4().hex}.png", resized)
             processed_images.append(resized)
             scales.append(scale)
 
         all_results = self.model(img_contents=processed_images, batch_size=batch_size, tqdm_enable=True)
         for img_idx, results in enumerate(all_results):
-            import uuid
-            results.vis(f"output-PP_DOCLAYOUTV1/{uuid.uuid4().hex}__{img_idx}.png")
+            # import uuid
+            # results.vis(f"output-PP_DOCLAYOUTV1/{uuid.uuid4().hex}__{img_idx}.png")
             layout_res = []
             img, boxes, scores, class_names, elapse = results.img, results.boxes, results.scores, results.class_names, results.elapse
             orders = results.orders if results.orders is not None else [-1] * len(boxes)

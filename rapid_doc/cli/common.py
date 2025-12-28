@@ -42,6 +42,10 @@ def prepare_env(output_dir, pdf_file_name, parse_method):
     return local_image_dir, local_md_dir
 
 def convert_pdf_bytes_to_bytes_by_pypdfium2(pdf_bytes, start_page_id=0, end_page_id=None):
+    original_image = None
+    if isinstance(pdf_bytes, dict):
+        original_image = pdf_bytes.get("original_image")
+        pdf_bytes = pdf_bytes["pdf_bytes"]
     pdf = pdfium.PdfDocument(pdf_bytes)
     output_pdf = pdfium.PdfDocument.new()
     try:
@@ -67,6 +71,11 @@ def convert_pdf_bytes_to_bytes_by_pypdfium2(pdf_bytes, start_page_id=0, end_page
 
     pdf.close()  # 关闭原PDF文档以释放资源
     output_pdf.close()  # 关闭新PDF文档以释放资源
+    if original_image is not None:
+        return {
+            "pdf_bytes": output_bytes,
+            "original_image": original_image,
+        }
     return output_bytes
 
 

@@ -102,6 +102,22 @@ def doc_analyze(
     适当调大MIN_BATCH_INFERENCE_SIZE可以提高性能，更大的 MIN_BATCH_INFERENCE_SIZE会消耗更多内存，
     可通过环境变量MINERU_MIN_BATCH_INFERENCE_SIZE设置，默认值为384。
     """
+    # -------- 参数归一化 --------
+    original_image_list = []
+    # 先判断是否有 dict
+    contains_dict = any(isinstance(item, dict) for item in pdf_bytes_list)
+    if contains_dict:
+        normalized_pdf_bytes_list = []
+        for idx, item in enumerate(pdf_bytes_list):
+            if isinstance(item, dict):
+                normalized_pdf_bytes_list.append(item["pdf_bytes"])
+                original_image_list.append(item.get("original_image"))
+            else:
+                normalized_pdf_bytes_list.append(item)
+                original_image_list.append(None)
+        # 原地修改
+        pdf_bytes_list[:] = normalized_pdf_bytes_list
+
     if lang_list is None:
         lang_list = ["ch"] * len(pdf_bytes_list)
     min_batch_inference_size = int(os.environ.get('MINERU_MIN_BATCH_INFERENCE_SIZE', 384))
@@ -130,6 +146,13 @@ def doc_analyze(
         # load_images_time = round(time.time() - load_images_start, 2)
         # speed = len(images_list) / (load_images_time + 1e-6)
         # logger.info(f"load images cost: {round(load_images_time, 4)}, speed: {round(speed, 3)} images/s")
+
+        if original_image_list and original_image_list[pdf_idx]:
+            pdf_img_width = images_list[0]['img_pil'].width
+            pdf_img_height = images_list[0]['img_pil'].height
+            if original_image_list[pdf_idx].size != (pdf_img_width, pdf_img_height):
+                # Resize原图以匹配PDF转图片的尺寸
+                images_list[0]['img_pil'] = original_image_list[pdf_idx].resize((pdf_img_width, pdf_img_height), Image.Resampling.LANCZOS)
         all_image_lists.append(images_list)
 
         all_pdf_dict = []

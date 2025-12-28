@@ -243,6 +243,12 @@ def images_bytes_to_pdf_bytes(image_bytes):
     # 获取 PDF bytes 并重置指针（可选）
     pdf_bytes = pdf_buffer.getvalue()
     pdf_buffer.close()
+    layout_original_image = os.getenv('MINERU_LAYOUT_ORIGINAL_IMAGE', 'true')
+    if (layout_original_image.lower() in ['true', '1', 'yes']):
+        return {
+            "pdf_bytes": pdf_bytes,
+            "original_image": image,
+        }
     return pdf_bytes
 
 def get_ori_image(
@@ -317,6 +323,9 @@ def save_table_fill_image(layout_dets: list[dict], table_fill_image_list: list[d
     """保存表格里的图片，图片路径 save_path：需要同时支持s3和本地,
     图片存放在save_path下，文件名是:
     {page_num}_{bbox[0]}_{bbox[1]}_{bbox[2]}_{bbox[3]}.png , bbox内数字取整。"""
+
+    if not image_writer:
+        return
 
     def return_path(path_type):
         return f"{path_type}/{page_img_md5}"
