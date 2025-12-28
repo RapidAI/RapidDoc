@@ -287,7 +287,10 @@ async def file_parse(
                     # 写入图片
                     if return_images:
                         images_dir = os.path.join(parse_dir, "images")
-                        image_paths = glob.glob(os.path.join(glob.escape(images_dir), "*.jpg"))
+                        image_paths = (
+                                glob.glob(os.path.join(glob.escape(images_dir), "*.jpg")) +
+                                glob.glob(os.path.join(glob.escape(images_dir), "*.png"))
+                        )
                         for image_path in image_paths:
                             zf.write(image_path,
                                      arcname=os.path.join(safe_pdf_name, "images", os.path.basename(image_path)))
@@ -323,7 +326,10 @@ async def file_parse(
                         data["content_list"] = json.loads(get_infer_result("_content_list.json", pdf_name, parse_dir))
                     if return_images:
                         images_dir = os.path.join(parse_dir, "images")
-                        safe_pattern = os.path.join(glob.escape(images_dir), "*.jpg")
+                        safe_pattern = [
+                            os.path.join(glob.escape(images_dir), "*.jpg"),
+                            os.path.join(glob.escape(images_dir), "*.png")
+                        ]
                         image_paths = glob.glob(safe_pattern)
                         data["images"] = {
                             os.path.basename(

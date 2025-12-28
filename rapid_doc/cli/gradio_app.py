@@ -83,11 +83,15 @@ def replace_image_with_base64(markdown_text, image_dir_path):
     # 替换图片链接
     def replace(match):
         relative_path = match.group(1)
-        # 只处理以.jpg结尾的图片
+        # 只处理以.jpg .png结尾的图片
         if relative_path.endswith('.jpg'):
             full_path = os.path.join(image_dir_path, relative_path)
             base64_image = image_to_base64(full_path)
             return f'![{relative_path}](data:image/jpeg;base64,{base64_image})'
+        elif relative_path.endswith('.png'):
+            full_path = os.path.join(image_dir_path, relative_path)
+            base64_image = image_to_base64(full_path)
+            return f'![{relative_path}](data:image/png;base64,{base64_image})'
         else:
             # 其他格式的图片保持原样
             return match.group(0)
