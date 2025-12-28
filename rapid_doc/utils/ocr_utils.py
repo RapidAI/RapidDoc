@@ -358,7 +358,7 @@ def is_mostly_tilted(ocr_res, threshold=1.0):
     mostly_tilted = abs(avg_angle) > threshold and abs(avg_angle - 180) > threshold
     return mostly_tilted
 
-def get_ocr_result_list(ocr_res, useful_list, ocr_enable, bgr_image, lang, original_label):
+def get_ocr_result_list(ocr_res, useful_list, ocr_enable, bgr_image, lang, original_label, original_order = -1):
     if not ocr_enable and is_mostly_tilted(ocr_res):
         # 非ocr时，如果文字倾斜，则强制走ocr
         ocr_enable = True
@@ -412,6 +412,7 @@ def get_ocr_result_list(ocr_res, useful_list, ocr_enable, bgr_image, lang, origi
             ocr_result_list.append({
                 'category_id': 15,
                 'original_label': original_label,
+                'original_order': original_order,
                 'poly': p1 + p2 + p3 + p4,
                 'score': 1,
                 'text': text,
@@ -422,6 +423,7 @@ def get_ocr_result_list(ocr_res, useful_list, ocr_enable, bgr_image, lang, origi
             ocr_result_list.append({
                 'category_id': 15,
                 'original_label': original_label,
+                'original_order': original_order,
                 'poly': p1 + p2 + p3 + p4,
                 'score': float(round(score, 2)),
                 'text': text,

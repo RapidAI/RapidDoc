@@ -2,6 +2,10 @@ pp_doclayout_plus_l:
   model_dir_or_path: https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/v1.0.0/layout/PP-DocLayout_plus-L/pp_doclayout_plus_l.onnx
   SHA256: 3e0a48f1eead902e83e04695430597e92207ef50e19b06bdf65f46096ba6bbd3
 
+pp_doclayoutv2:
+  model_dir_or_path: https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/master/layout/PP-DocLayoutV2/pp_doclayoutv2.onnx
+  SHA256: 224b493724708c4031d73672f9074a84e3f0ac5c1fac07ce54047f232ab056b2
+
 pp_doclayout_l:
   model_dir_or_path: https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/v1.0.0/layout/PP-DocLayout-L/pp_doclayout_l.onnx
   SHA256: 116d4a65052187be1ed408d6286fc5a5a07de361a1c85969d633d7ca56a73c05

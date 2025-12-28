@@ -39,11 +39,13 @@ def num_tokens_from_string(string: str) -> int:
 
 class MarkdownTextSplitter:
 
-    def __init__(self, chunk_token_num=512, min_chunk_tokens=50, max_table_tokens=8000) -> None:
+    def __init__(self, chunk_token_num=512, min_chunk_tokens=50, max_table_tokens=8000, char_max_length=60000, max_tokens=None) -> None:
         """Create a new TextSplitter."""
         self.chunk_token_num = chunk_token_num
         self.min_chunk_tokens = min_chunk_tokens
         self.max_table_tokens = max_table_tokens
+        self.char_max_length = char_max_length
+        self.max_tokens = chunk_token_num * 2 if max_tokens is None else max_tokens
 
     def split_text(self, txt) -> list[str]:
         """
@@ -79,7 +81,7 @@ class MarkdownTextSplitter:
                 # 完成当前块
                 chunk_content = self._finalize_ast_chunk(current_chunk, context_stack)
                 if chunk_content.strip():
-                    chunks.append(chunk_content)
+                    chunks.extend(self._force_split_if_oversize(chunk_content))
                 current_chunk = []
                 current_tokens = 0
 
@@ -94,7 +96,7 @@ class MarkdownTextSplitter:
 
                             chunk_content = self._finalize_ast_chunk(current_chunk, context_stack)
                             if chunk_content.strip():
-                                chunks.append(chunk_content)
+                                chunks.extend(self._force_split_if_oversize(chunk_content))
                             current_chunk = []
                             current_tokens = 0
                         current_chunk.append(seg)
@@ -108,7 +110,7 @@ class MarkdownTextSplitter:
 
                     chunk_content = self._finalize_ast_chunk(current_chunk, context_stack)
                     if chunk_content.strip():
-                        chunks.append(chunk_content)
+                        chunks.extend(self._force_split_if_oversize(chunk_content))
                     current_chunk = []
                     current_tokens = 0
 
@@ -119,7 +121,7 @@ class MarkdownTextSplitter:
         if current_chunk:
             chunk_content = self._finalize_ast_chunk(current_chunk, context_stack)
             if chunk_content.strip():
-                chunks.append(chunk_content)
+                chunks.extend(self._force_split_if_oversize(chunk_content))
 
         return [chunk for chunk in chunks if chunk.strip()]
 
@@ -352,6 +354,36 @@ class MarkdownTextSplitter:
         table.extend(body_rows)
         table.append("</table>")
         return "".join(table)
+
+    def _force_split_if_oversize(self, text: str):
+        """
+        如果 chunk 超过最大 token 或字符限制，进行硬拆分
+        """
+        if (num_tokens_from_string(text) <= self.max_tokens
+                and len(text) <= self.char_max_length):
+            return [text]
+
+        segments = []
+        current = []
+        current_tokens = 0
+
+        # 以换行作为软切点
+        for line in text.split("\n"):
+            line_tokens = num_tokens_from_string(line)
+
+            if (current_tokens + line_tokens > self.max_tokens
+                    and current):
+                segments.append("\n".join(current))
+                current = []
+                current_tokens = 0
+
+            current.append(line)
+            current_tokens += line_tokens
+
+        if current:
+            segments.append("\n".join(current))
+
+        return segments
 
 
 if __name__ == '__main__':

@@ -1,5 +1,5 @@
 import time
-from typing import List, Union
+from typing import Any, List, Sequence, Union
 
 import numpy as np
 
@@ -12,13 +12,14 @@ from ..utils import ModelType
 
 class PPDocLayoutModelHandler(BaseModelHandler):
     def __init__(self, labels, conf_thres: Union[float, dict], iou_thres, session: InferSession, model_type: ModelType):
-        if model_type == ModelType.PP_DOCLAYOUT_PLUS_L:
+        if model_type in [ModelType.PP_DOCLAYOUT_PLUS_L, ModelType.PP_DOCLAYOUTV2]:
             target_size = (800, 800)
         elif model_type == ModelType.PP_DOCLAYOUT_S:
             target_size = (480, 480)
         else:
             # PP_DOCLAYOUT_L、PP_DOCLAYOUT_M、RT_DETR_L_WIRED_TABLE_CELL_DET、RT_DETR_L_WIRELESS_TABLE_CELL_DET
             target_size = (640, 640)
+        self.model_type = model_type
         self.img_size = target_size
         self.pp_preprocess = PPPreProcess(img_size=self.img_size, model_type=model_type)
         self.pp_postprocess = PPPostProcess(labels, conf_thres, iou_thres)
@@ -51,11 +52,13 @@ class PPDocLayoutModelHandler(BaseModelHandler):
             datas = self.pp_postprocess(output["boxes"],[ori_img_shape[1], ori_img_shape[0]])
             if datas:
                 boxes, scores, class_names = zip(*[(d["coordinate"], d["score"], d["label"]) for d in datas])
+                orders = list(range(len(boxes))) if self.model_type == ModelType.PP_DOCLAYOUTV2 else None
             else:
                 boxes, scores, class_names = [], [], []
+                orders = []
             elapse = time.perf_counter() - s1
             result = RapidLayoutOutput(img=ori_img_list[i], boxes=boxes,
-                                       class_names=class_names, scores=scores, elapse=elapse)
+                                       class_names=class_names, scores=scores, orders=orders, elapse=elapse)
             result_list.append(result)
         return result_list
 
@@ -65,7 +68,7 @@ class PPDocLayoutModelHandler(BaseModelHandler):
     def postprocess(self, ori_img_shape, img, preds):
         return self.pp_postprocess(ori_img_shape, img, preds)
 
-    def _format_output(self, pred):
+    def _format_output(self, pred: Sequence[Any]) -> List[dict]:
         """
         Transform batch outputs into a list of single image output.
 

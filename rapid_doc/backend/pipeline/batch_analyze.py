@@ -196,7 +196,7 @@ class BatchAnalyze:
                             # Integration results
                             if ocr_res:
                                 ocr_result_list = get_ocr_result_list(
-                                    ocr_res, useful_list, ocr_res_list_dict['ocr_enable'], bgr_image, _lang, res['original_label']
+                                    ocr_res, useful_list, ocr_res_list_dict['ocr_enable'], bgr_image, _lang, res['original_label'], res['original_order']
                                 )
 
                                 ocr_res_list_dict['layout_res'].extend(ocr_result_list)
@@ -308,7 +308,7 @@ class BatchAnalyze:
                             if dt_boxes_final:
                                 ocr_res = [box.tolist() if hasattr(box, 'tolist') else box for box in dt_boxes_final]
                                 ocr_result_list = get_ocr_result_list(
-                                    ocr_res, useful_list, ocr_enable, bgr_image, _lang, res['original_label']
+                                    ocr_res, useful_list, ocr_enable, bgr_image, _lang, res['original_label'], res['original_order']
                                 )
 
                                 ocr_res_list_dict['layout_res'].extend(ocr_result_list)
@@ -354,7 +354,7 @@ class BatchAnalyze:
                     # Integration results
                     if ocr_res:
                         ocr_result_list = get_ocr_result_list(
-                            ocr_res, useful_list, ocr_enable, bgr_image, _lang, res['original_label']
+                            ocr_res, useful_list, ocr_enable, bgr_image, _lang, res['original_label'], res['original_order']
                         )
                         ocr_res_list_dict['layout_res'].extend(ocr_result_list)
 

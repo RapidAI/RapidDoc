@@ -8,7 +8,8 @@ from tqdm import tqdm
 from .inference_engine.base import get_engine
 from .model_handler import ModelHandler, ModelProcessor
 from .utils.load_image import LoadImage
-from .utils.typings import ModelType, RapidLayoutInput, RapidLayoutOutput
+from .utils.typings import ModelType, RapidLayoutInput, RapidLayoutOutput, PP_DOCLAYOUT_L_Threshold, \
+    PP_DOCLAYOUT_PLUS_L_Threshold, PP_DOCLAYOUTV2_Threshold
 from .utils.utils import is_url
 
 
@@ -16,6 +17,16 @@ class RapidLayout:
     def __init__(self, cfg: Optional[RapidLayoutInput] = None):
         if cfg is None:
             cfg = RapidLayoutInput()
+
+        if not cfg.conf_thresh:
+            if cfg.model_type == ModelType.PP_DOCLAYOUT_PLUS_L:
+                cfg.conf_thresh = PP_DOCLAYOUT_PLUS_L_Threshold
+            elif cfg.model_type == ModelType.PP_DOCLAYOUTV2:
+                cfg.conf_thresh = PP_DOCLAYOUTV2_Threshold
+            elif cfg.model_type == ModelType.PP_DOCLAYOUT_L:
+                cfg.conf_thresh = PP_DOCLAYOUT_L_Threshold
+            else:
+                cfg.conf_thresh = 0.5
 
         if not cfg.model_dir_or_path:
             cfg.model_dir_or_path = ModelProcessor.get_model_path(cfg.model_type)

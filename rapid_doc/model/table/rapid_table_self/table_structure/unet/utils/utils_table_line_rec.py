@@ -237,7 +237,8 @@ def min_area_rect_box(
     """
     boxes = []
     for region in regions:
-        if region.bbox_area > H * W * 3 / 4:  # 过滤大的单元格
+        bbox_area = getattr(region, "area_bbox", region.bbox_area)
+        if bbox_area  > H * W * 3 / 4:  # 过滤大的单元格
             continue
         rect = cv2.minAreaRect(region.coords[:, ::-1])
 

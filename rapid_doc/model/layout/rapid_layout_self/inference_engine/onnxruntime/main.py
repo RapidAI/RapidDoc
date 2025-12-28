@@ -60,11 +60,15 @@ class OrtInferSession(InferSession):
 
     def __call__(self, input_content: np.ndarray, scale_factor: np.ndarray = None) -> Any:
         if scale_factor is not None:
-            if 'im_shape' in self.get_input_names():
-                shape = input_content.shape[-2:]
-                input_dict = dict(zip(self.get_input_names(), [[[shape[0], shape[1]]], input_content, scale_factor]))
-            else:
-                input_dict = dict(zip(self.get_input_names(), [input_content, scale_factor]))
+            input_names = self.get_input_names()
+            input_dict = {}
+            if "image" in input_names:
+                input_dict["image"] = input_content
+            if "scale_factor" in input_names:
+                input_dict["scale_factor"] = scale_factor
+            if "im_shape" in input_names:
+                h, w = input_content.shape[-2:]
+                input_dict["im_shape"] = np.array([[h, w]], dtype=np.float32)
         else:
             input_dict = dict(zip(self.get_input_names(), [input_content]))
         try:

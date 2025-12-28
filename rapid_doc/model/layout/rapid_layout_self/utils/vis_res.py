@@ -1,4 +1,4 @@
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List
 
 import cv2
 import numpy as np
@@ -12,6 +12,7 @@ class VisLayout:
         boxes: Optional[np.ndarray],
         scores: Optional[np.ndarray],
         class_names: Optional[np.ndarray],
+        orders: Optional[List[int]],
         mask_alpha=0.3,
     ) -> Optional[np.ndarray]:
         """_summary_
@@ -37,11 +38,20 @@ class VisLayout:
 
         det_img = cls.draw_masks(det_img, boxes, mask_alpha)
 
-        for label, box, score in zip(class_names, boxes, scores):
+        for idx, (label, box, score) in enumerate(zip(class_names, boxes, scores)):
             color = cls.get_color()
 
             cls.draw_box(det_img, box, color)
+
+            # 基础 caption
             caption = f"{label} {int(score * 100)}%"
+
+            # 如果有 orders，追加阅读顺序
+            if orders is not None:
+                order_map = {box_idx: o for o, box_idx in enumerate(orders)}
+                if idx in order_map:
+                    caption = f"[{order_map[idx]}] " + caption
+
             cls.draw_text(det_img, caption, box, color, font_size, text_thickness)
 
         return det_img

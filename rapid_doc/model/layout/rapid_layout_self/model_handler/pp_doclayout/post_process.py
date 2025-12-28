@@ -4,11 +4,12 @@ import numpy as np
 
 
 class PPPostProcess:
-    def __init__(self, labels, conf_thres: Union[float, dict] =0.4, iou_thres=0.5):
+    def __init__(self, labels, conf_thres: Union[float, dict] =0.4, iou_thres=0.5, layout_nms=True):
         self.labels = labels
         self.strides = [8, 16, 32, 64]
         self.conf_thres = conf_thres
         self.iou_thres = iou_thres
+        self.layout_nms = layout_nms
         self.nms_top_k = 1000
         self.keep_top_k = 100
 
@@ -47,11 +48,13 @@ class PPPostProcess:
                 else np.array([])
             )
         # === 2️⃣ NMS (非极大值抑制) ===
-        selected_indices = nms(boxes, iou_same=0.6, iou_diff=0.98)
-        boxes = np.array(boxes[selected_indices])
+        if self.layout_nms:
+            selected_indices = nms(boxes[:, :6], iou_same=0.6, iou_diff=0.98)
+            boxes = np.array(boxes[selected_indices])
         # === 3️⃣ 过滤大面积 image 框 ===
         filter_large_image = True
-        if filter_large_image and len(boxes) > 1 and boxes.shape[1] == 6:
+        # boxes.shape[1] == 6 is object detection, 8 is ordered object detection
+        if filter_large_image and len(boxes) > 1 and boxes.shape[1] in [6, 8]:
             if img_size[0] > img_size[1]:
                 area_thres = 0.82
             else:
@@ -60,7 +63,14 @@ class PPPostProcess:
             img_area = img_size[0] * img_size[1]
             filtered_boxes = []
             for box in boxes:
-                label_index, score, xmin, ymin, xmax, ymax = box
+                (
+                    label_index,
+                    score,
+                    xmin,
+                    ymin,
+                    xmax,
+                    ymax,
+                ) = box[:6]
                 if label_index == image_index:
                     xmin = max(0, xmin)
                     ymin = max(0, ymin)
@@ -77,6 +87,12 @@ class PPPostProcess:
         # === 4️⃣ 格式化输出 ===
         if boxes.size == 0:
             return []
+
+        if boxes.shape[1] == 8:
+            # Sort boxes by their order
+            sorted_idx = np.lexsort((-boxes[:, 7], boxes[:, 6]))
+            sorted_boxes = boxes[sorted_idx]
+            boxes = sorted_boxes[:, :6]
 
         if boxes.shape[1] == 6:
             """For Normal Object Detection"""

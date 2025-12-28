@@ -129,11 +129,16 @@ def insert_lines_into_block(block_bbox, line_height, page_w, page_h):
     else:
         return [[x0, y0, x1, y1]]
 
+def extract_block_original_order(block):
+    orders = []
+    for line in block.get('lines', []):
+        for span in line.get('spans', []):
+            order = span.get('original_order')
+            if order is not None and order >= 0:
+                orders.append(order)
+    return min(orders) if orders else -1
+
 def sort_blocks_by_xycut_plus(fix_blocks, page_pil_img):
-    page_image = np.array(page_pil_img)
-    block_bboxes = []
-    layout_det_res = []
-    rec_labels, rec_texts, rec_boxes, rec_polys, rec_scores, dt_polys = [],[],[],[],[],[]
     for block in fix_blocks:
         # 如果block['bbox']任意值小于0，将其置为0
         block['bbox'] = [max(0, x) for x in block['bbox']]
@@ -143,6 +148,31 @@ def sort_blocks_by_xycut_plus(fix_blocks, page_pil_img):
                 block['virtual_lines'] = copy.deepcopy(block['lines'])
                 block['lines'] = copy.deepcopy(block['real_lines'])
                 del block['real_lines']
+    try:
+        # 判断fix_blocks里面有original_order>=0的，说明版面模型自带阅读顺序，直接使用版面的阅读顺序
+        block_orders = [
+            extract_block_original_order(block)
+            for block in fix_blocks
+        ]
+        has_original_order = any(order >= 0 for order in block_orders)
+        if has_original_order:
+            for block, order in zip(fix_blocks, block_orders):
+                block['index'] = order if order >= 0 else len(fix_blocks)
+            sorted_blocks = sorted(fix_blocks, key=lambda b: b['index'])
+            line_index = 1
+            for block in sorted_blocks:
+                for line in block.get('lines', []):
+                    line['index'] = line_index
+                    line_index += 1
+            return fix_blocks
+    except Exception as e:
+        logger.exception(e)
+
+    page_image = np.array(page_pil_img)
+    block_bboxes = []
+    layout_det_res = []
+    rec_labels, rec_texts, rec_boxes, rec_polys, rec_scores, dt_polys = [],[],[],[],[],[]
+    for block in fix_blocks:
         block_bboxes.append(block['bbox'])
         # 统计 lines 中的 spans 的 original_label 出现次数
         label_counter = {}

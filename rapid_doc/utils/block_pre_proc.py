@@ -80,12 +80,12 @@ def prepare_block_bboxes(
         if (x1 - x0) > (page_w / 3) and (y1 - y0) > 10 and y0 > (page_h * 0.7):
             footnote_blocks.append([x0, y0, x1, y1])
 
-    """移除在footnote下面的任何框"""
-    need_remove_blocks = find_blocks_under_footnote(all_bboxes, footnote_blocks)
-    if len(need_remove_blocks) > 0:
-        for block in need_remove_blocks:
-            all_bboxes.remove(block)
-            all_discarded_blocks.append(block)
+    # """移除在footnote下面的任何框"""
+    # need_remove_blocks = find_blocks_under_footnote(all_bboxes, footnote_blocks)
+    # if len(need_remove_blocks) > 0:
+    #     for block in need_remove_blocks:
+    #         all_bboxes.remove(block)
+    #         all_discarded_blocks.append(block)
 
     """经过以上处理后，还存在大框套小框的情况，则删除小框"""
     all_bboxes = remove_overlaps_min_blocks(all_bboxes)

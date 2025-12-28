@@ -222,7 +222,7 @@ class MagicModel:
             return reduct_overlap(
                 list(
                     map(
-                        lambda x: {'bbox': x['bbox'], 'score': x['score'], 'original_label': x.get('original_label')},
+                        lambda x: {'bbox': x['bbox'], 'score': x['score'], 'original_label': x.get('original_label'), 'original_order': x.get('original_order')},
                         filter(
                             lambda x: x['category_id'] == subject_category_id,
                             self.__page_model_info['layout_dets'],
@@ -235,7 +235,7 @@ class MagicModel:
             return reduct_overlap(
                 list(
                     map(
-                        lambda x: {'bbox': x['bbox'], 'score': x['score'], 'original_label': x.get('original_label')},
+                        lambda x: {'bbox': x['bbox'], 'score': x['score'], 'original_label': x.get('original_label'), 'original_order': x.get('original_order')},
                         filter(
                             lambda x: x['category_id'] == object_category_id,
                             self.__page_model_info['layout_dets'],
@@ -374,6 +374,7 @@ class MagicModel:
                     span['content'] = layout_det['text']
                     span['type'] = ContentType.TEXT
                 span['original_label'] = layout_det.get('original_label')
+                span['original_order'] = layout_det.get('original_order')
                 all_spans.append(span)
         return remove_duplicate_spans(all_spans)
 
