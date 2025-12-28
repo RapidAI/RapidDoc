@@ -11,6 +11,8 @@ ocr_patch.py
 from rapidocr.ch_ppocr_det import TextDetector
 from rapidocr.ch_ppocr_det.utils import DetPreProcess
 from rapid_doc.utils.model_utils import import_package
+from importlib.metadata import version
+rapidocr_version = version("rapidocr")
 
 
 def patch_text_detector():
@@ -28,8 +30,11 @@ def patch_torch_ocr():
     torch_ = import_package("torch")
     if not torch_:
         return  # 未安装 PyTorch，跳过
+    if rapidocr_version >= "3.4.3":
+        from rapidocr.inference_engine.pytorch.networks.backbones.rec_lcnetv3 import LearnableRepLayer, ConvBNLayer
+    else:
+        from rapidocr.networks.backbones.rec_lcnetv3 import LearnableRepLayer, ConvBNLayer
 
-    from rapidocr.networks.backbones.rec_lcnetv3 import LearnableRepLayer, ConvBNLayer
     from torch import nn
     import torch
 
@@ -73,12 +78,18 @@ def patch_torch_ocr():
     LearnableRepLayer._fuse_bn_tensor = _fuse_bn_tensor2
 
     # 替换 rapidocr 的 TorchInferSession
-    from rapidocr.inference_engine import torch as rapidocr_torch
+    if rapidocr_version >= "3.4.3":
+        from rapidocr.inference_engine.pytorch import main as rapidocr_torch
+    else:
+        from rapidocr.inference_engine import torch as rapidocr_torch
     from rapid_doc.model.ocr.torch import TorchInferSession
     rapidocr_torch.TorchInferSession = TorchInferSession
 
 def patch_openvino_ocr():
     """优化 openvino OCR 推理，使用异步推理替代同步，修复并发识别报错"""
+    torch_ = import_package("openvino")
+    if not torch_:
+        return  # 未安装 PyTorch，跳过
     # 替换 rapidocr 的 OpenVINOInferSession
     from rapidocr.inference_engine import openvino as rapidocr_openvino
     from rapid_doc.model.ocr.openvino import OpenVINOInferSession

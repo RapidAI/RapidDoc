@@ -3,9 +3,15 @@ from pathlib import Path
 import numpy as np
 import torch
 from omegaconf import OmegaConf
+from importlib.metadata import version
+rapidocr_version = version("rapidocr")
 
-from rapidocr.networks.architectures.base_model import BaseModel
-from rapidocr.networks.backbones.rec_hgnet import ConvBNAct
+if rapidocr_version >= "3.4.3":
+    from rapidocr.inference_engine.pytorch.networks.architectures.base_model import BaseModel
+    from rapidocr.inference_engine.pytorch.networks.backbones.rec_hgnet import ConvBNAct
+else:
+    from rapidocr.networks.architectures.base_model import BaseModel
+    from rapidocr.networks.backbones.rec_hgnet import ConvBNAct
 from rapidocr.utils.download_file import DownloadFile, DownloadFileInput
 from rapidocr.utils.log import logger
 from rapidocr.inference_engine.base import FileInfo, InferSession
