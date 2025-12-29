@@ -11,7 +11,7 @@ InputType = Union[str, np.ndarray, bytes, Path]
 class PPPreProcess:
     def __init__(self, img_size: Tuple[int, int], model_type: ModelType):
         self.size = img_size
-        if model_type.value.endswith("_l"):
+        if model_type in [ModelType.PP_DOCLAYOUT_L, ModelType.PP_DOCLAYOUT_PLUS_L, ModelType.PP_DOCLAYOUTV2]:
             self.mean = np.array([0, 0, 0])
             self.std = np.array([1.0, 1.0, 1.0])
         else:

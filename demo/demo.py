@@ -45,10 +45,10 @@ def do_parse(
 
 
     layout_config = {
-        "model_type": LayoutModelType.PP_DOCLAYOUT_PLUS_L,
+        "model_type": LayoutModelType.PP_DOCLAYOUTV2,
         # "conf_thresh": 0.4,
         # "batch_num": 1,
-        # "model_dir_or_path": "C:\ocr\models\ppmodel\layout\PP-DocLayout-L\pp_doclayout_l.onnx"
+        # "model_dir_or_path": "C:\ocr\models\ppmodel\layout\PP-DocLayoutV2\pp_doclayoutv2.onnx"
     }
 
     ocr_config = {
@@ -82,7 +82,7 @@ def do_parse(
 
     table_config = {
         # "force_ocr": False, # 表格文字，是否强制使用ocr，默认 False 根据 parse_method 来判断是否需要ocr还是从pdf中直接提取文本
-        # 注：文字版pdf可以使用pypdfium2提取到表格内图片，扫描版或图片需要使用PP_DOCLAYOUT_PLUS_L版面识别模型，才能识别到表格内的图片
+        # 注：文字版pdf可以使用pypdfium2提取到表格内图片，扫描版或图片需要使用PP_DOCLAYOUT_PLUS_L/PP_DOCLAYOUTV2版面识别模型，才能识别到表格内的图片
         # "skip_text_in_image": True, # 是否跳过表格里图片中的文字（如表格单元格中嵌入的图片、图标、扫描底图等）
         # "use_img2table": False, # 是否优先使用img2table库提取表格，需要手动安装（pip install img2table），基于opencv识别准确度不如使用模型，但是速度很快，默认关闭
 

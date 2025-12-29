@@ -130,6 +130,9 @@ def insert_lines_into_block(block_bbox, line_height, page_w, page_h):
         return [[x0, y0, x1, y1]]
 
 def extract_block_original_order(block):
+    order = block.get('original_order')
+    if order is not None and order >= 0:
+        return order
     orders = []
     for line in block.get('lines', []):
         for span in line.get('spans', []):

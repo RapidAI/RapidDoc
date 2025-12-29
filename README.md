@@ -25,8 +25,8 @@
   
 - **版面识别**
   - 模型使用 `PP-DocLayout` 系列 ONNX 模型（v2、plus-L、L、M、S）
-    - **PP-DocLayoutV2**：PaddleOCR-VL使用的版面模型，自带阅读顺序
-    - **PP-DocLayout_plus-L**：效果好运行稳定，默认使用 
+    - **PP-DocLayoutV2**：自带阅读顺序，效果最好，默认使用
+    - **PP-DocLayout_plus-L**：效果好运行稳定
     - **PP-DocLayout-L**：速度快，效果也不错
     - **PP-DocLayout-S**：速度极快，存在部分漏检
 
@@ -56,7 +56,7 @@
 
 ### 1. OmniDocBench
 
-以下是RapidDoc在 OmniDocBench 上的评估结果。Pipeline 模型使用 PP-DocLayout_plus-L、PP-OCRv5-mobile、PP-FormulaNet_plus-M、UNET_SLANET_PLUS。
+以下是RapidDoc在 OmniDocBench 上的评估结果。Pipeline 模型使用 PP-DocLayoutV2、PP-OCRv5-mobile、PP-FormulaNet_plus-M、UNET_SLANET_PLUS。
 <table style="width:100%; border-collapse: collapse;">
     <caption>Comprehensive evaluation of document parsing on OmniDocBench (v1.5)</caption>
     <thead>
@@ -295,6 +295,16 @@
         </tr>
         <tr>
             <td rowspan="4"><strong>Pipeline</strong><br><strong>Tools</strong></td>
+            <td><strong>RapidDoc</strong></td>
+            <td>-</td>
+            <td>87.81</td>
+            <td>0.065</td>
+            <td>89.348</td>
+            <td>80.59</td>
+            <td>87.90</td>
+            <td>0.053</td>
+        </tr>
+        <tr>
             <td>PP-StructureV3</td>
             <td>-</td>
             <td>86.73</td>
@@ -303,16 +313,6 @@
             <td>81.68</td>
             <td>89.48</td>
             <td>0.073</td>
-        </tr>
-        <tr>
-            <td><strong>RapidDoc</strong></td>
-            <td>-</td>
-            <td>85.25</td>
-            <td>0.085</td>
-            <td>85.19</td>
-            <td>79.07</td>
-            <td>86.35</td>
-            <td>0.114</td>
         </tr>
         <tr>
             <td>Mineru2-pipeline</td>

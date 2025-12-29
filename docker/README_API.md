@@ -103,7 +103,7 @@ curl --location --request POST 'http://localhost:8888/file_parse' \
 --form 'return_content_list=true' \
 --form 'return_images=true' \
 --form 'clear_output_file=false' \
---form 'layout_config="{\"model_type\": \"LayoutModelType.PP_DOCLAYOUT_PLUS_L\"}"'
+--form 'layout_config="{\"model_type\": \"LayoutModelType.PP_DOCLAYOUTV2\"}"'
 
 # 多文件批量处理
 curl -X POST "http://localhost:8888/file_parse" \

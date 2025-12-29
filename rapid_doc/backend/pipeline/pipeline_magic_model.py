@@ -392,6 +392,8 @@ class MagicModel:
             if category_id == category_type:
                 block = {
                     'bbox': bbox,
+                    'original_label': item.get('original_label'),
+                    'original_order': item.get('original_order'),
                     'score': item.get('score'),
                 }
                 for col in extra_col:

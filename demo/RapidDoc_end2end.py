@@ -16,6 +16,7 @@ from rapid_doc.utils.enum_class import MakeMode
 from rapid_doc.backend.pipeline.pipeline_analyze import doc_analyze as pipeline_doc_analyze
 from rapid_doc.backend.pipeline.pipeline_middle_json_mkcontent import union_make as pipeline_union_make
 from rapid_doc.backend.pipeline.model_json_to_middle_json import result_to_middle_json as pipeline_result_to_middle_json
+from rapid_doc.model.layout.rapid_layout_self import ModelType as LayoutModelType
 
 def do_parse(
     output_dir,
@@ -30,6 +31,7 @@ def do_parse(
     end_page_id=None,
 ):
     layout_config = {
+        "model_type": LayoutModelType.PP_DOCLAYOUTV2,
     }
 
     ocr_config = {
@@ -112,13 +114,14 @@ def parse_doc(
 
 
 if __name__ == '__main__':
-    files_dir = r"/root/hzkitty/OmniDocBenchFiles/images"
-    output_dir = r"/root/hzkitty/OmniDocBenchFiles/layout_plus_l-ocr_mobile-image"
+    files_dir = r"/root/hzkitty/OmniDocBenchFiles/pdfs"
+    output_dir = r"/root/hzkitty/OmniDocBenchFiles/layout_v2-ocr_mobile-pdf"
 
-    # files_dir = r"D:\Download\OmniDocBench\images"
-    # output_dir = r"D:\Download\OmniDocBench\layout_plus_l-ocr_mobile-image"
+    # files_dir = r"D:\Download\OmniDocBench\pdfs"
+    # output_dir = r"D:\Download\OmniDocBench\layout_v2-ocr_mobile-pdf"
 
-    suffixes = [".pdf", ".png", ".jpg", ".jpeg"]
+    # suffixes = [".pdf", ".png", ".jpg", ".jpeg"]
+    suffixes = [".pdf"]
     batch_size = 100
 
     doc_path_list = []

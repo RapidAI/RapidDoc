@@ -18,7 +18,7 @@ class DownloadFileInput:
 
 CPU_MODEL = [
     # layout
-    "pp_doclayout_plus_l.onnx",
+    "pp_doclayoutv2.onnx",
     # formula
     "pp_formulanet_plus_m.onnx",
     # ocr
@@ -36,7 +36,7 @@ CPU_MODEL = [
 
 GPU_MODEL = [
     # layout
-    "pp_doclayout_plus_l.onnx",
+    "pp_doclayoutv2.onnx",
     # formula
     "pp_formulanet_plus_m.pth",
     "pp_formulanet_plus_m_inference.yml"
@@ -55,7 +55,7 @@ GPU_MODEL = [
 
 NPU_MODEL = [
     # layout
-    "pp_doclayout_plus_l.onnx",
+    "pp_doclayoutv2.onnx",
     "doclayout_yolo_docstructbench_imgsz1024.onnx",
     # formula
     "pp_formulanet_plus_m.pth",

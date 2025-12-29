@@ -32,6 +32,8 @@ def fill_spans_in_blocks(blocks, spans, radio):
                 block_spans.append(span)
 
         block_dict['spans'] = block_spans
+        block_dict['original_label'] = block[10]
+        block_dict['original_order'] = block[11]
         block_with_spans.append(block_dict)
 
         # 从spans删除已经放入block_spans中的span

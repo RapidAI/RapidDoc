@@ -41,17 +41,18 @@ def do_parse(
     f_dump_model_output=True,  # Whether to dump model output files
     f_dump_orig_pdf=True,  # Whether to dump original PDF files
     f_dump_content_list=True,  # Whether to dump content list files
-    f_dump_md_html=True,  # Whether to convert markdown to HTML
-    f_dump_md_docx=True,  # Whether to convert markdown to docx (via Pandoc)
+    f_dump_md_html=False,  # Whether to convert markdown to HTML
+    f_dump_md_docx=False,  # Whether to convert markdown to docx (via Pandoc)
     f_make_md_mode=MakeMode.MM_MD,  # The mode for making markdown content, default is MM_MD
     start_page_id=0,  # Start page ID for parsing, default is 0
     end_page_id=None,  # End page ID for parsing, default is None (parse all pages until the end of the document)
 ):
     layout_config = {
-        # "model_type": LayoutModelType.PP_DOCLAYOUT_PLUS_L,
+        # "model_type": LayoutModelType.PP_DOCLAYOUTV2,
         # "conf_thresh": 0.4,
         # "batch_num": 1,
-        # "model_dir_or_path": r"C:\ocr\models\ppmodel\layout\PP-DocLayout_plus-L\pp_doclayout_plus_l.onnx",
+        # "model_dir_or_path": r"C:\ocr\models\ppmodel\layout\PP-DocLayoutV2\pp_doclayoutv2.onnx",
+        # "markdown_ignore_labels": ["number", "footnote", "header", "header_image", "footer", "footer_image", "aside_text",]
     }
 
     ocr_config = {
@@ -85,7 +86,7 @@ def do_parse(
 
     table_config = {
         # "force_ocr": False, # 表格文字，是否强制使用ocr，默认 False 根据 parse_method 来判断是否需要ocr还是从pdf中直接提取文本
-        # 注：文字版pdf可以使用pypdfium2提取到表格内图片，扫描版或图片需要使用PP_DOCLAYOUT_PLUS_L版面识别模型，才能识别到表格内的图片
+        # 注：文字版pdf可以使用pypdfium2提取到表格内图片，扫描版或图片需要使用PP_DOCLAYOUT_PLUS_L/PP_DOCLAYOUTV2版面识别模型，才能识别到表格内的图片
         # "skip_text_in_image": True, # 是否跳过表格里图片中的文字（如表格单元格中嵌入的图片、图标、扫描底图等）
         # "use_img2table": False, # 是否优先使用img2table库提取表格，需要手动安装（pip install img2table），基于opencv识别准确度不如使用模型，但是速度很快，默认关闭
 

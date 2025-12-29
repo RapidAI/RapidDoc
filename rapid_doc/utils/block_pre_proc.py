@@ -80,16 +80,22 @@ def prepare_block_bboxes(
         if (x1 - x0) > (page_w / 3) and (y1 - y0) > 10 and y0 > (page_h * 0.7):
             footnote_blocks.append([x0, y0, x1, y1])
 
-    # """移除在footnote下面的任何框"""
-    # need_remove_blocks = find_blocks_under_footnote(all_bboxes, footnote_blocks)
-    # if len(need_remove_blocks) > 0:
-    #     for block in need_remove_blocks:
-    #         all_bboxes.remove(block)
-    #         all_discarded_blocks.append(block)
+    use_pp_doclayoutv2 = False
+    if all_bboxes:
+        original_order = all_bboxes[0][11]
+        if original_order is not None and original_order >= 0:
+            use_pp_doclayoutv2 = True
+    if not use_pp_doclayoutv2:
+        # """移除在footnote下面的任何框"""
+        need_remove_blocks = find_blocks_under_footnote(all_bboxes, footnote_blocks)
+        if len(need_remove_blocks) > 0:
+            for block in need_remove_blocks:
+                all_bboxes.remove(block)
+                all_discarded_blocks.append(block)
 
-    """经过以上处理后，还存在大框套小框的情况，则删除小框"""
-    all_bboxes = remove_overlaps_min_blocks(all_bboxes)
-    all_discarded_blocks = remove_overlaps_min_blocks(all_discarded_blocks)
+        """经过以上处理后，还存在大框套小框的情况，则删除小框"""
+        all_bboxes = remove_overlaps_min_blocks(all_bboxes) #PP-DocLayoutV2大框套小框的情况
+        all_discarded_blocks = remove_overlaps_min_blocks(all_discarded_blocks)
 
     """粗排序后返回"""
     all_bboxes.sort(key=lambda x: x[0]+x[1])
@@ -107,9 +113,9 @@ def add_bboxes(blocks, block_type, bboxes):
             BlockType.TABLE_CAPTION,
             BlockType.TABLE_FOOTNOTE,
         ]:
-            bboxes.append([x0, y0, x1, y1, None, None, None, block_type, None, None, None, None, block['score'], block['group_id']])
+            bboxes.append([x0, y0, x1, y1, None, None, None, block_type, None, None, block.get('original_label'), block.get('original_order'), block['score'], block['group_id']])
         else:
-            bboxes.append([x0, y0, x1, y1, None, None, None, block_type, None, None, None, None, block['score']])
+            bboxes.append([x0, y0, x1, y1, None, None, None, block_type, None, None, block.get('original_label'), block.get('original_order'), block['score']])
 
 
 def fix_text_overlap_title_blocks(all_bboxes):

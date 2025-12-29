@@ -33,6 +33,29 @@ PP_DOCLAYOUT_PLUS_L_Threshold = {
     19: 0.5,  # reference_content
 }
 
+PP_DOCLAYOUT_PLUS_L_layout_merge_bboxes_mode = {
+    0: "large",  # paragraph_title
+    1: "large",  # image
+    2: "union",  # text
+    3: "union",  # number
+    4: "union",  # abstract
+    5: "union",  # content
+    6: "union",  # figure_table_chart_title
+    7: "large",  # formula
+    8: "union",  # table
+    9: "union",  # reference
+    10: "union",  # doc_title
+    11: "union",  # footnote
+    12: "union",  # header
+    13: "union",  # algorithm
+    14: "union",  # footer
+    15: "union",  # seal
+    16: "large",  # chart
+    17: "union",  # formula_number
+    18: "union",  # aside_text
+    19: "union", # reference_content
+}
+
 PP_DOCLAYOUT_L_Threshold = {
     0: 0.3,    # paragraph_title
     1: 0.5,    # image
@@ -56,7 +79,7 @@ PP_DOCLAYOUT_L_Threshold = {
     19: 0.5,   # formula_number
     20: 0.5,   # header_image (默认值)
     21: 0.5,   # footer_image (默认值)
-    22: 0.5    # aside_text
+    22: 0.5,    # aside_text
 }
 
 PP_DOCLAYOUTV2_Threshold = {
@@ -87,6 +110,34 @@ PP_DOCLAYOUTV2_Threshold = {
     24: 0.5,  # vision_footnote
 }
 
+PP_DOCLAYOUTV2_layout_merge_bboxes_mode= {
+    0: "union",  # abstract
+    1: "union",  # algorithm
+    2: "union",  # aside_text
+    3: "large",  # chart
+    4: "union",  # content
+    5: "large",  # display_formula
+    6: "large",  # doc_title
+    7: "union",  # figure_title
+    8: "union",  # footer
+    9: "union",  # footer
+    10: "union",  # footnote
+    11: "union",  # formula_number
+    12: "union",  # header
+    13: "union",  # header
+    14: "union", # image
+    15: "large",  # inline_formula
+    16: "union",  # number
+    17: "large",  # paragraph_title
+    18: "union",  # reference
+    19: "union",  # reference_content
+    20: "union",  # seal
+    21: "union",  # table
+    22: "union",  # text
+    23: "union",  # text
+    24: "union",  # vision_footnote
+}
+
 class ModelType(Enum):
     PP_DOCLAYOUT_PLUS_L = "pp_doclayout_plus_l"
     PP_DOCLAYOUTV2 = "pp_doclayoutv2"
@@ -105,7 +156,7 @@ class EngineType(Enum):
 
 @dataclass
 class RapidLayoutInput:
-    model_type: ModelType = ModelType.PP_DOCLAYOUT_PLUS_L
+    model_type: ModelType = ModelType.PP_DOCLAYOUTV2
     model_dir_or_path: Union[str, Path, None] = None
 
     engine_type: EngineType = EngineType.ONNXRUNTIME

@@ -46,12 +46,13 @@ os.environ['MINERU_DEVICE_MODE'] = "cuda:1"
 
 #### 2、layout_config 版面解析参数说明如下：
 
-|  参数名   |  说明   |         默认值         | 备注 |
-| :-------: |:-----:|:-------------------:|:--:|
-| model_type |  模型   | PP_DOCLAYOUT_PLUS_L |  |
-| conf_thresh  |  阈值   |     0.5（_S为0.2）     |  |
-| batch_num | 批处理大小 |          1          |  |
-| model_dir_or_path | 模型路径  |        None         |  |
+|  参数名   |   说明    |         默认值         | 备注 |
+| :-------: |:-------:|:-------------------:|:--:|
+| model_type |   模型    | PP_DOCLAYOUTV2 |  |
+| conf_thresh  |   阈值    |     0.5（_S为0.2）     |  |
+| batch_num |  批处理大小  |          1          |  |
+| model_dir_or_path |  模型路径   |        None         |  |
+| markdown_ignore_labels | 忽略的版面类型 |        ["number","footnote","header","header_image","footer","footer_image","aside_text",]        |  |
 示例：
 
 ```python
@@ -151,7 +152,7 @@ from rapid_doc.model.table.rapid_table_self import ModelType as TableModelType, 
 
 table_config = {
     # "force_ocr": False, # 表格文字，是否强制使用ocr，默认 False 根据 parse_method 来判断是否需要ocr还是从pdf中直接提取文本
-    # 注：文字版pdf可以使用pypdfium2提取到表格内图片，扫描版或图片需要使用PP_DOCLAYOUT_PLUS_L版面识别模型，才能识别到表格内的图片
+    # 注：文字版pdf可以使用pypdfium2提取到表格内图片，扫描版或图片需要使用PP_DOCLAYOUT_PLUS_L/PP_DOCLAYOUTV2版面识别模型，才能识别到表格内的图片
     # "skip_text_in_image": True, # 是否跳过表格里图片中的文字（如表格单元格中嵌入的图片、图标、扫描底图等）
     # "use_img2table": False, # 是否优先使用img2table库提取表格，需要手动安装（pip install img2table），基于opencv识别准确度不如使用模型，但是速度很快，默认关闭
 
