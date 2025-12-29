@@ -2,7 +2,7 @@
 
 ## 😺 项目介绍
 
-**RapidDoc 是一个轻量级、专注于文档解析的开源框架，支持 **OCR、版面分析、公式识别、表格识别和阅读顺序恢复** 等多种功能，支持将复杂 PDF 文档转换为 Markdown、JSON、WORD、HTML 多种格式**
+**RapidDoc 是一个轻量级、专注于文档解析的开源框架，支持 **OCR、版面分析、公式识别、表格识别和阅读顺序恢复** 等多种功能，支持将复杂 PDF 文档转换为 Markdown、JSON、WORD、HTML 格式。**
 
 **框架基于 [Mineru](https://github.com/opendatalab/MinerU) 二次开发，移除 VLM，专注于 Pipeline 产线下的高效文档解析，在 CPU 上也能保持不错的解析速度。**
 
@@ -56,7 +56,9 @@
 
 ### 1. OmniDocBench
 
-以下是RapidDoc在 OmniDocBench 上的评估结果。Pipeline 模型使用 PP-DocLayoutV2、PP-OCRv5-mobile、PP-FormulaNet_plus-M、UNET_SLANET_PLUS。
+以下是RapidDoc在 OmniDocBench 上的评估结果。
+
+Pipeline 模型使用 PP-DocLayoutV2、PP-OCRv5-mobile、PP-FormulaNet_plus-M、UNET_SLANET_PLUS。
 <table style="width:100%; border-collapse: collapse;">
     <caption>Comprehensive evaluation of document parsing on OmniDocBench (v1.5)</caption>
     <thead>
