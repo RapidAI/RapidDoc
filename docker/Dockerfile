@@ -21,8 +21,8 @@ RUN apt-get update && \
 WORKDIR /app
 
 # 安装 Python 依赖
-RUN python3 -m pip install 'rapid-doc[cpu]==0.6.1' -i https://pypi.org/simple --break-system-packages && \
-    python3 -m pip install 'rapid-doc[api]==0.6.1' -i https://pypi.org/simple --break-system-packages && \
+RUN python3 -m pip install 'rapid-doc[cpu]==0.7.0' -i https://pypi.org/simple --break-system-packages && \
+    python3 -m pip install 'rapid-doc[api]==0.7.0' -i https://pypi.org/simple --break-system-packages && \
     python3 -m pip cache purge
 
 # 复制配置文件和脚本（优先复制，利用Docker缓存）

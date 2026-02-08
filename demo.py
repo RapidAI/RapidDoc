@@ -43,8 +43,8 @@ def do_parse(
     f_dump_model_output=True,  # Whether to dump model output files
     f_dump_orig_pdf=True,  # Whether to dump original PDF files
     f_dump_content_list=True,  # Whether to dump content list files
-    f_dump_md_html=True,  # Whether to convert markdown to HTML
-    f_dump_md_docx=True,  # Whether to convert markdown to docx (via Pandoc)
+    f_dump_md_html=False,  # Whether to convert markdown to HTML
+    f_dump_md_docx=False,  # Whether to convert markdown to docx (via Pandoc)
     f_make_md_mode=MakeMode.MM_MD,  # The mode for making markdown content, default is MM_MD
     start_page_id=0,  # Start page ID for parsing, default is 0
     end_page_id=None,  # End page ID for parsing, default is None (parse all pages until the end of the document)

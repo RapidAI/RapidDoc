@@ -86,13 +86,13 @@ def atom_model_init(model_name: str, **kwargs):
             kwargs.get('layout_config'),
         )
     elif model_name == AtomicModel.FORMULA:
-        atom_model = kwargs.get('formula_config').get('custom_model')
+        atom_model = (kwargs.get('formula_config') or {}).get('custom_model')
         if not isinstance(atom_model, CustomBaseModel):
             atom_model = formula_model_init(
                 kwargs.get('formula_config'),
             )
     elif model_name == AtomicModel.OCR:
-        atom_model = kwargs.get('ocr_config').get('custom_model')
+        atom_model = (kwargs.get('ocr_config') or {}).get('custom_model')
         if not isinstance(atom_model, CustomBaseModel):
             atom_model = ocr_model_init(
                 kwargs.get('det_db_box_thresh', 0.3),
@@ -102,7 +102,7 @@ def atom_model_init(model_name: str, **kwargs):
                 kwargs.get('enable_merge_det_boxes', True)
             )
     elif model_name == AtomicModel.Table:
-        atom_model = kwargs.get('table_config').get('custom_model')
+        atom_model = (kwargs.get('table_config') or {}).get('custom_model')
         if not isinstance(atom_model, CustomBaseModel):
             atom_model = table_model_init(
                 kwargs.get('lang'),
