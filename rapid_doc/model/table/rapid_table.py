@@ -72,6 +72,20 @@ class RapidTableModel(object):
                                          engine_cfg=engine_cfg, use_ocr=False)
             self.table_model = RapidTable(input_args)
 
+    def batch_predict(self, images: list, ocr_result=None, fill_image_res=None, mfd_res=None, skip_text_in_image=True, use_img2table=False) -> list[str]:
+        results = []
+        for image in images:
+            res = self.predict(
+                image=image,
+                ocr_result=ocr_result,
+                fill_image_res=fill_image_res,
+                mfd_res=mfd_res,
+                skip_text_in_image=skip_text_in_image,
+                use_img2table=use_img2table
+            )
+            results.append(res)
+        return results
+
     def predict(self, image, ocr_result=None, fill_image_res=None, mfd_res=None, skip_text_in_image=True, use_img2table=False):
         bgr_image = cv2.cvtColor(np.asarray(image), cv2.COLOR_RGB2BGR)
 

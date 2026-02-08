@@ -88,6 +88,7 @@ class RapidOcrModel(object):
                 default_params['EngineConfig.torch.npu_id'] = npu_id
         default_params.pop('engine_type', None)
         default_params.pop('use_det_mode', None)
+        default_params.pop('custom_model', None)
         self.ocr_engine = RapidOCR(params=default_params)
         self.text_detector = self.ocr_engine.text_det
         self.text_recognizer = self.ocr_engine.text_rec

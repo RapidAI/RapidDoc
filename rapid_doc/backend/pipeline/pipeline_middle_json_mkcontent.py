@@ -33,6 +33,9 @@ def make_blocks_to_markdown(paras_of_layout,
         elif para_type == BlockType.TITLE:
             title_level = get_title_level(para_block)
             para_text = f'{"#" * title_level} {merge_para_with_text(para_block)}'
+            para_text = f"{para_text}".replace("-\n", "").replace(
+                "\n", " "
+            )
         elif para_type == BlockType.INTERLINE_EQUATION:
             if len(para_block['lines']) == 0 or len(para_block['lines'][0]['spans']) == 0:
                 continue
@@ -316,7 +319,8 @@ def escape_special_markdown_char(content):
     """
     转义正文里对markdown语法有特殊意义的字符
     """
-    special_chars = ["*", "`", "~", "$"]
+    # special_chars = ["*", "`", "~", "$"]
+    special_chars = ["*", "`", "~"] # vl模型识别文本的时候，公式用$包裹的
     for char in special_chars:
         content = content.replace(char, "\\" + char)
 

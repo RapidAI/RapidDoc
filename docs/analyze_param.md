@@ -49,6 +49,7 @@ os.environ['MINERU_DEVICE_MODE'] = "cuda:1"
 |  参数名   |   说明    |         默认值         | 备注 |
 | :-------: |:-------:|:-------------------:|:--:|
 | model_type |   模型    | PP_DOCLAYOUTV2 |  |
+| layout_shape_mode |  版面框形状  | PP_DOCLAYOUTV2 | "rect" / "auto" |
 | conf_thresh  |   阈值    |     0.5（_S为0.2）     |  |
 | batch_num |  批处理大小  |          1          |  |
 | model_dir_or_path |  模型路径   |        None         |  |
@@ -69,11 +70,12 @@ layout_config = {
 #### 3、ocr_config OCR识别参数说明如下：
 在rapidocr配置基础上新增如下参数
 
-|  参数名   |      说明      |                      默认值                       |                                             备注                                              |
-| :-------: |:------------:|:----------------------------------------------:|:-------------------------------------------------------------------------------------------:|
-| engine_type  | det和rec的推理引擎 | OPENVINO（cpu）、TORCH（gpu） |                                                                                             |
-| use_det_mode  | 文本检测框模式：auto（默认）、txt、ocr | auto | 1、txt只会从pypdfium2获取文本框，保留pdf中的图片<br/>2、ocr只会从OCR-det获取文本框<br/>3、auto先从pypdfium2获取文本框，提取不到再使用OCR-det提取 |
-| Det.rec_batch_num |   rec批处理大小   |                       1                        |                                                                                             |
+|        参数名        |            说明            |                      默认值                      |                                             备注                                              |
+|:-----------------:|:------------------------:|:---------------------------------------------:|:-------------------------------------------------------------------------------------------:|
+|   custom_model    |          自定义模型           |                                               |                                                                                             |
+|    engine_type    |       det和rec的推理引擎       |           OPENVINO（cpu）、TORCH（gpu）            |      
+|   use_det_mode    | 文本检测框模式：auto（默认）、txt、ocr |                     auto                      | 1、txt只会从pypdfium2获取文本框，保留pdf中的图片<br/>2、ocr只会从OCR-det获取文本框<br/>3、auto先从pypdfium2获取文本框，提取不到再使用OCR-det提取 |
+| Det.rec_batch_num |         rec批处理大小         |                       1                       |                                                                                             |
 > [ocr_config想更深入了解，请移步rapidocr config.yaml参数解释](https://rapidai.github.io/RapidOCRDocs/install_usage/api/RapidOCR/)
 
 示例：
@@ -100,14 +102,15 @@ ocr_config = {
 
 #### 4、formula_config 公式识别参数说明如下：
 
-|  参数名   |    说明    |         默认值          |                备注                 |
-| :-------: |:--------:|:--------------------:|:---------------------------------:|
-| model_type |    模型    | PP_FORMULANET_PLUS_M |                                   |
-| engine_type  |   推理引擎   | ONNXRUNTIME（cpu）、TORCH（gpu） |  torch仅支持PP_FORMULANET_PLUS_M模型   |
-| formula_level  |  公式识别等级  |          0           | 公式识别等级，默认为0，全识别。1:仅识别行间公式，行内公式不识别 |
-| batch_num |  批处理大小   |          1           |                                   |
-| model_dir_or_path |   模型路径   |         None         |                 不设置自动下载                  |
-| dict_keys_path | yml字典路径  |         None         |         torch推理使用，不设置自动下载         |
+|        参数名        |   说明    |         默认值          |                备注                 |
+|:-----------------:|:-------:|:--------------------:|:---------------------------------:|
+|   custom_model    |  自定义模型  |  |                                   |
+|    model_type     |   模型    | PP_FORMULANET_PLUS_M |                                   |
+|    engine_type    |  推理引擎   | ONNXRUNTIME（cpu）、TORCH（gpu） |  torch仅支持PP_FORMULANET_PLUS_M模型   |
+|   formula_level   | 公式识别等级  |          0           | 公式识别等级，默认为0，全识别。1:仅识别行间公式，行内公式不识别 |
+|     batch_num     |  批处理大小  |          1           |                                   |
+| model_dir_or_path |  模型路径   |         None         |                 不设置自动下载                  |
+|  dict_keys_path   | yml字典路径 |         None         |         torch推理使用，不设置自动下载         |
 示例：
 
 ```python
@@ -125,6 +128,7 @@ formula_config = {
 
 |               参数名                |          说明           |              默认值               |                              备注                               |
 |:--------------------------------:|:---------------------:|:------------------------------:|:-------------------------------------------------------------:|
+|           custom_model           |         自定义模型         |                           |                                                               |
 |            force_ocr             |     表格文字是否强制使用ocr     |             False              |            根据 parse_method 来判断是否需要ocr还是从pdf中直接提取文本            |
 |        skip_text_in_image        |     是否跳过表格里图片中的文字     |              True              |                  如表格单元格中嵌入的图片、图标、扫描底图等，里面的文字                  |
 |          use_img2table           | 是否优先使用img2table库提取表格  |             False              | 需要手动安装（pip install img2table），基于opencv识别准确度不如使用模型，但是速度很快，默认关闭 |

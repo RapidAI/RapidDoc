@@ -68,6 +68,72 @@ def _add_table_borders(docx_path: str) -> None:
     doc.save(docx_path)
 
 
+def _set_fonts(docx_path: str, chinese_font: str = '宋体', latin_font: str = 'Times New Roman') -> None:
+    """
+    设置 Word 文档的默认字体：中文使用宋体，英文/数字使用 Times New Roman
+    """
+    if not PYTHON_DOCX_AVAILABLE:
+        return
+
+    doc = Document(docx_path)
+
+    # 1. 修改正文默认样式 (Normal Style)
+    style = doc.styles['Normal']
+    font = style.font
+    font.size = Pt(12)  # 可选：设置默认字号
+
+    # 设置西文字体
+    font.name = latin_font
+    # 设置中文字体 (必须通过 oxml 直接操作)
+    rFonts = font._element.rPr.get_or_add_rFonts()
+    rFonts.set(qn('w:eastAsia'), chinese_font)
+    rFonts.set(qn('w:ascii'), latin_font)
+    rFonts.set(qn('w:hAnsi'), latin_font)
+
+    # 2. 遍历所有段落和运行内容，确保字体应用
+    # (Pandoc 生成的内容有时会带有具体的格式覆盖，直接改 Style 可能不彻底)
+    for paragraph in doc.paragraphs:
+        for run in paragraph.runs:
+            run.font.name = latin_font
+            run._element.rPr.get_or_add_rFonts().set(qn('w:eastAsia'), chinese_font)
+
+    # 3. 处理表格中的字体
+    for table in doc.tables:
+        for row in table.rows:
+            for cell in row.cells:
+                for paragraph in cell.paragraphs:
+                    for run in paragraph.runs:
+                        run.font.name = latin_font
+                        run._element.rPr.get_or_add_rFonts().set(qn('w:eastAsia'), chinese_font)
+
+    doc.save(docx_path)
+
+
+from docx.shared import RGBColor  # 需要导入这个类
+
+
+def _fix_styles(docx_path: str):
+    """
+    统一修改文档样式：将所有标题颜色改为黑色
+    """
+    if not PYTHON_DOCX_AVAILABLE:
+        return
+
+    doc = Document(docx_path)
+
+    # 遍历文档中定义的所有样式
+    for style in doc.styles:
+        # 寻找名称中包含 "Heading" 或 "标题" 的样式
+        if 'Heading' in style.name or '标题' in style.name:
+            if hasattr(style, 'font'):
+                # 强制设为黑色
+                style.font.color.rgb = RGBColor(0, 0, 0)
+                # 如果你想让标题也使用宋体/Times New Roman，可以在这里一起设置
+                style.font.name = 'Times New Roman'
+                style._element.rPr.get_or_add_rFonts().set(qn('w:eastAsia'), '宋体')
+
+    doc.save(docx_path)
+
 def _html_table_to_markdown(html_table: str) -> str:
     """
     将 HTML 表格转换为 Markdown 管道表格
@@ -183,7 +249,7 @@ def markdown_to_docx(
             "pypandoc 未安装，Markdown转docx功能不可用。\n"
             "请运行: pip install pypandoc-binary"
         )
-    
+    markdown_content = markdown_content.encode('utf-8', errors='ignore').decode('utf-8')
     # 预处理：将 HTML 表格转换为 Markdown 表格
     processed_content = _preprocess_html_tables(markdown_content)
     
@@ -194,7 +260,8 @@ def markdown_to_docx(
     ]
     
     # 启用表格和数学公式支持
-    pandoc_args.extend(['-f', 'markdown+pipe_tables+grid_tables+multiline_tables+table_captions+tex_math_dollars'])
+    # pandoc_args.extend(['-f', 'markdown+pipe_tables+grid_tables+multiline_tables+table_captions+tex_math_dollars'])
+    pandoc_args.extend(['-f', 'markdown-raw_tex+pipe_tables+grid_tables+multiline_tables+table_captions+tex_math_dollars'])
     
     # 如果指定了参考文档，使用其样式
     if reference_doc and os.path.exists(reference_doc):
@@ -228,7 +295,11 @@ def markdown_to_docx(
         # 后处理：为表格添加边框
         if PYTHON_DOCX_AVAILABLE:
             try:
+                # 1. 添加表格边框
                 _add_table_borders(output_path)
+                # 2. 设置中西双字体
+                _set_fonts(output_path, chinese_font='宋体', latin_font='Times New Roman')
+                _fix_styles(output_path)  # 修正颜色
             except Exception as e:
                 logger.warning(f"添加表格边框失败: {e}")
         

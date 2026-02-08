@@ -31,7 +31,7 @@ class RapidFormulaModel(object):
     def predict(self, image):
         return self.batch_predict(images=[image], batch_size=1)[0]
 
-    def batch_predict(self, images: list, batch_size: int) -> list:
+    def batch_predict(self, images: list, batch_size) -> list[str]:
         images_formula_res = []
         all_results = self.latex_engine(img_contents=images, batch_size=batch_size, tqdm_enable=True)
         for results in all_results:

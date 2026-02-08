@@ -1,6 +1,9 @@
+import copy
+
 from loguru import logger
 
 from .model_list import AtomicModel
+from ...model.custom import CustomBaseModel
 from ...model.layout.rapid_layout import RapidLayoutModel
 from ...model.formula.rapid_formula_model import RapidFormulaModel
 from ...model.ocr.rapid_ocr import RapidOcrModel
@@ -8,13 +11,17 @@ from ...model.table.rapid_table import RapidTableModel
 from ...utils.hash_utils import make_hashable
 
 def table_model_init(lang=None, ocr_config=None, table_config=None):
+    ocr_config_clean = None
+    if ocr_config is not None:
+        ocr_config_clean = copy.deepcopy(ocr_config)
+        ocr_config_clean.pop("custom_model", None)
     atom_model_manager = AtomModelSingleton()
     ocr_engine = atom_model_manager.get_atom_model(
         atom_model_name=AtomicModel.OCR,
         det_db_box_thresh=0.5,
         det_db_unclip_ratio=1.6,
         lang=lang,
-        ocr_config=ocr_config,
+        ocr_config=ocr_config_clean,
         enable_merge_det_boxes=False
     )
     table_model = RapidTableModel(ocr_engine, table_config)
@@ -79,23 +86,29 @@ def atom_model_init(model_name: str, **kwargs):
             kwargs.get('layout_config'),
         )
     elif model_name == AtomicModel.FORMULA:
-        atom_model = formula_model_init(
-            kwargs.get('formula_config'),
-        )
+        atom_model = kwargs.get('formula_config').get('custom_model')
+        if not isinstance(atom_model, CustomBaseModel):
+            atom_model = formula_model_init(
+                kwargs.get('formula_config'),
+            )
     elif model_name == AtomicModel.OCR:
-        atom_model = ocr_model_init(
-            kwargs.get('det_db_box_thresh', 0.3),
-            kwargs.get('lang'),
-            kwargs.get('ocr_config'),
-            kwargs.get('det_db_unclip_ratio', 1.8),
-            kwargs.get('enable_merge_det_boxes', True)
-        )
+        atom_model = kwargs.get('ocr_config').get('custom_model')
+        if not isinstance(atom_model, CustomBaseModel):
+            atom_model = ocr_model_init(
+                kwargs.get('det_db_box_thresh', 0.3),
+                kwargs.get('lang'),
+                kwargs.get('ocr_config'),
+                kwargs.get('det_db_unclip_ratio', 1.8),
+                kwargs.get('enable_merge_det_boxes', True)
+            )
     elif model_name == AtomicModel.Table:
-        atom_model = table_model_init(
-            kwargs.get('lang'),
-            kwargs.get('ocr_config'),
-            kwargs.get('table_config'),
-        )
+        atom_model = kwargs.get('table_config').get('custom_model')
+        if not isinstance(atom_model, CustomBaseModel):
+            atom_model = table_model_init(
+                kwargs.get('lang'),
+                kwargs.get('ocr_config'),
+                kwargs.get('table_config'),
+            )
     else:
         logger.error('model name not allow')
         exit(1)

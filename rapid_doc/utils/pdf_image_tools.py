@@ -243,7 +243,7 @@ def images_bytes_to_pdf_bytes(image_bytes):
     # 获取 PDF bytes 并重置指针（可选）
     pdf_bytes = pdf_buffer.getvalue()
     pdf_buffer.close()
-    layout_original_image = os.getenv('MINERU_LAYOUT_ORIGINAL_IMAGE', 'true')
+    layout_original_image = os.getenv('MINERU_LAYOUT_ORIGINAL_IMAGE', 'false')
     if (layout_original_image.lower() in ['true', '1', 'yes']):
         return {
             "pdf_bytes": pdf_bytes,

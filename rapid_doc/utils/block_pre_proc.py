@@ -105,6 +105,7 @@ def prepare_block_bboxes(
 def add_bboxes(blocks, block_type, bboxes):
     for block in blocks:
         x0, y0, x1, y1 = block['bbox']
+        polygon_points = block.get('polygon_points')
         if block_type in [
             BlockType.IMAGE_BODY,
             BlockType.IMAGE_CAPTION,
@@ -113,9 +114,9 @@ def add_bboxes(blocks, block_type, bboxes):
             BlockType.TABLE_CAPTION,
             BlockType.TABLE_FOOTNOTE,
         ]:
-            bboxes.append([x0, y0, x1, y1, None, None, None, block_type, None, None, block.get('original_label'), block.get('original_order'), block['score'], block['group_id']])
+            bboxes.append([x0, y0, x1, y1, None, None, None, block_type, None, None, block.get('original_label'), block.get('original_order'), block['score'], block['group_id'], polygon_points])
         else:
-            bboxes.append([x0, y0, x1, y1, None, None, None, block_type, None, None, block.get('original_label'), block.get('original_order'), block['score']])
+            bboxes.append([x0, y0, x1, y1, None, None, None, block_type, None, None, block.get('original_label'), block.get('original_order'), block['score'], None, polygon_points])
 
 
 def fix_text_overlap_title_blocks(all_bboxes):

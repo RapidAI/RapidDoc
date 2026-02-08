@@ -263,8 +263,7 @@ def batch_image_analyze(
             batch_ratio = 1
             logger.info(f'Could not determine GPU memory, using default batch_ratio: {batch_ratio}')
 
-    enable_ocr_det_batch = True
-    batch_model = BatchAnalyze(model_manager, batch_ratio, formula_enable, table_enable, enable_ocr_det_batch, layout_config, ocr_config, formula_config, table_config, checkbox_config)
+    batch_model = BatchAnalyze(model_manager, batch_ratio, formula_enable, table_enable, layout_config, ocr_config, formula_config, table_config, checkbox_config)
     results = batch_model(images_with_extra_info)
 
     clean_memory(get_device())

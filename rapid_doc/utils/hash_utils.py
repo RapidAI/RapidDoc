@@ -32,8 +32,13 @@ def dict_md5(d):
 
 def make_hashable(value):
     if isinstance(value, dict):
-        # 递归处理 dict 内的所有值
-        return json.dumps({k: make_hashable(v) for k, v in value.items()}, sort_keys=True)
+        result = {}
+        for k, v in value.items():
+            if k == "custom_model":
+                result[k] = type(v).__name__
+            else:
+                result[k] = make_hashable(v)
+        return json.dumps(result, sort_keys=True)
     elif isinstance(value, list):
         return json.dumps([make_hashable(v) for v in value], sort_keys=True)
     elif isinstance(value, Enum):

@@ -6,7 +6,9 @@
 
 **框架基于 [Mineru](https://github.com/opendatalab/MinerU) 二次开发，移除 VLM，专注于 Pipeline 产线下的高效文档解析，在 CPU 上也能保持不错的解析速度。**
 
-**本项目所使用的核心模型主要来源于 [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR) 的 [PP-StructureV3](https://www.paddleocr.ai/main/version3.x/pipeline_usage/PP-StructureV3.html) 系列（OCR、版面分析、公式识别、阅读顺序恢复，以及部分表格识别模型），并已全部转换为 ONNX 格式，支持在 CPU/GPU 上高效推理。**
+**本项目所使用的默认模型主要来源于 [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR) 的 [PP-StructureV3](https://www.paddleocr.ai/main/version3.x/pipeline_usage/PP-StructureV3.html) 系列（OCR、版面分析、公式识别、阅读顺序恢复，以及部分表格识别模型），并已全部转换为 ONNX 格式，支持在 CPU/GPU 上高效推理。**
+
+**同时支持自定义OCR、公式、表格模型，需实现 CustomBaseModel 的 batch_predict 方法，目前内置 [PaddleOCRVL](https://www.paddleocr.ai/main/version3.x/pipeline_usage/PaddleOCR-VL.html) 系列模型的集成。**
 
 **KittyDoc 已经成为 RapidAI 开源家族成员**
 
@@ -26,6 +28,7 @@
 - **版面识别**
   - 模型使用 `PP-DocLayout` 系列 ONNX 模型（v2、plus-L、L、M、S）
     - **PP-DocLayoutV2**：自带阅读顺序，效果最好，默认使用
+    - **PP-DocLayoutV3**：自带阅读顺序，支持异形框
     - **PP-DocLayout_plus-L**：效果好运行稳定
     - **PP-DocLayout-L**：速度快，效果也不错
     - **PP-DocLayout-S**：速度极快，存在部分漏检
@@ -44,8 +47,8 @@
     - **[有线表格识别UNET](https://github.com/RapidAI/TableStructureRec)** + SLANET_plus/UNITABLE（作为无线表格识别）
 
 - **阅读顺序恢复**
-  - 使用 PP-StructureV3 阅读顺序恢复算法，基于xycut算法和版面的结果
-  - 速度快效果好，支持多栏、竖排等复杂版面，和V3不开启版面子模块检测效果一致
+  - PP-DocLayoutV2和PP-DocLayoutV3使用版面模型自带的阅读顺序
+  - 其余版面模型，使用 PP-StructureV3 阅读顺序恢复算法，基于xycut算法和版面的结果
 
 - **推理方式**
   - 所有模型通过 ONNXRuntime 推理，OCR可配置其他推理引擎
@@ -371,6 +374,29 @@ os.environ['MINERU_DEVICE_MODE'] = "cuda"
 # 或指定 GPU 编号，例如使用第二块 GPU（cuda:1）
 os.environ['MINERU_DEVICE_MODE'] = "cuda:1"
 ```
+#### 使用PaddleOCRVL系列推理
+vl模型的部署，参考[官方文档](https://www.paddleocr.ai/main/version3.x/pipeline_usage/PaddleOCR-VL.html#31-vlm) 
+```python
+import os
+os.environ['PADDLEOCRVL_VERSION'] = "v1.5"
+os.environ['PADDLEOCRVL_VL_REC_BACKEND'] = "vllm-server"
+os.environ['PADDLEOCRVL_VL_VL_REC_SERVER_URL'] = "http://localhost:8118/v1"
+
+from rapid_doc.model.layout.rapid_layout_self import ModelType as LayoutModelType
+from rapid_doc.model.custom.paddleocr_vl.paddleocr_vl import PaddleOCRVLTableModel, PaddleOCRVLOCRModel, PaddleOCRVLFormulaModel
+layout_config = {
+    "model_type": LayoutModelType.PP_DOCLAYOUTV3,
+}
+ocr_config = {
+    "custom_model": PaddleOCRVLOCRModel()
+}
+formula_config = {
+    "custom_model": PaddleOCRVLFormulaModel()
+}
+table_config = {
+    "custom_model": PaddleOCRVLTableModel()
+}
+```
 
 #### 使用docker部署RapidDoc
 RapidDoc提供了便捷的docker部署方式，这有助于快速搭建环境并解决一些棘手的环境兼容问题。
@@ -421,13 +447,14 @@ RapidDoc提供了便捷的docker部署方式，这有助于快速搭建环境并
 - [x] markdown转docx、html
 - [x] 支持 PP-DocLayoutV2 版面识别+阅读顺序
 - [x] OmniDocBench评测
+- [ ] 支持自定义的ocr、table、公式。支持PaddleOCR-VL系列
 - [ ] 公式支持openvino
 
 
 ## 🙏 致谢
 
 - [MinerU](https://github.com/opendatalab/MinerU)
-- [PaddleOCR & PP-StructureV3](https://github.com/PaddlePaddle/PaddleOCR)
+- [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)
 - [RapidOCR](https://github.com/RapidAI/RapidOCR)
 
 ## ⚖️ 开源许可

@@ -11,14 +11,14 @@ from .pre_process import PPPreProcess
 from ..utils import ModelType
 
 class PPDocLayoutModelHandler(BaseModelHandler):
-    def __init__(self, labels, conf_thres: Union[float, dict], iou_thres, session: InferSession, model_type: ModelType):
+    def __init__(self, labels, conf_thres: Union[float, dict], iou_thres, session: InferSession, model_type: ModelType, layout_shape_mode):
         layout_unclip_ratio = None
         layout_merge_bboxes_mode = None
         if model_type == ModelType.PP_DOCLAYOUT_PLUS_L:
             target_size = (800, 800)
             layout_unclip_ratio = [1.0, 1.0]
             layout_merge_bboxes_mode = PP_DOCLAYOUT_PLUS_L_layout_merge_bboxes_mode
-        elif model_type == ModelType.PP_DOCLAYOUTV2:
+        elif model_type in [ModelType.PP_DOCLAYOUTV2, ModelType.PP_DOCLAYOUTV3]:
             target_size = (800, 800)
             layout_unclip_ratio = [1.0, 1.0]
             layout_merge_bboxes_mode = PP_DOCLAYOUTV2_layout_merge_bboxes_mode
@@ -29,8 +29,9 @@ class PPDocLayoutModelHandler(BaseModelHandler):
             target_size = (640, 640)
         self.model_type = model_type
         self.img_size = target_size
+        self.layout_shape_mode = layout_shape_mode
         self.pp_preprocess = PPPreProcess(img_size=self.img_size, model_type=model_type)
-        self.pp_postprocess = PPPostProcess(labels, conf_thres, iou_thres, layout_merge_bboxes_mode=layout_merge_bboxes_mode, layout_unclip_ratio=layout_unclip_ratio)
+        self.pp_postprocess = PPPostProcess(labels, conf_thres, iou_thres, layout_merge_bboxes_mode=layout_merge_bboxes_mode, layout_unclip_ratio=layout_unclip_ratio, scale_size=target_size)
 
         self.session = session
 
@@ -55,17 +56,25 @@ class PPDocLayoutModelHandler(BaseModelHandler):
         # 3、后处理
         batch_outputs = self._format_output(batch_preds)
         result_list = []
+        layout_shape_mode = self.layout_shape_mode
         for i, output in enumerate(batch_outputs):
             ori_img_shape = ori_img_list[i].shape[:2]
-            datas = self.pp_postprocess(output["boxes"],[ori_img_shape[1], ori_img_shape[0]])
-            if datas:
-                boxes, scores, class_names = zip(*[(d["coordinate"], d["score"], d["label"]) for d in datas])
-                orders = list(range(len(boxes))) if self.model_type == ModelType.PP_DOCLAYOUTV2 else None
+            if "masks" in output:
+                masks = output["masks"]
             else:
-                boxes, scores, class_names = [], [], []
+                layout_shape_mode = "rect"
+                masks = None
+            datas = self.pp_postprocess(output["boxes"],[ori_img_shape[1], ori_img_shape[0]], masks, layout_shape_mode,)
+            if datas:
+                boxes, polygon_points, scores, class_names = zip(*[(d["coordinate"], d.get("polygon_points"), d["score"], d["label"]) for d in datas])
+                orders = list(range(len(boxes))) if self.model_type in [ModelType.PP_DOCLAYOUTV2, ModelType.PP_DOCLAYOUTV3] else None
+                if any(p is None for p in polygon_points):
+                    polygon_points = None
+            else:
+                boxes, polygon_points, scores, class_names = [], [], [], []
                 orders = []
             elapse = time.perf_counter() - s1
-            result = RapidLayoutOutput(img=ori_img_list[i], boxes=boxes,
+            result = RapidLayoutOutput(img=ori_img_list[i], boxes=boxes, polygon_points=polygon_points,
                                        class_names=class_names, scores=scores, orders=orders, elapse=elapse)
             result_list.append(result)
         return result_list

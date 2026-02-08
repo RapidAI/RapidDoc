@@ -3,6 +3,9 @@ import copy
 import json
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+# 加载.env文件中的环境变量
+load_dotenv()
 # # 使用默认 GPU（cuda:0）
 # os.environ['MINERU_DEVICE_MODE'] = "cuda"
 # # 或指定 GPU 编号，例如使用第二块 GPU（cuda:1）
@@ -23,6 +26,7 @@ from rapidocr import EngineType as OCREngineType, OCRVersion, ModelType as OCRMo
 from rapid_doc.model.layout.rapid_layout_self import ModelType as LayoutModelType
 from rapid_doc.model.formula.rapid_formula_self import ModelType as FormulaModelType, EngineType as FormulaEngineType
 from rapid_doc.model.table.rapid_table_self import ModelType as TableModelType
+from rapid_doc.model.custom.paddleocr_vl.paddleocr_vl import PaddleOCRVLTableModel, PaddleOCRVLOCRModel, PaddleOCRVLFormulaModel
 
 def do_parse(
     output_dir,  # Output directory for storing parsing results
@@ -45,13 +49,15 @@ def do_parse(
 
 
     layout_config = {
-        "model_type": LayoutModelType.PP_DOCLAYOUTV2,
+        # "model_type": LayoutModelType.PP_DOCLAYOUTV2,
         # "conf_thresh": 0.4,
         # "batch_num": 1,
-        # "model_dir_or_path": "C:\ocr\models\ppmodel\layout\PP-DocLayoutV2\pp_doclayoutv2.onnx"
+        # "model_dir_or_path": r"C:\ocr\models\ppmodel\layout\PP-DocLayoutV2\pp_doclayoutv2.onnx",
+        # "markdown_ignore_labels": ["number", "footnote", "header", "header_image", "footer", "footer_image", "aside_text",],
     }
 
     ocr_config = {
+        # "custom_model": PaddleOCRVLOCRModel(),
         # "Det.model_path": r"C:\ocr\models\ppmodel\ocr\v4\ch_PP-OCRv4_det_infer\openvino\ch_PP-OCRv4_det_infer.onnx",
         # "Rec.model_path": r"C:\ocr\models\ppmodel\ocr\v4\ch_PP-OCRv4_rec_infer\openvino\ch_PP-OCRv4_rec_infer.onnx",
         # "Rec.rec_batch_num": 1,
@@ -70,7 +76,8 @@ def do_parse(
     }
 
     formula_config = {
-        "model_type": FormulaModelType.PP_FORMULANET_PLUS_M,
+        # "custom_model": PaddleOCRVLFormulaModel(),
+        # "model_type": FormulaModelType.PP_FORMULANET_PLUS_M,
         # "engine_type": FormulaEngineType.TORCH,
         # "formula_level": 1, # 公式识别等级，默认为0，全识别。1:仅识别行间公式，行内公式不识别
         # "batch_num": 1,
@@ -81,6 +88,7 @@ def do_parse(
     # os.environ['MINERU_MODEL_SOURCE'] = 'local'
 
     table_config = {
+        # "custom_model": PaddleOCRVLTableModel(),
         # "force_ocr": False, # 表格文字，是否强制使用ocr，默认 False 根据 parse_method 来判断是否需要ocr还是从pdf中直接提取文本
         # 注：文字版pdf可以使用pypdfium2提取到表格内图片，扫描版或图片需要使用PP_DOCLAYOUT_PLUS_L/PP_DOCLAYOUTV2版面识别模型，才能识别到表格内的图片
         # "skip_text_in_image": True, # 是否跳过表格里图片中的文字（如表格单元格中嵌入的图片、图标、扫描底图等）

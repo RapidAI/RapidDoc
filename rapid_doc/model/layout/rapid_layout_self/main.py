@@ -23,6 +23,8 @@ class RapidLayout:
                 cfg.conf_thresh = PP_DOCLAYOUT_PLUS_L_Threshold
             elif cfg.model_type == ModelType.PP_DOCLAYOUTV2:
                 cfg.conf_thresh = PP_DOCLAYOUTV2_Threshold
+            elif cfg.model_type == ModelType.PP_DOCLAYOUTV3:
+                cfg.conf_thresh = 0.3
             elif cfg.model_type == ModelType.PP_DOCLAYOUT_L:
                 cfg.conf_thresh = PP_DOCLAYOUT_L_Threshold
             else:

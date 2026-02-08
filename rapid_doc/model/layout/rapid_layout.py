@@ -24,6 +24,8 @@ class RapidLayoutModel(object):
         if layout_config is not None:
             if layout_config.get("model_type"):
                 cfg.model_type = layout_config.get("model_type")
+            if layout_config.get("layout_shape_mode"):
+                cfg.layout_shape_mode = layout_config.get("layout_shape_mode")
             if not layout_config.get("conf_thresh"):
                 if cfg.model_type == ModelType.PP_DOCLAYOUT_S:
                     # S可能存在部分漏检，自动调低阈值
@@ -41,7 +43,6 @@ class RapidLayoutModel(object):
                                                         ["number", "footnote", "header", "header_image", "footer", "footer_image", "aside_text",])
         self.pp_doclayout_cls_dict, self.pp_doclayout_plus_cls_dict, self.pp_doclayoutv2_cls_dict \
             = get_cls_dicts(self.markdown_ignore_labels)
-
         self.model = RapidLayout(cfg=cfg)
         self.model_type = cfg.model_type
         self.doclayout_yolo_list = ['title', 'plain text', 'abandon', 'figure', 'figure_caption',
@@ -76,17 +77,18 @@ class RapidLayoutModel(object):
             # import uuid
             # results.vis(f"output-PP_DOCLAYOUT/{uuid.uuid4().hex}__{img_idx}.png")
             layout_res = []
-            img, boxes, scores, class_names, elapse = results.img, results.boxes, results.scores, results.class_names, results.elapse
+            boxes, scores, class_names = results.boxes, results.scores, results.class_names
             orders = results.orders if results.orders is not None else [-1] * len(boxes)
+            polygon_pointses = results.polygon_points if results.polygon_points is not None else [None] * len(boxes)
             scale = scales[img_idx]
             restore_scale = 1.0 / scale
             temp_results = []
-            for xyxy, conf, cla, order in zip(boxes, scores, class_names, orders):
+            for xyxy, polygon_points, conf, cla, order in zip(boxes, polygon_pointses, scores, class_names, orders):
                 xmin, ymin, xmax, ymax = [round(float(p), 2) for p in xyxy]
                 # xmin, ymin, xmax, ymax = [p for p in xyxy]
                 if self.model_type == ModelType.PP_DOCLAYOUT_PLUS_L:
                     category_id = self.pp_doclayout_plus_cls_dict[cla]
-                elif self.model_type == ModelType.PP_DOCLAYOUTV2:
+                elif self.model_type in [ModelType.PP_DOCLAYOUTV2, ModelType.PP_DOCLAYOUTV3]:
                     category_id = self.pp_doclayoutv2_cls_dict[cla]
                 elif self.model_type == ModelType.DOCLAYOUT_DOCSTRUCTBENCH:
                     if cla == 'isolate_formula':
@@ -95,19 +97,16 @@ class RapidLayoutModel(object):
                         category_id = self.doclayout_yolo_list.index(cla)
                 else:
                     category_id = self.pp_doclayout_cls_dict[cla]
-                # 如果是表格/图片，边界适当扩展（DocLayout模型识别的边框坐标，稍微有一点不全）
-                # if category_id in [CategoryId.TableBody, CategoryId.ImageBody]:
-                #     xmax = min(img.shape[1], xmax + 3)
-                #     ymax = min(img.shape[0], ymax + 5)
                 temp_results.append({
                     "category_id": category_id,
                     "original_label": cla,
                     "original_order": order,
                     "bbox": (xmin, ymin, xmax, ymax),
+                    "polygon_points": polygon_points,
                     "score": round(float(conf), 3)
                 })
 
-            if self.model_type != ModelType.PP_DOCLAYOUTV2:
+            if self.model_type not in [ModelType.PP_DOCLAYOUTV2, ModelType.PP_DOCLAYOUTV3]:
                 # 行内公式判断
                 temp_results = self.check_inline_formula(temp_results)
 
@@ -117,11 +116,18 @@ class RapidLayoutModel(object):
                 ymin *= restore_scale
                 xmax *= restore_scale
                 ymax *= restore_scale
+                polygon_points = item["polygon_points"]
+                if polygon_points is not None:
+                    polygon_points = [
+                        [float(x * restore_scale), float(y * restore_scale)]
+                        for x, y in polygon_points
+                    ]
                 layout_res.append({
                     "category_id": item["category_id"],
                     "original_label": item["original_label"],
                     "original_order": item["original_order"],
                     "poly": [xmin, ymin, xmax, ymin, xmax, ymax, xmin, ymax],
+                    "polygon_points": polygon_points,
                     "score": item["score"],
                 })
             images_layout_res.append(layout_res)
@@ -262,7 +268,11 @@ if __name__ == '__main__':
     # cfg.engine_cfg = engine_cfg
     model = RapidLayout(cfg=cfg)
 
-    all_results = model(img_contents=[r"cf7af1ef0c174bbaab6bef1ef27bbd2a.png"])
+    all_results = model(img_contents=[r"D:\file\text-pdf\images\vl1.57.png"])
 
     print(all_results)
     all_results[0].vis(r"layout_vis.png")
+    # all_results[0].img = cv2.imread(r"D:\file\text-pdf\images\vl1.57.png")
+    # img_list = all_results[0].crop()
+    # for i, img in enumerate(img_list):
+    #     cv2.imwrite(f"C:\ocr\img\layout_crop\img{i}.png", img)

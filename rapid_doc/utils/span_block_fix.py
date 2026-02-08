@@ -20,7 +20,8 @@ def fill_spans_in_blocks(blocks, spans, radio):
             BlockType.IMAGE_BODY, BlockType.IMAGE_CAPTION, BlockType.IMAGE_FOOTNOTE,
             BlockType.TABLE_BODY, BlockType.TABLE_CAPTION, BlockType.TABLE_FOOTNOTE
         ]:
-            block_dict['group_id'] = block[-1]
+            # group_id 在索引 13 位置
+            block_dict['group_id'] = block[13] if len(block) > 13 else None
         block_spans = []
         for span in spans:
             temp_radio = radio
@@ -34,6 +35,8 @@ def fill_spans_in_blocks(blocks, spans, radio):
         block_dict['spans'] = block_spans
         block_dict['original_label'] = block[10]
         block_dict['original_order'] = block[11]
+        # polygon_points 在索引 14 位置
+        block_dict['polygon_points'] = block[14] if len(block) > 14 else None
         block_with_spans.append(block_dict)
 
         # 从spans删除已经放入block_spans中的span

@@ -3,6 +3,7 @@ from enum import Enum
 from pathlib import Path
 from typing import List, Optional, Union
 
+import cv2
 import numpy as np
 
 from .logger import Logger
@@ -141,6 +142,7 @@ PP_DOCLAYOUTV2_layout_merge_bboxes_mode= {
 class ModelType(Enum):
     PP_DOCLAYOUT_PLUS_L = "pp_doclayout_plus_l"
     PP_DOCLAYOUTV2 = "pp_doclayoutv2"
+    PP_DOCLAYOUTV3 = "pp_doclayoutv3"
     PP_DOCLAYOUT_L = "pp_doclayout_l"
     PP_DOCLAYOUT_M = "pp_doclayout_m"
     PP_DOCLAYOUT_S = "pp_doclayout_s"
@@ -164,12 +166,14 @@ class RapidLayoutInput:
 
     conf_thresh: Union[float, dict] = None
     iou_thresh: float = 0.5
+    layout_shape_mode: Optional[str] = "auto" # "rect" / "auto"
 
 
 @dataclass
 class RapidLayoutOutput:
     img: Optional[np.ndarray] = None
     boxes: Optional[List[List[float]]] = None
+    polygon_points: Optional[List[List[float]]] = None
     class_names: Optional[List[str]] = None
     scores: Optional[List[float]] = None
     orders: Optional[List[int]] = None
@@ -185,6 +189,7 @@ class RapidLayoutOutput:
         vis_img = VisLayout.draw_detections(
             self.img,
             np.array(self.boxes),
+            self.polygon_points,
             np.array(self.scores),
             np.array(self.class_names),
             self.orders,
@@ -194,3 +199,55 @@ class RapidLayoutOutput:
             logger.info(f"Visualization saved as {save_path}")
 
         return vis_img
+
+    def crop(self) -> List[np.ndarray]:
+        if self.img is None or self.boxes is None:
+            logger.warning("No image or boxes to visualize.")
+            return None
+        img_list = []
+        polygon_pointses = self.polygon_points if self.polygon_points is not None else [None] * len(self.boxes)
+        for xyxy, polygon_points in zip(self.boxes, polygon_pointses):
+            input_res = {
+                "bbox": xyxy,
+                "polygon_points": polygon_points
+            }
+            return_image, _ = crop_img(input_res, self.img)
+            img_list.append(return_image)
+        return img_list
+
+
+def crop_img(input_res, input_img: np.ndarray, crop_paste_x=0, crop_paste_y=0, layout_shape_mode="auto"):
+
+    crop_xmin, crop_ymin = int(input_res['bbox'][0]), int(input_res['bbox'][1])
+    crop_xmax, crop_ymax = int(input_res['bbox'][2]), int(input_res['bbox'][3])
+
+    # Calculate new dimensions
+    crop_new_width = crop_xmax - crop_xmin + crop_paste_x * 2
+    crop_new_height = crop_ymax - crop_ymin + crop_paste_y * 2
+
+    # Create a white background array
+    return_image = np.ones((crop_new_height, crop_new_width, 3), dtype=np.uint8) * 255
+
+    # Crop the original image using numpy slicing
+    cropped_img = input_img[crop_ymin:crop_ymax, crop_xmin:crop_xmax]
+
+    polygon = input_res.get("polygon_points")
+    if layout_shape_mode != "rect" and polygon:
+        polygon = np.array(polygon, dtype=np.int32)
+        if polygon.ndim == 1:
+            polygon = polygon.reshape((-1, 2))
+        polygon = polygon.reshape((-1, 1, 2))
+        polygon = polygon - np.array([crop_xmin, crop_ymin])
+        mask = np.zeros(cropped_img.shape[:2], dtype=np.uint8)
+        cv2.fillPoly(mask, [polygon], 1)
+        mask = mask.astype(bool)
+        cropped_img = cropped_img.copy()
+        cropped_img[~mask] = 255
+
+    # Paste the cropped image onto the white background
+    return_image[crop_paste_y:crop_paste_y + (crop_ymax - crop_ymin),
+    crop_paste_x:crop_paste_x + (crop_xmax - crop_xmin)] = cropped_img
+
+    return_list = [crop_paste_x, crop_paste_y, crop_xmin, crop_ymin, crop_xmax, crop_ymax, crop_new_width,
+                   crop_new_height]
+    return return_image, return_list

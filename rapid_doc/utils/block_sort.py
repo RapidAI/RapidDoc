@@ -277,11 +277,16 @@ def process_block_list(blocks, body_type, block_type):
     indices = [block['index'] for block in blocks]
     median_index = statistics.median(indices)
 
-    body_bbox = next((block['bbox'] for block in blocks if block.get('type') == body_type), [])
+    body_block = next((block for block in blocks if block.get('type') == body_type), None)
+    body_bbox = body_block['bbox'] if body_block else []
+    polygon_points = body_block.get('polygon_points') if body_block else None
 
-    return {
+    result = {
         'type': block_type,
         'bbox': body_bbox,
         'blocks': blocks,
         'index': median_index,
     }
+    if polygon_points:
+        result['polygon_points'] = polygon_points
+    return result
