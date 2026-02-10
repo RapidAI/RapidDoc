@@ -20,6 +20,7 @@ from loguru import logger
 from file_converter import ensure_pdf, OFFICE_EXTENSIONS
 from rapid_doc.cli.common import aio_do_parse
 from rapid_doc.utils.pdf_image_tools import images_bytes_to_pdf_bytes
+from rapid_doc.model.custom.paddleocr_vl.paddleocr_vl import PaddleOCRVLTableModel, PaddleOCRVLOCRModel, PaddleOCRVLFormulaModel
 from rapid_doc.version import __version__
 
 app = FastAPI(
@@ -120,6 +121,14 @@ def _convert_value_to_enum(config):
     return {k: resolve_enum_value(v) for k, v in config.items()}
 
 
+def has_vl_env():
+    return all([
+        os.getenv('PADDLEOCRVL_VL_REC_BACKEND'),
+        os.getenv('PADDLEOCRVL_VL_VL_REC_SERVER_URL'),
+        os.getenv('PADDLEOCRVL_VERSION'),
+    ])
+
+
 @app.post(
     "/file_parse",
     tags=["projects"],
@@ -181,6 +190,10 @@ async def file_parse(
         table_config = _convert_value_to_enum(json.loads(table_config or "{}"))
         checkbox_config = json.loads(checkbox_config or "{}")
         image_config = json.loads(image_config or "{}")
+        if has_vl_env():
+            ocr_config["custom_model"] = PaddleOCRVLOCRModel()
+            formula_config["custom_model"] = PaddleOCRVLFormulaModel()
+            table_config["custom_model"] = PaddleOCRVLTableModel()
 
         # 处理上传的PDF文件
         pdf_file_names = []

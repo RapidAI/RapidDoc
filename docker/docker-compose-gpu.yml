@@ -15,6 +15,9 @@ services:
       - TZ=${TIMEZONE:-UTC}
       - GOTENBERG_URL=http://gotenberg:3000
       #- MINERU_DEVICE_MODE=cuda:0
+      #- PADDLEOCRVL_VERSION=v1.5
+      #- PADDLEOCRVL_VL_REC_BACKEND=vllm-server
+      #- PADDLEOCRVL_VL_VL_REC_SERVER_URL=http://localhost:8118/v1
     restart: always
     depends_on:
       - gotenberg

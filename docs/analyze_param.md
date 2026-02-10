@@ -42,6 +42,11 @@ import os
 os.environ['MINERU_DEVICE_MODE'] = "cuda"
 # 或指定 GPU 编号，例如使用第二块 GPU（cuda:1）
 os.environ['MINERU_DEVICE_MODE'] = "cuda:1"
+
+# paddleocr-vl模型配置
+os.environ['PADDLEOCRVL_VERSION'] = "v1.5"
+os.environ['PADDLEOCRVL_VL_REC_BACKEND'] = "vllm-server"
+os.environ['PADDLEOCRVL_VL_VL_REC_SERVER_URL'] = "http://localhost:8118/v1"
 ```
 
 #### 2、layout_config 版面解析参数说明如下：

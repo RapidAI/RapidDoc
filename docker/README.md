@@ -61,9 +61,12 @@ curl -X POST "http://localhost:8888/parse" \
 
 #### 基础配置
 
-| 变量名 | 默认值 | 说明 |
-|--------|--------|------|
-| `API_PORT` | `8888` | RapidDoc Web API 端口 |
+| 变量名                                | 默认值      | 说明                   |
+|------------------------------------|----------|----------------------|
+| `API_PORT`                         | `8888`   | RapidDoc Web API 端口  |
+| `PADDLEOCRVL_VERSION`              |          | paddleocr-vl 版本      |
+| `PADDLEOCRVL_VL_REC_BACKEND`       |          | paddleocr-vl backend |
+| `PADDLEOCRVL_VL_VL_REC_SERVER_URL` |          | paddleocr-vl url     |
 
 
 ### 系统配置
