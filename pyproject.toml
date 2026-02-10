@@ -78,7 +78,7 @@ html = [
 
 gradio = [
     "gradio>=5.34,<6",
-    "gradio-pdf>=0.0.22",
+    "gradio-pdf==0.0.22",
 ]
 
 core = [

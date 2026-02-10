@@ -447,8 +447,7 @@ RapidDoc提供了便捷的docker部署方式，这有助于快速搭建环境并
 - [x] markdown转docx、html
 - [x] 支持 PP-DocLayoutV2 版面识别+阅读顺序
 - [x] OmniDocBench评测
-- [ ] 支持自定义的ocr、table、公式。支持PaddleOCR-VL系列
-- [ ] 公式支持openvino
+- [x] 支持自定义的ocr、table、公式。支持PaddleOCR-VL系列
 
 
 ## 🙏 致谢
