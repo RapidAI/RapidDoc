@@ -39,6 +39,13 @@ dependencies = [
     "tokenizers>=0.13.2",
     "rapidocr>=3.4.0,<=3.4.3",
     "openai>=1.63",
+    "python-docx>=1.2.0,<2",
+    'pypptx-with-oxml>=1.0.3,<2',
+    "mammoth>=1.11.0,<2",
+    "pylatexenc>=2.10,<3",
+    "lxml>=4.0.0,<7.0.0",
+    "pandas>=2.3.3,<3",
+    "openpyxl>=3.1.5,<4",
 ]
 
 [project.optional-dependencies]
@@ -66,7 +73,6 @@ api = [
 ]
 
 word = [
-    "python-docx>=0.8.10",
     "pypandoc-binary",
 ]
 
@@ -77,8 +83,11 @@ html = [
 ]
 
 gradio = [
-    "gradio>=5.34,<6",
-    "gradio-pdf==0.0.22",
+#    "gradio>=5.34,<6",
+#    "gradio-pdf==0.0.22",
+
+    "gradio>=5.49.1,!=6.0.0,!=6.0.1,!=6.0.2,!=6.1.0,!=6.2.0,!=6.3.0,!=6.4.0,!=6.5.0,!=6.5.1,!=6.6.0,!=6.7.0,<6.9.0",
+    "gradio-pdf>=0.0.22",
 ]
 
 core = [

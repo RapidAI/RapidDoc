@@ -1,3 +1,4 @@
+import copy
 import os
 import gc
 import json
@@ -11,6 +12,7 @@ from pathlib import Path
 from typing import Optional, List
 
 import uvicorn
+from dotenv import load_dotenv
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse, FileResponse
@@ -18,7 +20,8 @@ from starlette.background import BackgroundTask
 from loguru import logger
 
 from file_converter import ensure_pdf, OFFICE_EXTENSIONS
-from rapid_doc.cli.common import aio_do_parse
+from rapid_doc.cli.common import aio_do_parse, old_office_suffixes, pdf_suffixes, image_suffixes, office_suffixes
+from rapid_doc.utils.office_converter import convert_legacy_office_to_modern
 from rapid_doc.utils.pdf_image_tools import images_bytes_to_pdf_bytes
 from rapid_doc.model.custom.paddleocr_vl.paddleocr_vl import PaddleOCRVLTableModel, PaddleOCRVLOCRModel, PaddleOCRVLFormulaModel
 from rapid_doc.version import __version__
@@ -41,11 +44,7 @@ async def health_check():
     }
 
 # 支持的文件扩展名 - 与官方 API 保持一致
-pdf_suffixes = [".pdf"]
-# office_suffixes = [".ppt", ".pptx", ".doc", ".docx"]
-office_suffixes = list(OFFICE_EXTENSIONS)
-image_suffixes = [".png", ".jpg", ".jpeg", ".bmp", ".tiff", ".tif"]
-
+office_extensions = [suffix[1:] for suffix in OFFICE_EXTENSIONS]
 
 def sanitize_filename(filename: str) -> str:
     """
@@ -80,6 +79,18 @@ def get_infer_result(file_suffix_identifier: str, pdf_name: str, parse_dir: str)
         with open(result_file_path, "r", encoding="utf-8") as fp:
             return fp.read()
     return None
+
+
+def resolve_parse_dir(output_dir: str, pdf_name: str, backend: str, parse_method: str) -> str:
+    """Resolve the actual parse directory written by aio_do_parse."""
+    office_dir = os.path.join(output_dir, pdf_name, "office")
+    if os.path.exists(office_dir):
+        return office_dir
+
+    if backend.startswith("pipeline"):
+        return os.path.join(output_dir, pdf_name, parse_method)
+
+    return os.path.join(output_dir, pdf_name, "vlm")
 
 def _convert_value_to_enum(config):
     """
@@ -201,13 +212,13 @@ async def file_parse(
         # 读取文件内容
         for file in files:
             # 验证文件扩展名
-            file_suffix = Path(file.filename).suffix.lower()
-            if file_suffix not in pdf_suffixes + office_suffixes + image_suffixes:
+            file_suffix = Path(file.filename).suffix[1:].lower()
+            if file_suffix not in pdf_suffixes + office_extensions + image_suffixes:
                 return JSONResponse(
                     content={"error": f"File type {file_suffix} is not supported for {file.filename}"},
                     status_code=400,
                 )
-            if file_suffix in pdf_suffixes + image_suffixes:
+            if file_suffix in pdf_suffixes + image_suffixes + office_suffixes:
                 content = await file.read()
                 if file_suffix in image_suffixes:
                     content = images_bytes_to_pdf_bytes(content)
@@ -218,20 +229,25 @@ async def file_parse(
                 temp_file_path = os.path.join(temp_dir, file.filename)
                 with open(temp_file_path, "wb") as tmp_f:
                     tmp_f.write(await file.read())
-                pdf_to_process, temp_pdf_to_delete = ensure_pdf(temp_file_path, temp_dir)
-                if not pdf_to_process:
+
+                if file_suffix in old_office_suffixes:
+                    convert_file_path = convert_legacy_office_to_modern(temp_file_path)
+                else:
+                    # 转为 pdf
+                    convert_file_path, temp_pdf_to_delete = ensure_pdf(temp_file_path, temp_dir)
+                if not convert_file_path:
                     return JSONResponse(
-                        content={"error": f"Failed to convert Office/document to PDF: {file.filename}"},
+                        content={"error": f"Failed to convert Office/document: {file.filename}"},
                         status_code=500,
                     )
                 # 从磁盘读字节
-                with open(pdf_to_process, "rb") as f:
+                with open(convert_file_path, "rb") as f:
                     content = f.read()
                 shutil.rmtree(temp_dir, ignore_errors=True)
             file_name = Path(file.filename).stem  # 去掉扩展名
             pdf_bytes_list.append(content)
             pdf_file_names.append(file_name)
-
+        pdf_file_names_copy = copy.deepcopy(pdf_file_names)
         # 设置语言列表，确保与文件数量一致
         actual_lang_list = lang_list
         if len(actual_lang_list) != len(pdf_file_names):
@@ -266,12 +282,9 @@ async def file_parse(
             zip_fd, zip_path = tempfile.mkstemp(suffix=".zip", prefix="rapid_doc_results_")
             os.close(zip_fd)
             with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
-                for pdf_name in pdf_file_names:
+                for pdf_name in pdf_file_names_copy:
                     safe_pdf_name = sanitize_filename(pdf_name)
-                    if backend.startswith("pipeline"):
-                        parse_dir = os.path.join(unique_dir, pdf_name, parse_method)
-                    else:
-                        parse_dir = os.path.join(unique_dir, pdf_name, "vlm")
+                    parse_dir = resolve_parse_dir(unique_dir, pdf_name, backend, parse_method)
 
                     if not os.path.exists(parse_dir):
                         continue
@@ -319,14 +332,11 @@ async def file_parse(
         else:
             # 构建 JSON 结果
             result_dict = {}
-            for pdf_name in pdf_file_names:
+            for pdf_name in pdf_file_names_copy:
                 result_dict[pdf_name] = {}
                 data = result_dict[pdf_name]
 
-                if backend.startswith("pipeline"):
-                    parse_dir = os.path.join(unique_dir, pdf_name, parse_method)
-                else:
-                    parse_dir = os.path.join(unique_dir, pdf_name, "vlm")
+                parse_dir = resolve_parse_dir(unique_dir, pdf_name, backend, parse_method)
 
                 if os.path.exists(parse_dir):
                     if return_md:
@@ -372,5 +382,6 @@ async def file_parse(
 
 
 if __name__ == "__main__":
+    load_dotenv()
     # os.environ['MINERU_MODEL_SOURCE'] = "modelscope"
     uvicorn.run(app, host="0.0.0.0", port=8888)

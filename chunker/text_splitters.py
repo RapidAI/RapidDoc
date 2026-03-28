@@ -14,6 +14,7 @@
 #  limitations under the License.
 #
 import os
+import re
 import tiktoken
 import tempfile
 from markdown import markdown as md_to_html
@@ -28,7 +29,9 @@ os.makedirs(tiktoken_cache_dir, exist_ok=True)
 os.environ["TIKTOKEN_CACHE_DIR"] = tiktoken_cache_dir
 # encoder = tiktoken.encoding_for_model("gpt-3.5-turbo")
 encoder = tiktoken.get_encoding("cl100k_base")
-
+HTML_TABLE_PATTERN = re.compile(r"(?is)<table\b.*?</table>")
+HTML_TABLE_ROW_PATTERN = re.compile(r"(?is)<tr\b.*?</tr>\s*")
+HTML_TABLE_CELL_PATTERN = re.compile(r"(?is)<t[hd]\b.*?</t[hd]>\s*")
 
 def num_tokens_from_string(string: str) -> int:
     """Returns the number of tokens in a text string."""
@@ -72,10 +75,14 @@ class MarkdownTextSplitter:
         current_tokens = 0
         context_stack = []  # 维护标题层级栈
 
-        for node in tree.children:
-            chunk_data, should_break = self._process_ast_node(
-                node, context_stack, self.chunk_token_num, self.min_chunk_tokens
-            )
+        for block in self._merge_html_table_blocks(tree.children):
+            if isinstance(block, str):
+                chunk_data = block
+                should_break = True
+            else:
+                chunk_data, should_break = self._process_ast_node(
+                    block, context_stack, self.chunk_token_num, self.min_chunk_tokens
+                )
 
             if should_break and current_chunk and current_tokens >= self.min_chunk_tokens:
                 # 完成当前块
@@ -124,6 +131,59 @@ class MarkdownTextSplitter:
                 chunks.extend(self._force_split_if_oversize(chunk_content))
 
         return [chunk for chunk in chunks if chunk.strip()]
+
+    def _merge_html_table_blocks(self, nodes):
+        """
+        markdown-it 在 table 内部出现换行/空行时，可能把一个 <table> 拆成多个 html_block。
+        这里先按 <table>...</table> 平衡关系合并，避免主循环在碎片之间切块。
+        """
+        merged_blocks = []
+        table_parts = []
+        table_depth = 0
+
+        for node in nodes:
+            if table_parts:
+                table_parts.append(self._extract_raw_node_content(node))
+                table_depth += self._count_html_table_balance(
+                    table_parts[-1]
+                )
+                if table_depth <= 0:
+                    merged_blocks.append("".join(table_parts))
+                    table_parts = []
+                    table_depth = 0
+                continue
+
+            raw_content = self._extract_raw_node_content(node)
+            table_balance = self._count_html_table_balance(raw_content)
+
+            if table_balance > 0:
+                table_parts = [raw_content]
+                table_depth = table_balance
+                if table_depth <= 0:
+                    merged_blocks.append("".join(table_parts))
+                    table_parts = []
+                    table_depth = 0
+            else:
+                merged_blocks.append(node)
+
+        if table_parts:
+            merged_blocks.append("".join(table_parts))
+
+        return merged_blocks
+
+    def _extract_raw_node_content(self, node):
+        """优先取 markdown-it 原始节点内容，拿不到时退回文本提取。"""
+        if hasattr(node, "content") and node.content:
+            return node.content
+        return self._extract_text_from_node(node)
+
+    def _count_html_table_balance(self, text: str) -> int:
+        """统计 HTML table 起止标签平衡值。"""
+        if not text:
+            return 0
+        open_count = len(re.findall(r"(?is)<table\b", text))
+        close_count = len(re.findall(r"(?is)</table\s*>", text))
+        return open_count - close_count
 
     def _process_ast_node(self, node, context_stack, chunk_token_num, min_chunk_tokens):
         """
@@ -359,8 +419,152 @@ class MarkdownTextSplitter:
         """
         如果 chunk 超过最大 token 或字符限制，进行硬拆分
         """
-        if (num_tokens_from_string(text) <= self.max_tokens
-                and len(text) <= self.char_max_length):
+        token_limit = self.chunk_token_num * 2
+        if (num_tokens_from_string(text) <= token_limit
+                and len(text) <= 60000):
+            return [text]
+
+        if HTML_TABLE_PATTERN.search(text):
+            return self._force_split_with_html_tables(text, token_limit)
+
+        return self._split_plain_text_by_lines(text, token_limit)
+
+    def _force_split_with_html_tables(self, text: str, token_limit: int):
+        """优先保持 HTML table / tr 完整性，再进行硬拆分。"""
+        segments = []
+        current_segment = ""
+        current_tokens = 0
+
+        for block in self._split_blocks_preserving_tables(text):
+            if HTML_TABLE_PATTERN.fullmatch(block.strip()):
+                block_parts = self._split_html_table_block(block, token_limit)
+            else:
+                block_parts = self._split_plain_text_by_lines(block, token_limit)
+
+            for part in block_parts:
+                if not part or not part.strip():
+                    continue
+
+                part_tokens = num_tokens_from_string(part)
+                if current_segment and current_tokens + part_tokens > token_limit:
+                    segments.append(current_segment.strip())
+                    current_segment = ""
+                    current_tokens = 0
+
+                current_segment += part
+                current_tokens += part_tokens
+
+        if current_segment.strip():
+            segments.append(current_segment.strip())
+
+        return segments
+
+    def _split_blocks_preserving_tables(self, text: str):
+        """把文本拆成 table/non-table 交替块，避免先打散 table。"""
+        blocks = []
+        cursor = 0
+        for match in HTML_TABLE_PATTERN.finditer(text):
+            start, end = match.span()
+            if start > cursor:
+                blocks.append(text[cursor:start])
+            blocks.append(text[start:end])
+            cursor = end
+
+        if cursor < len(text):
+            blocks.append(text[cursor:])
+
+        return blocks if blocks else [text]
+
+    def _split_html_table_block(self, table_html: str, token_limit: int):
+        """按完整 <tr> 聚合拆表；只有单行超限时才继续拆行内内容。"""
+        if num_tokens_from_string(table_html) <= token_limit and len(table_html) <= 60000:
+            return [table_html]
+
+        row_matches = list(HTML_TABLE_ROW_PATTERN.finditer(table_html))
+        if not row_matches:
+            return self._split_plain_text_by_lines(table_html, token_limit)
+
+        prefix = table_html[:row_matches[0].start()]
+        suffix = table_html[row_matches[-1].end():]
+
+        segments = []
+        current_rows = []
+
+        def build_table(rows):
+            return f"{prefix}{''.join(rows)}{suffix}"
+
+        for row_match in row_matches:
+            row_html = row_match.group(0)
+            row_as_table = build_table([row_html])
+
+            if num_tokens_from_string(row_as_table) > token_limit or len(row_as_table) > 60000:
+                if current_rows:
+                    segments.append(build_table(current_rows))
+                    current_rows = []
+                segments.extend(self._split_oversize_table_row(prefix, row_html, suffix, token_limit))
+                continue
+
+            candidate_rows = current_rows + [row_html]
+            candidate_table = build_table(candidate_rows)
+            if (current_rows
+                    and (num_tokens_from_string(candidate_table) > token_limit
+                         or len(candidate_table) > 60000)):
+                segments.append(build_table(current_rows))
+                current_rows = [row_html]
+            else:
+                current_rows = candidate_rows
+
+        if current_rows:
+            segments.append(build_table(current_rows))
+
+        return segments
+
+    def _split_oversize_table_row(self, table_prefix: str, row_html: str, table_suffix: str, token_limit: int):
+        """单个 <tr> 超限时，优先按单元格拆；再不行才回退到普通换行拆分。"""
+        cell_matches = list(HTML_TABLE_CELL_PATTERN.finditer(row_html))
+        if not cell_matches:
+            return self._split_plain_text_by_lines(
+                f"{table_prefix}{row_html}{table_suffix}", token_limit
+            )
+
+        row_prefix = row_html[:cell_matches[0].start()]
+        row_suffix = row_html[cell_matches[-1].end():]
+        segments = []
+        current_cells = []
+
+        def build_row(cells):
+            return f"{table_prefix}{row_prefix}{''.join(cells)}{row_suffix}{table_suffix}"
+
+        for cell_match in cell_matches:
+            cell_html = cell_match.group(0)
+            cell_as_row = build_row([cell_html])
+
+            if num_tokens_from_string(cell_as_row) > token_limit or len(cell_as_row) > 60000:
+                if current_cells:
+                    segments.append(build_row(current_cells))
+                    current_cells = []
+                segments.extend(self._split_plain_text_by_lines(cell_as_row, token_limit))
+                continue
+
+            candidate_cells = current_cells + [cell_html]
+            candidate_row = build_row(candidate_cells)
+            if (current_cells
+                    and (num_tokens_from_string(candidate_row) > token_limit
+                         or len(candidate_row) > 60000)):
+                segments.append(build_row(current_cells))
+                current_cells = [cell_html]
+            else:
+                current_cells = candidate_cells
+
+        if current_cells:
+            segments.append(build_row(current_cells))
+
+        return segments
+
+    def _split_plain_text_by_lines(self, text: str, token_limit: int):
+        """普通文本兜底拆分，按换行尽量保持块完整。"""
+        if (num_tokens_from_string(text) <= token_limit
+                and len(text) <= 60000):
             return [text]
 
         segments = []
@@ -368,12 +572,12 @@ class MarkdownTextSplitter:
         current_tokens = 0
 
         # 以换行作为软切点
-        for line in text.split("\n"):
+        for line in text.splitlines(keepends=True):
             line_tokens = num_tokens_from_string(line)
 
-            if (current_tokens + line_tokens > self.max_tokens
+            if (current_tokens + line_tokens > token_limit
                     and current):
-                segments.append("\n".join(current))
+                segments.append("".join(current))
                 current = []
                 current_tokens = 0
 
@@ -381,7 +585,7 @@ class MarkdownTextSplitter:
             current_tokens += line_tokens
 
         if current:
-            segments.append("\n".join(current))
+            segments.append("".join(current))
 
         return segments
 

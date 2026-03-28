@@ -7,6 +7,7 @@ RUN apt-get update && \
         libsm6 \
         libxext6 \
         libxrender-dev \
+        libreoffice \
         fonts-noto-core \
         fonts-noto-cjk \
         fontconfig \

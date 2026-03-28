@@ -1,12 +1,13 @@
-# Copyright (c) Opendatalab. All rights reserved.
 import copy
 import json
 import os
+import time
 from pathlib import Path
 from dotenv import load_dotenv
-# 加载.env文件中的环境变量
+
 load_dotenv()
-# # 使用默认 GPU（cuda:0）
+# ============== 设备配置 ==============
+# 使用默认 GPU（cuda:0）
 # os.environ['MINERU_DEVICE_MODE'] = "cuda"
 # # 或指定 GPU 编号，例如使用第二块 GPU（cuda:1）
 # os.environ['MINERU_DEVICE_MODE'] = "cuda:1"
@@ -14,27 +15,26 @@ load_dotenv()
 # os.environ['RAPID_MODELS_DIR'] = r'D:\CodeProjects\doc\RapidAI\models' #模型文件存储目录，如果不设置会默认下载到rapid_doc项目里面
 from loguru import logger
 
-from rapid_doc.cli.common import convert_pdf_bytes_to_bytes_by_pypdfium2, prepare_env, read_fn
+from rapid_doc.cli.common import convert_pdf_bytes_to_bytes_by_pypdfium2, prepare_env, read_fn, office_suffixes, \
+    old_office_suffixes
 from rapid_doc.data.data_reader_writer import FileBasedDataWriter
 from rapid_doc.utils.draw_bbox import draw_layout_bbox, draw_span_bbox
 from rapid_doc.utils.enum_class import MakeMode
+from rapid_doc.utils.guess_suffix_or_lang import guess_suffix_by_bytes
+from rapid_doc.utils.office_converter import convert_legacy_office_to_modern
+from rapid_doc.backend.office.office_analyze import office_analyze
+from rapid_doc.backend.office.office_middle_json_mkcontent import union_make as office_union_make
 from rapid_doc.backend.pipeline.pipeline_analyze import doc_analyze as pipeline_doc_analyze
 from rapid_doc.backend.pipeline.pipeline_middle_json_mkcontent import union_make as pipeline_union_make
 from rapid_doc.backend.pipeline.model_json_to_middle_json import result_to_middle_json as pipeline_result_to_middle_json
-
-from rapidocr import EngineType as OCREngineType, OCRVersion, ModelType as OCRModelType
-from rapid_doc.model.layout.rapid_layout_self import ModelType as LayoutModelType
-from rapid_doc.model.formula.rapid_formula_self import ModelType as FormulaModelType, EngineType as FormulaEngineType
-from rapid_doc.model.table.rapid_table_self import ModelType as TableModelType
-from rapid_doc.model.custom.paddleocr_vl.paddleocr_vl import PaddleOCRVLTableModel, PaddleOCRVLOCRModel, PaddleOCRVLFormulaModel
 
 def do_parse(
     output_dir,  # Output directory for storing parsing results
     pdf_file_names: list[str],  # List of PDF file names to be parsed
     pdf_bytes_list: list[bytes],  # List of PDF bytes to be parsed
     parse_method="auto",  # The method for parsing PDF, default is 'auto'
-    formula_enable=True,  # Enable formula parsing
-    table_enable=True,  # Enable table parsing
+    p_formula_enable=True,  # Enable formula parsing
+    p_table_enable=True,  # Enable table parsing
     f_draw_layout_bbox=True,  # Whether to draw layout bounding boxes
     f_draw_span_bbox=True,  # Whether to draw span bounding boxes
     f_dump_md=True,  # Whether to dump markdown files
@@ -42,12 +42,73 @@ def do_parse(
     f_dump_model_output=True,  # Whether to dump model output files
     f_dump_orig_pdf=True,  # Whether to dump original PDF files
     f_dump_content_list=True,  # Whether to dump content list files
+    f_dump_md_html=False,  # Whether to convert markdown to HTML
+    f_dump_md_docx=False,  # Whether to convert markdown to docx (via Pandoc)
     f_make_md_mode=MakeMode.MM_MD,  # The mode for making markdown content, default is MM_MD
     start_page_id=0,  # Start page ID for parsing, default is 0
     end_page_id=None,  # End page ID for parsing, default is None (parse all pages until the end of the document)
 ):
+    layout_config, ocr_config, formula_config, table_config, checkbox_config, image_config = _build_config()
+    need_remove_index = _process_office_doc(
+        output_dir,
+        pdf_file_names=pdf_file_names,
+        pdf_bytes_list=pdf_bytes_list,
+        f_dump_md=f_dump_md,
+        f_dump_middle_json=f_dump_middle_json,
+        f_dump_model_output=f_dump_model_output,
+        f_dump_orig_file=f_dump_orig_pdf,
+        f_dump_content_list=f_dump_content_list,
+        f_make_md_mode=f_make_md_mode,
+        f_dump_md_html = f_dump_md_html,
+        f_dump_md_docx = f_dump_md_docx,
 
+    )
+    for index in sorted(need_remove_index, reverse=True):
+        del pdf_bytes_list[index]
+        del pdf_file_names[index]
+    if not pdf_bytes_list:
+        logger.warning("No valid PDF or image files to process.")
+        return
 
+    for idx, pdf_bytes in enumerate(pdf_bytes_list):
+        new_pdf_bytes = convert_pdf_bytes_to_bytes_by_pypdfium2(pdf_bytes, start_page_id, end_page_id)
+        pdf_bytes_list[idx] = new_pdf_bytes
+    # 记录开始时间
+    start_time = time.time()
+    infer_results, all_image_lists, all_page_dicts, lang_list, ocr_enabled_list = pipeline_doc_analyze(pdf_bytes_list, parse_method=parse_method, formula_enable=p_formula_enable,table_enable=p_table_enable,
+                                                                                                     layout_config=layout_config, ocr_config=ocr_config, formula_config=formula_config, table_config=table_config, checkbox_config=checkbox_config)
+
+    for idx, model_list in enumerate(infer_results):
+
+        model_json = copy.deepcopy(model_list)
+        pdf_file_name = pdf_file_names[idx]
+        local_image_dir, local_md_dir = prepare_env(output_dir, pdf_file_name, parse_method)
+        image_writer, md_writer = FileBasedDataWriter(local_image_dir), FileBasedDataWriter(local_md_dir)
+
+        images_list = all_image_lists[idx]
+        pdf_dict= all_page_dicts[idx]
+        _lang = lang_list[idx]
+        _ocr_enable = ocr_enabled_list[idx]
+        middle_json = pipeline_result_to_middle_json(model_list, images_list, pdf_dict, image_writer, _lang, _ocr_enable, p_formula_enable, ocr_config=ocr_config, image_config=image_config)
+        # 计算总运行时间（单位：秒）
+        print(f"运行时间: {time.time() - start_time}秒")
+        pdf_info = middle_json["pdf_info"]
+
+        pdf_bytes = pdf_bytes_list[idx]
+        _process_output(
+            pdf_info, pdf_bytes, pdf_file_name, local_md_dir, local_image_dir,
+            md_writer, f_draw_layout_bbox, f_draw_span_bbox, f_dump_orig_pdf,
+            f_dump_md, f_dump_content_list, f_dump_middle_json, f_dump_model_output,
+            f_make_md_mode, middle_json, model_json, process_mode="pipeline",
+            f_dump_md_html=f_dump_md_html, f_dump_md_docx=f_dump_md_docx,
+        )
+
+def _build_config():
+    from rapidocr import EngineType as OCREngineType, OCRVersion, ModelType as OCRModelType
+    from rapid_doc.model.layout.rapid_layout_self import ModelType as LayoutModelType
+    from rapid_doc.model.formula.rapid_formula_self import ModelType as FormulaModelType, EngineType as FormulaEngineType
+    from rapid_doc.model.table.rapid_table_self import ModelType as TableModelType, EngineType as TableEngineType
+    from rapid_doc.model.custom.paddleocr_vl.paddleocr_vl import PaddleOCRVLTableModel, PaddleOCRVLOCRModel, PaddleOCRVLFormulaModel
     layout_config = {
         # "model_type": LayoutModelType.PP_DOCLAYOUTV2,
         # "conf_thresh": 0.4,
@@ -69,7 +130,7 @@ def do_parse(
 
         # 新增的自定义参数
         # "engine_type": OCREngineType.TORCH, # 统一设置推理引擎
-        # "Det.rec_batch_num": 1, # Det批处理大小
+        # "Det.rec_batch_num": 8, # Det批处理大小
 
         # 文本检测框模式：auto（默认）、txt、ocr
         # "use_det_mode": 'auto' #（1、txt只会从pypdfium2获取文本框，保留pdf中的图片，2、ocr只会从OCR-det获取文本框，3、auto先从pypdfium2获取文本框，提取不到再使用OCR-det提取）
@@ -82,10 +143,8 @@ def do_parse(
         # "formula_level": 1, # 公式识别等级，默认为0，全识别。1:仅识别行间公式，行内公式不识别
         # "batch_num": 1,
         # "model_dir_or_path": r"C:\ocr\models\ppmodel\formula\PP-FormulaNet_plus-S\pp_formulanet_plus_s.onnx",
-        # "dict_keys_path": "D:\CodeProjects\doc\RapidAI\pp_formulanet_plus_m_inference.yml", #yml字典路径（torch使用）
+        # "dict_keys_path": "D:\CodeProjects\doc\RapidAI\model\pp_formulanet_plus_m_inference.yml", #yml字典路径（torch使用）
     }
-
-    # os.environ['MINERU_MODEL_SOURCE'] = 'local'
 
     table_config = {
         # "custom_model": PaddleOCRVLTableModel(),
@@ -105,7 +164,7 @@ def do_parse(
         # "table_formula_enable": False, # 表格内公式识别
         # "table_image_enable": False, # 表格内图片识别
         # "extract_original_image": False # 是否提取表格内原始图片，默认 False
-        # "cls.model_type": TableModelType.Q_CLS, # 表格分类模型
+        # "cls.model_type": TableModelType.PADDLE_CLS, # 表格分类模型
         # "cls.model_dir_or_path": "", # 表格分类模型地址
         # "unet.model_dir_or_path": "", # UNET表格模型地址
         # "unitable.model_dir_or_path": "", # UNITABLE表格模型地址
@@ -115,7 +174,7 @@ def do_parse(
     }
 
     checkbox_config = {
-        # "checkbox_enable": False, # 是否识别复选框，默认不识别，基于opencv，有可能会误检
+        # "checkbox_enable": True, # 是否识别复选框，默认不识别，基于opencv，有可能会误检
     }
 
     # 版面识别元素为图片的配置
@@ -123,77 +182,173 @@ def do_parse(
         # "extract_original_image": True, # 是否提取原始图片（使用 pypdfium2 提取原始图片。截图可能导致清晰度降低和边界丢失，默认关闭）
         # "extract_original_image_iou_thresh": 0.5, # 是否提取原始图片和版面识别的图片，bbox重叠度，默认0.9
     }
-    for idx, pdf_bytes in enumerate(pdf_bytes_list):
-        new_pdf_bytes = convert_pdf_bytes_to_bytes_by_pypdfium2(pdf_bytes, start_page_id, end_page_id)
-        pdf_bytes_list[idx] = new_pdf_bytes
+    return layout_config, ocr_config, formula_config, table_config, checkbox_config, image_config
 
-    infer_results, all_image_lists, all_page_dicts, lang_list, ocr_enabled_list = pipeline_doc_analyze(pdf_bytes_list, parse_method=parse_method, formula_enable=formula_enable,table_enable=table_enable
-                                                                                                     ,layout_config=layout_config, ocr_config=ocr_config, formula_config=formula_config, table_config=table_config, checkbox_config=checkbox_config)
+def _process_office_doc(
+        output_dir,
+        pdf_file_names: list[str],
+        pdf_bytes_list: list[bytes],
+        f_dump_md=True,
+        f_dump_middle_json=True,
+        f_dump_model_output=True,
+        f_dump_orig_file=True,
+        f_dump_content_list=True,
+        f_make_md_mode=MakeMode.MM_MD,
+        f_dump_md_html=None,
+        f_dump_md_docx=None,
+):
+    need_remove_index = []
+    for i, file_bytes in enumerate(pdf_bytes_list):
+        pdf_file_name = pdf_file_names[i]
+        file_suffix = guess_suffix_by_bytes(file_bytes)
+        if file_suffix in office_suffixes:
 
-    for idx, model_list in enumerate(infer_results):
-        model_json = copy.deepcopy(model_list)
-        pdf_file_name = pdf_file_names[idx]
-        local_image_dir, local_md_dir = prepare_env(output_dir, pdf_file_name, parse_method)
-        image_writer, md_writer = FileBasedDataWriter(local_image_dir), FileBasedDataWriter(local_md_dir)
+            need_remove_index.append(i)
 
-        images_list = all_image_lists[idx]
-        pdf_dict = all_page_dicts[idx]
-        _lang = lang_list[idx]
-        _ocr_enable = ocr_enabled_list[idx]
-        middle_json = pipeline_result_to_middle_json(model_list, images_list, pdf_dict, image_writer, _lang, _ocr_enable, formula_enable, ocr_config=ocr_config, image_config=image_config)
+            local_image_dir, local_md_dir = prepare_env(output_dir, pdf_file_name, f"office")
+            image_writer, md_writer = FileBasedDataWriter(local_image_dir), FileBasedDataWriter(local_md_dir)
+            middle_json, infer_result = office_analyze(
+                file_bytes,
+                image_writer=image_writer,
+            )
 
-        pdf_info = middle_json["pdf_info"]
+            f_draw_layout_bbox = False
+            f_draw_span_bbox = False
+            pdf_info = middle_json["pdf_info"]
 
-        pdf_bytes = pdf_bytes_list[idx]
-        if f_draw_layout_bbox:
-            draw_layout_bbox(pdf_info, pdf_bytes, local_md_dir, f"{pdf_file_name}_layout.pdf")
+            _process_output(
+                pdf_info, file_bytes, pdf_file_name, local_md_dir, local_image_dir,
+                md_writer, f_draw_layout_bbox, f_draw_span_bbox, f_dump_orig_file,
+                f_dump_md, f_dump_content_list, f_dump_middle_json, f_dump_model_output,
+                f_make_md_mode, middle_json, infer_result, process_mode=file_suffix, f_dump_md_html=f_dump_md_html, f_dump_md_docx=f_dump_md_docx
+            )
 
-        if f_draw_span_bbox:
-            draw_span_bbox(pdf_info, pdf_bytes, local_md_dir, f"{pdf_file_name}_span.pdf")
+    return need_remove_index
 
-        if f_dump_orig_pdf:
+
+def _process_output(
+        pdf_info,
+        pdf_bytes,
+        pdf_file_name,
+        local_md_dir,
+        local_image_dir,
+        md_writer,
+        f_draw_layout_bbox,
+        f_draw_span_bbox,
+        f_dump_orig_pdf,
+        f_dump_md,
+        f_dump_content_list,
+        f_dump_middle_json,
+        f_dump_model_output,
+        f_make_md_mode,
+        middle_json,
+        model_output=None,
+        process_mode="pipeline",
+        f_dump_md_html=None,
+        f_dump_md_docx=None,
+):
+
+    if process_mode == "pipeline":
+        make_func = pipeline_union_make
+    elif process_mode in office_suffixes:
+        make_func = office_union_make
+    else:
+        raise Exception(f"Unknown process_mode: {process_mode}")
+
+    """处理输出文件"""
+    if f_draw_layout_bbox:
+        draw_layout_bbox(pdf_info, pdf_bytes, local_md_dir, f"{pdf_file_name}_layout.pdf")
+
+    if f_draw_span_bbox:
+        draw_span_bbox(pdf_info, pdf_bytes, local_md_dir, f"{pdf_file_name}_span.pdf")
+
+    if f_dump_orig_pdf:
+        if process_mode in ["pipeline", "vlm"]:
             md_writer.write(
                 f"{pdf_file_name}_origin.pdf",
                 pdf_bytes,
             )
-
-        if f_dump_md:
-            image_dir = str(os.path.basename(local_image_dir))
-            md_content_str = pipeline_union_make(pdf_info, f_make_md_mode, image_dir)
-            md_writer.write_string(
-                f"{pdf_file_name}.md",
-                md_content_str,
+        elif process_mode in office_suffixes:
+            md_writer.write(
+                f"{pdf_file_name}_origin.{process_mode}",
+                pdf_bytes,
             )
 
-        if f_dump_content_list:
-            image_dir = str(os.path.basename(local_image_dir))
-            content_list = pipeline_union_make(pdf_info, MakeMode.CONTENT_LIST, image_dir)
-            md_writer.write_string(
-                f"{pdf_file_name}_content_list.json",
-                json.dumps(content_list, ensure_ascii=False, indent=4),
-            )
+    image_dir = str(os.path.basename(local_image_dir))
 
-        if f_dump_middle_json:
-            md_writer.write_string(
-                f"{pdf_file_name}_middle.json",
-                json.dumps(middle_json, ensure_ascii=False, indent=4),
-            )
+    if f_dump_md:
+        md_content_str = make_func(pdf_info, f_make_md_mode, image_dir)
+        md_writer.write_string(
+            f"{pdf_file_name}.md",
+            md_content_str,
+        )
 
-        if f_dump_model_output:
-            md_writer.write_string(
-                f"{pdf_file_name}_model.json",
-                json.dumps(model_json, ensure_ascii=False, indent=4),
-            )
+        # ===================== Markdown 转 HTML =====================
+        if f_dump_md_html and md_content_str:
+            try:
+                from rapid_doc.utils.markdown_to_html import markdown_to_html
+                html_path = os.path.join(local_md_dir, f"{pdf_file_name}.html")
+                markdown_to_html(
+                    md_content_str,
+                    output_path=html_path,
+                    title=pdf_file_name,
+                    image_base_path=local_md_dir,  # 图片相对于md目录
+                    embed_images=False,  # 不嵌入图片，保持引用
+                )
+            except ImportError as e:
+                logger.warning(f"Markdown转HTML失败: {e}")
+            except Exception as e:
+                logger.error(f"Markdown转HTML失败: {e}")
 
-        logger.info(f"local output dir is {local_md_dir}")
+        # ===================== Markdown 转 docx (via Pandoc) =====================
+        if f_dump_md_docx and md_content_str:
+            try:
+                from rapid_doc.utils.markdown_to_word import markdown_to_docx
+                md_docx_path = os.path.join(local_md_dir, f"{pdf_file_name}_md.docx")
+                markdown_to_docx(
+                    md_content_str,
+                    output_path=md_docx_path,
+                    image_base_path=local_md_dir,  # 图片相对于md目录
+                )
+            except ImportError as e:
+                logger.warning(f"Markdown转docx失败: {e}")
+            except Exception as e:
+                logger.error(f"Markdown转docx失败: {e}")
 
+    if f_dump_content_list:
+        content_list = make_func(pdf_info, MakeMode.CONTENT_LIST, image_dir)
+        md_writer.write_string(
+            f"{pdf_file_name}_content_list.json",
+            json.dumps(content_list, ensure_ascii=False, indent=4),
+        )
+
+    if process_mode != "pipeline":
+        content_list_v2 = make_func(pdf_info, MakeMode.CONTENT_LIST_V2, image_dir)
+        md_writer.write_string(
+            f"{pdf_file_name}_content_list_v2.json",
+            json.dumps(content_list_v2, ensure_ascii=False, indent=4),
+        )
+
+    if f_dump_middle_json:
+        md_writer.write_string(
+            f"{pdf_file_name}_middle.json",
+            json.dumps(middle_json, ensure_ascii=False, indent=4),
+        )
+
+    if f_dump_model_output:
+        md_writer.write_string(
+            f"{pdf_file_name}_model.json",
+            json.dumps(model_output, ensure_ascii=False, indent=4),
+        )
+
+    logger.info(f"local output dir is {local_md_dir}")
 
 def parse_doc(
         path_list: list[Path],
         output_dir,
         method="auto",
-        start_page_id=0,
-        end_page_id=None
+        start_page_id=0,  # Start page ID for parsing, default is 0
+        end_page_id=None  # End page ID for parsing, default is None (parse all pages until the end of the document)
 ):
     """
         Parameter description:
@@ -204,13 +359,14 @@ def parse_doc(
             txt: Use text extraction method.
             ocr: Use OCR method for image-based PDFs.
             Without method specified, 'auto' will be used by default.
-        start_page_id: Start page ID for parsing, default is 0
-        end_page_id: End page ID for parsing, default is None (parse all pages until the end of the document)
     """
     try:
         file_name_list = []
         pdf_bytes_list = []
         for path in path_list:
+            file_suffix = Path(path).suffix[1:].lower()
+            if file_suffix in old_office_suffixes:
+                path = convert_legacy_office_to_modern(path)
             file_name = str(Path(path).stem)
             pdf_bytes = read_fn(path)
             file_name_list.append(file_name)
@@ -226,26 +382,32 @@ def parse_doc(
     except Exception as e:
         logger.exception(e)
 
+def collect_files(directory: Path, suffixes: set[str]) -> list[Path]:
+    """收集目录下指定后缀的文件，递归查找。"""
+    if not directory.exists() or not directory.is_dir():
+        return []
 
-if __name__ == '__main__':
-    __dir__ = os.path.dirname(os.path.abspath(__file__))
-    pdf_files_dir = os.path.join(__dir__, "pdfs")
-    image_files_dir = os.path.join(__dir__, "images")
-    output_dir = os.path.join(__dir__, "output")
+    return [
+        file_path
+        for file_path in directory.rglob("*")
+        if file_path.is_file() and file_path.suffix.lower() in suffixes
+    ]
 
-    pdf_suffixes = [".pdf"]
-    image_suffixes = [".png", ".jpeg", ".jpg"]
+
+if __name__ == "__main__":
+    base_dir = Path(__file__).resolve().parent
+    output_dir = base_dir / "output"
+
+    dir_suffix_map = {
+        base_dir / "pdfs": {".pdf"},
+        base_dir / "docx": {".docx"},
+        base_dir / "pptx": {".pptx"},
+        base_dir / "xlsx": {".xlsx"},
+        base_dir / "images": {".png", ".jpeg", ".jpg"},
+    }
 
     doc_path_list = []
-
-    # 遍历 pdfs 目录
-    for doc_path in Path(pdf_files_dir).glob('*'):
-        if doc_path.suffix.lower() in pdf_suffixes:
-            doc_path_list.append(doc_path)
-
-    # 遍历 images 目录
-    for img_path in Path(image_files_dir).glob('*'):
-        if img_path.suffix.lower() in image_suffixes:
-            doc_path_list.append(img_path)
+    for directory, suffixes in dir_suffix_map.items():
+        doc_path_list.extend(collect_files(directory, suffixes))
 
     parse_doc(doc_path_list, output_dir)
