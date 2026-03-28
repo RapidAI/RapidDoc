@@ -116,20 +116,24 @@ class TableMatch:
                 continue
 
             if "<td></td>" == tag:
-                end_html.extend("<td>")
+                end_html.append("<td>")
 
-            if td_index in matched_index.keys():
+            if td_index in matched_index:
+                cell_indices = matched_index[td_index]
+
                 b_with = False
                 if (
-                    "<b>" in ocr_contents[matched_index[td_index][0]]
-                    and len(matched_index[td_index]) > 1
+                        len(cell_indices) > 1
+                        and "<b>" in ocr_contents[cell_indices[0]][0]
                 ):
                     b_with = True
-                    end_html.extend("<b>")
+                    end_html.append("<b>")
 
-                for i, td_index_index in enumerate(matched_index[td_index]):
+                contents: List[str] = []
+                for i, td_index_index in enumerate(cell_indices):
                     content = ocr_contents[td_index_index][0]
-                    if len(matched_index[td_index]) > 1:
+
+                    if len(cell_indices) > 1:
                         if len(content) == 0:
                             continue
 
@@ -137,23 +141,27 @@ class TableMatch:
                             content = content[1:]
 
                         if "<b>" in content:
-                            content = content[3:]
+                            content = content.replace("<b>", "")
 
                         if "</b>" in content:
-                            content = content[:-4]
+                            content = content.replace("</b>", "")
+
+                        content = content.strip()
 
                         if len(content) == 0:
                             continue
 
-                        if i != len(matched_index[td_index]) - 1 and " " != content[-1]:
-                            # content += " " #用字符级别的框，每个字符都会多空格
-                            content += ""
-                    end_html.extend(content)
+                        if i != len(cell_indices) - 1 and content.endswith(" "):
+                            content = content.rstrip()
+
+                    contents.append(content)
+
+                end_html.append(" ".join(contents))
 
                 if b_with:
-                    end_html.extend("</b>")
+                    end_html.append("</b>")
 
-            if "<td></td>" == tag:
+            if tag == "<td></td>":
                 end_html.append("</td>")
             else:
                 end_html.append(tag)

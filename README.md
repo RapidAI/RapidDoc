@@ -4,6 +4,8 @@
 
 **RapidDoc 是一个轻量级、专注于文档解析的开源框架，支持 **OCR、版面分析、公式识别、表格识别和阅读顺序恢复** 等多种功能，支持将复杂 PDF 文档转换为 Markdown、JSON、WORD、HTML 格式。**
 
+**支持docx/doc、pptx/ppt、xlsx/xls的原生解析（不使用模型）。**
+
 **框架基于 [Mineru](https://github.com/opendatalab/MinerU) 二次开发，移除 VLM，专注于 Pipeline 产线下的高效文档解析，在 CPU 上也能保持不错的解析速度。**
 
 **本项目所使用的默认模型主要来源于 [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR) 的 [PP-StructureV3](https://www.paddleocr.ai/main/version3.x/pipeline_usage/PP-StructureV3.html) 系列（OCR、版面分析、公式识别、阅读顺序恢复，以及部分表格识别模型），并已全部转换为 ONNX 格式，支持在 CPU/GPU 上高效推理。**
@@ -448,6 +450,7 @@ RapidDoc提供了便捷的docker部署方式，这有助于快速搭建环境并
 - [x] 支持 PP-DocLayoutV2 版面识别+阅读顺序
 - [x] OmniDocBench评测
 - [x] 支持自定义的ocr、table、公式。支持PaddleOCR-VL系列
+- [x] 支持docx/doc、pptx/ppt、xlsx/xls的原生解析（不使用模型）
 
 
 ## 🙏 致谢
