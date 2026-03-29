@@ -1,11 +1,14 @@
-FROM nvidia/cuda:12.4.1-devel-ubuntu22.04
+FROM docker.1ms.run/nvidia/cuda:12.4.1-devel-ubuntu22.04
+
+ARG DEBIAN_FRONTEND=noninteractive
 
 ## Install libgl for opencv support & Noto fonts for Chinese characters && python
-RUN apt-get update && \
-    apt-get install -y software-properties-common curl wget gnupg && \
+RUN sed -i 's|http://archive.ubuntu.com/ubuntu/|https://mirrors.tuna.tsinghua.edu.cn/ubuntu/|g; s|http://security.ubuntu.com/ubuntu/|https://mirrors.tuna.tsinghua.edu.cn/ubuntu/|g; s|http://ports.ubuntu.com/ubuntu-ports/|https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/|g' /etc/apt/sources.list && \
+    apt-get -o Acquire::Retries=5 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 update && \
+    apt-get -o Acquire::Retries=5 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 install -y --no-install-recommends software-properties-common curl wget gnupg ca-certificates && \
     add-apt-repository ppa:deadsnakes/ppa -y && \
-    apt-get update && \
-    apt-get install -y \
+    apt-get -o Acquire::Retries=5 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 update && \
+    apt-get -o Acquire::Retries=5 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 install -y --no-install-recommends \
         python3.10 \
         python3.10-distutils \
         python3-pip \
@@ -13,7 +16,9 @@ RUN apt-get update && \
         libsm6 \
         libxext6 \
         libxrender-dev \
-        libreoffice \
+        libreoffice-writer \
+        libreoffice-calc \
+        libreoffice-impress \
         fonts-noto-core \
         fonts-noto-cjk \
         fontconfig \
@@ -28,10 +33,17 @@ RUN apt-get update && \
 # 设置工作目录
 WORKDIR /app
 
+# 配置 pip 国内镜像与超时，降低大包下载超时概率
+ENV PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple
+ENV PIP_DEFAULT_TIMEOUT=300
+ENV PIP_RETRIES=10
+
 # 安装 Python 依赖
 RUN python3 -m pip install --upgrade pip setuptools wheel && \
-    python3 -m pip install 'rapid-doc[gpu]==0.8.0' 'rapid-doc[api]==0.8.0' -i https://pypi.org/simple && \
-    python3 -m pip install 'onnxruntime-gpu==1.23.0' -i https://pypi.org/simple && \
+    python3 -m pip install --no-cache-dir --prefer-binary \
+        'rapid-doc[gpu]==0.8.0' \
+        'rapid-doc[api]==0.8.0' \
+        'onnxruntime-gpu==1.23.0' && \
     python3 -m pip cache purge
 
 # 复制配置文件和脚本（优先复制，利用Docker缓存）
@@ -39,7 +51,7 @@ COPY .env.example /app/
 COPY start_with_env.sh /app/
 
 # 设置启动脚本权限
-RUN chmod +x  start_with_env.sh
+RUN sed -i 's/\r$//' /app/start_with_env.sh && chmod +x /app/start_with_env.sh
 
 # 复制应用代码（最后复制，避免频繁变更影响缓存）
 COPY app.py file_converter.py download_models.py models_download_utils.py /app/

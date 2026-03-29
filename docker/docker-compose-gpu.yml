@@ -13,20 +13,19 @@ services:
       - "8888:8888"
     environment:
       - TZ=${TIMEZONE:-UTC}
-      - GOTENBERG_URL=http://gotenberg:3000
+      #- GOTENBERG_URL=http://gotenberg:3000
       #- MINERU_DEVICE_MODE=cuda:0
       #- PADDLEOCRVL_VERSION=v1.5
       #- PADDLEOCRVL_VL_REC_BACKEND=vllm-server
       #- PADDLEOCRVL_VL_VL_REC_SERVER_URL=http://localhost:8118/v1
     restart: always
-    depends_on:
-      - gotenberg
 
-  gotenberg:
-    container_name: gotenberg
-    image: gotenberg/gotenberg:8
-    ports:
-      - "3000:3000"
-    environment:
-      - TZ=${TIMEZONE:-UTC}
-    restart: always
+# 除了
+#  gotenberg:
+#    container_name: gotenberg
+#    image: gotenberg/gotenberg:8
+#    ports:
+#      - "3000:3000"
+#    environment:
+#      - TZ=${TIMEZONE:-UTC}
+#    restart: always
