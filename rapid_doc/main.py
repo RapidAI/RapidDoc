@@ -1,26 +1,18 @@
 import base64
 import json
 import os
-import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Iterable
 
 from rapid_doc.backend.office.office_analyze import office_analyze
-from rapid_doc.backend.office.office_middle_json_mkcontent import (
-    union_make as office_union_make,
-)
-from rapid_doc.backend.pipeline.model_json_to_middle_json import (
-    result_to_middle_json as pipeline_result_to_middle_json,
-)
+from rapid_doc.backend.office.office_middle_json_mkcontent import union_make as office_union_make
+from rapid_doc.backend.pipeline.model_json_to_middle_json import result_to_middle_json as pipeline_result_to_middle_json
 from rapid_doc.backend.pipeline.pipeline_analyze import ModelSingleton
-from rapid_doc.backend.pipeline.pipeline_analyze import (
-    doc_analyze as pipeline_doc_analyze,
-)
-from rapid_doc.backend.pipeline.pipeline_middle_json_mkcontent import (
-    union_make as pipeline_union_make,
-)
-from rapid_doc.cli.common import image_suffixes, office_suffixes, old_office_suffixes, read_fn
+from rapid_doc.backend.pipeline.pipeline_analyze import  doc_analyze as pipeline_doc_analyze
+from rapid_doc.backend.pipeline.pipeline_middle_json_mkcontent import union_make as pipeline_union_make
+from rapid_doc.cli.common import image_suffixes, office_suffixes, old_office_suffixes, read_fn, prepare_env
+from rapid_doc.data.data_reader_writer import FileBasedDataWriter
 from rapid_doc.data.data_reader_writer.base import DataWriter
 from rapid_doc.utils.draw_bbox import draw_layout_bbox, draw_span_bbox
 from rapid_doc.utils.enum_class import MakeMode
@@ -34,12 +26,10 @@ class RapidDocOutput:
     # 统一的解析输出对象，单文档调用时直接返回它；
     # 同时实现了可迭代协议，因此也支持：
     # markdown, images = engine(pdf_bytes)
-    middle_json: dict[str, Any] | None = None
-    content_list_json: list[Any] | None = None
     markdown: str = ""
     images: dict[str, bytes] = field(default_factory=dict)
-    draw_layout_bbox: bytes | None = None
-    draw_span_bbox: bytes | None = None
+    middle_json: dict[str, Any] | None = None
+    content_list_json: list[Any] | None = None
 
     def __iter__(self):
         yield self.markdown
@@ -72,7 +62,7 @@ class FanoutDataWriter(DataWriter):
             writer.write(path, data)
 
 
-class RapidDOC:
+class RapidDoc:
     def __init__(
         self,
         layout_config: dict[str, Any] | None = None,
@@ -86,10 +76,11 @@ class RapidDOC:
         table_enable: bool = True,
         lang: str = "ch",
         make_md_mode: str = MakeMode.MM_MD,
+        output_dir: str | Path | None = None, # 如果有output_dir会覆盖image_writer和md_writer
         image_writer: DataWriter | None = None,
         md_writer: DataWriter | None = None,
         image_dir_name: str = "images",
-        image_output_mode: str = "external",
+        image_output_mode: str = "url", # url / data_uri
         preload_model: bool = False,
     ) -> None:
         self.layout_config = layout_config or {}
@@ -104,6 +95,7 @@ class RapidDOC:
         self.table_enable = table_enable
         self.lang = lang
         self.make_md_mode = make_md_mode
+        self.default_output_dir = output_dir
         self.default_image_writer = image_writer
         self.default_md_writer = md_writer
         self.image_dir_name = image_dir_name or "images"
@@ -142,6 +134,7 @@ class RapidDOC:
     def __call__(
         self,
         inputs: str | bytes | Path | list[str | bytes | Path],
+        output_dir: str | Path | None = None,
         image_writer: DataWriter | None = None,
         md_writer: DataWriter | None = None,
         image_output_mode: str | None = None,
@@ -152,10 +145,10 @@ class RapidDOC:
         lang: str | list[str] | None = None,
         start_page_id: int = 0,
         end_page_id: int | None = None,
-        draw_layout_bbox: bool | None = None,
-        draw_span_bbox: bool | None = None,
-        draw_layout_bbox_enable: bool = False,
-        draw_span_bbox_enable: bool = False,
+        f_dump_middle_json: bool = True,
+        f_dump_content_list: bool = True,
+        f_draw_layout_bbox: bool = False,
+        f_draw_span_bbox: bool = False,
     ) -> RapidDocOutput | list[RapidDocOutput]:
         is_batch = self._is_batch_input(inputs)
         normalized_inputs = list(inputs) if is_batch else [inputs]
@@ -169,15 +162,11 @@ class RapidDOC:
         final_table_enable = (
             self.table_enable if table_enable is None else table_enable
         )
+        final_output_dir = output_dir or self.default_output_dir
         final_image_writer = image_writer or self.default_image_writer
         final_md_writer = md_writer or self.default_md_writer
 
         self._validate_image_output_mode(final_image_output_mode)
-
-        if draw_layout_bbox is not None:
-            draw_layout_bbox_enable = draw_layout_bbox
-        if draw_span_bbox is not None:
-            draw_span_bbox_enable = draw_span_bbox
 
         normalized_docs = self._normalize_inputs(normalized_inputs)
         lang_list = self._normalize_lang_list(lang, len(normalized_docs))
@@ -209,10 +198,13 @@ class RapidDOC:
             outputs[index] = self._parse_office(
                 name=doc["name"],
                 file_bytes=doc["raw_bytes"],
+                output_dir=final_output_dir,
                 image_writer=final_image_writer,
                 md_writer=final_md_writer,
                 image_dir_name=final_image_dir_name,
                 image_output_mode=final_image_output_mode,
+                f_dump_middle_json=f_dump_middle_json,
+                f_dump_content_list=f_dump_content_list,
             )
 
         if pipeline_pdf_bytes_list:
@@ -223,14 +215,17 @@ class RapidDOC:
                 parse_method=final_parse_method,
                 formula_enable=final_formula_enable,
                 table_enable=final_table_enable,
+                output_dir=final_output_dir,
                 image_writer=final_image_writer,
                 md_writer=final_md_writer,
                 image_dir_name=final_image_dir_name,
                 image_output_mode=final_image_output_mode,
                 start_page_id=start_page_id,
                 end_page_id=end_page_id,
-                draw_layout_bbox_enable=draw_layout_bbox_enable,
-                draw_span_bbox_enable=draw_span_bbox_enable,
+                f_dump_middle_json=f_dump_middle_json,
+                f_dump_content_list=f_dump_content_list,
+                f_draw_layout_bbox=f_draw_layout_bbox,
+                f_draw_span_bbox=f_draw_span_bbox,
             )
             for output_index, result in zip(pipeline_indexes, pipeline_outputs):
                 outputs[output_index] = result
@@ -247,14 +242,17 @@ class RapidDOC:
         parse_method: str,
         formula_enable: bool,
         table_enable: bool,
+        output_dir: str | Path | None,
         image_writer: DataWriter | None,
         md_writer: DataWriter | None,
         image_dir_name: str,
         image_output_mode: str,
         start_page_id: int,
         end_page_id: int | None,
-        draw_layout_bbox_enable: bool,
-        draw_span_bbox_enable: bool,
+        f_dump_middle_json: bool,
+        f_dump_content_list: bool,
+        f_draw_layout_bbox: bool,
+        f_draw_span_bbox: bool,
     ) -> list[RapidDocOutput]:
         from rapid_doc.cli.common import convert_pdf_bytes_to_bytes_by_pypdfium2
 
@@ -287,6 +285,9 @@ class RapidDOC:
             name = names[index]
             pdf_bytes = sliced_pdf_bytes_list[index]
             pdf_raw_bytes = self._extract_pdf_bytes(pdf_bytes)
+            if output_dir:
+                local_image_dir, local_md_dir = prepare_env(output_dir, name, parse_method)
+                image_writer, md_writer = FileBasedDataWriter(local_image_dir), FileBasedDataWriter(local_md_dir)
             memory_image_writer, combined_image_writer = self._build_image_writer(
                 image_dir_name=image_dir_name,
                 extra_image_writer=image_writer,
@@ -326,36 +327,22 @@ class RapidDOC:
                     logical_image_map,
                 )
 
-            layout_pdf_bytes = None
-            span_pdf_bytes = None
-            if draw_layout_bbox_enable:
-                layout_pdf_bytes = self._render_draw_pdf_bytes(
-                    drawer=draw_layout_bbox,
-                    pdf_info=middle_json["pdf_info"],
-                    pdf_bytes=pdf_raw_bytes,
-                    filename=f"{name}_layout.pdf",
-                )
-            if draw_span_bbox_enable:
-                span_pdf_bytes = self._render_draw_pdf_bytes(
-                    drawer=draw_span_bbox,
-                    pdf_info=middle_json["pdf_info"],
-                    pdf_bytes=pdf_raw_bytes,
-                    filename=f"{name}_span.pdf",
-                )
-
             output = RapidDocOutput(
-                middle_json=middle_json,
-                content_list_json=content_list_json,
                 markdown=markdown,
                 images=image_bytes_map,
-                draw_layout_bbox=layout_pdf_bytes,
-                draw_span_bbox=span_pdf_bytes,
+                middle_json=middle_json,
+                content_list_json=content_list_json,
             )
 
             self._dump_output_if_needed(
                 output=output,
+                pdf_bytes=pdf_raw_bytes,
                 name=name,
                 md_writer=md_writer,
+                f_dump_middle_json=f_dump_middle_json,
+                f_dump_content_list=f_dump_content_list,
+                f_draw_layout_bbox=f_draw_layout_bbox,
+                f_draw_span_bbox=f_draw_span_bbox,
             )
             outputs.append(output)
 
@@ -365,11 +352,17 @@ class RapidDOC:
         self,
         name: str,
         file_bytes: bytes,
+        output_dir: str | Path | None,
         image_writer: DataWriter | None,
         md_writer: DataWriter | None,
         image_dir_name: str,
         image_output_mode: str,
+        f_dump_middle_json: bool,
+        f_dump_content_list: bool,
     ) -> RapidDocOutput:
+        if output_dir:
+            local_image_dir, local_md_dir = prepare_env(output_dir, name, f"office")
+            image_writer, md_writer = FileBasedDataWriter(local_image_dir), FileBasedDataWriter(local_md_dir)
         memory_image_writer, combined_image_writer = self._build_image_writer(
             image_dir_name=image_dir_name,
             extra_image_writer=image_writer,
@@ -403,43 +396,53 @@ class RapidDOC:
             )
 
         output = RapidDocOutput(
-            middle_json=middle_json,
-            content_list_json=content_list_json,
             markdown=markdown,
             images=image_bytes_map,
-            draw_layout_bbox=None,
-            draw_span_bbox=None,
+            middle_json=middle_json,
+            content_list_json=content_list_json,
         )
 
         self._dump_output_if_needed(
             output=output,
+            pdf_bytes=file_bytes,
             name=name,
             md_writer=md_writer,
+            f_dump_middle_json=f_dump_middle_json,
+            f_dump_content_list=f_dump_content_list,
+            f_draw_layout_bbox=False,
+            f_draw_span_bbox=False,
         )
         return output
 
     def _dump_output_if_needed(
         self,
         output: RapidDocOutput,
+        pdf_bytes: bytes,
         name: str,
         md_writer: DataWriter | None,
+        f_dump_middle_json: bool,
+        f_dump_content_list: bool,
+        f_draw_layout_bbox: bool,
+        f_draw_span_bbox: bool,
     ) -> None:
         if md_writer is None:
             return
 
         md_writer.write_string(f"{name}.md", output.markdown)
-        md_writer.write_string(
-            f"{name}_middle.json",
-            json.dumps(output.middle_json, ensure_ascii=False, indent=4),
-        )
-        md_writer.write_string(
-            f"{name}_content_list.json",
-            json.dumps(output.content_list_json, ensure_ascii=False, indent=4),
-        )
-        if output.draw_layout_bbox is not None:
-            md_writer.write(f"{name}_layout.pdf", output.draw_layout_bbox)
-        if output.draw_span_bbox is not None:
-            md_writer.write(f"{name}_span.pdf", output.draw_span_bbox)
+        if f_dump_middle_json:
+            md_writer.write_string(
+                f"{name}_middle.json",
+                json.dumps(output.middle_json, ensure_ascii=False, indent=4),
+            )
+        if f_dump_content_list:
+            md_writer.write_string(
+                f"{name}_content_list.json",
+                json.dumps(output.content_list_json, ensure_ascii=False, indent=4),
+            )
+        if f_draw_layout_bbox:
+            draw_layout_bbox(output.middle_json["pdf_info"], pdf_bytes, md_writer, f"{name}_layout.pdf")
+        if f_draw_span_bbox:
+            draw_span_bbox(output.middle_json["pdf_info"], pdf_bytes, md_writer, f"{name}_span.pdf")
 
     def _build_image_writer(
         self,
@@ -549,17 +552,6 @@ class RapidDOC:
             logical_image_map[image_name] = image_bytes
         return logical_image_map
 
-    def _render_draw_pdf_bytes(
-        self,
-        drawer,
-        pdf_info: list[dict[str, Any]],
-        pdf_bytes: bytes,
-        filename: str,
-    ) -> bytes:
-        with tempfile.TemporaryDirectory(prefix="rapid_doc_draw_") as temp_dir:
-            drawer(pdf_info, pdf_bytes, temp_dir, filename)
-            return Path(temp_dir, filename).read_bytes()
-
     def _extract_pdf_bytes(self, pdf_bytes: bytes | dict[str, Any]) -> bytes:
         if isinstance(pdf_bytes, dict):
             return pdf_bytes["pdf_bytes"]
@@ -575,9 +567,9 @@ class RapidDOC:
         return RapidDocOutput()
 
     def _validate_image_output_mode(self, image_output_mode: str) -> None:
-        if image_output_mode not in {"external", "data_uri"}:
+        if image_output_mode not in {"url", "data_uri"}:
             raise ValueError(
-                "image_output_mode only supports 'external' and 'data_uri'."
+                "image_output_mode only supports 'url' and 'data_uri'."
             )
 
     def _is_batch_input(self, inputs: Any) -> bool:
@@ -595,7 +587,7 @@ if __name__ == '__main__':
         __dir__ / "demo/pdfs/示例1-论文模板.pdf",
         __dir__ / "demo/docx/test.docx",
     ]
-    engine = RapidDOC()
-    outputs = engine(doc_path_list)
+    engine = RapidDoc()
+    outputs = engine(doc_path_list, output_dir=output_dir)
     for output in outputs:
         print(output.markdown)

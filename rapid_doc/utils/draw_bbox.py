@@ -5,6 +5,7 @@ from loguru import logger
 from pypdf import PdfReader, PdfWriter, PageObject
 from reportlab.pdfgen import canvas
 
+from rapid_doc.data.data_reader_writer import DataWriter
 from .enum_class import BlockType, ContentType, SplitFlag
 
 
@@ -226,7 +227,7 @@ def _layout_item(bbox, polygon_points=None):
     return {"bbox": bbox, "polygon_points": None}
 
 
-def draw_layout_bbox(pdf_info, pdf_bytes, out_path, filename):
+def draw_layout_bbox(pdf_info, pdf_bytes, out_path: str | DataWriter, filename):
     dropped_bbox_list = []
     tables_body_list, tables_caption_list, tables_footnote_list = [], [], []
     imgs_body_list, imgs_caption_list, imgs_footnote_list = [], [], []
@@ -417,11 +418,20 @@ def draw_layout_bbox(pdf_info, pdf_bytes, out_path, filename):
         output_pdf.add_page(page)
 
     # 保存结果
-    with open(f"{out_path}/{filename}", "wb") as f:
-        output_pdf.write(f)
+    if isinstance(out_path, DataWriter):
+        buffer = BytesIO()
+        output_pdf.write(buffer)
+        pdf_bytes = buffer.getvalue()
+        out_path.write(
+            f"{filename}",
+            pdf_bytes,
+        )
+    else:
+        with open(f"{out_path}/{filename}", "wb") as f:
+            output_pdf.write(f)
 
 
-def draw_span_bbox(pdf_info, pdf_bytes, out_path, filename):
+def draw_span_bbox(pdf_info, pdf_bytes, out_path: str | DataWriter, filename):
     text_list = []
     inline_equation_list = []
     interline_equation_list = []
@@ -524,8 +534,17 @@ def draw_span_bbox(pdf_info, pdf_bytes, out_path, filename):
         output_pdf.add_page(page)
 
     # Save the PDF
-    with open(f"{out_path}/{filename}", "wb") as f:
-        output_pdf.write(f)
+    if isinstance(out_path, DataWriter):
+        buffer = BytesIO()
+        output_pdf.write(buffer)
+        pdf_bytes = buffer.getvalue()
+        out_path.write(
+            f"{filename}",
+            pdf_bytes,
+        )
+    else:
+        with open(f"{out_path}/{filename}", "wb") as f:
+            output_pdf.write(f)
 
 
 def draw_line_sort_bbox(pdf_info, pdf_bytes, out_path, filename):

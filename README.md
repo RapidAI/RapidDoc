@@ -406,6 +406,25 @@ RapidDoc提供了便捷的docker部署方式，这有助于快速搭建环境并
 您可以在文档中获取 [Docker部署说明](docker/README.md)，镜像已推送至 [Docker Hub](https://hub.docker.com/r/hzkitty/rapid-doc)。
 
 ---
+### 📋 使用
+
+```python
+import os
+from pathlib import Path
+from rapid_doc import RapidDoc
+__dir__ = Path(__file__).resolve().parent.parent
+output_dir = os.path.join(__dir__, "output")
+
+doc_path_list = [
+    __dir__ / "demo/pdfs/示例1-论文模板.pdf",
+    __dir__ / "demo/docx/test.docx",
+]
+engine = RapidDoc()
+outputs = engine(doc_path_list, output_dir=output_dir)
+for output in outputs:
+    print(output.markdown)
+```
+---
 
 ## 在线体验
 
