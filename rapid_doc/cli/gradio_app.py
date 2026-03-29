@@ -22,8 +22,8 @@ from rapid_doc.utils.office_converter import convert_legacy_office_to_modern
 from rapid_doc.version import __version__
 
 OFFICE_VIEWER_HEAD = """
-<link rel="stylesheet" href="https://unpkg.com/jit-viewer/dist/iife/jit-viewer.min.css">
-<script src="https://unpkg.com/jit-viewer/dist/iife/jit-viewer.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/jit-viewer@1.1.0/dist/iife/jit-viewer.min.css">
+<script src="https://unpkg.com/jit-viewer@1.1.0/dist/iife/jit-viewer.min.js"></script>
 <style>
   .office-preview-shell {
     display: flex;
@@ -34,15 +34,8 @@ OFFICE_VIEWER_HEAD = """
     border-radius: 12px;
     overflow: hidden;
   }
-  .office-preview-title {
-    padding: 12px 16px;
-    font-weight: 600;
-    color: #1f2937;
-    border-bottom: 1px solid #e5e7eb;
-    background: #f8fafc;
-  }
   .office-preview-host {
-    min-height: 760px;
+    min-height: 800px;
   }
   .office-preview-empty,
   .office-preview-error {
@@ -51,6 +44,19 @@ OFFICE_VIEWER_HEAD = """
   }
   .office-preview-error {
     color: #b91c1c;
+  }
+  #viewer {
+    position: relative;
+    height: 800px;
+  }
+
+  .jv-viewer__branding[data-v-12fe006b] {
+    position: absolute !important;
+    left: 0;
+    right: 0;
+    bottom: 0 !important;
+    top: auto !important;
+    z-index: 10;
   }
 </style>
 <script>
@@ -96,10 +102,10 @@ OFFICE_VIEWER_HEAD = """
       const viewer = createViewer({
         file: fileUrl,
         filename: fileName,
-        toolbar: true,
+        toolbar: false,
         theme: "light",
         width: "100%",
-        height: "760px",
+        height: "800px",
         onError: (err) => {
           console.error("Office preview failed:", err);
           if (errorHost) {
@@ -323,7 +329,6 @@ def render_office_preview_html(file_path=None):
     file_name = html.escape(os.path.basename(abs_path), quote=True)
     return f"""
 <div class="office-preview-shell" data-office-preview-root data-file-url="{file_url}" data-file-name="{file_name}">
-  <div class="office-preview-title">{file_name}</div>
   <div class="office-preview-host" data-office-viewer-host></div>
   <div class="office-preview-error" data-office-preview-error></div>
 </div>
