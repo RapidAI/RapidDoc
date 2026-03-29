@@ -27,32 +27,35 @@ def classify(pdf_bytes):
         str: 'txt' 表示可以直接提取文本，'ocr' 表示需要OCR
     """
 
-    # 从字节数据加载PDF
+    sample_pdf_bytes = extract_pages(pdf_bytes)
+    pdf = None
     with PyPDFium2Parser.lock:
-        sample_pdf_bytes = extract_pages(pdf_bytes)
         pdf = pdfium.PdfDocument(sample_pdf_bytes)
     try:
-        # 获取PDF页数
-        page_count = len(pdf)
+        with PyPDFium2Parser.lock:
+            # 获取PDF页数
+            page_count = len(pdf)
 
-        # 如果PDF页数为0，直接返回OCR
-        if page_count == 0:
+            # 如果PDF页数为0，直接返回OCR
+            if page_count == 0:
+                return 'ocr'
+
+            # 检查的页面数（最多检查10页）
+            pages_to_check = min(page_count, 10)
+
+            # 设置阈值：如果每页平均少于50个有效字符，认为需要OCR
+            chars_threshold = 50
+
+            # 检查平均字符数和无效字符
+            if get_avg_cleaned_chars_per_page(pdf, pages_to_check) < chars_threshold:
+                return 'ocr'
+
+        if detect_invalid_chars(sample_pdf_bytes):
             return 'ocr'
 
-        # 检查的页面数（最多检查10页）
-        pages_to_check = min(page_count, 10)
-
-        # 设置阈值：如果每页平均少于50个有效字符，认为需要OCR
-        chars_threshold = 50
-
-        with PyPDFium2Parser.lock:
-            # 检查平均字符数和无效字符
-            if (get_avg_cleaned_chars_per_page(pdf, pages_to_check) < chars_threshold) or detect_invalid_chars(sample_pdf_bytes):
-                return 'ocr'
-
-            # 检查图像覆盖率
-            if get_high_image_coverage_ratio(sample_pdf_bytes, pages_to_check) >= 0.8:
-                return 'ocr'
+        # 检查图像覆盖率
+        if get_high_image_coverage_ratio(sample_pdf_bytes, pages_to_check) >= 0.8:
+            return 'ocr'
 
         return 'txt'
 
@@ -63,7 +66,9 @@ def classify(pdf_bytes):
 
     finally:
         # 无论执行哪个路径，都确保PDF被关闭
-        pdf.close()
+        if pdf is not None:
+            with PyPDFium2Parser.lock:
+                pdf.close()
 
 
 def get_avg_cleaned_chars_per_page(pdf_doc, pages_to_check):
@@ -73,15 +78,20 @@ def get_avg_cleaned_chars_per_page(pdf_doc, pages_to_check):
     cleaned_total_chars = 0
 
     # 检查前几页的文本
-    for i in range(pages_to_check):
-        page = pdf_doc[i]
-        text_page = page.get_textpage()
-        text = text_page.get_text_bounded()
-        total_chars += len(text)
+    with PyPDFium2Parser.lock:
+        for i in range(pages_to_check):
+            page = pdf_doc[i]
+            text_page = page.get_textpage()
+            try:
+                text = text_page.get_text_bounded()
+                total_chars += len(text)
 
-        # 清理提取的文本，移除空白字符
-        cleaned_text = re.sub(r'\s+', '', text)
-        cleaned_total_chars += len(cleaned_text)
+                # 清理提取的文本，移除空白字符
+                cleaned_text = re.sub(r'\s+', '', text)
+                cleaned_total_chars += len(cleaned_text)
+            finally:
+                if hasattr(text_page, "close"):
+                    text_page.close()
 
     # 计算平均每页字符数
     avg_cleaned_chars_per_page = cleaned_total_chars / pages_to_check
@@ -191,40 +201,54 @@ def extract_pages(src_pdf_bytes: bytes) -> bytes:
         bytes: 提取页面后的PDF字节数据
     """
 
-    # 从字节数据加载PDF
-    pdf = pdfium.PdfDocument(src_pdf_bytes)
+    pdf = None
+    sample_docs = None
+    with PyPDFium2Parser.lock:
+        # 从字节数据加载PDF
+        pdf = pdfium.PdfDocument(src_pdf_bytes)
 
-    # 获取PDF页数
-    total_page = len(pdf)
-    if total_page == 0:
-        # 如果PDF没有页面，直接返回空文档
-        logger.warning("PDF is empty, return empty document")
-        return b''
+        # 获取PDF页数
+        total_page = len(pdf)
+        if total_page == 0:
+            # 如果PDF没有页面，直接返回空文档
+            logger.warning("PDF is empty, return empty document")
+            pdf.close()
+            return b''
 
-    # 选择最多10页
-    select_page_cnt = min(10, total_page)
+        # 选择最多10页
+        select_page_cnt = min(10, total_page)
 
-    # 从总页数中随机选择页面
-    page_indices = np.random.choice(total_page, select_page_cnt, replace=False).tolist()
+        # 从总页数中随机选择页面
+        page_indices = np.random.choice(total_page, select_page_cnt, replace=False).tolist()
 
-    # 创建一个新的PDF文档
-    sample_docs = pdfium.PdfDocument.new()
+        # 创建一个新的PDF文档
+        sample_docs = pdfium.PdfDocument.new()
 
     try:
-        # 将选择的页面导入新文档
-        sample_docs.import_pages(pdf, page_indices)
-        pdf.close()
+        with PyPDFium2Parser.lock:
+            # 将选择的页面导入新文档
+            sample_docs.import_pages(pdf, page_indices)
 
-        # 将新PDF保存到内存缓冲区
-        output_buffer = BytesIO()
-        sample_docs.save(output_buffer)
+            # 将新PDF保存到内存缓冲区
+            output_buffer = BytesIO()
+            sample_docs.save(output_buffer)
 
-        # 获取字节数据
-        return output_buffer.getvalue()
+            # 获取字节数据
+            return output_buffer.getvalue()
     except Exception as e:
-        pdf.close()
         logger.exception(e)
         return b''  # 出错时返回空字节
+    finally:
+        with PyPDFium2Parser.lock:
+            try:
+                pdf.close()
+            except Exception:
+                pass
+            if sample_docs is not None:
+                try:
+                    sample_docs.close()
+                except Exception:
+                    pass
 
 
 def detect_invalid_chars(sample_pdf_bytes: bytes) -> bool:

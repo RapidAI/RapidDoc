@@ -12,6 +12,7 @@ from ...utils.pdf_classify import classify
 from ...utils.pdf_image_tools import load_images_from_pdf, get_ori_image
 from ...utils.model_utils import get_vram, clean_memory
 from ...utils.pdf_text_tool import get_page
+from ...utils import PyPDFium2Parser
 
 os.environ['PYTORCH_ENABLE_MPS_FALLBACK'] = '1'  # 让mps可以fallback
 os.environ['NO_ALBUMENTATIONS_UPDATE'] = '1'  # 禁止albumentations检查更新
@@ -156,15 +157,22 @@ def doc_analyze(
         all_image_lists.append(images_list)
 
         all_pdf_dict = []
-        for pdf_doc in pdf_doc_list:
+        with PyPDFium2Parser.lock:
+            pdf_page_count = len(pdf_doc_list)
+        for page_index in range(pdf_page_count):
+            with PyPDFium2Parser.lock:
+                pdf_page = pdf_doc_list[page_index]
             # 获取pdf的文字和图片的字典对象
-            page_dict = get_page(pdf_doc)
+            page_dict = get_page(pdf_page)
             if page_dict['blocks']:
-                page_dict['ori_image_list'] = get_ori_image(pdf_doc) # 从 PDF 中提取所有原始图片
+                page_dict['ori_image_list'] = get_ori_image(pdf_page) # 从 PDF 中提取所有原始图片
             else:
                 page_dict['ori_image_list'] = [] # 提取不到文字视为扫描版，不需要提取图片
-            pdf_doc.close()
+            with PyPDFium2Parser.lock:
+                pdf_page.close()
             all_pdf_dict.append(page_dict)
+        with PyPDFium2Parser.lock:
+            pdf_doc_list.close()
         all_pdf_docs.append(all_pdf_dict)
         for page_idx in range(len(images_list)):
             img_dict = images_list[page_idx]

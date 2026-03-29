@@ -6,6 +6,8 @@ from loguru import logger
 from PIL import Image
 from pypdfium2 import PdfBitmap, PdfDocument, PdfPage
 
+from rapid_doc.utils import PyPDFium2Parser
+
 
 def page_to_image(
     page: PdfPage,
@@ -14,18 +16,23 @@ def page_to_image(
 ) -> (Image.Image, float):
     scale = dpi / 72
 
-    long_side_length = max(*page.get_size())
-    if (long_side_length*scale) > max_width_or_height:
-        scale = max_width_or_height / long_side_length
-
-    bitmap: PdfBitmap = page.render(scale=scale)  # type: ignore
-
-    image = bitmap.to_pil()
+    bitmap = None
     try:
-        bitmap.close()
-    except Exception as e:
-        logger.error(f"Failed to close bitmap: {e}")
-    return image, scale
+        with PyPDFium2Parser.lock:
+            long_side_length = max(*page.get_size())
+            if (long_side_length * scale) > max_width_or_height:
+                scale = max_width_or_height / long_side_length
+
+            bitmap = page.render(scale=scale)  # type: ignore
+            image = bitmap.to_pil()
+        return image, scale
+    finally:
+        if bitmap is not None:
+            try:
+                with PyPDFium2Parser.lock:
+                    bitmap.close()
+            except Exception as e:
+                logger.error(f"Failed to close bitmap: {e}")
 
 
 
@@ -65,22 +72,32 @@ def pdf_to_images(
     start_page_id: int = 0,
     end_page_id: int | None = None,
 ) -> list[Image.Image]:
-    doc = pdf if isinstance(pdf, PdfDocument) else PdfDocument(pdf)
-    page_num = len(doc)
+    with PyPDFium2Parser.lock:
+        doc = pdf if isinstance(pdf, PdfDocument) else PdfDocument(pdf)
+        page_num = len(doc)
 
-    end_page_id = end_page_id if end_page_id is not None and end_page_id >= 0 else page_num - 1
-    if end_page_id > page_num - 1:
-        logger.warning("end_page_id is out of range, use images length")
-        end_page_id = page_num - 1
+        end_page_id = end_page_id if end_page_id is not None and end_page_id >= 0 else page_num - 1
+        if end_page_id > page_num - 1:
+            logger.warning("end_page_id is out of range, use images length")
+            end_page_id = page_num - 1
 
     images = []
     try:
         for i in range(start_page_id, end_page_id + 1):
-            image, _ = page_to_image(doc[i], dpi, max_width_or_height)
-            images.append(image)
+            page = None
+            with PyPDFium2Parser.lock:
+                page = doc[i]
+            try:
+                image, _ = page_to_image(page, dpi, max_width_or_height)
+                images.append(image)
+            finally:
+                if page is not None:
+                    with PyPDFium2Parser.lock:
+                        page.close()
     finally:
         try:
-            doc.close()
+            with PyPDFium2Parser.lock:
+                doc.close()
         except Exception:
             pass
     return images

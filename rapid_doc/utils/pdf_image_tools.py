@@ -74,7 +74,9 @@ def load_images_from_pdf(
     Raises:
         TimeoutError: 当转换超时时抛出
     """
-    pdf_doc = pdfium.PdfDocument(pdf_bytes)
+    with PyPDFium2Parser.lock:
+        pdf_doc = pdfium.PdfDocument(pdf_bytes)
+        pdf_doc_len = len(pdf_doc)
 
     concurrency_enabled = os.getenv('MINERU_PDF_CONCURRENCY_ENABLED', 'true')
     # 检测是否为 Windows 环境
@@ -86,13 +88,13 @@ def load_images_from_pdf(
             pdf_bytes,
             dpi,
             start_page_id,
-            get_end_page_id(end_page_id, len(pdf_doc)),
+            get_end_page_id(end_page_id, pdf_doc_len),
             image_type
         ), pdf_doc
     else:
         if timeout is None:
             timeout = get_load_images_timeout()
-        end_page_id = get_end_page_id(end_page_id, len(pdf_doc))
+        end_page_id = get_end_page_id(end_page_id, pdf_doc_len)
 
         # 计算总页数
         total_pages = end_page_id - start_page_id + 1
@@ -145,7 +147,8 @@ def load_images_from_pdf(
 
                 return images_list, pdf_doc
             except FuturesTimeoutError:
-                pdf_doc.close()
+                with PyPDFium2Parser.lock:
+                    pdf_doc.close()
                 executor.shutdown(wait=False, cancel_futures=True)
                 raise TimeoutError(f"PDF to images conversion timeout after {timeout}s")
 
@@ -157,17 +160,27 @@ def load_images_from_pdf_core(
     image_type=ImageType.PIL,  # PIL or BASE64
 ):
     images_list = []
-    pdf_doc = pdfium.PdfDocument(pdf_bytes)
-    pdf_page_num = len(pdf_doc)
-    end_page_id = get_end_page_id(end_page_id, pdf_page_num)
+    with PyPDFium2Parser.lock:
+        pdf_doc = pdfium.PdfDocument(pdf_bytes)
+        pdf_page_num = len(pdf_doc)
+        end_page_id = get_end_page_id(end_page_id, pdf_page_num)
 
-    for index in range(start_page_id, end_page_id + 1):
-        # logger.debug(f"Converting page {index}/{pdf_page_num} to image")
-        page = pdf_doc[index]
-        image_dict = pdf_page_to_image(page, dpi=dpi, image_type=image_type)
-        images_list.append(image_dict)
-
-    pdf_doc.close()
+    try:
+        for index in range(start_page_id, end_page_id + 1):
+            # logger.debug(f"Converting page {index}/{pdf_page_num} to image")
+            page = None
+            with PyPDFium2Parser.lock:
+                page = pdf_doc[index]
+            try:
+                image_dict = pdf_page_to_image(page, dpi=dpi, image_type=image_type)
+                images_list.append(image_dict)
+            finally:
+                if page is not None:
+                    with PyPDFium2Parser.lock:
+                        page.close()
+    finally:
+        with PyPDFium2Parser.lock:
+            pdf_doc.close()
 
     return images_list
 
@@ -274,25 +287,26 @@ def get_ori_image(
         # === 获取 bbox ===
         bbox, pil_image = None, None
         try:
-            # PDF页面坐标系 左下角原点坐标 (x1, y1, x2, y2)
-            x1, y1, x2, y2 = image.get_pos()
-            page_width, page_height = page.get_size()
+            with PyPDFium2Parser.lock:
+                # PDF页面坐标系 左下角原点坐标 (x1, y1, x2, y2)
+                x1, y1, x2, y2 = image.get_pos()
+                page_width, page_height = page.get_size()
 
-            width = abs(x2 - x1)
-            height = abs(y2 - y1)
-            # 过滤掉“点状”小图像
-            MIN_IMAGE_WIDTH = 5
-            MIN_IMAGE_HEIGHT = 5
-            if width < MIN_IMAGE_WIDTH or height < MIN_IMAGE_HEIGHT:
-                image.close()
-                continue
-            # 转换为左上角原点坐标
-            new_x1 = x1
-            new_x2 = x2
-            new_y1 = page_height - y2
-            new_y2 = page_height - y1
+                width = abs(x2 - x1)
+                height = abs(y2 - y1)
+                # 过滤掉“点状”小图像
+                MIN_IMAGE_WIDTH = 5
+                MIN_IMAGE_HEIGHT = 5
+                if width < MIN_IMAGE_WIDTH or height < MIN_IMAGE_HEIGHT:
+                    image.close()
+                    continue
+                # 转换为左上角原点坐标
+                new_x1 = x1
+                new_x2 = x2
+                new_y1 = page_height - y2
+                new_y2 = page_height - y1
 
-            bbox = [new_x1, new_y1, new_x2, new_y2]
+                bbox = [new_x1, new_y1, new_x2, new_y2]
         except Exception:
             pass
         try:
@@ -304,11 +318,13 @@ def get_ori_image(
                 kwargs["render"] = render
             if "scale_to_original" in sig.parameters:
                 kwargs["scale_to_original"] = scale_to_original
-            pil_image = image.get_bitmap(**kwargs).to_pil()
+            with PyPDFium2Parser.lock:
+                pil_image = image.get_bitmap(**kwargs).to_pil()
         except Exception:
             pass
         finally:
-            image.close()
+            with PyPDFium2Parser.lock:
+                image.close()
         if bbox and pil_image:
             images_list.append({
                 "uuid": str(uuid.uuid4()),

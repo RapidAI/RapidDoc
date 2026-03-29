@@ -54,10 +54,12 @@ def convert_pdf_bytes_to_bytes_by_pypdfium2(pdf_bytes, start_page_id=0, end_page
     if isinstance(pdf_bytes, dict):
         original_image = pdf_bytes.get("original_image")
         pdf_bytes = pdf_bytes["pdf_bytes"]
-    pdf = pdfium.PdfDocument(pdf_bytes)
-    output_pdf = pdfium.PdfDocument.new()
+    pdf = None
+    output_pdf = None
     try:
         with PyPDFium2Parser.lock:
+            pdf = pdfium.PdfDocument(pdf_bytes)
+            output_pdf = pdfium.PdfDocument.new()
             end_page_id = get_end_page_id(end_page_id, len(pdf))
 
             # 选择要导入的页面索引
@@ -77,8 +79,11 @@ def convert_pdf_bytes_to_bytes_by_pypdfium2(pdf_bytes, start_page_id=0, end_page
         logger.warning(f"Error in converting PDF bytes: {e}, Using original PDF bytes.")
         output_bytes = pdf_bytes
 
-    pdf.close()  # 关闭原PDF文档以释放资源
-    output_pdf.close()  # 关闭新PDF文档以释放资源
+    with PyPDFium2Parser.lock:
+        if pdf is not None:
+            pdf.close()  # 关闭原PDF文档以释放资源
+        if output_pdf is not None:
+            output_pdf.close()  # 关闭新PDF文档以释放资源
     if original_image is not None:
         return {
             "pdf_bytes": output_bytes,

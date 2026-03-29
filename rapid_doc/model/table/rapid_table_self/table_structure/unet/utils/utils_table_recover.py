@@ -2,6 +2,7 @@
 # @Author: SWHL
 # @Contact: liekkaskono@163.com
 import random
+import re
 from typing import Any, Dict, List, Union, Set, Tuple
 
 import cv2
@@ -441,7 +442,12 @@ def plot_html_table(
                     continue
                 if row == row_start and col == col_start:
                     ocr_rec_text = cell_box_map.get(i)
-                    text = "<br>".join(ocr_rec_text)
+                    cleaned_text_list = [
+                        re.sub(r"[\r\n]+", "", t).strip()
+                        for t in ocr_rec_text
+                        if t and t.strip()
+                    ]
+                    text = "<br>".join(cleaned_text_list)
                     # 如果是起始单元格
                     row_span = row_end - row_start + 1
                     col_span = col_end - col_start + 1
