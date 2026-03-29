@@ -3,9 +3,11 @@ import copy
 import json
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 from loguru import logger
 from bs4 import BeautifulSoup
 from fuzzywuzzy import fuzz
+load_dotenv()
 from rapid_doc.cli.common import (
     convert_pdf_bytes_to_bytes_by_pypdfium2,
     prepare_env,

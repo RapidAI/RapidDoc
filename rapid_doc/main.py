@@ -1,9 +1,12 @@
 import base64
 import json
 import os
+import tempfile
+import requests
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Iterable
+from urllib.parse import unquote, urlparse
 
 from rapid_doc.backend.office.office_analyze import office_analyze
 from rapid_doc.backend.office.office_middle_json_mkcontent import union_make as office_union_make
@@ -11,7 +14,7 @@ from rapid_doc.backend.pipeline.model_json_to_middle_json import result_to_middl
 from rapid_doc.backend.pipeline.pipeline_analyze import ModelSingleton
 from rapid_doc.backend.pipeline.pipeline_analyze import  doc_analyze as pipeline_doc_analyze
 from rapid_doc.backend.pipeline.pipeline_middle_json_mkcontent import union_make as pipeline_union_make
-from rapid_doc.cli.common import image_suffixes, office_suffixes, old_office_suffixes, read_fn, prepare_env
+from rapid_doc.cli.common import image_suffixes, office_suffixes, old_office_suffixes, prepare_env
 from rapid_doc.data.data_reader_writer import FileBasedDataWriter
 from rapid_doc.data.data_reader_writer.base import DataWriter
 from rapid_doc.utils.draw_bbox import draw_layout_bbox, draw_span_bbox
@@ -467,6 +470,9 @@ class RapidDoc:
         item: str | bytes | Path,
         index: int,
     ) -> dict[str, Any]:
+        if isinstance(item, str) and self._is_url(item):
+            return self._normalize_url_input(item, index)
+
         if isinstance(item, (str, Path)):
             path = Path(item)
             if not path.exists():
@@ -479,41 +485,98 @@ class RapidDoc:
                 file_suffix = actual_path.suffix.lower().lstrip(".")
 
             raw_bytes = actual_path.read_bytes()
-            if file_suffix in image_suffixes:
-                pdf_bytes = read_fn(actual_path)
-            else:
-                pdf_bytes = raw_bytes
-
-            return {
-                "name": actual_path.stem,
-                "suffix": file_suffix or guess_suffix_by_bytes(raw_bytes),
-                "raw_bytes": raw_bytes,
-                "pdf_bytes": pdf_bytes,
-            }
+            return self._build_normalized_doc(
+                raw_bytes=raw_bytes,
+                name=actual_path.stem,
+                suffix=file_suffix,
+                index=index,
+            )
 
         if isinstance(item, bytearray):
             item = bytes(item)
 
         if isinstance(item, bytes):
-            suffix = guess_suffix_by_bytes(item)
-            doc_name = f"document_{index + 1}"
-            if suffix in image_suffixes:
-                return {
-                    "name": doc_name,
-                    "suffix": suffix,
-                    "raw_bytes": item,
-                    "pdf_bytes": images_bytes_to_pdf_bytes(item),
-                }
-            if suffix in ["pdf", *office_suffixes]:
-                return {
-                    "name": doc_name,
-                    "suffix": suffix,
-                    "raw_bytes": item,
-                    "pdf_bytes": item,
-                }
-            raise ValueError(f"Unsupported bytes input suffix: {suffix}")
+            return self._build_normalized_doc(
+                raw_bytes=item,
+                name=f"document_{index + 1}",
+                suffix="",
+                index=index,
+            )
 
         raise TypeError(f"Unsupported input type: {type(item)}")
+
+    def _normalize_url_input(
+        self,
+        url: str,
+        index: int,
+    ) -> dict[str, Any]:
+        response = requests.get(url, timeout=60)
+        response.raise_for_status()
+
+        remote_name = self._infer_remote_name(url, index)
+        return self._build_normalized_doc(
+            raw_bytes=response.content,
+            name=Path(remote_name).stem,
+            suffix=Path(remote_name).suffix.lower().lstrip("."),
+            index=index,
+        )
+
+    def _build_normalized_doc(
+        self,
+        raw_bytes: bytes,
+        name: str,
+        suffix: str,
+        index: int,
+    ) -> dict[str, Any]:
+        doc_name = name or f"document_{index + 1}"
+        file_suffix = suffix.lower().lstrip(".") if suffix else ""
+        if not file_suffix:
+            file_suffix = guess_suffix_by_bytes(raw_bytes)
+
+        if file_suffix in old_office_suffixes:
+            raw_bytes, doc_name, file_suffix = self._convert_legacy_office_bytes(
+                raw_bytes=raw_bytes,
+                suffix=file_suffix,
+                name=doc_name,
+            )
+
+        if file_suffix in image_suffixes:
+            pdf_bytes = images_bytes_to_pdf_bytes(raw_bytes)
+        elif file_suffix in ["pdf", *office_suffixes]:
+            pdf_bytes = raw_bytes
+        else:
+            raise ValueError(f"Unsupported input suffix: {file_suffix}")
+
+        return {
+            "name": doc_name,
+            "suffix": file_suffix,
+            "raw_bytes": raw_bytes,
+            "pdf_bytes": pdf_bytes,
+        }
+
+    def _convert_legacy_office_bytes(
+        self,
+        raw_bytes: bytes,
+        suffix: str,
+        name: str,
+    ) -> tuple[bytes, str, str]:
+        with tempfile.TemporaryDirectory(prefix="rapid_doc_legacy_") as temp_dir:
+            input_path = Path(temp_dir) / f"{Path(name).stem}.{suffix}"
+            input_path.write_bytes(raw_bytes)
+
+            converted_path = Path(convert_legacy_office_to_modern(input_path, temp_dir))
+            return (
+                converted_path.read_bytes(),
+                converted_path.stem,
+                converted_path.suffix.lower().lstrip("."),
+            )
+
+    def _infer_remote_name(self, url: str, index: int) -> str:
+        parsed = urlparse(url)
+        remote_name = Path(unquote(parsed.path)).name
+        if remote_name:
+            return remote_name
+        return f"document_{index + 1}"
 
     def _normalize_lang_list(
         self,
@@ -576,6 +639,13 @@ class RapidDoc:
         if isinstance(inputs, (bytes, bytearray, str, Path)):
             return False
         return isinstance(inputs, Iterable)
+
+    def _is_url(self, value: str) -> bool:
+        try:
+            parsed = urlparse(value)
+        except Exception:
+            return False
+        return bool(parsed.scheme and parsed.netloc)
 
 
 if __name__ == '__main__':
