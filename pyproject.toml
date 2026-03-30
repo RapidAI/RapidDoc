@@ -32,6 +32,7 @@ dependencies = [
     "fast-langdetect>=0.2.3,<0.3.0",
     "scikit-image>=0.25.0,<1.0.0",
     "beautifulsoup4>=4.13.5,<5",
+    "magika>=0.6.2,<1.1.0",
     "pydantic>=2.7.2,<2.13",
     "matplotlib>=3.10,<4",
     "ftfy>=6.3.1,<7",

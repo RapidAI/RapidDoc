@@ -20,7 +20,7 @@ from rapid_doc.cli.common import convert_pdf_bytes_to_bytes_by_pypdfium2, prepar
 from rapid_doc.data.data_reader_writer import FileBasedDataWriter
 from rapid_doc.utils.draw_bbox import draw_layout_bbox, draw_span_bbox
 from rapid_doc.utils.enum_class import MakeMode
-from rapid_doc.utils.guess_suffix_or_lang import guess_suffix_by_bytes
+from rapid_doc.utils.guess_suffix_or_lang import guess_suffix_by_bytes, guess_suffix_by_path
 from rapid_doc.utils.office_converter import convert_legacy_office_to_modern
 from rapid_doc.backend.office.office_analyze import office_analyze
 from rapid_doc.backend.office.office_middle_json_mkcontent import union_make as office_union_make
@@ -362,7 +362,7 @@ def parse_doc(
         file_name_list = []
         pdf_bytes_list = []
         for path in path_list:
-            file_suffix = Path(path).suffix[1:].lower()
+            file_suffix = guess_suffix_by_path(path)
             if file_suffix in old_office_suffixes:
                 path = convert_legacy_office_to_modern(path)
             file_name = str(Path(path).stem)

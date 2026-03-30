@@ -224,26 +224,52 @@ def image_to_base64(image_path):
 
 
 def replace_image_with_base64(markdown_text, image_dir_path):
-    # 匹配Markdown中的图片标签
-    pattern = r'\!\[(?:[^\]]*)\]\(([^)]+)\)'
+    mime_types = {
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".png": "image/png",
+        ".gif": "image/gif",
+        ".webp": "image/webp",
+    }
 
-    # 替换图片链接
-    def replace(match):
+    def _path_to_data_uri(relative_path: str):
+        normalized_path = relative_path.strip()
+        if not normalized_path or normalized_path.startswith(("data:", "http://", "https://")):
+            return None
+
+        file_ext = os.path.splitext(normalized_path)[1].lower()
+        mime_type = mime_types.get(file_ext)
+        if mime_type is None:
+            return None
+
+        try:
+            full_path = os.path.join(image_dir_path, normalized_path)
+            base64_image = image_to_base64(full_path)
+            return f"data:{mime_type};base64,{base64_image}"
+        except Exception as e:
+            logger.warning(f"Failed to convert image {normalized_path} to base64: {e}")
+            return None
+
+    # 处理 Markdown 图片语法 ![...](path)
+    def _replace_markdown_image(match):
         relative_path = match.group(1)
-        # 只处理以.jpg .png结尾的图片
-        if relative_path.endswith('.jpg'):
-            full_path = os.path.join(image_dir_path, relative_path)
-            base64_image = image_to_base64(full_path)
-            return f'![{relative_path}](data:image/jpeg;base64,{base64_image})'
-        elif relative_path.endswith('.png'):
-            full_path = os.path.join(image_dir_path, relative_path)
-            base64_image = image_to_base64(full_path)
-            return f'![{relative_path}](data:image/png;base64,{base64_image})'
-        else:
-            # 其他格式的图片保持原样
-            return match.group(0)
-    # 应用替换
-    return re.sub(pattern, replace, markdown_text)
+        data_uri = _path_to_data_uri(relative_path)
+        if data_uri:
+            return f"![{relative_path}]({data_uri})"
+        return match.group(0)
+
+    result = re.sub(r'\!\[(?:[^\]]*)\]\(([^)]+)\)', _replace_markdown_image, markdown_text)
+
+    # 处理 HTML 表格中的 <img src="path">，这类图片不会被上面的 Markdown 正则命中
+    def _replace_html_image_src(match):
+        relative_path = match.group(1)
+        data_uri = _path_to_data_uri(relative_path)
+        if data_uri:
+            return f'src="{data_uri}"'
+        return match.group(0)
+
+    result = re.sub(r'src="(?!data:)([^"]+)"', _replace_html_image_src, result)
+    return result
 
 
 async def to_markdown(file_path, end_pages=10, is_ocr=False, formula_enable=True, table_enable=True, language="ch", backend="pipeline", url=None):
@@ -371,7 +397,9 @@ latex_delimiters_type_b = [
 ]
 latex_delimiters_type_all = latex_delimiters_type_a + latex_delimiters_type_b
 
-header_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'resources', 'header.html')
+header_path = 'header.html'
+if not os.path.exists(header_path):
+    header_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'resources', 'header.html')
 
 with open(header_path, 'r') as header_file:
     header = header_file.read()
@@ -573,6 +601,11 @@ def main(ctx,
         )
 
     output_root = os.path.abspath("../../docker/output")
+
+    if os.path.exists('header.html'):
+        logger.info("old server_name is {}".format(server_name))
+        logger.info("new server_name is 0.0.0.0")
+        server_name="0.0.0.0"
 
     demo.launch(server_name=server_name, server_port=server_port, show_api=api_enable, allowed_paths=[output_root])
 
