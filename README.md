@@ -478,6 +478,16 @@ for output in outputs:
 - [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR)
 - [RapidOCR](https://github.com/RapidAI/RapidOCR)
 
+## Star History
+
+<a href="https://www.star-history.com/?repos=RapidAI%2FRapidDoc&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/image?repos=RapidAI/RapidDoc&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/image?repos=RapidAI/RapidDoc&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/image?repos=RapidAI/RapidDoc&type=date&legend=top-left" />
+ </picture>
+</a>
+
 ## ⚖️ 开源许可
 
 基于 [MinerU](https://github.com/opendatalab/MinerU) 改造而来，已**移除原项目中的 YOLO 模型**，并替换为 **PP-StructureV3 系列 ONNX 模型**。  
