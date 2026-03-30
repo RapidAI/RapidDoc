@@ -143,7 +143,10 @@ def convert_file(input_path, output_dir, target_format):
     input_file = Path(input_path)
     output_dir = Path(output_dir)
 
+    logger.info(f"convert_file start: input_path={input_file}, output_dir={output_dir}, target_format={target_format}")
+
     if not input_file.is_file():
+        logger.error(f"convert_file failed: input file does not exist: {input_path}")
         raise FileNotFoundError(f"The input file {input_path} does not exist.")
 
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -177,6 +180,8 @@ def convert_file(input_path, output_dir, target_format):
             stderr = (exc.stderr or b"").decode(errors="ignore").strip()
             stdout = (exc.stdout or b"").decode(errors="ignore").strip()
             details = stderr or stdout or "conversion timed out"
+            logger.error(f"convert_file failed: input_path={input_file}, target_format={target_format}, "
+                         f"returncode={process.returncode}, details={details}",)
             raise ConvertToPdfError(
                 f"LibreOffice convert timed out after {subprocess_kwargs['timeout']} seconds: {details}"
             ) from exc
@@ -185,12 +190,15 @@ def convert_file(input_path, output_dir, target_format):
         stderr = process.stderr.decode(errors="ignore").strip()
         stdout = process.stdout.decode(errors="ignore").strip()
         details = stderr or stdout or "unknown error"
+        logger.error(f"convert_file failed: input_path={input_file}, target_format={target_format}, returncode={process.returncode}, details={details}")
         raise ConvertToPdfError(f"LibreOffice convert failed: {details}")
 
     output_file = _expected_output_path(input_file, output_dir, target_format)
     if not output_file.exists():
+        logger.error(f"convert_file failed: output not found after success, input_path={input_file}, expected_output={output_file}")
         raise ConvertToPdfError(f"LibreOffice reported success, but output file was not found: {output_file}")
 
+    logger.info(f"convert_file end: input_path={input_file}, output_file={output_file}, target_format={target_format}")
     return str(output_file)
 
 

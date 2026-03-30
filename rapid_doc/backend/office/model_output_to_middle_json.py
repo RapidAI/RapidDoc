@@ -209,6 +209,10 @@ def result_to_middle_json(model_output_blocks_list, image_writer):
                 continue
             level = block.get("level", 1)
             if block.get("is_numbered_style", False):
+                existing_section_number = block.get("section_number")
+                if isinstance(existing_section_number, str) and existing_section_number.strip():
+                    block["section_number"] = existing_section_number.strip()
+                    continue
                 # Ensure all ancestor levels start at 1 (never 0)
                 for ancestor in range(1, level):
                     if section_counters[ancestor] == 0:

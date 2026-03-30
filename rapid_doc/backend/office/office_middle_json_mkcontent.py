@@ -400,6 +400,10 @@ def _flatten_list_items(list_block):
         else:
             item_text = merge_para_with_text(block)
             if item_text.strip():
+                raw_prefix = block.get('prefix')
+                if isinstance(raw_prefix, str) and raw_prefix.strip():
+                    items.append(f"{indent}{raw_prefix.strip()} {item_text}")
+                    continue
                 if attribute == 'ordered':
                     items.append(f"{indent}{ordered_counter}. {item_text}")
                     ordered_counter += 1
@@ -422,7 +426,10 @@ def _flatten_list_items_v2(list_block):
         else:
             item_content = merge_para_with_text_v2(block)
             if item_content:
-                if attribute == 'ordered':
+                raw_prefix = block.get('prefix')
+                if isinstance(raw_prefix, str) and raw_prefix.strip():
+                    prefix = f"{'    ' * ilevel}{raw_prefix.strip()}"
+                elif attribute == 'ordered':
                     prefix = f"{'    ' * ilevel}{ordered_counter}."
                     ordered_counter += 1
                 else:
@@ -965,6 +972,13 @@ def get_body_data(para_block):
 def merge_para_with_text_v2(para_block):
     _visible_styles = {'underline', 'strikethrough'}
     para_content = []
+    if para_block['type'] == BlockType.TITLE and para_block.get('is_numbered_style', False):
+        section_number = para_block.get('section_number', '')
+        if section_number:
+            para_content.append({
+                'type': ContentType.TEXT,
+                'content': f"{section_number} ",
+            })
     for i, line in enumerate(para_block['lines']):
         for j, span in enumerate(line['spans']):
             content = span.get("content", '')

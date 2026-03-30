@@ -108,6 +108,9 @@ class MagicModel:
             if block_type == BlockType.TITLE:
                 block["is_numbered_style"] = block_info.get("is_numbered_style", False)
                 block["level"] = block_info.get("level", 1)
+                section_number = block_info.get("section_number")
+                if isinstance(section_number, str) and section_number.strip():
+                    block["section_number"] = section_number.strip()
             blocks.append(block)
 
         self.image_blocks = []
@@ -369,6 +372,9 @@ def parse_list_block(list_block: dict):
                 "type": BlockType.TEXT,
                 "lines": [{"spans": spans}]
             }
+            prefix = item.get("prefix")
+            if isinstance(prefix, str) and prefix.strip():
+                text_block["prefix"] = prefix.strip()
             blocks.append(text_block)
 
         elif item_type == "list":

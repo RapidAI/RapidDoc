@@ -80,6 +80,10 @@ class DocxConverter:
         self.index_block_stack: list = []  # 目录索引块堆栈
         self.pre_index_ilevel: int = -1  # 上一个目录项的缩进等级
         self.heading_list_numids: set = set()  # 用作章节标题的列表numId集合
+        self.numbering_abstract_defs: dict[int, dict[int, dict[str, Any]]] = {}
+        self.numbering_instances: dict[int, dict[str, Any]] = {}
+        self.numbering_counters: dict[int, dict[int, int]] = {}
+        self.numbering_prev_levels: dict[int, int] = {}
         self.equation_bookends: str = "<eq>{EQ}</eq>"  # 公式标记格式
         self.chart_list = []  # 图表列表
         self.processed_textbox_elements: list = []
@@ -540,6 +544,10 @@ class DocxConverter:
         self.index_block_stack = []
         self.pre_index_ilevel = -1
         self.heading_list_numids = set()
+        self.numbering_abstract_defs = {}
+        self.numbering_instances = {}
+        self.numbering_counters = {}
+        self.numbering_prev_levels = {}
         self.chart_list = []
         self.processed_textbox_elements = []
         self.toc_anchor_set = set()
@@ -552,6 +560,7 @@ class DocxConverter:
         self._mammoth_tables_html = self._preparse_tables_with_mammoth(file_bytes)
         self._mammoth_table_idx = 0
         self.docx_obj = Document(BytesIO(file_bytes))
+        self._load_numbering_definitions()
         self.toc_anchor_set = self._collect_toc_anchor_set()
         # 预扫描文档，识别用作章节标题的列表numId
         self.heading_list_numids = self._detect_heading_list_numids()
@@ -1043,6 +1052,10 @@ class DocxConverter:
         if numid == 0:
             numid = None
 
+        numbering_text = None
+        if numid is not None and ilevel is not None:
+            numbering_text = self._advance_numbering_sequence(numid, ilevel)
+
         # 处理列表
         if (
             numid is not None
@@ -1070,6 +1083,8 @@ class DocxConverter:
                         "is_numbered_style": is_numbered,
                         "content": content_text,
                     }
+                    if numbering_text:
+                        title_block["section_number"] = numbering_text
                     if paragraph_anchor:
                         title_block["anchor"] = paragraph_anchor
                     self.cur_page.append(title_block)
@@ -1079,6 +1094,7 @@ class DocxConverter:
                     ilevel=ilevel,
                     elements=paragraph_elements,
                     is_numbered=is_numbered,
+                    numbering_text=numbering_text,
                     text=text,
                     equations=equations,
                 )
@@ -1130,6 +1146,8 @@ class DocxConverter:
                     "is_numbered_style": is_numbered_style,
                     "content": content_text,
                 }
+                if is_numbered_style and numbering_text:
+                    h_block["section_number"] = numbering_text
                 if paragraph_anchor:
                     h_block["anchor"] = paragraph_anchor
                 self.cur_page.append(h_block)
@@ -1676,21 +1694,274 @@ class DocxConverter:
         Returns:
             tuple[Optional[int], Optional[int]]: (numId, ilvl) 元组
         """
-        # 访问段落的XML元素
-        numPr = paragraph._element.find(
-            ".//w:numPr", namespaces=paragraph._element.nsmap
+        paragraph_num_pr = paragraph._element.find(
+            "./w:pPr/w:numPr", namespaces=paragraph._element.nsmap
         )
+        style_element = getattr(paragraph.style, "element", None)
+        style_num_pr = None
+        if style_element is not None:
+            style_num_pr = style_element.find(
+                "./w:pPr/w:numPr", namespaces=paragraph._element.nsmap
+            )
 
-        if numPr is not None:
-            # 获取 numId 元素并提取值
-            numId_elem = numPr.find("w:numId", namespaces=paragraph._element.nsmap)
-            ilvl_elem = numPr.find("w:ilvl", namespaces=paragraph._element.nsmap)
-            numId = numId_elem.get(self.XML_KEY) if numId_elem is not None else None
-            ilvl = ilvl_elem.get(self.XML_KEY) if ilvl_elem is not None else None
+        numid = self._extract_numpr_value(paragraph_num_pr, "numId")
+        ilevel = self._extract_numpr_value(paragraph_num_pr, "ilvl")
 
-            return self._str_to_int(numId, None), self._str_to_int(ilvl, None)
+        if numid is None:
+            numid = self._extract_numpr_value(style_num_pr, "numId")
+        if ilevel is None:
+            ilevel = self._extract_numpr_value(style_num_pr, "ilvl")
 
-        return None, None  # 如果段落不是列表的一部分
+        return numid, ilevel
+
+    def _extract_numpr_value(
+        self,
+        num_pr: Optional[BaseOxmlElement],
+        tag_name: str,
+    ) -> Optional[int]:
+        """Extract an integer value from a <w:numPr> child element."""
+        if num_pr is None:
+            return None
+        child = num_pr.find(f"w:{tag_name}", namespaces=num_pr.nsmap)
+        if child is None:
+            return None
+        value = child.get(self.XML_KEY)
+        return self._str_to_int(value, None)
+
+    def _load_numbering_definitions(self) -> None:
+        """Load numbering definitions so heading/list counters follow DOCX rules."""
+        self.numbering_abstract_defs = {}
+        self.numbering_instances = {}
+
+        if not hasattr(self.docx_obj, "part") or not hasattr(self.docx_obj.part, "package"):
+            return
+
+        numbering_part = None
+        for part in self.docx_obj.part.package.parts:
+            if "numbering" in part.partname:
+                numbering_part = part
+                break
+
+        if numbering_part is None:
+            return
+
+        root = numbering_part.element
+        namespaces = {
+            "w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+        }
+
+        for abstract_num in root.findall("./w:abstractNum", namespaces=namespaces):
+            abstract_num_id = self._str_to_int(
+                abstract_num.get(
+                    "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}abstractNumId"
+                ),
+                None,
+            )
+            if abstract_num_id is None:
+                continue
+            levels: dict[int, dict[str, Any]] = {}
+            for level in abstract_num.findall("./w:lvl", namespaces=namespaces):
+                ilvl = self._str_to_int(
+                    level.get(
+                        "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}ilvl"
+                    ),
+                    None,
+                )
+                if ilvl is None:
+                    continue
+                levels[ilvl] = self._parse_numbering_level(level)
+            self.numbering_abstract_defs[abstract_num_id] = levels
+
+        for num in root.findall("./w:num", namespaces=namespaces):
+            num_id = self._str_to_int(
+                num.get("{http://schemas.openxmlformats.org/wordprocessingml/2006/main}numId"),
+                None,
+            )
+            if num_id is None:
+                continue
+
+            abstract_num_id_elem = num.find("./w:abstractNumId", namespaces=namespaces)
+            abstract_num_id = None
+            if abstract_num_id_elem is not None:
+                abstract_num_id = self._str_to_int(
+                    abstract_num_id_elem.get(self.XML_KEY),
+                    None,
+                )
+
+            overrides: dict[int, dict[str, Any]] = {}
+            for override in num.findall("./w:lvlOverride", namespaces=namespaces):
+                ilvl = self._str_to_int(
+                    override.get(
+                        "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}ilvl"
+                    ),
+                    None,
+                )
+                if ilvl is None:
+                    continue
+                override_data: dict[str, Any] = {}
+                start_override = override.find("./w:startOverride", namespaces=namespaces)
+                if start_override is not None:
+                    override_data["start"] = self._str_to_int(
+                        start_override.get(self.XML_KEY),
+                        1,
+                    )
+                override_level = override.find("./w:lvl", namespaces=namespaces)
+                if override_level is not None:
+                    override_data.update(self._parse_numbering_level(override_level))
+                overrides[ilvl] = override_data
+
+            self.numbering_instances[num_id] = {
+                "abstract_num_id": abstract_num_id,
+                "overrides": overrides,
+            }
+
+    def _parse_numbering_level(self, level_element: BaseOxmlElement) -> dict[str, Any]:
+        """Parse one numbering level definition from numbering.xml."""
+        namespaces = {
+            "w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+        }
+        start_elem = level_element.find("./w:start", namespaces=namespaces)
+        num_fmt_elem = level_element.find("./w:numFmt", namespaces=namespaces)
+        lvl_text_elem = level_element.find("./w:lvlText", namespaces=namespaces)
+        return {
+            "start": self._str_to_int(
+                start_elem.get(self.XML_KEY) if start_elem is not None else None,
+                1,
+            ),
+            "num_fmt": num_fmt_elem.get(self.XML_KEY) if num_fmt_elem is not None else "decimal",
+            "lvl_text": lvl_text_elem.get(self.XML_KEY) if lvl_text_elem is not None else None,
+        }
+
+    def _get_numbering_level_definition(
+        self, numid: int, ilevel: int
+    ) -> Optional[dict[str, Any]]:
+        """Resolve a numbering level definition with num-level overrides applied."""
+        num_info = self.numbering_instances.get(numid)
+        if not num_info:
+            return None
+
+        abstract_num_id = num_info.get("abstract_num_id")
+        base_level = (
+            self.numbering_abstract_defs.get(abstract_num_id, {}).get(ilevel, {}).copy()
+        )
+        override_level = num_info.get("overrides", {}).get(ilevel, {})
+        if not base_level and not override_level:
+            return None
+        base_level.update(override_level)
+        return base_level
+
+    def _advance_numbering_sequence(
+        self, numid: int, ilevel: int
+    ) -> Optional[str]:
+        """Advance a DOCX numbering sequence and render the visible numbering text."""
+        level_def = self._get_numbering_level_definition(numid, ilevel)
+        if level_def is None:
+            return None
+
+        counters = self.numbering_counters.setdefault(numid, {})
+        prev_level = self.numbering_prev_levels.get(numid)
+        start_value = max(level_def.get("start", 1) or 1, 1)
+
+        for ancestor in range(ilevel):
+            if ancestor in counters:
+                continue
+            ancestor_def = self._get_numbering_level_definition(numid, ancestor) or {}
+            counters[ancestor] = max(ancestor_def.get("start", 1) or 1, 1)
+
+        if prev_level is None:
+            counters[ilevel] = start_value
+        elif ilevel > prev_level:
+            for level in range(prev_level + 1, ilevel + 1):
+                child_def = self._get_numbering_level_definition(numid, level) or {}
+                counters[level] = max(child_def.get("start", 1) or 1, 1)
+        elif ilevel == prev_level:
+            counters[ilevel] = counters.get(ilevel, start_value - 1) + 1
+        else:
+            for level in list(counters.keys()):
+                if level > ilevel:
+                    del counters[level]
+            counters[ilevel] = counters.get(ilevel, start_value - 1) + 1
+
+        self.numbering_prev_levels[numid] = ilevel
+        return self._render_numbering_text(numid, ilevel, counters)
+
+    def _render_numbering_text(
+        self, numid: int, ilevel: int, counters: dict[int, int]
+    ) -> Optional[str]:
+        """Render the visible numbering prefix using lvlText and numFmt."""
+        level_def = self._get_numbering_level_definition(numid, ilevel)
+        if level_def is None:
+            return None
+
+        lvl_text = level_def.get("lvl_text") or f"%{ilevel + 1}"
+
+        def _replace(match: re.Match[str]) -> str:
+            placeholder_level = int(match.group(1)) - 1
+            placeholder_value = counters.get(placeholder_level)
+            if placeholder_value is None:
+                placeholder_def = (
+                    self._get_numbering_level_definition(numid, placeholder_level) or {}
+                )
+                placeholder_value = max(placeholder_def.get("start", 1) or 1, 1)
+                counters[placeholder_level] = placeholder_value
+            placeholder_level_def = (
+                self._get_numbering_level_definition(numid, placeholder_level) or {}
+            )
+            num_fmt = placeholder_level_def.get("num_fmt", "decimal")
+            return self._format_number_value(placeholder_value, num_fmt)
+
+        return re.sub(r"%(\d+)", _replace, lvl_text)
+
+    def _format_number_value(self, value: int, num_fmt: str) -> str:
+        """Format one numbering value according to a subset of Word numFmt rules."""
+        if num_fmt == "decimalZero":
+            return f"{value:02d}"
+        if num_fmt == "lowerLetter":
+            return self._to_alpha(value).lower()
+        if num_fmt == "upperLetter":
+            return self._to_alpha(value).upper()
+        if num_fmt == "lowerRoman":
+            return self._to_roman(value).lower()
+        if num_fmt == "upperRoman":
+            return self._to_roman(value).upper()
+        if num_fmt == "decimalEnclosedCircleChinese":
+            circled = {
+                1: "①", 2: "②", 3: "③", 4: "④", 5: "⑤",
+                6: "⑥", 7: "⑦", 8: "⑧", 9: "⑨", 10: "⑩",
+                11: "⑪", 12: "⑫", 13: "⑬", 14: "⑭", 15: "⑮",
+                16: "⑯", 17: "⑰", 18: "⑱", 19: "⑲", 20: "⑳",
+            }
+            return circled.get(value, str(value))
+        return str(value)
+
+    def _to_alpha(self, value: int) -> str:
+        """Convert 1-based integers to Excel-style alphabetic numbering."""
+        if value <= 0:
+            return str(value)
+        chars = []
+        current = value
+        while current > 0:
+            current -= 1
+            chars.append(chr(ord("A") + (current % 26)))
+            current //= 26
+        return "".join(reversed(chars))
+
+    def _to_roman(self, value: int) -> str:
+        """Convert positive integers to Roman numerals."""
+        if value <= 0:
+            return str(value)
+        numerals = [
+            (1000, "M"), (900, "CM"), (500, "D"), (400, "CD"),
+            (100, "C"), (90, "XC"), (50, "L"), (40, "XL"),
+            (10, "X"), (9, "IX"), (5, "V"), (4, "IV"), (1, "I"),
+        ]
+        result = []
+        current = value
+        for arabic, roman in numerals:
+            while current >= arabic:
+                result.append(roman)
+                current -= arabic
+        return "".join(result)
 
     def _is_numbered_list(self, numId: int, ilvl: int) -> bool:
         """
@@ -1797,6 +2068,7 @@ class DocxConverter:
         ilevel: int,
         elements: list,
         is_numbered: bool = False,
+        numbering_text: Optional[str] = None,
         text: str = "",
         equations: list = None,
     ) -> list:
@@ -1838,6 +2110,7 @@ class DocxConverter:
 
         # 确定列表属性
         list_attribute = "ordered" if is_numbered else "unordered"
+        list_item_prefix = numbering_text if is_numbered and numbering_text else None
 
         # 情况 1: 不存在上一个列表ID，或遇到了不同 numId 的新列表，创建新的顶层列表
         if self.pre_num_id == -1 or self.pre_num_id != numid:
@@ -1864,6 +2137,8 @@ class DocxConverter:
                 "type": BlockType.TEXT,
                 "content": content_text,
             }
+            if list_item_prefix:
+                list_item["prefix"] = list_item_prefix
 
             list_block["content"].append(list_item)
             self.pre_num_id = numid
@@ -1895,6 +2170,8 @@ class DocxConverter:
                 "type": BlockType.TEXT,
                 "content": content_text,
             }
+            if list_item_prefix:
+                list_item["prefix"] = list_item_prefix
             child_list_block["content"].append(list_item)
 
             # 更新目前缩进
@@ -1918,6 +2195,8 @@ class DocxConverter:
                 "type": BlockType.TEXT,
                 "content": content_text,
             }
+            if list_item_prefix:
+                list_item["prefix"] = list_item_prefix
             list_block["content"].append(list_item)
             self.pre_ilevel = ilevel
 
@@ -1931,6 +2210,8 @@ class DocxConverter:
                 "type": BlockType.TEXT,
                 "content": content_text,
             }
+            if list_item_prefix:
+                list_item["prefix"] = list_item_prefix
             list_block["content"].append(list_item)
 
     def _detect_heading_list_numids(self) -> set:
