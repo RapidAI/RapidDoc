@@ -2,7 +2,7 @@ import re
 import zipfile
 from io import BytesIO
 from pathlib import Path
-from typing import BinaryIO, Optional, Union, Any, Final
+from typing import BinaryIO, Optional, Union, Any, Final, Iterator
 
 import pandas as pd
 from PIL import Image, ImageDraw, ImageFont
@@ -38,6 +38,15 @@ class DocxConverter:
         "a14": "http://schemas.microsoft.com/office/drawing/2010/main",
         "c": "http://schemas.openxmlformats.org/drawingml/2006/chart",
     }
+    _PARAGRAPH_TRANSPARENT_INLINE_CONTAINERS: Final = {
+        "bdo",
+        "customXml",
+        "dir",
+        "fldSimple",
+        "ins",
+        "moveTo",
+        "smartTag",
+    }
     """
     Word 文档中使用的 XML 命名空间映射。
 
@@ -62,6 +71,9 @@ class DocxConverter:
         }
         self.blip_xpath_expr = etree.XPath(
             ".//a:blip", namespaces=DocxConverter._BLIP_NAMESPACES
+        )
+        self.vml_imagedata_xpath_expr = etree.XPath(
+            ".//v:imagedata", namespaces=DocxConverter._BLIP_NAMESPACES
         )
 
         # 存放文档字节数据，用于需要重读 ZIP 的辅助方法
@@ -592,6 +604,8 @@ class DocxConverter:
             tag_name = etree.QName(element).localname
             # 检查是否存在内联图像（blip元素）
             drawing_blip = self.blip_xpath_expr(element)
+            vml_imagedata = self.vml_imagedata_xpath_expr(element)
+            image_elements = [*drawing_blip, *vml_imagedata]
 
             # 查找所有绘图元素（用于处理DrawingML）
             drawingml_els = element.findall(
@@ -667,7 +681,7 @@ class DocxConverter:
                     # 如果表格解析失败，记录调试信息
                     logger.debug("could not parse a table, broken docx table")
             # 检查图片元素
-            elif drawing_blip:
+            elif image_elements:
                 # 判断图片是否为锚定（浮动）图片
                 is_anchored = bool(
                     element.findall(
@@ -678,10 +692,10 @@ class DocxConverter:
                 # 锚定图片在段落中浮动定位，段落文本应出现在图片之前
                 if is_anchored and tag_name == "p":
                     self._handle_text_elements(element)
-                    self._handle_pictures(drawing_blip)
+                    self._handle_pictures(image_elements)
                 else:
                     # 处理图片元素
-                    self._handle_pictures(drawing_blip)
+                    self._handle_pictures(image_elements)
                     # 如果是段落元素，同时处理其中的文本内容（如描述性文字）
                     if tag_name == "p":
                         self._handle_text_elements(element)
@@ -1034,9 +1048,10 @@ class DocxConverter:
                 is_section_end = True
         paragraph = Paragraph(element, self.docx_obj)
         paragraph_elements = self._get_paragraph_elements(paragraph)
+        paragraph_text = self._get_paragraph_text(paragraph)
         paragraph_anchor = self._extract_paragraph_bookmark(element)
         text, equations = self._handle_equations_in_text(
-            element=element, text=paragraph.text
+            element=element, text=paragraph_text
         )
 
         if text is None:
@@ -1153,7 +1168,7 @@ class DocxConverter:
                 self.cur_page.append(h_block)
 
         elif len(equations) > 0:
-            if (paragraph.text is None or len(paragraph.text.strip()) == 0) and len(
+            if (paragraph_text is None or len(paragraph_text.strip()) == 0) and len(
                 text
             ) > 0:
                 # 独立公式
@@ -1228,12 +1243,12 @@ class DocxConverter:
             self.cur_page = []
             self.pages.append(self.cur_page)
 
-    def _handle_pictures(self, drawing_blip: Any):
+    def _handle_pictures(self, image_elements: Any):
         """
         处理图片。
 
         Args:
-            drawing_blip: 绘图 blip 对象
+            image_elements: 图片引用元素列表，支持 DrawingML blip 和 VML imagedata
 
         Returns:
 
@@ -1251,17 +1266,25 @@ class DocxConverter:
                 Optional[bytes]: 图像数据
             """
             image_data: Optional[bytes] = None
-            rId = image.get(
-                "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}embed"
+            rel_attr_names = (
+                "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}embed",
+                "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}id",
+                "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}link",
             )
-            if rId in self.docx_obj.part.rels:
-                # 使用关系 ID 访问图像部分
-                image_part = self.docx_obj.part.rels[rId].target_part
-                image_data = image_part.blob  # 获取二进制图像数据
+            for rel_attr_name in rel_attr_names:
+                rId = image.get(rel_attr_name)
+                if not rId or rId not in self.docx_obj.part.rels:
+                    continue
+                rel = self.docx_obj.part.rels[rId]
+                target_part = getattr(rel, "target_part", None)
+                if target_part is not None and hasattr(target_part, "blob"):
+                    # 使用关系 ID 访问图像部分
+                    image_data = target_part.blob
+                    break
             return image_data
 
-        # 遍历所有 blip 元素，支持 group images（多个 blip）
-        for image in drawing_blip:
+        # 遍历所有图片引用元素，支持 group images（多个 blip）和 VML/OLE 预览图
+        for image in image_elements:
             image_data: Optional[bytes] = get_docx_image(image)
             if image_data is None:
                 logger.warning("Warning: image cannot be found")
@@ -1322,14 +1345,17 @@ class DocxConverter:
             段落元素列表，每个元素包含文本、格式和超链接信息
         """
 
+        inner_contents = list(self._iter_paragraph_inner_content(paragraph))
+        paragraph_text = self._get_paragraph_text_from_contents(inner_contents)
+
         # 目前保留空段落以保持向后兼容性:
-        if paragraph.text.strip() == "":
+        if paragraph_text.strip() == "":
             # 检查是否存在带可见样式（下划线或删除线）的空白文本 run。
             # 有可见样式的空白文本（如带下划线的空格）在视觉上是可见的，应予保留，
             # 因此跳过提前返回，交由后续完整 run 处理流程处理。
             has_visible_style_run = any(
                 isinstance(c, Run) and c.text and self._has_visible_style(self._get_format_from_run(c))
-                for c in paragraph.iter_inner_content()
+                for c in inner_contents
             )
             if not has_visible_style_run:
                 return [("", None, None)]
@@ -1349,7 +1375,7 @@ class DocxConverter:
         _field_acc_format = None  # 首个显示 run 的格式
 
         # 遍历段落的 runs 并按格式分组
-        for c in paragraph.iter_inner_content():
+        for c in inner_contents:
             if isinstance(c, Hyperlink):
                 # 若地址为 URL（含 ://），直接保留字符串，避免 Path 将 // 规范化为 /
                 address = c.address
@@ -1483,6 +1509,50 @@ class DocxConverter:
             paragraph_elements.append((group_text, previous_format, None))
 
         return paragraph_elements
+
+    def _iter_paragraph_inner_content(
+        self,
+        paragraph: Paragraph,
+        container: Optional[BaseOxmlElement] = None,
+    ) -> Iterator[Union[Run, Hyperlink]]:
+        """Yield visible paragraph inline containers in document order.
+        python-docx only walks direct ``w:r`` and ``w:hyperlink`` children of ``w:p``.
+        Inline ``w:sdt`` content controls are skipped entirely, which drops their text
+        from both ``paragraph.text`` and ``paragraph.iter_inner_content()``. This walker
+        treats ``w:sdt`` and a few transparent wrapper nodes as pass-through containers
+        and reuses the existing Run/Hyperlink wrappers for the actual visible content.
+        """
+        if container is None:
+            container = paragraph._element
+
+        _W_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+
+        for child in container:
+            tag_name = etree.QName(child).localname
+
+            if tag_name == "r":
+                yield Run(child, paragraph)
+            elif tag_name == "hyperlink":
+                yield Hyperlink(child, paragraph)
+            elif tag_name == "sdt":
+                sdt_content = child.find(f"{{{_W_NS}}}sdtContent")
+                if sdt_content is not None:
+                    yield from self._iter_paragraph_inner_content(paragraph, sdt_content)
+            elif tag_name in self._PARAGRAPH_TRANSPARENT_INLINE_CONTAINERS:
+                yield from self._iter_paragraph_inner_content(paragraph, child)
+
+    @staticmethod
+    def _get_paragraph_text_from_contents(
+        inner_contents: list[Union[Run, Hyperlink]],
+    ) -> str:
+        """Rebuild paragraph plain text from visible inline containers."""
+        return "".join(content.text or "" for content in inner_contents)
+
+    def _get_paragraph_text(self, paragraph: Paragraph) -> str:
+        """Return paragraph plain text, including inline ``w:sdt`` content."""
+        return self._get_paragraph_text_from_contents(
+            list(self._iter_paragraph_inner_content(paragraph))
+        )
 
     @classmethod
     def _resolve_style_chain_bool(
@@ -2201,7 +2271,7 @@ class DocxConverter:
             self.pre_ilevel = ilevel
 
         # 情况 4: 同级列表项（相同缩进）
-        elif self.pre_num_id == numid or self.pre_ilevel == ilevel:
+        elif self.pre_num_id == numid and self.pre_ilevel == ilevel:
             # 获取栈顶的列表块
             list_block = self.list_block_stack[-1]
 
@@ -2213,6 +2283,14 @@ class DocxConverter:
             if list_item_prefix:
                 list_item["prefix"] = list_item_prefix
             list_block["content"].append(list_item)
+
+        else:
+            logger.warning(
+                "Unexpected DOCX list state in _add_list_item: "
+                f"pre_num_id={self.pre_num_id}, numid={numid}, "
+                f"pre_ilevel={self.pre_ilevel}, ilevel={ilevel}, "
+                f"stack_depth={len(self.list_block_stack)}. "
+            )
 
     def _detect_heading_list_numids(self) -> set:
         """
@@ -2243,7 +2321,7 @@ class DocxConverter:
                     numid, ilevel = self._get_numId_and_ilvl(paragraph)
                     if numid == 0:
                         numid = None
-                    text = paragraph.text.strip() if paragraph.text else ""
+                    text = self._get_paragraph_text(paragraph).strip()
                 except Exception:
                     continue
 
@@ -2720,8 +2798,9 @@ class DocxConverter:
             str: 处理后的文本内容（包含公式标记和超链接格式）
         """
         paragraph_elements = self._get_paragraph_elements(paragraph)
+        paragraph_text = self._get_paragraph_text(paragraph)
         text, equations = self._handle_equations_in_text(
-            element=paragraph._element, text=paragraph.text
+            element=paragraph._element, text=paragraph_text
         )
 
         if text is None:
@@ -2916,7 +2995,7 @@ class DocxConverter:
         for p, position in all_paragraphs:
             # 创建 Paragraph 对象以获取文本内容
             paragraph = Paragraph(p, self.docx_obj)
-            text_content = paragraph.text
+            text_content = self._get_paragraph_text(paragraph)
 
             # 基于内容和位置创建唯一标识
             paragraph_id = (text_content, position)
