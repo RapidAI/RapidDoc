@@ -15,7 +15,7 @@ class Logger:
         self.logger.propagate = False
 
         formatter = colorlog.ColoredFormatter(
-            "%(log_color)s[%(levelname)s] %(asctime)s [RapidTable] %(filename)s:%(lineno)d: %(message)s",
+            "%(log_color)s[%(levelname)s] %(asctime)s [RapidLayout] %(filename)s:%(lineno)d: %(message)s",
             log_colors={
                 "DEBUG": "cyan",
                 "INFO": "green",

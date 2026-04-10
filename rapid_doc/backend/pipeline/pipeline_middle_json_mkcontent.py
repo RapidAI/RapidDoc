@@ -72,6 +72,10 @@ def make_blocks_to_markdown(paras_of_layout,
                                     if span['type'] == ContentType.IMAGE:
                                         if span.get('image_path', ''):
                                             para_text += f"![]({img_buket_path}/{span['image_path']})"
+                                        if 'seal' == span.get("original_label"):
+                                            content = _get_seal_text(span)
+                                            if content:
+                                                para_text += f"  \n{content}"
                     for block in para_block['blocks']:  # 2nd.拼image_caption
                         if block['type'] == BlockType.IMAGE_CAPTION:
                             para_text += '  \n' + merge_para_with_text(block)
@@ -230,6 +234,8 @@ def make_blocks_to_content_list(para_block, img_buket_path, page_idx, page_size)
             if block['type'] == BlockType.IMAGE_BODY:
                 for line in block['lines']:
                     for span in line['spans']:
+                        if 'seal' == span.get("original_label"):
+                            para_content['text'] = _get_seal_text(span)
                         if span['type'] == ContentType.IMAGE:
                             if span.get('image_path', ''):
                                 para_content['img_path'] = f"{img_buket_path}/{span['image_path']}"
@@ -313,6 +319,14 @@ def get_title_level(block):
     elif title_level < 1:
         title_level = 0
     return title_level
+
+def _get_seal_text(seal_span):
+    content = seal_span.get('content', '')
+    if isinstance(content, list):
+        return ' '.join(str(item) for item in content if str(item).strip())
+    if isinstance(content, str):
+        return content.strip()
+    return ''
 
 
 def escape_special_markdown_char(content):

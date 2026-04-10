@@ -12,6 +12,7 @@ from tqdm import tqdm
 
 from .analyze_utils import _extract_text_from_pdf, _run_ocr_det_batch, _process_single_table, _run_ocr_rec_postprocess
 from .model_init import AtomModelSingleton
+from .model_list import AtomicModel
 from ..utils import remove_layout_in_ori_images, filter_overlap_boxes
 from ...model.custom import CustomBaseModel
 from ...utils.checkbox_det_cls import checkbox_predict
@@ -53,6 +54,7 @@ class BatchAnalyze:
         # OCR 配置
         self.use_det_mode = self.ocr_config.get("use_det_mode", "auto")
         self.ocr_det_base_batch_size = self.ocr_config.get("Det.rec_batch_num", 1)
+        self.seal_enable = self.ocr_config.get("seal_enable", True)
         self.use_custom_ocr = False
         
         # 版面配置
@@ -101,7 +103,8 @@ class BatchAnalyze:
         
         # 预处理数据
         pdf_dict_list = [pdf_dict for _, _, _, _, pdf_dict in images_with_extra_info]
-        np_images = [cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR) for image, _, _, _, _ in images_with_extra_info]
+        # np_images = [cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR) for image, _, _, _, _ in images_with_extra_info]
+        np_images = [np.array(image) for image, _, _, _, _ in images_with_extra_info]
         scale_list = [scale for _, scale, _, _, _ in images_with_extra_info]
         
         # 1. 版面识别
@@ -126,6 +129,10 @@ class BatchAnalyze:
         # 6. 后处理 OCR rec 结果
         _run_ocr_rec_postprocess(images_layout_res, self.ocr_config)
 
+        # 7. 印章识别
+        if self.seal_enable:
+            self._run_seal_ocr(np_images, images_layout_res)
+
         clean_vram(self.model.device, vram_threshold=8)
         return images_layout_res
     
@@ -144,8 +151,8 @@ class BatchAnalyze:
         if self.use_det_mode == 'txt':
             images_layout_res = remove_layout_in_ori_images(images_layout_res, pdf_dict_list, scale_list)
         
-        # 公式等级过滤
-        if self.formula_enable and self.formula_level == 1:
+        # 公式等级过滤（不识别行间公式，直接作为文本识别）
+        if not self.formula_enable or self.formula_level == 1:
             images_layout_res = [
                 [item for item in page if item["category_id"] != CategoryId.InlineEquation]
                 for page in images_layout_res
@@ -365,3 +372,36 @@ class BatchAnalyze:
                     )
                     pbar.update(1)
 
+
+    def _run_seal_ocr(
+        self,
+        np_images,
+        images_layout_res,
+    ):
+        """印章 处理流程"""
+        atom_model_manager = AtomModelSingleton()
+        seal_ocr_model = atom_model_manager.get_atom_model(
+            atom_model_name=AtomicModel.OCR,
+            is_seal=True,
+        )
+        for index, np_img in enumerate(np_images):
+            layout_res = images_layout_res[index]
+            for layout_re in layout_res:
+                if 'seal' == layout_re.get("original_label"):
+                    seal_img, _ = crop_img(layout_re, np_img)
+                    seal_crop_bgr = cv2.cvtColor(seal_img, cv2.COLOR_RGB2BGR)
+                    seal_ocr_res = seal_ocr_model.ocr(seal_crop_bgr, det=True, rec=True)[0]
+                    if not seal_ocr_res:
+                        continue
+                    print(seal_ocr_res)
+                    seal_texts = []
+                    for seal_item in seal_ocr_res:
+                        if not seal_item or len(seal_item) != 2:
+                            continue
+                        rec_result = seal_item[1]
+                        if not rec_result or len(rec_result) < 1:
+                            continue
+                        rec_text = rec_result[0]
+                        if rec_text:
+                            seal_texts.append(rec_text)
+                    layout_re["text"] = seal_texts

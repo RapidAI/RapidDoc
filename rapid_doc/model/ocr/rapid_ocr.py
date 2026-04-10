@@ -1,6 +1,8 @@
+import json
 from typing import List, Dict, Any
 
 from rapid_doc.model.ocr.ocr_patch import apply_ocr_patch
+from rapid_doc.model.ocr.seal_crop import SortPolyBoxes, CropByPolys
 
 # 应用所有 OCR 相关补丁
 apply_ocr_patch()
@@ -13,7 +15,7 @@ import warnings
 import numpy as np
 from pathlib import Path
 from loguru import logger
-from rapidocr import RapidOCR, EngineType, OCRVersion, ModelType
+from rapidocr import RapidOCR, EngineType, OCRVersion
 from rapidocr.ch_ppocr_rec import TextRecInput, TextRecOutput
 from tqdm import tqdm
 
@@ -28,10 +30,18 @@ if models_dir:
     from rapidocr.ch_ppocr_rec import main as rec_main
     rec_main.DEFAULT_MODEL_PATH = Path(models_dir)
 
+root_dir = os.path.join(Path(__file__).resolve().parent.parent, 'utils')
+DEFAULT_SEAL_DEBUG_DIR = os.path.join(
+    Path(__file__).resolve().parents[3],
+    'output_images',
+    'seal_ocr_debug',
+)
+
 class RapidOcrModel(object):
-    def __init__(self, det_db_box_thresh=0.3, lang=None, ocr_config=None, use_dilation=True, det_db_unclip_ratio=1.8, enable_merge_det_boxes=True):
+    def __init__(self, det_db_box_thresh=0.3, lang=None, ocr_config=None, use_dilation=True, det_db_unclip_ratio=1.8, enable_merge_det_boxes=True, is_seal=False):
         self.drop_score = 0.5
         self.enable_merge_det_boxes = enable_merge_det_boxes
+        self.is_seal = is_seal
         device = get_device()
         # 默认配置
         default_params = {
@@ -89,10 +99,97 @@ class RapidOcrModel(object):
         default_params.pop('engine_type', None)
         default_params.pop('use_det_mode', None)
         default_params.pop('custom_model', None)
+        default_params.pop('seal_enable', None)
+
+        if self.is_seal:
+            # 印章识别参数
+            default_params['Det.limit_side_len'] = 736
+            default_params['Det.limit_type'] = 'min'
+            default_params['Det.max_side_limit'] = 4000
+            default_params['Det.thresh'] = 0.2
+            default_params['Det.box_thresh'] = 0.6
+            default_params['Det.unclip_ratio'] = 0.5
+            default_params['Det.box_type'] = 'poly'
+            default_params['Det.use_dilation'] = False
+            default_params['Det.ocr_version'] = OCRVersion.PPOCRV4
+            default_params['Rec.ocr_version'] = OCRVersion.PPOCRV4 #印章使用v4的rec模型效果更好
+
+            rapid_doc_dir = Path(os.path.abspath(__file__)).parent.parent.parent
+            seal_det_model_path = os.path.join(rapid_doc_dir, 'resources', 'pp-ocrv4_mobile_seal_det.onnx')
+            default_params['Det.model_path'] = seal_det_model_path
+            self.enable_merge_det_boxes = False
+
         self.ocr_engine = RapidOCR(params=default_params)
         self.text_detector = self.ocr_engine.text_det
         self.text_recognizer = self.ocr_engine.text_rec
         self.rec_batch_num = self.text_recognizer.rec_batch_num
+
+        if self.is_seal:
+            self._seal_sort_boxes = SortPolyBoxes()
+            self._seal_crop_by_polys = CropByPolys(det_box_type='poly')
+            self._seal_debug_counter = 0
+            self._seal_debug_dir = self._resolve_seal_debug_dir()
+
+    def _resolve_seal_debug_dir(self):
+        if not self.is_seal:
+            return None
+
+        debug_dir = os.getenv("MINERU_SEAL_OCR_DEBUG_DIR")
+        if debug_dir:
+            return debug_dir
+
+        debug_enable = os.getenv("MINERU_SEAL_OCR_DEBUG", "").lower()
+        if debug_enable in {"1", "true", "yes", "on"}:
+            return DEFAULT_SEAL_DEBUG_DIR
+
+        return None
+
+    def _dump_seal_debug_artifacts(self, input_image, dt_boxes, img_crop_list, rec_res=None):
+        if not self._seal_debug_dir:
+            return
+
+        sample_dir = os.path.join(
+            self._seal_debug_dir,
+            f"sample_{self._seal_debug_counter:04d}",
+        )
+        self._seal_debug_counter += 1
+        os.makedirs(sample_dir, exist_ok=True)
+
+        cv2.imwrite(os.path.join(sample_dir, "input.png"), input_image)
+
+        det_vis = input_image.copy()
+        for index, box in enumerate(dt_boxes or []):
+            points = np.asarray(box, dtype=np.int32).reshape((-1, 1, 2))
+            cv2.polylines(det_vis, [points], isClosed=True, color=(0, 0, 255), thickness=2)
+            anchor = tuple(np.asarray(box[0], dtype=np.int32).tolist())
+            cv2.putText(
+                det_vis,
+                str(index),
+                anchor,
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.6,
+                (255, 0, 0),
+                2,
+                cv2.LINE_AA,
+            )
+        cv2.imwrite(os.path.join(sample_dir, "det_vis.png"), det_vis)
+
+        records = []
+        for index, crop_img in enumerate(img_crop_list or []):
+            crop_name = f"crop_{index:02d}.png"
+            cv2.imwrite(os.path.join(sample_dir, crop_name), crop_img)
+            record = {
+                "index": index,
+                "crop_path": crop_name,
+            }
+            if rec_res is not None and index < len(rec_res):
+                text, score = rec_res[index]
+                record["text"] = text
+                record["score"] = float(score)
+            records.append(record)
+
+        with open(os.path.join(sample_dir, "meta.json"), "w", encoding="utf-8") as f:
+            json.dump(records, f, ensure_ascii=False, indent=2)
 
     def ocr(self,
             img,
@@ -135,13 +232,18 @@ class RapidOcrModel(object):
                     if dt_boxes is None:
                         ocr_res.append(None)
                         continue
-                    dt_boxes = np.array(dt_boxes) # 转为np
-                    dt_boxes = sorted_boxes(dt_boxes)
-                    # merge_det_boxes 和 update_det_boxes 都会把poly转成bbox再转回poly，因此需要过滤所有倾斜程度较大的文本框
-                    if self.enable_merge_det_boxes:
-                        dt_boxes = merge_det_boxes(dt_boxes)
-                    if mfd_res:
-                        dt_boxes = update_det_boxes(dt_boxes, mfd_res)
+                    if self.is_seal:
+                        dt_boxes = self._seal_sort_boxes(dt_boxes)
+                        img_crop_list = self._seal_crop_by_polys(img, dt_boxes)
+                        self._dump_seal_debug_artifacts(img, dt_boxes, img_crop_list)
+                    else:
+                        dt_boxes = np.array(dt_boxes) # 转为np
+                        dt_boxes = sorted_boxes(dt_boxes)
+                        # merge_det_boxes 和 update_det_boxes 都会把poly转成bbox再转回poly，因此需要过滤所有倾斜程度较大的文本框
+                        if self.enable_merge_det_boxes:
+                            dt_boxes = merge_det_boxes(dt_boxes)
+                        if mfd_res:
+                            dt_boxes = update_det_boxes(dt_boxes, mfd_res)
                     tmp_res = [box.tolist() for box in dt_boxes]
                     ocr_res.append(tmp_res)
                 # print(f"ocr===运行时间222: {time.time() - start_time}秒")
@@ -231,26 +333,32 @@ class RapidOcrModel(object):
         else:
             pass
             # logger.debug("dt_boxes num : {}, elapsed : {}".format(len(dt_boxes), elapse))
-        img_crop_list = []
+        if self.is_seal:
+            dt_boxes = self._seal_sort_boxes(dt_boxes)
+            img_crop_list = self._seal_crop_by_polys(ori_im, dt_boxes)
+        else:
+            img_crop_list = []
 
-        dt_boxes = sorted_boxes(dt_boxes)
+            dt_boxes = sorted_boxes(dt_boxes)
 
-        # merge_det_boxes 和 update_det_boxes 都会把poly转成bbox再转回poly，因此需要过滤所有倾斜程度较大的文本框
-        if self.enable_merge_det_boxes:
-            dt_boxes = merge_det_boxes(dt_boxes)
+            # merge_det_boxes 和 update_det_boxes 都会把poly转成bbox再转回poly，因此需要过滤所有倾斜程度较大的文本框
+            if self.enable_merge_det_boxes:
+                dt_boxes = merge_det_boxes(dt_boxes)
 
-        if mfd_res:
-            dt_boxes = update_det_boxes(dt_boxes, mfd_res)
+            if mfd_res:
+                dt_boxes = update_det_boxes(dt_boxes, mfd_res)
 
-        for bno in range(len(dt_boxes)):
-            tmp_box = copy.deepcopy(dt_boxes[bno])
-            img_crop = get_rotate_crop_image(ori_im, tmp_box)
-            img_crop_list.append(img_crop)
+            for bno in range(len(dt_boxes)):
+                tmp_box = copy.deepcopy(dt_boxes[bno])
+                img_crop = get_rotate_crop_image(ori_im, tmp_box)
+                img_crop_list.append(img_crop)
 
         rec_result = self.text_recognizer(TextRecInput(img_crop_list))
         rec_res = list(zip(rec_result.txts, rec_result.scores))
         elapse = rec_result.elapse
         # logger.debug("rec_res num  : {}, elapsed : {}".format(len(rec_res), elapse))
+        if self.is_seal:
+            self._dump_seal_debug_artifacts(ori_im, dt_boxes, img_crop_list, rec_res)
 
         filter_boxes, filter_rec_res = [], []
         for box, rec_result in zip(dt_boxes, rec_res):

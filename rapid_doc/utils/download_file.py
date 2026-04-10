@@ -24,6 +24,7 @@ CPU_MODEL = [
     # ocr
     "ch_PP-OCRv5_rec_mobile_infer.onnx",
     "ch_PP-OCRv5_mobile_det.onnx",
+    "ch_PP-OCRv4_rec_infer.onnx",
     "ch_ppocr_mobile_v2.0_cls_infer.onnx",
     "ppocrv5_dict.txt",
     "FZYTK.TTF",

@@ -8,7 +8,10 @@ from packaging.version import Version
 
 try:
     import openvino as ov
-    from openvino.runtime import Core
+    try:
+        from openvino import Core
+    except ImportError:
+        from openvino.runtime import Core  # 兼容旧版本
 except ImportError:
     raise ImportError(
         "openvino is not installed. Please install it with: pip install openvino"

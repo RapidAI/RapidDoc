@@ -12,7 +12,7 @@ from rapid_doc.backend.office.office_analyze import office_analyze
 from rapid_doc.backend.office.office_middle_json_mkcontent import union_make as office_union_make
 from rapid_doc.backend.pipeline.model_json_to_middle_json import result_to_middle_json as pipeline_result_to_middle_json
 from rapid_doc.backend.pipeline.pipeline_analyze import ModelSingleton
-from rapid_doc.backend.pipeline.pipeline_analyze import  doc_analyze as pipeline_doc_analyze
+from rapid_doc.backend.pipeline.pipeline_analyze import doc_analyze as pipeline_doc_analyze
 from rapid_doc.backend.pipeline.pipeline_middle_json_mkcontent import union_make as pipeline_union_make
 from rapid_doc.cli.common import image_suffixes, office_suffixes, old_office_suffixes, prepare_env
 from rapid_doc.data.data_reader_writer import FileBasedDataWriter

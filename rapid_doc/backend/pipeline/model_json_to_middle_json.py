@@ -136,7 +136,7 @@ def page_model_info_to_page_info(
     # 过滤 spans
     spans = remove_outside_spans(spans, all_bboxes, all_discarded_blocks)
     spans, _ = remove_overlaps_low_confidence_spans(spans)
-    spans, _ = remove_overlaps_min_spans(spans)
+    # spans, _ = remove_overlaps_min_spans(spans) #  删除重叠spans中较小的那些
     
     # 根据 OCR 模式处理 spans
     if use_vl_ocr:
@@ -216,7 +216,8 @@ def result_to_middle_json(
     ocr_enable=False,
     formula_enabled=True,
     ocr_config=None,
-    image_config=None
+    image_config=None,
+    batch_idx=0, pdf_pages_batch=0
 ):
     """
     将模型输出转换为中间 JSON 格式
@@ -258,14 +259,14 @@ def result_to_middle_json(
         image_dict = images_list[page_index]
         
         page_info = page_model_info_to_page_info(
-            page_model_info, image_dict, page_dict, image_writer, page_index,
+            page_model_info, image_dict, page_dict, image_writer, page_index + batch_idx * pdf_pages_batch,
             ocr_enable=ocr_enable, formula_enabled=formula_enabled,
             image_config=image_config, use_vl_ocr=use_vl_ocr
         )
         
         if page_info is None:
             page_w, page_h = map(int, page_dict['size'])
-            page_info = make_page_info_dict([], page_index, page_w, page_h, [])
+            page_info = make_page_info_dict([], page_index + batch_idx * pdf_pages_batch, page_w, page_h, [])
         
         middle_json["pdf_info"].append(page_info)
     

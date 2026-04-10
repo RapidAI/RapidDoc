@@ -2,6 +2,8 @@
 import json
 import os
 
+from loguru import logger
+
 from rapid_doc.utils.model_utils import import_package
 
 try:
@@ -116,3 +118,16 @@ def get_latex_delimiter_config():
         return None
     else:
         return latex_delimiter_config
+
+def get_processing_window_size(default: int = 64) -> int:
+    value = os.getenv('MINERU_PROCESSING_WINDOW_SIZE')
+    if value is None:
+        return default
+    try:
+        window_size = int(value)
+    except ValueError:
+        logger.warning(
+            f"Invalid MINERU_PROCESSING_WINDOW_SIZE value: {value}, use default {default}"
+        )
+        return default
+    return max(1, window_size)

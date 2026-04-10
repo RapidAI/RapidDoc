@@ -34,9 +34,9 @@ class RapidTableModel(object):
 
         # 获取用户传入的 engine_type
         self.engine_type = table_config.get('engine_type') if table_config else None
-        # CPU 上优先使用 OpenVINO（如果可用且用户未指定 engine_type）
-        if device.startswith('cpu') and check_openvino() and not self.engine_type:
-            self.engine_type = EngineType.OPENVINO
+        # # CPU 上优先使用 OpenVINO（如果可用且用户未指定 engine_type）
+        # if device.startswith('cpu') and check_openvino() and not self.engine_type:
+        #     self.engine_type = EngineType.OPENVINO
 
         if self.model_type == ModelType.UNET_SLANET_PLUS:
             cls_input_args = RapidTableInput(model_type=table_config.get("cls.model_type", ModelType.Q_CLS), engine_type=self.engine_type,

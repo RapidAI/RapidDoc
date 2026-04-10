@@ -92,6 +92,61 @@ def convert_pdf_bytes_to_bytes_by_pypdfium2(pdf_bytes, start_page_id=0, end_page
         }
     return output_bytes
 
+def convert_pdf_to_bytes_by_pypdfium2(
+    pdf_bytes,
+    start_page_id=0,
+    end_page_id=None,
+    pdf_pages_batch=0,
+):
+    if isinstance(pdf_bytes, dict):
+        pdf_bytes = pdf_bytes["pdf_bytes"]
+    pdf = pdfium.PdfDocument(pdf_bytes)
+    output_pdf = pdfium.PdfDocument.new()
+
+    try:
+        file_end = False
+        total_pages = len(pdf)
+
+        if total_pages == 0:
+            return b"", True
+
+        if start_page_id < 0:
+            start_page_id = 0
+
+        if pdf_pages_batch > 0:
+            end_page_id = start_page_id + pdf_pages_batch - 1
+        else:
+            end_page_id = end_page_id if end_page_id is not None and end_page_id >= 0 else total_pages - 1
+
+        if end_page_id > total_pages - 1:
+            logger.warning("end_page_id is out of range, use pdf length")
+            end_page_id = total_pages - 1
+            file_end = True
+        elif end_page_id == total_pages - 1:
+            file_end = True
+
+        # 逐页导入，失败则跳过
+        for page_index in range(start_page_id, end_page_id + 1):
+            try:
+                output_pdf.import_pages(pdf, pages=[page_index])
+            except Exception as page_error:
+                logger.warning(f"Failed to import page {page_index}: {page_error}, skipping this page.")
+                continue
+
+        output_buffer = io.BytesIO()
+        output_pdf.save(output_buffer)
+        output_bytes = output_buffer.getvalue()
+
+    except Exception as e:
+        logger.warning(f"Error in converting PDF bytes: {e}, using original PDF bytes.")
+        output_bytes = b""
+        file_end = True
+
+    finally:
+        pdf.close()
+        output_pdf.close()
+
+    return output_bytes, file_end
 
 #=============================================app.py相关调用=============================================
 def _prepare_pdf_bytes(pdf_bytes_list, start_page_id, end_page_id):

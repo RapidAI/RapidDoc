@@ -25,7 +25,7 @@
 
 - **OCR 识别**
   - 使用 [RapidOCR](https://github.com/RapidAI/RapidOCR) 支持多种推理引擎
-  - CPU 下默认使用 OpenVINO，GPU 下默认使用 torch
+  - CPU 下默认使用 OpenVINO（速度快，内存占用较高），GPU 下默认使用 torch
   
 - **版面识别**
   - 模型使用 `PP-DocLayout` 系列 ONNX 模型（v2、plus-L、L、M、S）
@@ -470,7 +470,7 @@ for output in outputs:
 - [x] OmniDocBench评测
 - [x] 支持自定义的ocr、table、公式。支持PaddleOCR-VL系列
 - [x] 支持docx/doc、pptx/ppt、xlsx/xls的原生解析（不使用模型）
-
+- [x] 支持印章文本检测
 
 ## 🙏 致谢
 

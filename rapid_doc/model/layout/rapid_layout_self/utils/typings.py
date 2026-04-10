@@ -65,7 +65,7 @@ PP_DOCLAYOUT_L_Threshold = {
     4: 0.5,    # abstract
     5: 0.5,    # content
     6: 0.5,    # figure_title (默认值)
-    7: 0.3,    # formula
+    7: 0.5,    # formula
     8: 0.5,    # table
     9: 0.5,    # table_title (默认值)
     10: 0.5,   # reference
@@ -89,7 +89,7 @@ PP_DOCLAYOUTV2_Threshold = {
     2: 0.5,  # aside_text
     3: 0.5,  # chart
     4: 0.5,  # content
-    5: 0.4,  # formula
+    5: 0.5,  # formula
     6: 0.4,  # doc_title
     7: 0.5,  # figure_title
     8: 0.5,  # footer
@@ -99,7 +99,7 @@ PP_DOCLAYOUTV2_Threshold = {
     12: 0.5,  # header
     13: 0.5,  # header
     14: 0.5,  # image
-    15: 0.4,  # formula
+    15: 0.5,  # inline_formula
     16: 0.5,  # number
     17: 0.4,  # paragraph_title
     18: 0.5,  # reference

@@ -55,6 +55,8 @@ def guess_language_by_text(code):
 
 
 def guess_suffix_by_bytes(file_bytes, file_path=None) -> str:
+    if isinstance(file_bytes, dict):
+        file_bytes = file_bytes["pdf_bytes"]
     suffix = magika.identify_bytes(file_bytes).prediction.output.label
     if file_path and suffix in ["ai", "html"] and Path(file_path).suffix.lower() in [".pdf"] and file_bytes[:4] == PDF_SIG_BYTES:
         suffix = "pdf"

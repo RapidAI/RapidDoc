@@ -363,6 +363,8 @@ class MagicModel:
             
             if category_id == CategoryId.ImageBody:
                 span['type'] = ContentType.IMAGE
+                if 'seal' == layout_det.get("original_label"):
+                    span['content'] = layout_det.get('text')
             elif category_id == CategoryId.TableBody:
                 latex = layout_det.get('latex')
                 html = layout_det.get('html')

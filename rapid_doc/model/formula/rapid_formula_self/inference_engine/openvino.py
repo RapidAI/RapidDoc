@@ -6,7 +6,16 @@ from typing import Any, Dict, List
 
 import numpy as np
 
-from openvino.runtime import Core
+try:
+    import openvino as ov
+    try:
+        from openvino import Core
+    except ImportError:
+        from openvino.runtime import Core  # 兼容旧版本
+except ImportError:
+    raise ImportError(
+        "openvino is not installed. Please install it with: pip install openvino"
+    )
 
 from ..model_handler.utils import ModelProcessor
 from ..utils.logger import Logger

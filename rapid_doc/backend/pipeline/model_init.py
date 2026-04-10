@@ -36,14 +36,15 @@ def layout_model_init(layout_config=None):
     model = RapidLayoutModel(layout_config)
     return model
 
-def ocr_model_init(det_db_box_thresh=0.3, lang=None, ocr_config=None, det_db_unclip_ratio=1.8, enable_merge_det_boxes=True):
+def ocr_model_init(det_db_box_thresh=0.3, lang=None, ocr_config=None, det_db_unclip_ratio=1.8, enable_merge_det_boxes=True, is_seal=False):
     model = RapidOcrModel(
             det_db_box_thresh=det_db_box_thresh,
             lang=lang,
             ocr_config=ocr_config,
             use_dilation=True,
             det_db_unclip_ratio=det_db_unclip_ratio,
-            enable_merge_det_boxes=enable_merge_det_boxes,)
+            enable_merge_det_boxes=enable_merge_det_boxes,
+            is_seal=is_seal)
     return model
 
 
@@ -66,7 +67,8 @@ class AtomModelSingleton:
                 kwargs.get('det_db_box_thresh', 0.3),
                 kwargs.get('lang'),
                 kwargs.get('det_db_unclip_ratio', 1.8),
-                kwargs.get('enable_merge_det_boxes', True)
+                kwargs.get('enable_merge_det_boxes', True),
+                kwargs.get('is_seal', True),
             )
         elif atom_model_name in [AtomicModel.Table]:
             key = (atom_model_name, make_hashable(kwargs.get('table_config', None)))
@@ -99,7 +101,8 @@ def atom_model_init(model_name: str, **kwargs):
                 kwargs.get('lang'),
                 kwargs.get('ocr_config'),
                 kwargs.get('det_db_unclip_ratio', 1.8),
-                kwargs.get('enable_merge_det_boxes', True)
+                kwargs.get('enable_merge_det_boxes', True),
+                kwargs.get('is_seal', False),
             )
     elif model_name == AtomicModel.Table:
         atom_model = (kwargs.get('table_config') or {}).get('custom_model')

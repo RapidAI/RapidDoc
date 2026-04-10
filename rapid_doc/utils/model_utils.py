@@ -27,7 +27,10 @@ def check_openvino():
     检查当前环境是否支持 OpenVINO
     """
     try:
-        from openvino.runtime import Core
+        try:
+            from openvino import Core
+        except ImportError:
+            from openvino.runtime import Core  # 兼容旧版本
         core = Core()
         devices = core.available_devices
         return bool(devices)
