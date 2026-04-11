@@ -12,6 +12,8 @@ load_dotenv()
 # # 或指定 GPU 编号，例如使用第二块 GPU（cuda:1）
 # os.environ['MINERU_DEVICE_MODE'] = "cuda:1"
 # os.environ['MINERU_LAYOUT_ORIGINAL_IMAGE'] = "true"
+# 是否启用图片方向矫正，开启后，可以自动识别并矫正 90°、270°的图片
+# os.environ['USE_DOC_ORIENTATION_CLASSIFY'] = "true"
 # # 模型文件存储目录
 # os.environ['RAPID_MODELS_DIR'] = r'D:\CodeProjects\doc\RapidAI\models' #模型文件存储目录，如果不设置会默认下载到rapid_doc项目里面
 from loguru import logger

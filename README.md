@@ -471,6 +471,7 @@ for output in outputs:
 - [x] 支持自定义的ocr、table、公式。支持PaddleOCR-VL系列
 - [x] 支持docx/doc、pptx/ppt、xlsx/xls的原生解析（不使用模型）
 - [x] 支持印章文本检测
+- [x] 文档方向90°、270°矫正（默认关闭），表格方向90°、270°矫正（默认开启）
 
 ## 🙏 致谢
 

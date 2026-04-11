@@ -184,7 +184,7 @@ def txt_most_angle_extract_table(page_dict, table_res_dict, scale):
         most_angle = angle_counts.most_common(1)[0][0]  # 取最多的角度
     else:
         most_angle = 0
-    return most_angle
+    return str(most_angle), angles
 
 """判断是否是背景图（背景图片里有文字）"""
 def txt_in_ori_image(page_dict, ori_image_bbox):

@@ -294,17 +294,69 @@ def merge_adjacent_bboxes(spans: List[Dict[str, Any]], x_gap_ratio: float = 0.6,
 
     return merged_result
 
-def rotate_image(img_info, angle):
+def rotate_table_image(img_info, angle):
     """
     将图像根据 angle 旋转到正向
     :param img_info: np.ndarray 图像
-    :param angle: 当前图像方向角度（0, 90, 180, 270）
+    :param angle: 当前图像方向角度（"0", "90", "180", "270"）
     """
     # 旋转图像
-    if angle == 270:
+    if angle == "270":
         img_info["table_img"] = cv2.rotate(img_info["table_img"], cv2.ROTATE_90_CLOCKWISE)
-    elif angle == 90:
+    elif angle == "90":
         img_info["table_img"] = cv2.rotate(img_info["table_img"], cv2.ROTATE_90_COUNTERCLOCKWISE)
     else:
         # 180度和0度不做处理
         pass
+
+def get_rotate_image(img, angle):
+    """
+    将图像根据 angle 旋转到正向
+    :param img_info: np.ndarray 图像
+    :param angle: 当前图像方向角度（"0", "90", "180", "270"）
+    """
+    # 旋转图像
+    if angle == "270":
+        img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
+    elif angle == "90":
+        img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
+    else:
+        # 180度和0度不做处理
+        pass
+    return img
+
+def restore_poly(poly, angle, orig_w, orig_h):
+    """
+    把旋转后图片上的矩形框，还原到原图坐标
+    poly: [xmin, ymin, xmax, ymin, xmax, ymax, xmin, ymax]
+    angle: "0" / "90" / "180" / "270"
+    orig_w, orig_h: 原图宽高
+    """
+    xmin, ymin, xmax, _, _, ymax, _, _ = poly
+
+    if angle == "0":
+        return poly
+
+    elif angle == "90":
+        # 旋转图 -> 原图
+        new_xmin = orig_w - 1 - ymax
+        new_ymin = xmin
+        new_xmax = orig_w - 1 - ymin
+        new_ymax = xmax
+
+    elif angle == "270":
+        new_xmin = ymin
+        new_ymin = orig_h - 1 - xmax
+        new_xmax = ymax
+        new_ymax = orig_h - 1 - xmin
+
+    elif angle == "180":
+        new_xmin = orig_w - 1 - xmax
+        new_ymin = orig_h - 1 - ymax
+        new_xmax = orig_w - 1 - xmin
+        new_ymax = orig_h - 1 - ymin
+
+    else:
+        raise ValueError(f"unsupported angle: {angle}")
+
+    return [new_xmin, new_ymin, new_xmax, new_ymin, new_xmax, new_ymax, new_xmin, new_ymax]

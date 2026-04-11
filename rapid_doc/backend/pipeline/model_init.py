@@ -7,6 +7,7 @@ from ...model.custom import CustomBaseModel
 from ...model.layout.rapid_layout import RapidLayoutModel
 from ...model.formula.rapid_formula_model import RapidFormulaModel
 from ...model.ocr.rapid_ocr import RapidOcrModel
+from ...model.orientation.rapid_orientation_model import RapidOrientationModel
 from ...model.table.rapid_table import RapidTableModel
 from ...utils.hash_utils import make_hashable
 
@@ -26,6 +27,11 @@ def table_model_init(lang=None, ocr_config=None, table_config=None):
     )
     table_model = RapidTableModel(ocr_engine, table_config)
     return table_model
+
+
+def img_orientation_cls_model_init():
+    cls_model = RapidOrientationModel()
+    return cls_model
 
 def formula_model_init(formula_config=None):
     model = RapidFormulaModel(formula_config)
@@ -112,6 +118,8 @@ def atom_model_init(model_name: str, **kwargs):
                 kwargs.get('ocr_config'),
                 kwargs.get('table_config'),
             )
+    elif model_name == AtomicModel.ImgOrientationCls:
+        atom_model = img_orientation_cls_model_init()
     else:
         logger.error('model name not allow')
         exit(1)

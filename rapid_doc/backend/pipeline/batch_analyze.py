@@ -2,6 +2,7 @@
 """
 批量分析模块
 """
+import os
 from typing import List, Tuple, Dict, Optional
 
 import cv2
@@ -15,6 +16,7 @@ from .model_init import AtomModelSingleton
 from .model_list import AtomicModel
 from ..utils import remove_layout_in_ori_images, filter_overlap_boxes
 from ...model.custom import CustomBaseModel
+from ...utils.boxbase import get_rotate_image, restore_poly
 from ...utils.checkbox_det_cls import checkbox_predict
 from ...utils.config_reader import get_formula_enable, get_table_enable
 from ...utils.enum_class import CategoryId
@@ -59,7 +61,8 @@ class BatchAnalyze:
         
         # 版面配置
         self.layout_base_batch_size = self.layout_config.get("batch_num", 1)
-        
+        self.use_doc_orientation_classify = (str(os.getenv("USE_DOC_ORIENTATION_CLASSIFY", "false"))
+                                             .strip().lower() in ("true", "1", "yes", "on"))
         # 公式配置
         self.formula_level = self.formula_config.get("formula_level", 0)
         self.formula_base_batch_size = self.formula_config.get("batch_num", 1)
@@ -106,7 +109,22 @@ class BatchAnalyze:
         # np_images = [cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR) for image, _, _, _, _ in images_with_extra_info]
         np_images = [np.array(image) for image, _, _, _, _ in images_with_extra_info]
         scale_list = [scale for _, scale, _, _, _ in images_with_extra_info]
-        
+
+        # 图片方向矫正
+        img_ori_orientation_list = []
+        if self.use_doc_orientation_classify:
+            atom_model_manager = AtomModelSingleton()
+            img_orientation_cls_model = atom_model_manager.get_atom_model(
+                atom_model_name=AtomicModel.ImgOrientationCls,
+            )
+            for i, np_img in enumerate(np_images):
+                h, w = np_img.shape[:2]
+                rotate_label = img_orientation_cls_model.predict(np_img)
+                if rotate_label in ["90", "270"]:
+                    np_images[i] = get_rotate_image(np_img, rotate_label)
+                pdf_dict_list[i]['rotate_label'] = rotate_label
+                img_ori_orientation_list.append((h, w, rotate_label))
+
         # 1. 版面识别
         images_layout_res = self._run_layout_detection(np_images, pdf_dict_list, scale_list)
         # 2. 收集各类型检测区域
@@ -132,6 +150,16 @@ class BatchAnalyze:
         # 7. 印章识别
         if self.seal_enable:
             self._run_seal_ocr(np_images, images_layout_res)
+
+        if img_ori_orientation_list:
+            # 把旋转后图片上的矩形框，还原到原图坐标
+            for index, np_img in enumerate(np_images):
+                h, w, rotate_label = img_ori_orientation_list[index]
+                layout_res = images_layout_res[index]
+                for layout_re in layout_res:
+                    layout_re["rotate_label"] = rotate_label
+                    if rotate_label in ["90", "270"]:
+                        layout_re["poly"] = restore_poly(layout_re["poly"], rotate_label, w, h)
 
         clean_vram(self.model.device, vram_threshold=8)
         return images_layout_res

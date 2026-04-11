@@ -13,7 +13,7 @@ from tqdm import tqdm
 
 from .model_init import AtomModelSingleton
 from .model_list import AtomicModel
-from ...utils.boxbase import rotate_image
+from ...utils.boxbase import rotate_table_image
 from ...utils.enum_class import CategoryId
 from ...utils.model_utils import crop_img
 from ...utils.ocr_utils import (
@@ -24,6 +24,9 @@ from ...utils.span_pre_proc import (
     txt_spans_extract, txt_spans_bbox_extract,
     txt_most_angle_extract_table, extract_table_fill_image
 )
+
+from rapid_orientation import RapidOrientation
+orientation_engine = RapidOrientation()
 
 
 # =================================== OCR-det ===================================
@@ -46,6 +49,9 @@ def _extract_text_from_pdf(
 
             for ocr_res_dict in text_list:
                 if ocr_res_dict['ocr_enable']:
+                    continue
+                if page_dict.get("rotate_label") in ["90", "180", "270"]:
+                    ocr_res_dict['ocr_enable'] = True
                     continue
 
                 for res in ocr_res_dict['ocr_res_list']:
@@ -280,18 +286,32 @@ def _process_single_table(
         enable_merge_det_boxes=False,
     )
 
-    # 检测文字旋转
-    most_angle = txt_most_angle_extract_table(page_dict, table_res_dict, scale=scale)
-    if most_angle in [90, 270]:
-        rotate_image(table_res_dict, most_angle)
-
+    # 获取表格文本框
     bgr_image = cv2.cvtColor(table_res_dict["table_img"], cv2.COLOR_RGB2BGR)
     det_res = ocr_model.ocr(bgr_image, mfd_res=adjusted_mfdetrec_res, rec=False)[0]
+
+    angles = []
+    rotate_label = "0"
+    pdf_not_rotate = page_dict.get("rotate_label") not in ["90", "180", "270"]
+    if pdf_not_rotate:
+        # 检测文字旋转
+        rotate_label, angles = txt_most_angle_extract_table(page_dict, table_res_dict, scale=scale)
+    if not angles:
+        # 如果没有文本的角度，使用模型判断是否旋转
+        img_orientation_cls_model = atom_model_manager.get_atom_model(
+            atom_model_name=AtomicModel.ImgOrientationCls,
+        )
+        rotate_label = img_orientation_cls_model.predict(bgr_image, det_res)
+    if rotate_label in ["90", "270"]:
+        rotate_table_image(table_res_dict, rotate_label)
+        # 旋转后的表格需要重新获取文本框
+        bgr_image = cv2.cvtColor(table_res_dict["table_img"], cv2.COLOR_RGB2BGR)
+        det_res = ocr_model.ocr(bgr_image, mfd_res=adjusted_mfdetrec_res, rec=False)[0]
 
     ocr_result = []
 
     # 尝试从 PDF 提取文本
-    if not table_force_ocr and not table_res_dict['ocr_enable'] and most_angle == 0:
+    if (not table_force_ocr and not table_res_dict['ocr_enable'] and rotate_label == "0" and pdf_not_rotate):
         ocr_result = _extract_table_text_from_pdf(
             table_res_dict, page_dict, scale, det_res, useful_list, table_use_word_box
         )
@@ -310,6 +330,8 @@ def _process_single_table(
 
     fill_image_res = []
     if table_image_enable:
+        if not pdf_not_rotate:
+            table_extract_original_image = False
         fill_image_res = extract_table_fill_image(
             page_dict, table_res_dict, scale, table_extract_original_image
         )
