@@ -123,8 +123,12 @@ include = ["rapid_doc*"]
 namespaces = false
 
 [tool.setuptools.package-data]
-"rapid_doc" = ["**/*.yaml"]
-"rapid_doc.resources" = ["**"]
+rapid_doc = [
+    "**/*.yaml",
+    "resources/*.onnx",
+    "resources/*.html",
+    "resources/fasttext-langdetect/*",
+]
 
 [tool.setuptools]
 include-package-data = true

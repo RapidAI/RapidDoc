@@ -35,8 +35,8 @@ ENV PIP_RETRIES=10
 # 安装 Python 依赖
 RUN python3 -m pip install --upgrade pip setuptools wheel --break-system-packages && \
     python3 -m pip install --no-cache-dir --prefer-binary --break-system-packages \
-        'rapid-doc[cpu]==0.9.0' \
-        'rapid-doc[api]==0.9.0' && \
+        'rapid-doc[cpu]==0.9.1' \
+        'rapid-doc[api]==0.9.1' && \
     python3 -m pip cache purge
 
 # 复制配置文件和脚本（优先复制，利用Docker缓存）

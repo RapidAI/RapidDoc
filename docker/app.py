@@ -164,7 +164,7 @@ async def file_parse(
     return_middle_json: bool = Form(False),
     return_model_output: bool = Form(False),
     return_content_list: bool = Form(False),
-    return_images: bool = Form(False),
+    return_images: bool = Form(True),
     response_format_zip: bool = Form(False),
     start_page_id: int = Form(0),
     end_page_id: int = Form(99999),
