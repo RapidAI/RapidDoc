@@ -60,6 +60,10 @@ def guess_suffix_by_bytes(file_bytes, file_path=None) -> str:
     suffix = magika.identify_bytes(file_bytes).prediction.output.label
     if file_path and suffix in ["ai", "html"] and Path(file_path).suffix.lower() in [".pdf"] and file_bytes[:4] == PDF_SIG_BYTES:
         suffix = "pdf"
+    if suffix in ["unknown", "empty"] and file_path:
+        if not isinstance(file_path, Path):
+            file_path = Path(file_path)
+        return file_path.suffix.lower().lstrip(".")
     return suffix
 
 
@@ -74,4 +78,6 @@ def guess_suffix_by_path(file_path) -> str:
                     suffix = "pdf"
         except Exception as e:
             logger.warning(f"Failed to read file {file_path} for PDF signature check: {e}")
+    if suffix in ["unknown", "empty"]:
+        return file_path.suffix.lower().lstrip(".")
     return suffix

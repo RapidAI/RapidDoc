@@ -19,6 +19,7 @@ from rapid_doc.data.data_reader_writer import FileBasedDataWriter
 from rapid_doc.data.data_reader_writer.base import DataWriter
 from rapid_doc.utils.draw_bbox import draw_layout_bbox, draw_span_bbox
 from rapid_doc.utils.enum_class import MakeMode
+from rapid_doc.utils.config_reader import get_processing_window_size
 from rapid_doc.utils.guess_suffix_or_lang import guess_suffix_by_bytes
 from rapid_doc.utils.office_converter import convert_legacy_office_to_modern
 from rapid_doc.utils.pdf_image_tools import images_bytes_to_pdf_bytes
@@ -85,6 +86,7 @@ class RapidDoc:
         image_dir_name: str = "images",
         image_output_mode: str = "url", # url / data_uri
         preload_model: bool = False,
+        pdf_pages_batch: int = 64,
     ) -> None:
         self.layout_config = layout_config or {}
         self.ocr_config = ocr_config or {}
@@ -103,6 +105,7 @@ class RapidDoc:
         self.default_md_writer = md_writer
         self.image_dir_name = image_dir_name or "images"
         self.image_output_mode = image_output_mode
+        self.pdf_pages_batch = pdf_pages_batch
 
         self._validate_image_output_mode(self.image_output_mode)
 
@@ -229,6 +232,7 @@ class RapidDoc:
                 f_dump_content_list=f_dump_content_list,
                 f_draw_layout_bbox=f_draw_layout_bbox,
                 f_draw_span_bbox=f_draw_span_bbox,
+                pdf_pages_batch=self.pdf_pages_batch,
             )
             for output_index, result in zip(pipeline_indexes, pipeline_outputs):
                 outputs[output_index] = result
@@ -256,6 +260,7 @@ class RapidDoc:
         f_dump_content_list: bool,
         f_draw_layout_bbox: bool,
         f_draw_span_bbox: bool,
+        pdf_pages_batch: int,
     ) -> list[RapidDocOutput]:
         from rapid_doc.cli.common import convert_pdf_bytes_to_bytes_by_pypdfium2
 
@@ -264,92 +269,165 @@ class RapidDoc:
             for pdf_bytes in pdf_bytes_list
         ]
 
-        (
-            infer_results,
-            all_image_lists,
-            all_page_dicts,
-            final_lang_list,
-            ocr_enabled_list,
-        ) = pipeline_doc_analyze(
-            sliced_pdf_bytes_list,
-            lang_list,
-            parse_method=parse_method,
-            formula_enable=formula_enable,
-            table_enable=table_enable,
-            layout_config=self.layout_config,
-            ocr_config=self.ocr_config,
-            formula_config=self.formula_config,
-            table_config=self.table_config,
-            checkbox_config=self.checkbox_config,
-        )
-
-        outputs: list[RapidDocOutput] = []
-        for index, model_list in enumerate(infer_results):
-            name = names[index]
-            pdf_bytes = sliced_pdf_bytes_list[index]
-            pdf_raw_bytes = self._extract_pdf_bytes(pdf_bytes)
+        memory_image_writers: list[MemoryDataWriter] = []
+        combined_image_writers: list[DataWriter] = []
+        md_writers: list[DataWriter | None] = []
+        for name in names:
+            current_image_writer = image_writer
+            current_md_writer = md_writer
             if output_dir:
                 local_image_dir, local_md_dir = prepare_env(output_dir, name, parse_method)
-                image_writer, md_writer = FileBasedDataWriter(local_image_dir), FileBasedDataWriter(local_md_dir)
+                current_image_writer = FileBasedDataWriter(local_image_dir)
+                current_md_writer = FileBasedDataWriter(local_md_dir)
             memory_image_writer, combined_image_writer = self._build_image_writer(
                 image_dir_name=image_dir_name,
-                extra_image_writer=image_writer,
+                extra_image_writer=current_image_writer,
             )
+            memory_image_writers.append(memory_image_writer)
+            combined_image_writers.append(combined_image_writer)
+            md_writers.append(current_md_writer)
 
-            middle_json = pipeline_result_to_middle_json(
-                model_list,
-                all_image_lists[index],
-                all_page_dicts[index],
-                combined_image_writer,
-                final_lang_list[index],
-                ocr_enabled_list[index],
-                formula_enable,
+        outputs: list[RapidDocOutput | None] = [None] * len(sliced_pdf_bytes_list)
+        middle_json_list: list[dict[str, Any] | None] = [None] * len(sliced_pdf_bytes_list)
+        finished = [False] * len(sliced_pdf_bytes_list)
+        tmp_start_page_id = 0
+        batch_idx = 0
+        if not pdf_pages_batch:
+            pdf_pages_batch = get_processing_window_size(default=64)
+
+        while not all(finished):
+            active_indexes = [idx for idx, is_finished in enumerate(finished) if not is_finished]
+            active_pdf_bytes_list = [sliced_pdf_bytes_list[idx] for idx in active_indexes]
+            active_lang_list = [lang_list[idx] for idx in active_indexes]
+            (
+                infer_results,
+                all_image_lists,
+                all_page_dicts,
+                final_lang_list,
+                ocr_enabled_list,
+                file_end_list,
+            ) = pipeline_doc_analyze(
+                active_pdf_bytes_list,
+                active_lang_list,
+                parse_method=parse_method,
+                formula_enable=formula_enable,
+                table_enable=table_enable,
+                layout_config=self.layout_config,
                 ocr_config=self.ocr_config,
-                image_config=self.image_config,
-            )
-            markdown = pipeline_union_make(
-                middle_json["pdf_info"],
-                self.make_md_mode,
-                image_dir_name,
-            )
-            content_list_json = pipeline_union_make(
-                middle_json["pdf_info"],
-                MakeMode.CONTENT_LIST,
-                image_dir_name,
+                formula_config=self.formula_config,
+                table_config=self.table_config,
+                checkbox_config=self.checkbox_config,
+                start_page_id=tmp_start_page_id,
+                end_page_id=None,
+                pdf_pages_batch=pdf_pages_batch,
             )
 
-            image_bytes_map = dict(memory_image_writer.data)
-            logical_image_map = self._build_logical_image_map(
-                image_bytes_map,
-                image_dir_name=image_dir_name,
-            )
+            for active_idx, model_list in enumerate(infer_results):
+                original_idx = active_indexes[active_idx]
 
-            if image_output_mode == "data_uri":
-                markdown = self._replace_markdown_images_with_data_uri(
-                    markdown,
-                    logical_image_map,
+                tmp_middle_json = pipeline_result_to_middle_json(
+                    model_list,
+                    all_image_lists[active_idx],
+                    all_page_dicts[active_idx],
+                    combined_image_writers[original_idx],
+                    final_lang_list[active_idx],
+                    ocr_enabled_list[active_idx],
+                    formula_enable,
+                    ocr_config=self.ocr_config,
+                    image_config=self.image_config,
+                    batch_idx=batch_idx,
+                    pdf_pages_batch=pdf_pages_batch,
                 )
+                if middle_json_list[original_idx] is None:
+                    middle_json_list[original_idx] = tmp_middle_json
+                else:
+                    middle_json_list[original_idx]["pdf_info"].extend(tmp_middle_json["pdf_info"])
 
-            output = RapidDocOutput(
-                markdown=markdown,
-                images=image_bytes_map,
-                middle_json=middle_json,
-                content_list_json=content_list_json,
+                if file_end_list[active_idx]:
+                    outputs[original_idx] = self._build_pipeline_output(
+                        name=names[original_idx],
+                        pdf_bytes=sliced_pdf_bytes_list[original_idx],
+                        middle_json=middle_json_list[original_idx],
+                        memory_image_writer=memory_image_writers[original_idx],
+                        md_writer=md_writers[original_idx],
+                        image_dir_name=image_dir_name,
+                        image_output_mode=image_output_mode,
+                        f_dump_middle_json=f_dump_middle_json,
+                        f_dump_content_list=f_dump_content_list,
+                        f_draw_layout_bbox=f_draw_layout_bbox,
+                        f_draw_span_bbox=f_draw_span_bbox,
+                    )
+                    finished[original_idx] = True
+                elif not model_list:
+                    raise RuntimeError(
+                        f"No pages parsed for {names[original_idx]} before reaching the end of the file."
+                    )
+
+            tmp_start_page_id += pdf_pages_batch
+            batch_idx += 1
+
+        finished_outputs: list[RapidDocOutput] = []
+        for output in outputs:
+            if output is None:
+                raise RuntimeError("Pipeline batch finished without producing all outputs.")
+            finished_outputs.append(output)
+        return finished_outputs
+
+    def _build_pipeline_output(
+        self,
+        name: str,
+        pdf_bytes: bytes | dict[str, Any],
+        middle_json: dict[str, Any],
+        memory_image_writer: MemoryDataWriter,
+        md_writer: DataWriter | None,
+        image_dir_name: str,
+        image_output_mode: str,
+        f_dump_middle_json: bool,
+        f_dump_content_list: bool,
+        f_draw_layout_bbox: bool,
+        f_draw_span_bbox: bool,
+    ) -> RapidDocOutput:
+        markdown = pipeline_union_make(
+            middle_json["pdf_info"],
+            self.make_md_mode,
+            image_dir_name,
+        )
+        content_list_json = pipeline_union_make(
+            middle_json["pdf_info"],
+            MakeMode.CONTENT_LIST,
+            image_dir_name,
+        )
+
+        image_bytes_map = dict(memory_image_writer.data)
+        logical_image_map = self._build_logical_image_map(
+            image_bytes_map,
+            image_dir_name=image_dir_name,
+        )
+
+        if image_output_mode == "data_uri":
+            markdown = self._replace_markdown_images_with_data_uri(
+                markdown,
+                logical_image_map,
             )
 
-            self._dump_output_if_needed(
-                output=output,
-                pdf_bytes=pdf_raw_bytes,
-                name=name,
-                md_writer=md_writer,
-                f_dump_middle_json=f_dump_middle_json,
-                f_dump_content_list=f_dump_content_list,
-                f_draw_layout_bbox=f_draw_layout_bbox,
-                f_draw_span_bbox=f_draw_span_bbox,
-            )
-            outputs.append(output)
+        output = RapidDocOutput(
+            markdown=markdown,
+            images=image_bytes_map,
+            middle_json=middle_json,
+            content_list_json=content_list_json,
+        )
 
-        return outputs
+        self._dump_output_if_needed(
+            output=output,
+            pdf_bytes=self._extract_pdf_bytes(pdf_bytes),
+            name=name,
+            md_writer=md_writer,
+            f_dump_middle_json=f_dump_middle_json,
+            f_dump_content_list=f_dump_content_list,
+            f_draw_layout_bbox=f_draw_layout_bbox,
+            f_draw_span_bbox=f_draw_span_bbox,
+        )
+        return output
 
     def _parse_office(
         self,

@@ -11,17 +11,20 @@ load_dotenv()
 # os.environ['MINERU_DEVICE_MODE'] = "cuda"
 # # 或指定 GPU 编号，例如使用第二块 GPU（cuda:1）
 # os.environ['MINERU_DEVICE_MODE'] = "cuda:1"
+# os.environ['MINERU_LAYOUT_ORIGINAL_IMAGE'] = "true"
+# 是否启用图片方向矫正，开启后，可以自动识别并矫正 90°、270°的图片
+# os.environ['USE_DOC_ORIENTATION_CLASSIFY'] = "true"
 # # 模型文件存储目录
 # os.environ['RAPID_MODELS_DIR'] = r'D:\CodeProjects\doc\RapidAI\models' #模型文件存储目录，如果不设置会默认下载到rapid_doc项目里面
 from loguru import logger
 
-from rapid_doc.cli.common import convert_pdf_bytes_to_bytes_by_pypdfium2, prepare_env, read_fn, office_suffixes, \
-    old_office_suffixes
 from rapid_doc.data.data_reader_writer import FileBasedDataWriter
 from rapid_doc.utils.draw_bbox import draw_layout_bbox, draw_span_bbox
 from rapid_doc.utils.enum_class import MakeMode
+from rapid_doc.utils.config_reader import get_processing_window_size
 from rapid_doc.utils.guess_suffix_or_lang import guess_suffix_by_bytes, guess_suffix_by_path
 from rapid_doc.utils.office_converter import convert_legacy_office_to_modern
+from rapid_doc.cli.common import convert_pdf_bytes_to_bytes_by_pypdfium2, prepare_env, read_fn, office_suffixes, old_office_suffixes
 from rapid_doc.backend.office.office_analyze import office_analyze
 from rapid_doc.backend.office.office_middle_json_mkcontent import union_make as office_union_make
 from rapid_doc.backend.pipeline.pipeline_analyze import doc_analyze as pipeline_doc_analyze
@@ -59,9 +62,8 @@ def do_parse(
         f_dump_orig_file=f_dump_orig_pdf,
         f_dump_content_list=f_dump_content_list,
         f_make_md_mode=f_make_md_mode,
-        f_dump_md_html = f_dump_md_html,
-        f_dump_md_docx = f_dump_md_docx,
-
+        f_dump_md_html=f_dump_md_html,
+        f_dump_md_docx=f_dump_md_docx,
     )
     for index in sorted(need_remove_index, reverse=True):
         del pdf_bytes_list[index]
@@ -71,37 +73,118 @@ def do_parse(
         return
 
     for idx, pdf_bytes in enumerate(pdf_bytes_list):
-        new_pdf_bytes = convert_pdf_bytes_to_bytes_by_pypdfium2(pdf_bytes, start_page_id, end_page_id)
-        pdf_bytes_list[idx] = new_pdf_bytes
-    # 记录开始时间
-    start_time = time.time()
-    infer_results, all_image_lists, all_page_dicts, lang_list, ocr_enabled_list = pipeline_doc_analyze(pdf_bytes_list, parse_method=parse_method, formula_enable=p_formula_enable,table_enable=p_table_enable,
-                                                                                                     layout_config=layout_config, ocr_config=ocr_config, formula_config=formula_config, table_config=table_config, checkbox_config=checkbox_config)
+        if start_page_id !=0 or end_page_id is not None:
+            new_pdf_bytes = convert_pdf_bytes_to_bytes_by_pypdfium2(pdf_bytes, start_page_id, end_page_id)
+            pdf_bytes_list[idx] = new_pdf_bytes
+    pdf_pages_batch = get_processing_window_size(default=64)
 
-    for idx, model_list in enumerate(infer_results):
+    _process_pipeline_docs_in_batches(
+        output_dir=output_dir,
+        pdf_file_names=pdf_file_names,
+        pdf_bytes_list=pdf_bytes_list,
+        parse_method=parse_method,
+        p_formula_enable=p_formula_enable,
+        p_table_enable=p_table_enable,
+        f_draw_layout_bbox=f_draw_layout_bbox,
+        f_draw_span_bbox=f_draw_span_bbox,
+        f_dump_md=f_dump_md,
+        f_dump_middle_json=f_dump_middle_json,
+        f_dump_model_output=f_dump_model_output,
+        f_dump_orig_pdf=f_dump_orig_pdf,
+        f_dump_content_list=f_dump_content_list,
+        f_dump_md_html=f_dump_md_html,
+        f_dump_md_docx=f_dump_md_docx,
+        f_make_md_mode=f_make_md_mode,
+        layout_config=layout_config,
+        ocr_config=ocr_config,
+        formula_config=formula_config,
+        table_config=table_config,
+        checkbox_config=checkbox_config,
+        image_config=image_config,
+        pdf_pages_batch=pdf_pages_batch,
+    )
 
-        model_json = copy.deepcopy(model_list)
-        pdf_file_name = pdf_file_names[idx]
+
+def _process_pipeline_docs_in_batches(
+        output_dir,
+        pdf_file_names,
+        pdf_bytes_list,
+        parse_method,
+        p_formula_enable,
+        p_table_enable,
+        f_draw_layout_bbox,
+        f_draw_span_bbox,
+        f_dump_md,
+        f_dump_middle_json,
+        f_dump_model_output,
+        f_dump_orig_pdf,
+        f_dump_content_list,
+        f_dump_md_html,
+        f_dump_md_docx,
+        f_make_md_mode,
+        layout_config,
+        ocr_config,
+        formula_config,
+        table_config,
+        checkbox_config,
+        image_config,
+        pdf_pages_batch,
+):
+    local_image_dirs = []
+    local_md_dirs = []
+    image_writers = []
+    md_writers = []
+    for pdf_file_name in pdf_file_names:
         local_image_dir, local_md_dir = prepare_env(output_dir, pdf_file_name, parse_method)
-        image_writer, md_writer = FileBasedDataWriter(local_image_dir), FileBasedDataWriter(local_md_dir)
+        local_image_dirs.append(local_image_dir)
+        local_md_dirs.append(local_md_dir)
+        image_writers.append(FileBasedDataWriter(local_image_dir))
+        md_writers.append(FileBasedDataWriter(local_md_dir))
 
-        images_list = all_image_lists[idx]
-        pdf_dict= all_page_dicts[idx]
-        _lang = lang_list[idx]
-        _ocr_enable = ocr_enabled_list[idx]
-        middle_json = pipeline_result_to_middle_json(model_list, images_list, pdf_dict, image_writer, _lang, _ocr_enable, p_formula_enable, ocr_config=ocr_config, image_config=image_config)
-        # 计算总运行时间（单位：秒）
-        print(f"运行时间: {time.time() - start_time}秒")
-        pdf_info = middle_json["pdf_info"]
+    tmp_start_page_id = 0
+    batch_idx = 0
+    middle_json_list = [None] * len(pdf_bytes_list)
+    model_json_list = [[] if f_dump_model_output else None for _ in pdf_bytes_list]
+    finished = [False] * len(pdf_bytes_list)
 
-        pdf_bytes = pdf_bytes_list[idx]
-        _process_output(
-            pdf_info, pdf_bytes, pdf_file_name, local_md_dir, local_image_dir,
-            md_writer, f_draw_layout_bbox, f_draw_span_bbox, f_dump_orig_pdf,
-            f_dump_md, f_dump_content_list, f_dump_middle_json, f_dump_model_output,
-            f_make_md_mode, middle_json, model_json, process_mode="pipeline",
-            f_dump_md_html=f_dump_md_html, f_dump_md_docx=f_dump_md_docx,
-        )
+    while not all(finished):
+        active_indexes = [idx for idx, is_finished in enumerate(finished) if not is_finished]
+        active_pdf_bytes_list = [pdf_bytes_list[idx] for idx in active_indexes]
+        infer_results, all_image_lists, all_page_dicts, lang_list, ocr_enabled_list, file_end_list = pipeline_doc_analyze(active_pdf_bytes_list, parse_method=parse_method, formula_enable=p_formula_enable,table_enable=p_table_enable,
+                                                                                                         layout_config=layout_config, ocr_config=ocr_config, formula_config=formula_config, table_config=table_config, checkbox_config=checkbox_config,
+                                                                                                         start_page_id=tmp_start_page_id, end_page_id=None, pdf_pages_batch=pdf_pages_batch)
+
+        for active_idx, model_list in enumerate(infer_results):
+            original_idx = active_indexes[active_idx]
+            if f_dump_model_output:
+                model_json_list[original_idx].extend(copy.deepcopy(model_list))
+
+            tmp_middle_json = pipeline_result_to_middle_json(model_list, all_image_lists[active_idx], all_page_dicts[active_idx], image_writers[original_idx], lang_list[active_idx]
+                                                         , ocr_enabled_list[active_idx], p_formula_enable, ocr_config=ocr_config, image_config=image_config
+                                                         , batch_idx=batch_idx, pdf_pages_batch = pdf_pages_batch)
+            if middle_json_list[original_idx] is None:
+                middle_json_list[original_idx] = tmp_middle_json
+            else:
+                middle_json_list[original_idx]["pdf_info"].extend(tmp_middle_json["pdf_info"])
+
+            if file_end_list[active_idx]:
+                pdf_file_name = pdf_file_names[original_idx]
+                _process_output(
+                    middle_json_list[original_idx]["pdf_info"], pdf_bytes_list[original_idx], pdf_file_name, local_md_dirs[original_idx], local_image_dirs[original_idx],
+                    md_writers[original_idx], f_draw_layout_bbox, f_draw_span_bbox, f_dump_orig_pdf,
+                    f_dump_md, f_dump_content_list, f_dump_middle_json, f_dump_model_output,
+                    f_make_md_mode, middle_json_list[original_idx], model_json_list[original_idx], process_mode="pipeline", f_dump_md_html=f_dump_md_html,
+                    f_dump_md_docx=f_dump_md_docx
+                )
+                finished[original_idx] = True
+            elif not model_list:
+                logger.warning(f"No pages parsed for {pdf_file_names[original_idx]}, stop batch processing.")
+                finished[original_idx] = True
+
+        tmp_start_page_id += pdf_pages_batch
+        batch_idx += 1
+
+
 
 def _build_config():
     from rapidocr import EngineType as OCREngineType, OCRVersion, ModelType as OCRModelType
@@ -194,8 +277,8 @@ def _process_office_doc(
         f_dump_orig_file=True,
         f_dump_content_list=True,
         f_make_md_mode=MakeMode.MM_MD,
-        f_dump_md_html=None,
-        f_dump_md_docx=None,
+        f_dump_md_html=False,
+        f_dump_md_docx=False,
 ):
     need_remove_index = []
     for i, file_bytes in enumerate(pdf_bytes_list):
@@ -244,8 +327,8 @@ def _process_output(
         middle_json,
         model_output=None,
         process_mode="pipeline",
-        f_dump_md_html=None,
-        f_dump_md_docx=None,
+        f_dump_md_html=False,
+        f_dump_md_docx=False,
 ):
 
     if process_mode == "pipeline":
