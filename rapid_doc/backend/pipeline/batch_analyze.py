@@ -3,6 +3,7 @@
 批量分析模块
 """
 import os
+import inspect
 from typing import List, Tuple, Dict, Optional
 
 import cv2
@@ -102,6 +103,7 @@ class BatchAnalyze:
             formula_config=self.formula_config,
             table_config=self.table_config,
         )
+        atom_model_manager = AtomModelSingleton()
         self.use_custom_ocr = isinstance(self.model.ocr_model, CustomBaseModel)
         
         # 预处理数据
@@ -113,7 +115,6 @@ class BatchAnalyze:
         # 图片方向矫正
         img_ori_orientation_list = []
         if self.use_doc_orientation_classify:
-            atom_model_manager = AtomModelSingleton()
             img_orientation_cls_model = atom_model_manager.get_atom_model(
                 atom_model_name=AtomicModel.ImgOrientationCls,
             )
@@ -139,17 +140,17 @@ class BatchAnalyze:
             self._run_custom_ocr(ocr_res_all_page)
         else:
             self._run_traditional_ocr(
-                ocr_res_all_page, pdf_dict_list, scale_list
+                atom_model_manager, ocr_res_all_page, pdf_dict_list, scale_list
             )
         # 5. 表格识别
         if self.table_enable:
-            self._run_table_recognition(table_res_all_page, pdf_dict_list, scale_list)
+            self._run_table_recognition(atom_model_manager, table_res_all_page, pdf_dict_list, scale_list)
         # 6. 后处理 OCR rec 结果
         _run_ocr_rec_postprocess(images_layout_res, self.ocr_config)
 
         # 7. 印章识别
         if self.seal_enable:
-            self._run_seal_ocr(np_images, images_layout_res)
+            self._run_seal_ocr(atom_model_manager, np_images, images_layout_res)
 
         if img_ori_orientation_list:
             # 把旋转后图片上的矩形框，还原到原图坐标
@@ -323,12 +324,12 @@ class BatchAnalyze:
 
     def _run_traditional_ocr(
         self,
+        atom_model_manager,
         ocr_res_all_page: List[Dict],
         pdf_dict_list: List[Dict],
         scale_list: List[float],
     ):
         """传统 OCR 处理流程 (det + rec)"""
-        atom_model_manager = AtomModelSingleton()
 
         # PDF 文本提取模式
         if self.use_det_mode != 'ocr':
@@ -339,6 +340,7 @@ class BatchAnalyze:
 
     def _run_table_recognition(
         self,
+        atom_model_manager,
         table_res_all_page: List[Dict],
         pdf_dict_list: List[Dict],
         scale_list: List[float]
@@ -369,17 +371,16 @@ class BatchAnalyze:
                         table_res_dict['table_res']['html'] = table_result
         else:
             # 传统模式表格识别
-            self._run_traditional_table_recognition(table_res_all_page, pdf_dict_list, scale_list)
+            self._run_traditional_table_recognition(atom_model_manager, table_res_all_page, pdf_dict_list, scale_list)
 
     def _run_traditional_table_recognition(
         self,
+        atom_model_manager,
         table_res_all_page: List[Dict],
         pdf_dict_list: List[Dict],
         scale_list: List[float]
     ):
         """传统表格识别处理"""
-        atom_model_manager = AtomModelSingleton()
-
         table_res_grouped = {}
         for x in table_res_all_page:
             table_res_grouped.setdefault(x["page_idx"], []).append(x)
@@ -403,33 +404,43 @@ class BatchAnalyze:
 
     def _run_seal_ocr(
         self,
+        atom_model_manager,
         np_images,
         images_layout_res,
     ):
         """印章 处理流程"""
-        atom_model_manager = AtomModelSingleton()
-        seal_ocr_model = atom_model_manager.get_atom_model(
-            atom_model_name=AtomicModel.OCR,
-            is_seal=True,
-        )
+        seal_ocr_items = []
         for index, np_img in enumerate(np_images):
             layout_res = images_layout_res[index]
             for layout_re in layout_res:
                 if 'seal' == layout_re.get("original_label"):
                     seal_img, _ = crop_img(layout_re, np_img)
                     seal_crop_bgr = cv2.cvtColor(seal_img, cv2.COLOR_RGB2BGR)
-                    seal_ocr_res = seal_ocr_model.ocr(seal_crop_bgr, det=True, rec=True)[0]
-                    if not seal_ocr_res:
+                    seal_ocr_items.append((seal_crop_bgr, layout_re))
+
+        seal_ocr_model = None
+        for seal_crop_bgr, layout_re in tqdm(seal_ocr_items, desc="Seal Predict"):
+            if (isinstance(self.model.ocr_model, CustomBaseModel)
+                    and 'is_seal' in inspect.signature(self.model.ocr_model.batch_predict).parameters):
+                seal_texts = self.model.ocr_model.batch_predict([seal_crop_bgr], is_seal=True)
+                seal_texts = seal_texts[0].split('\n')
+            else:
+                if seal_ocr_model is None:
+                    seal_ocr_model = atom_model_manager.get_atom_model(
+                        atom_model_name=AtomicModel.OCR,
+                        is_seal=True,
+                    )
+                seal_ocr_res = seal_ocr_model.ocr(seal_crop_bgr, det=True, rec=True)[0]
+                if not seal_ocr_res:
+                    continue
+                seal_texts = []
+                for seal_item in seal_ocr_res:
+                    if not seal_item or len(seal_item) != 2:
                         continue
-                    print(seal_ocr_res)
-                    seal_texts = []
-                    for seal_item in seal_ocr_res:
-                        if not seal_item or len(seal_item) != 2:
-                            continue
-                        rec_result = seal_item[1]
-                        if not rec_result or len(rec_result) < 1:
-                            continue
-                        rec_text = rec_result[0]
-                        if rec_text:
-                            seal_texts.append(rec_text)
-                    layout_re["text"] = seal_texts
+                    rec_result = seal_item[1]
+                    if not rec_result or len(rec_result) < 1:
+                        continue
+                    rec_text = rec_result[0]
+                    if rec_text:
+                        seal_texts.append(rec_text)
+            layout_re["text"] = seal_texts

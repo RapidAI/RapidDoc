@@ -65,11 +65,15 @@ class VLModelPool:
 
 class PaddleOCRVLOCRModel(CustomBaseModel):
 
-    def batch_predict(self, image_list: list, **kwargs) -> list[str]:
+    def batch_predict(self, image_list: list, is_seal=False, **kwargs) -> list[str]:
         result_res = []
         vl_rec_model = VLModelPool.get_vl_model()
+        if is_seal:
+            text_prompt = "Seal Recognition:"
+        else:
+            text_prompt = "OCR:"
         with tqdm(total=len(image_list), desc="OCR Predict") as pbar:
-            data = [{"image": img, "query": "OCR:"} for img in image_list]
+            data = [{"image": img, "query": text_prompt} for img in image_list]
             preds = vl_rec_model._genai_client_process(data)
 
             for result_str in preds:
@@ -165,3 +169,16 @@ class PaddleOCRVLTableModel(CustomBaseModel):
                 result_res.append(html_str)
             pbar.update(len(image_list))
         return result_res
+
+
+if __name__ == '__main__':
+    from dotenv import load_dotenv
+    load_dotenv()
+
+    from pathlib import Path
+    rapid_doc_dir = Path(os.path.abspath(__file__)).parent.parent.parent.parent.parent
+    img_path = os.path.join(rapid_doc_dir, 'demo\\images', 'seal_text_det.png')
+
+    ocr_model = PaddleOCRVLOCRModel()
+    results = ocr_model.batch_predict([img_path], is_seal=True)
+    print(results)
