@@ -508,7 +508,8 @@ class RapidDoc:
     ) -> None:
         if md_writer is None:
             return
-
+        if isinstance(pdf_bytes, dict):
+            pdf_bytes = pdf_bytes["pdf_bytes"]
         md_writer.write_string(f"{name}.md", output.markdown)
         if f_dump_middle_json:
             md_writer.write_string(

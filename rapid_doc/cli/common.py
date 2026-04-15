@@ -99,44 +99,48 @@ def convert_pdf_to_bytes_by_pypdfium2(
     end_page_id=None,
     pdf_pages_batch=0,
 ):
+    original_image = None
     if isinstance(pdf_bytes, dict):
+        original_image = pdf_bytes.get("original_image")
         pdf_bytes = pdf_bytes["pdf_bytes"]
-    pdf = pdfium.PdfDocument(pdf_bytes)
-    output_pdf = pdfium.PdfDocument.new()
-
+    pdf = None
+    output_pdf = None
+    file_end = False
     try:
-        file_end = False
-        total_pages = len(pdf)
+        pdf = pdfium.PdfDocument(pdf_bytes)
+        output_pdf = pdfium.PdfDocument.new()
+        with PyPDFium2Parser.lock:
+            total_pages = len(pdf)
 
-        if total_pages == 0:
-            return b"", True
+            if total_pages == 0:
+                return b"", True
 
-        if start_page_id < 0:
-            start_page_id = 0
+            if start_page_id < 0:
+                start_page_id = 0
 
-        if pdf_pages_batch > 0:
-            end_page_id = start_page_id + pdf_pages_batch - 1
-        else:
-            end_page_id = end_page_id if end_page_id is not None and end_page_id >= 0 else total_pages - 1
+            if pdf_pages_batch > 0:
+                end_page_id = start_page_id + pdf_pages_batch - 1
+            else:
+                end_page_id = end_page_id if end_page_id is not None and end_page_id >= 0 else total_pages - 1
 
-        if end_page_id > total_pages - 1:
-            logger.warning("end_page_id is out of range, use pdf length")
-            end_page_id = total_pages - 1
-            file_end = True
-        elif end_page_id == total_pages - 1:
-            file_end = True
+            if end_page_id > total_pages - 1:
+                logger.warning("end_page_id is out of range, use pdf length")
+                end_page_id = total_pages - 1
+                file_end = True
+            elif end_page_id == total_pages - 1:
+                file_end = True
 
-        # 逐页导入，失败则跳过
-        for page_index in range(start_page_id, end_page_id + 1):
-            try:
-                output_pdf.import_pages(pdf, pages=[page_index])
-            except Exception as page_error:
-                logger.warning(f"Failed to import page {page_index}: {page_error}, skipping this page.")
-                continue
+            # 逐页导入，失败则跳过
+            for page_index in range(start_page_id, end_page_id + 1):
+                try:
+                    output_pdf.import_pages(pdf, pages=[page_index])
+                except Exception as page_error:
+                    logger.warning(f"Failed to import page {page_index}: {page_error}, skipping this page.")
+                    continue
 
-        output_buffer = io.BytesIO()
-        output_pdf.save(output_buffer)
-        output_bytes = output_buffer.getvalue()
+            output_buffer = io.BytesIO()
+            output_pdf.save(output_buffer)
+            output_bytes = output_buffer.getvalue()
 
     except Exception as e:
         logger.warning(f"Error in converting PDF bytes: {e}, using original PDF bytes.")
@@ -144,9 +148,16 @@ def convert_pdf_to_bytes_by_pypdfium2(
         file_end = True
 
     finally:
-        pdf.close()
-        output_pdf.close()
-
+        with PyPDFium2Parser.lock:
+            if pdf is not None:
+                pdf.close()  # 关闭原PDF文档以释放资源
+            if output_pdf is not None:
+                output_pdf.close()  # 关闭新PDF文档以释放资源
+    if original_image is not None:
+        return {
+            "pdf_bytes": output_bytes,
+            "original_image": original_image,
+        }, file_end
     return output_bytes, file_end
 
 #=============================================app.py相关调用=============================================
@@ -178,6 +189,8 @@ def _process_output(
         model_output=None,
         process_mode="pipeline",
 ):
+    if isinstance(pdf_bytes, dict):
+        pdf_bytes = pdf_bytes["pdf_bytes"]
     f_draw_line_sort_bbox = False
     from rapid_doc.backend.pipeline.pipeline_middle_json_mkcontent import union_make as pipeline_union_make
     if process_mode == "pipeline":

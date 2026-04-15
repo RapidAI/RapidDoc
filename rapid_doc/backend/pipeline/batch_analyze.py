@@ -72,7 +72,7 @@ class BatchAnalyze:
         self.table_force_ocr = self.table_config.get("force_ocr", False)
         self.skip_text_in_image = self.table_config.get("skip_text_in_image", True)
         self.use_img2table = self.table_config.get("use_img2table", False)
-        self.table_use_word_box = self.table_config.get("use_word_box", True)
+        self.table_use_word_box = self.table_config.get("use_word_box", False)
         self.table_formula_enable = self.table_config.get("table_formula_enable", True)
         self.table_image_enable = self.table_config.get("table_image_enable", True)
         self.table_extract_original_image = self.table_config.get("extract_original_image", False)

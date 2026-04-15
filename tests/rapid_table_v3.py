@@ -31,18 +31,23 @@ input_args = RapidTableInput(
 table_engine = RapidTable(input_args)
 
 img_paths = [
-    "2a18af309c8ea0e9419ab8ea69d24868ef86288da9d7d57de6e19a769c2d2630.jpg",
+    "ab7679fef468a0a9e09f521d096ce9ed.png",
     ]
 ocr_results_list = []
-
+return_word_box = False
 for img in img_paths:
-    ori_ocr_res = ocr_engine(img, return_word_box=True)
-    ocr_results = [ori_ocr_res.boxes, ori_ocr_res.txts, ori_ocr_res.scores, ori_ocr_res.word_results]
-    ocr_result = []
-    for word_results in ori_ocr_res.word_results:
-        ocr_result.extend([[word_result[2], word_result[0], word_result[1]] for word_result in word_results])
-    ocr_result = [list(x) for x in zip(*ocr_result)]
-    ocr_results_list.append(ocr_result)
+    ori_ocr_res = ocr_engine(img, return_word_box=return_word_box)
+    if return_word_box:
+        ocr_results = [ori_ocr_res.boxes, ori_ocr_res.txts, ori_ocr_res.scores, ori_ocr_res.word_results]
+        ocr_result = []
+        for word_results in ori_ocr_res.word_results:
+            ocr_result.extend([[word_result[2], word_result[0], word_result[1]] for word_result in word_results])
+        ocr_result = [list(x) for x in zip(*ocr_result)]
+        ocr_results_list.append(ocr_result)
+
+    else:
+        ocr_results = [ori_ocr_res.boxes, ori_ocr_res.txts, ori_ocr_res.scores]
+        ocr_results_list.append(ocr_results)
 
 
 results = table_engine(img_paths, ocr_results=ocr_results_list, batch_size=4)

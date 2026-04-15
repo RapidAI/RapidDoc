@@ -261,15 +261,12 @@ def images_bytes_to_pdf_bytes(image_bytes):
     image.save(
         pdf_buffer,
         format="PDF",
-        resolution=DEFAULT_PDF_IMAGE_DPI,
-        quality=95,
-        subsampling=0,
     )
 
     # 获取 PDF bytes 并重置指针（可选）
     pdf_bytes = pdf_buffer.getvalue()
     pdf_buffer.close()
-    layout_original_image = os.getenv('MINERU_LAYOUT_ORIGINAL_IMAGE', 'false')
+    layout_original_image = os.getenv('MINERU_LAYOUT_ORIGINAL_IMAGE', 'true')
     if (layout_original_image.lower() in ['true', '1', 'yes']):
         return {
             "pdf_bytes": pdf_bytes,
