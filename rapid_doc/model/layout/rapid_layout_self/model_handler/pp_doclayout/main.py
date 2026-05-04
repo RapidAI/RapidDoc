@@ -65,7 +65,7 @@ class PPDocLayoutModelHandler(BaseModelHandler):
                 layout_shape_mode = "rect"
                 masks = None
             datas = self.pp_postprocess(output["boxes"],[ori_img_shape[1], ori_img_shape[0]], masks, layout_shape_mode,)
-            if datas:
+            if datas is not None and len(datas) > 0:
                 boxes, polygon_points, scores, class_names = zip(*[(d["coordinate"], d.get("polygon_points"), d["score"], d["label"]) for d in datas])
                 orders = list(range(len(boxes))) if self.model_type in [ModelType.PP_DOCLAYOUTV2, ModelType.PP_DOCLAYOUTV3] else None
                 if any(p is None for p in polygon_points):

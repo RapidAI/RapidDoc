@@ -136,7 +136,7 @@ def page_model_info_to_page_info(
     # 过滤 spans
     spans = remove_outside_spans(spans, all_bboxes, all_discarded_blocks)
     spans, _ = remove_overlaps_low_confidence_spans(spans)
-    # spans, _ = remove_overlaps_min_spans(spans) #  删除重叠spans中较小的那些
+    spans, _ = remove_overlaps_min_spans(spans) #  删除重叠spans中较小的那些
     
     # 根据 OCR 模式处理 spans
     if use_vl_ocr:

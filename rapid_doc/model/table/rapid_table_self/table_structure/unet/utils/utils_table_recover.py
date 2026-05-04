@@ -233,7 +233,7 @@ def gather_ocr_list_by_row(ocr_list: List[Any], threhold: float = 0.2) -> List[A
     :param ocr_list: [[[xmin,ymin,xmax,ymax], text]]
     :return:
     """
-    threshold = 10
+    threshold = 20
     for i in range(len(ocr_list)):
         if not ocr_list[i]:
             continue

@@ -16,9 +16,15 @@ import cv2
 import pyclipper
 import numpy as np
 from typing import List, Tuple, Dict, Any
+
+from rapidocr.cal_rec_boxes import CalRecBoxes
 from rapidocr.ch_ppocr_det import TextDetector
 from rapidocr.ch_ppocr_det.utils import DetPreProcess, DBPostProcess
+from rapidocr.ch_ppocr_rec.typings import WordInfo, WordType
+from rapidocr.ch_ppocr_rec.utils import CTCLabelDecode
 from rapidocr.inference_engine.base import get_engine
+from rapidocr.utils.utils import has_chinese_char, quads_to_rect_bbox
+
 from rapid_doc.utils.model_utils import import_package
 from importlib.metadata import version
 rapidocr_version = version("rapidocr")
@@ -245,9 +251,143 @@ def patch_seal_det():
 
     TextDetector.sorted_boxes = sorted_boxes
 
+
+def patch_word_box():
+    """return_word_box 的时候，修复丢失空格问题"""
+    def cal_ocr_word_box(
+            self,
+            rec_txt: str,
+            bbox: np.ndarray,
+            word_info: WordInfo,
+            return_single_char_box: bool = False,
+    ) -> Tuple[List[str], List[List[List[float]]], List[float]]:
+        """Calculate the detection frame for each word based on the results of recognition and detection of ocr
+        汉字坐标是单字的
+        英语坐标是单词级别的
+        三种情况：
+        1. 全是汉字
+        2. 全是英文
+        3. 中英混合
+        """
+        if not rec_txt or word_info.line_txt_len == 0:
+            return [], [], []
+
+        bbox_points = quads_to_rect_bbox(bbox[None, ...])
+        avg_col_width = (bbox_points[2] - bbox_points[0]) / word_info.line_txt_len
+
+        is_all_en_num = all(v is WordType.EN_NUM for v in word_info.word_types)
+        col_confs = get_col_confs(word_info)
+
+        line_cols, char_widths, word_contents, content_confs = [], [], [], []
+        for word, word_col in zip(word_info.words, word_info.word_cols):
+            if is_all_en_num and not return_single_char_box:
+                line_cols.append(word_col)
+                word_contents.append("".join(word))
+                content_confs.append(calc_word_conf(word_col, col_confs))
+            else:
+                line_cols.extend(word_col)
+                word_contents.extend(word)
+                content_confs.extend(calc_char_confs(word_col, col_confs))
+
+            if len(word_col) == 1:
+                continue
+
+            avg_width = self.calc_avg_char_width(word_col, avg_col_width)
+            char_widths.append(avg_width)
+
+        avg_char_width = self.calc_all_char_avg_width(
+            char_widths, bbox_points[0], bbox_points[2], len(rec_txt)
+        )
+
+        if is_all_en_num and not return_single_char_box:
+            word_boxes = self.calc_en_num_box(
+                line_cols, avg_char_width, avg_col_width, bbox_points
+            )
+        else:
+            word_boxes = self.calc_box(
+                line_cols, avg_char_width, avg_col_width, bbox_points
+            )
+        return word_contents, word_boxes, content_confs
+
+    def get_col_confs(word_info: WordInfo) -> dict:
+        cols = [col for word_col in word_info.word_cols for col in word_col]
+        return dict(zip(cols, word_info.confs))
+
+    def calc_word_conf(word_col: List[int], col_confs: dict) -> float:
+        confs = [col_confs[col] for col in word_col if col in col_confs]
+        if not confs:
+            return 0.0
+
+        return round(float(np.mean(confs)), 5)
+
+    def calc_char_confs(word_col: List[int], col_confs: dict) -> List[float]:
+        return [calc_word_conf([col], col_confs) for col in word_col]
+    # 替换 cal_ocr_word_box 方法
+    CalRecBoxes.cal_ocr_word_box = cal_ocr_word_box
+
+
+    def get_word_info(self, text: str, selection: np.ndarray) -> WordInfo:
+        """
+        Group the decoded characters and record the corresponding decoded positions.
+        from https://github.com/PaddlePaddle/PaddleOCR/blob/fbba2178d7093f1dffca65a5b963ec277f1a6125/ppocr/postprocess/rec_postprocess.py#L70
+        """
+        word_list = []
+        word_col_list = []
+        state_list = []
+
+        word_content = []
+        word_col_content = []
+
+        valid_col = np.where(selection)[0]
+        if len(valid_col) <= 0:
+            return WordInfo()
+
+        col_width = np.zeros(valid_col.shape)
+        col_width[1:] = valid_col[1:] - valid_col[:-1]
+        col_width[0] = min(3 if has_chinese_char(text[0]) else 2, int(valid_col[0]))
+
+        def flush_word():
+            nonlocal state, word_content, word_col_content
+            if not word_content:
+                return
+
+            word_list.append(word_content)
+            word_col_list.append(word_col_content)
+            state_list.append(state)
+            word_content = []
+            word_col_content = []
+
+        state = None
+        for c_i, char in enumerate(text):
+            if char.isspace():
+                flush_word()
+                word_list.append([char])
+                word_col_list.append([int(valid_col[c_i])])
+                state_list.append(WordType.EN_NUM)
+                state = None
+                continue
+
+            c_state = WordType.CN if has_chinese_char(char) else WordType.EN_NUM
+            if state is None:
+                state = c_state
+
+            if state != c_state or col_width[c_i] > 5:
+                flush_word()
+                state = c_state
+
+            word_content.append(char)
+            word_col_content.append(int(valid_col[c_i]))
+
+        flush_word()
+
+        return WordInfo(words=word_list, word_cols=word_col_list, word_types=state_list)
+    # 替换 get_word_info 方法
+    CTCLabelDecode.get_word_info = get_word_info
+
 def apply_ocr_patch():
     """统一入口：应用所有 OCR 相关补丁"""
     patch_text_detector()
     patch_torch_ocr()
     patch_openvino_ocr()
     patch_seal_det()
+    patch_word_box()

@@ -89,7 +89,7 @@ def remove_overlaps_low_confidence_spans(spans):
 
 def remove_overlaps_min_spans(spans):
     dropped_spans = []
-    #  删除重叠spans中较小的那些
+    # 删除重叠 spans 中较小的那些
     for span1 in spans:
         for span2 in spans:
             if span1 != span2:
@@ -97,11 +97,27 @@ def remove_overlaps_min_spans(spans):
                 if span1 in dropped_spans or span2 in dropped_spans:
                     continue
                 else:
-                    overlap_box = get_minbox_if_overlap_by_ratio(span1['bbox'], span2['bbox'], 0.65)
+                    overlap_box = get_minbox_if_overlap_by_ratio(
+                        span1['bbox'], span2['bbox'], 0.65
+                    )
                     if overlap_box is not None:
-                        span_need_remove = next((span for span in spans if span['bbox'] == overlap_box), None)
-                        if span_need_remove is not None and span_need_remove not in dropped_spans:
+                        # 如果重叠双方任意一个是 seal，则不要删除
+                        if span1.get("original_label") == "seal" or span2.get("original_label") == "seal":
+                            continue
+
+                        span_need_remove = next(
+                            (span for span in spans if span['bbox'] == overlap_box),
+                            None
+                        )
+
+                        # 如果待删除的是 seal，也不要删除
+                        if (
+                            span_need_remove is not None
+                            and span_need_remove not in dropped_spans
+                            and span_need_remove.get("original_label") != "seal"
+                        ):
                             dropped_spans.append(span_need_remove)
+
     if len(dropped_spans) > 0:
         for span_need_remove in dropped_spans:
             spans.remove(span_need_remove)

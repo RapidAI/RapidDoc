@@ -242,7 +242,7 @@ def _build_config():
         # "model_type": TableModelType.UNITABLE,
         # "model_dir_or_path": "", #单个模型使用。如SLANET_PLUS、UNITABLE
 
-        # "use_word_box": True, # 使用单字坐标匹配单元格，默认 False
+        # "use_word_box": True, # 使用单字坐标匹配单元格，默认 True
         # "use_compare_table": False,  # 启用表格结果比较（同时跑有线/无线并比对），默认 False
         # "table_formula_enable": False, # 表格内公式识别
         # "table_image_enable": False, # 表格内图片识别
