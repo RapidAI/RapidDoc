@@ -13,6 +13,7 @@ from tqdm import tqdm
 
 from .model_init import AtomModelSingleton
 from .model_list import AtomicModel
+from ...utils.bbox_utils import normalize_to_int_bbox
 from ...utils.boxbase import rotate_table_image
 from ...utils.enum_class import CategoryId
 from ...utils.model_utils import crop_img
@@ -80,6 +81,28 @@ def _extract_text_from_pdf(
 
                 pbar.update(1)
 
+def _apply_mask_boxes_to_image(
+    bgr_image: np.ndarray,
+    mask_boxes: list[dict] | None,
+) -> np.ndarray:
+    if not mask_boxes:
+        return bgr_image
+
+    masked_image = bgr_image.copy()
+    image_h, image_w = masked_image.shape[:2]
+    for mask_box in mask_boxes:
+        bbox = mask_box.get("bbox")
+        if bbox is None:
+            continue
+
+        int_bbox = normalize_to_int_bbox(bbox, image_size=(image_h, image_w))
+        if int_bbox is None:
+            continue
+
+        x0, y0, x1, y1 = int_bbox
+        masked_image[y0:y1, x0:x1] = 255
+
+    return masked_image
 
 def _run_ocr_det_batch(
         ocr_res_all_page: List[Dict],
@@ -115,10 +138,14 @@ def _run_ocr_det_batch(
             )
 
             bgr_image = cv2.cvtColor(new_image, cv2.COLOR_RGB2BGR)
+            det_image = _apply_mask_boxes_to_image(
+                bgr_image,
+                adjusted_mfdetrec_res,
+            )
 
             all_cropped_info.append((
-                bgr_image, useful_list, ocr_res_dict, res,
-                adjusted_mfdetrec_res, ocr_res_dict['lang'], ocr_enable
+                bgr_image, det_image, useful_list, ocr_res_dict,
+                adjusted_mfdetrec_res, ocr_res_dict['lang'], res, ocr_enable
             ))
 
     if not all_cropped_info:
@@ -145,16 +172,19 @@ def _run_ocr_det_batch(
         # 按分辨率分组
         resolution_groups = defaultdict(list)
         for info in lang_crop_list:
-            h, w = info[0].shape[:2]
+            cropped_img = info[1]
+            h, w = cropped_img.shape[:2]
+            # 直接计算目标尺寸并用作分组键
             target_h = ((h + RESOLUTION_GROUP_STRIDE - 1) // RESOLUTION_GROUP_STRIDE) * RESOLUTION_GROUP_STRIDE
             target_w = ((w + RESOLUTION_GROUP_STRIDE - 1) // RESOLUTION_GROUP_STRIDE) * RESOLUTION_GROUP_STRIDE
-            resolution_groups[(target_h, target_w)].append(info)
+            group_key = (target_h, target_w)
+            resolution_groups[group_key].append(info)
 
-        # 批量处理
+        # 对每个分辨率组进行批处理
         for (target_h, target_w), group_crops in tqdm(resolution_groups.items(), desc=f"OCR-det {lang}"):
             batch_images = []
             for info in group_crops:
-                img = info[0]
+                img = info[1] # _det_image
                 h, w = img.shape[:2]
                 padded_img = np.ones((target_h, target_w, 3), dtype=np.uint8) * 255
                 padded_img[:h, :w] = img
@@ -164,7 +194,7 @@ def _run_ocr_det_batch(
             batch_results = ocr_model.det_batch_predict(batch_images, det_batch_size)
 
             for info, (dt_boxes, _) in zip(group_crops, batch_results):
-                bgr_image, useful_list, ocr_res_dict, res, adjusted_mfdetrec_res, _lang, ocr_enable = info
+                bgr_image, _det_image, useful_list, ocr_res_dict, adjusted_mfdetrec_res, _lang, res, ocr_enable = info
 
                 if dt_boxes is not None and len(dt_boxes) > 0:
                     dt_boxes_sorted = sorted_boxes(dt_boxes)
@@ -288,7 +318,12 @@ def _process_single_table(
 
     # 获取表格文本框
     bgr_image = cv2.cvtColor(table_res_dict["table_img"], cv2.COLOR_RGB2BGR)
-    det_res = ocr_model.ocr(bgr_image, mfd_res=adjusted_mfdetrec_res, rec=False)[0]
+    det_image = (
+        _apply_mask_boxes_to_image(bgr_image, adjusted_mfdetrec_res)
+        if adjusted_mfdetrec_res
+        else bgr_image
+    )
+    det_res = ocr_model.ocr(det_image, mfd_res=adjusted_mfdetrec_res, rec=False)[0]
 
     angles = []
     rotate_label = "0"
@@ -306,7 +341,7 @@ def _process_single_table(
         rotate_table_image(table_res_dict, rotate_label)
         # 旋转后的表格需要重新获取文本框
         bgr_image = cv2.cvtColor(table_res_dict["table_img"], cv2.COLOR_RGB2BGR)
-        det_res = ocr_model.ocr(bgr_image, mfd_res=adjusted_mfdetrec_res, rec=False)[0]
+        det_res = ocr_model.ocr(det_image, mfd_res=adjusted_mfdetrec_res, rec=False)[0]
 
     ocr_result = []
 
