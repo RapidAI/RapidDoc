@@ -261,6 +261,9 @@ def images_bytes_to_pdf_bytes(image_bytes):
     image.save(
         pdf_buffer,
         format="PDF",
+        resolution=DEFAULT_PDF_IMAGE_DPI,
+        quality=95,
+        subsampling=0,
     )
 
     # 获取 PDF bytes 并重置指针（可选）
