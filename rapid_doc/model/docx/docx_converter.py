@@ -98,6 +98,7 @@ class DocxConverter:
         self._numbering_level_cache: dict[
             tuple[int, int], Optional[BaseOxmlElement]
         ] = {}
+        self._numbering_counter_state: dict[tuple[int, int], int] = {}
 
     @staticmethod
     def _escape_hyperlink_text(text: str) -> str:
@@ -583,6 +584,7 @@ class DocxConverter:
         self._numbering_root = None
         self._numbering_root_loaded = False
         self._numbering_level_cache = {}
+        self._numbering_counter_state = {}
         # 读取文件字节，以便 mammoth 和 python-docx 各自使用独立读取流
         file_bytes = self._sanitize_missing_internal_relationships(file_stream.read())
         # 使用完整文档 mammoth 转换预解析所有表格，获得完整上下文（编号/图片/样式等）
@@ -1138,6 +1140,10 @@ class DocxConverter:
                         "is_numbered_style": is_numbered,
                         "content": content_text,
                     }
+                    if is_numbered:
+                        section_number = self._build_numbering_text(numid, ilevel)
+                        if section_number:
+                            title_block["section_number"] = section_number
                     if paragraph_anchor:
                         title_block["anchor"] = paragraph_anchor
                     self.cur_page.append(title_block)
@@ -1181,12 +1187,11 @@ class DocxConverter:
 
         elif "Heading" in p_style_id:
             style_element = getattr(paragraph.style, "element", None)
-            if style_element is not None:
+            is_numbered_style = numid is not None and ilevel is not None
+            if not is_numbered_style and style_element is not None:
                 is_numbered_style = (
                     "<w:numPr>" in style_element.xml or "<w:numPr>" in element.xml
                 )
-            else:
-                is_numbered_style = False
             # 构建包含公式和超链接的文本
             content_text = self._build_text_with_equations_and_hyperlinks(
                 paragraph_elements, text, equations
@@ -1198,6 +1203,10 @@ class DocxConverter:
                     "is_numbered_style": is_numbered_style,
                     "content": content_text,
                 }
+                if is_numbered_style and numid is not None and ilevel is not None:
+                    section_number = self._build_numbering_text(numid, ilevel)
+                    if section_number:
+                        h_block["section_number"] = section_number
                 if paragraph_anchor:
                     h_block["anchor"] = paragraph_anchor
                 self.cur_page.append(h_block)
@@ -1911,6 +1920,163 @@ class DocxConverter:
         self._numbering_level_cache[cache_key] = lvl_element
         return lvl_element
 
+    def _get_numbering_level_start(self, numId: int, ilvl: int) -> int:
+        """Resolve the Word numbering start value for a concrete level."""
+        namespaces = {
+            "w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+        }
+        numbering_root = self._get_numbering_root()
+        if numbering_root is not None:
+            num_element = numbering_root.find(
+                f".//w:num[@w:numId='{numId}']",
+                namespaces=namespaces,
+            )
+            if num_element is not None:
+                override = num_element.find(
+                    f".//w:lvlOverride[@w:ilvl='{ilvl}']/w:startOverride",
+                    namespaces=namespaces,
+                )
+                if override is not None:
+                    start = self._str_to_int(override.get(self.XML_KEY), None)
+                    if start is not None:
+                        return start
+
+        lvl_element = self._get_numbering_level_definition(numId, ilvl)
+        if lvl_element is not None:
+            start_element = lvl_element.find(
+                ".//w:start",
+                namespaces=namespaces,
+            )
+            if start_element is not None:
+                start = self._str_to_int(start_element.get(self.XML_KEY), None)
+                if start is not None:
+                    return start
+        return 1
+
+    def _get_numbering_level_format(self, numId: int, ilvl: int) -> str:
+        """Resolve the Word numFmt value for a concrete level."""
+        lvl_element = self._get_numbering_level_definition(numId, ilvl)
+        if lvl_element is None:
+            return "decimal"
+        namespaces = {
+            "w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+        }
+        num_fmt_element = lvl_element.find(".//w:numFmt", namespaces=namespaces)
+        if num_fmt_element is None:
+            return "decimal"
+        return num_fmt_element.get(self.XML_KEY) or "decimal"
+
+    def _format_numbering_value(self, value: int, num_fmt: str) -> str:
+        """Format a numbering counter using common Word numbering formats."""
+        if num_fmt in {"decimal", "decimalZero"}:
+            return f"{value:02d}" if num_fmt == "decimalZero" else str(value)
+
+        if num_fmt == "decimalEnclosedCircleChinese":
+            circled_numbers = {
+                1: "①",
+                2: "②",
+                3: "③",
+                4: "④",
+                5: "⑤",
+                6: "⑥",
+                7: "⑦",
+                8: "⑧",
+                9: "⑨",
+                10: "⑩",
+                11: "⑪",
+                12: "⑫",
+                13: "⑬",
+                14: "⑭",
+                15: "⑮",
+                16: "⑯",
+                17: "⑰",
+                18: "⑱",
+                19: "⑲",
+                20: "⑳",
+            }
+            return circled_numbers.get(value, str(value))
+
+        if num_fmt in {"lowerLetter", "upperLetter"}:
+            letters = ""
+            n = max(value, 1)
+            while n:
+                n -= 1
+                letters = chr(ord("a") + (n % 26)) + letters
+                n //= 26
+            return letters.upper() if num_fmt == "upperLetter" else letters
+
+        if num_fmt in {"lowerRoman", "upperRoman"}:
+            roman_pairs = [
+                (1000, "M"),
+                (900, "CM"),
+                (500, "D"),
+                (400, "CD"),
+                (100, "C"),
+                (90, "XC"),
+                (50, "L"),
+                (40, "XL"),
+                (10, "X"),
+                (9, "IX"),
+                (5, "V"),
+                (4, "IV"),
+                (1, "I"),
+            ]
+            n = max(value, 1)
+            roman = ""
+            for arabic, symbol in roman_pairs:
+                while n >= arabic:
+                    roman += symbol
+                    n -= arabic
+            return roman if num_fmt == "upperRoman" else roman.lower()
+
+        # Unknown or decorative formats are safer as their numeric value than
+        # as a hard failure, especially for heading numbers.
+        return str(value)
+
+    def _build_numbering_text(self, numId: int, ilvl: int) -> Optional[str]:
+        """Render the Word numbering text for a paragraph and advance counters."""
+        lvl_element = self._get_numbering_level_definition(numId, ilvl)
+        if lvl_element is None:
+            return None
+
+        namespaces = {
+            "w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+        }
+        lvl_text_element = lvl_element.find(".//w:lvlText", namespaces=namespaces)
+        if lvl_text_element is None:
+            return None
+        lvl_text = lvl_text_element.get(self.XML_KEY)
+        if not lvl_text:
+            return None
+
+        current_key = (numId, ilvl)
+        current_start = self._get_numbering_level_start(numId, ilvl)
+        previous_value = self._numbering_counter_state.get(current_key)
+        self._numbering_counter_state[current_key] = (
+            current_start if previous_value is None else previous_value + 1
+        )
+
+        # Deeper levels restart when an ancestor heading advances.
+        for key in list(self._numbering_counter_state.keys()):
+            key_num_id, key_ilvl = key
+            if key_num_id == numId and key_ilvl > ilvl:
+                del self._numbering_counter_state[key]
+
+        def replace_placeholder(match: re.Match) -> str:
+            ref_ilvl = int(match.group(1)) - 1
+            key = (numId, ref_ilvl)
+            if key not in self._numbering_counter_state:
+                self._numbering_counter_state[key] = self._get_numbering_level_start(
+                    numId, ref_ilvl
+                )
+            num_fmt = self._get_numbering_level_format(numId, ref_ilvl)
+            return self._format_numbering_value(
+                self._numbering_counter_state[key],
+                num_fmt,
+            )
+
+        return re.sub(r"%([1-9])", replace_placeholder, lvl_text)
+
     def _is_numbered_list(self, numId: int, ilvl: int) -> bool:
         """
         根据 numFmt 值检查列表是否为编号列表。
@@ -1948,6 +2114,7 @@ class DocxConverter:
                 "lowerLetter",
                 "upperLetter",
                 "decimalZero",
+                "decimalEnclosedCircleChinese",
             }
 
             return num_fmt in numbered_formats
@@ -2007,6 +2174,16 @@ class DocxConverter:
 
         # 确定列表属性
         list_attribute = "ordered" if is_numbered else "unordered"
+        list_prefix = self._build_numbering_text(numid, ilevel) if is_numbered else None
+
+        def make_list_item() -> dict:
+            item = {
+                "type": BlockType.TEXT,
+                "content": content_text,
+            }
+            if list_prefix:
+                item["prefix"] = list_prefix
+            return item
 
         # 情况 1: 不存在上一个列表ID，或遇到了不同 numId 的新列表，创建新的顶层列表
         if self.pre_num_id == -1 or self.pre_num_id != numid:
@@ -2029,10 +2206,7 @@ class DocxConverter:
             # 入栈, 记录当前的列表块
             self.list_block_stack.append(list_block)
 
-            list_item = {
-                "type": BlockType.TEXT,
-                "content": content_text,
-            }
+            list_item = make_list_item()
 
             list_block["content"].append(list_item)
             self.pre_num_id = numid
@@ -2060,10 +2234,7 @@ class DocxConverter:
                 self.cur_page.append(child_list_block)
                 self.list_block_stack.append(child_list_block)
                 child_list_block["content"].append(
-                    {
-                        "type": BlockType.TEXT,
-                        "content": content_text,
-                    }
+                    make_list_item()
                 )
                 self.pre_ilevel = ilevel
                 return None
@@ -2076,10 +2247,7 @@ class DocxConverter:
             self.list_block_stack.append(child_list_block)
 
             # 添加当前列表项到子列表
-            list_item = {
-                "type": BlockType.TEXT,
-                "content": content_text,
-            }
+            list_item = make_list_item()
             child_list_block["content"].append(list_item)
 
             # 更新目前缩进
@@ -2113,10 +2281,7 @@ class DocxConverter:
             else:
                 list_block = self.list_block_stack[-1]
 
-            list_item = {
-                "type": BlockType.TEXT,
-                "content": content_text,
-            }
+            list_item = make_list_item()
             list_block["content"].append(list_item)
             self.pre_ilevel = ilevel
 
@@ -2139,10 +2304,7 @@ class DocxConverter:
                 # 获取栈顶的列表块
                 list_block = self.list_block_stack[-1]
 
-            list_item = {
-                "type": BlockType.TEXT,
-                "content": content_text,
-            }
+            list_item = make_list_item()
             list_block["content"].append(list_item)
 
         else:
