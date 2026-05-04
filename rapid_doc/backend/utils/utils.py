@@ -3,11 +3,11 @@ from copy import deepcopy
 
 from loguru import logger
 from rapid_doc.utils.table_merge import merge_table
-from ..model.layout.rapid_layout_self.model_handler.pp_doclayout.post_process import calculate_polygon_overlap_ratio, \
+from rapid_doc.model.layout.rapid_layout_self.model_handler.pp_doclayout.post_process import calculate_polygon_overlap_ratio, \
     calculate_bbox_area
-from ..model.reading_order.utils import calculate_overlap_ratio
-from ..utils.boxbase import is_in
-from ..utils.span_pre_proc import txt_in_ori_image
+from rapid_doc.model.reading_order.utils import calculate_overlap_ratio
+from rapid_doc.utils.boxbase import is_in
+from rapid_doc.utils.span_pre_proc import txt_in_ori_image
 
 
 def cross_page_table_merge(pdf_info: list[dict]):

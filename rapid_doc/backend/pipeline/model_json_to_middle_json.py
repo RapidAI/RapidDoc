@@ -5,7 +5,7 @@
 import os
 from tqdm import tqdm
 
-from rapid_doc.backend.utils import cross_page_table_merge
+from rapid_doc.backend.utils.utils import cross_page_table_merge
 from rapid_doc.model.custom import CustomBaseModel
 from rapid_doc.utils.config_reader import get_device, get_formula_enable
 from rapid_doc.backend.pipeline.model_init import AtomModelSingleton

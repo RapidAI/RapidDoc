@@ -1,3 +1,4 @@
+# Copyright (c) Opendatalab. All rights reserved.
 from typing import BinaryIO
 
 from rapid_doc.model.pptx.pptx_converter import PptxConverter
@@ -15,4 +16,4 @@ def convert_binary(file_binary: BinaryIO):
 
 
 if __name__ == "__main__":
-    print(convert_path(r"D:\file\ppt\OpenClaw_多智能体团队协作流程汇报v2.0.pptx"))
+    print(convert_path("powerpoint_sample.pptx"))

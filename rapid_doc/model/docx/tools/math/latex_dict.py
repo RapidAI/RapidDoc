@@ -1,3 +1,4 @@
+# Copyright (c) Opendatalab. All rights reserved.
 """
 Adapted from https://github.com/xiilei/dwml/blob/master/dwml/latex_dict.py
 On 23/01/2025
@@ -22,8 +23,8 @@ CHR = {
     "\u0307": "\\dot{{{0}}}",
     "\u0308": "\\ddot{{{0}}}",
     "\u0309": "\\ovhook{{{0}}}",
-    "\u030a": "\\ocirc{{{0}}}}",
-    "\u030c": "\\check{{{0}}}}",
+    "\u030a": "\\ocirc{{{0}}}",
+    "\u030c": "\\check{{{0}}}",
     "\u0310": "\\candra{{{0}}}",
     "\u0312": "\\oturnedcomma{{{0}}}",
     "\u0315": "\\ocommatopright{{{0}}}",
@@ -46,7 +47,7 @@ CHR = {
     "\u20e8": "\\threeunderdot{{{0}}}",
     "\u20ec": "\\underrightharpoondown{{{0}}}",
     "\u20ed": "\\underleftharpoondown{{{0}}}",
-    "\u20ee": "\\underledtarrow{{{0}}}",
+    "\u20ee": "\\underleftarrow{{{0}}}",
     "\u20ef": "\\underrightarrow{{{0}}}",
     # Over | group
     "\u23b4": "\\overbracket{{{0}}}",
@@ -157,6 +158,7 @@ T = {
     "\u2127": "\\mho ",          # ℧ INVERTED OHM SIGN — pylatexenc: \textmho (textcomp, not in KaTeX/MathJax)
     "\u212e": "e",               # ℮ ESTIMATED SIGN — pylatexenc: \textestimated (no math equivalent; use 'e')
     "\u00c5": "\\mathring{A} ",  # Å LATIN CAPITAL LETTER A WITH RING — pylatexenc: \r{A} (text-mode only)
+    "\u2103": "\\text{°C}",       # ℃ DEGREE CELSIUS — pylatexenc: \textcelsius (textcomp, not in KaTeX/MathJax)
     # Multiplication/division operators (text-mode pylatexenc mappings overridden to math-mode)
     "\u00b7": "\\cdot ",   # MIDDLE DOT (·) — common in Chinese scientific notation
     "\u22c5": "\\cdot ",   # DOT OPERATOR (⋅)
@@ -164,6 +166,12 @@ T = {
     "\u00d7": "\\times ",  # MULTIPLICATION SIGN (×)
     "\u00f7": "\\div ",    # DIVISION SIGN (÷)
     "\u2212": "-",         # MINUS SIGN (−)
+    "\u2010": "-",         # HYPHEN
+    "\u2011": "-",         # NON-BREAKING HYPHEN
+    "\u2012": "-",         # FIGURE DASH
+    "\u2013": "-",         # EN DASH
+    "\u2014": "-",         # EM DASH
+    "\u2015": "-",         # HORIZONTAL BAR
     # Degree / prime — avoid ^{} syntax since escape_latex will mangle bare ^ and braces
     "\u00b0": "\\circ ",   # DEGREE SIGN (°) — caller's context (e.g. 90°) provides the ^
     "\u2032": "'",         # PRIME (′)

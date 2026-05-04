@@ -1,3 +1,4 @@
+# Copyright (c) Opendatalab. All rights reserved.
 from typing import BinaryIO
 
 from rapid_doc.model.docx.docx_converter import DocxConverter

@@ -1,11 +1,11 @@
+# Copyright (c) Opendatalab. All rights reserved.
+import posixpath
 import re
-import zipfile
 from io import BytesIO
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import BinaryIO, Optional, Union, Any, Final, Iterator
+from zipfile import ZIP_DEFLATED, ZipFile
 
-import pandas as pd
-from PIL import Image, ImageDraw, ImageFont
 from loguru import logger
 from docx import Document
 from docx.document import Document as DocxDocument
@@ -20,10 +20,12 @@ from mammoth.docx import body_xml
 
 from rapid_doc.model.docx.tools.office_xml import read_str
 from rapid_doc.model.docx.tools.math.omml import oMath2Latex
-from rapid_doc.utils.check_sys_env import is_windows_environment
 from rapid_doc.utils.docx_formatting import Formatting, Script
 from rapid_doc.utils.enum_class import BlockType, ContentType
-from rapid_doc.utils.pdf_reader import image_to_b64str
+from rapid_doc.backend.utils.office_image import (
+    serialize_office_image,
+)
+from rapid_doc.backend.utils.office_chart import extract_chart_html_from_ooxml
 
 class DocxConverter:
     _BLIP_NAMESPACES: Final = {
@@ -69,15 +71,10 @@ class DocxConverter:
         self.xml_namespaces = {
             "w": "http://schemas.microsoft.com/office/word/2003/wordml"
         }
-        self.blip_xpath_expr = etree.XPath(
-            ".//a:blip", namespaces=DocxConverter._BLIP_NAMESPACES
-        )
-        self.vml_imagedata_xpath_expr = etree.XPath(
-            ".//v:imagedata", namespaces=DocxConverter._BLIP_NAMESPACES
+        self.picture_xpath_expr = etree.XPath(
+            ".//a:blip | .//v:imagedata", namespaces=DocxConverter._BLIP_NAMESPACES
         )
 
-        # 存放文档字节数据，用于需要重读 ZIP 的辅助方法
-        self._file_bytes: bytes = b''
         self.docx_obj = None
         self.pages = []
         self.cur_page = []
@@ -91,15 +88,16 @@ class DocxConverter:
         )  # 列表计数器 (numId, ilvl) -> count
         self.index_block_stack: list = []  # 目录索引块堆栈
         self.pre_index_ilevel: int = -1  # 上一个目录项的缩进等级
+        self.plain_toc_base_level: Optional[int] = None  # 普通目录段落的起始层级
         self.heading_list_numids: set = set()  # 用作章节标题的列表numId集合
-        self.numbering_abstract_defs: dict[int, dict[int, dict[str, Any]]] = {}
-        self.numbering_instances: dict[int, dict[str, Any]] = {}
-        self.numbering_counters: dict[int, dict[int, int]] = {}
-        self.numbering_prev_levels: dict[int, int] = {}
         self.equation_bookends: str = "<eq>{EQ}</eq>"  # 公式标记格式
-        self.chart_list = []  # 图表列表
         self.processed_textbox_elements: list = []
         self.toc_anchor_set: set[str] = set()  # TOC 超链接目标锚点集合
+        self._numbering_root: Optional[BaseOxmlElement] = None
+        self._numbering_root_loaded: bool = False
+        self._numbering_level_cache: dict[
+            tuple[int, int], Optional[BaseOxmlElement]
+        ] = {}
 
     @staticmethod
     def _escape_hyperlink_text(text: str) -> str:
@@ -117,113 +115,6 @@ class DocxConverter:
         # 转义方括号
         text = text.replace("[", "\\[").replace("]", "\\]")
         return text
-
-    @staticmethod
-    def _minify_html(html: str) -> str:
-        """
-        移除HTML中的格式化空白（换行、缩进等）。
-
-        Args:
-            html: 要处理的HTML字符串
-
-        Returns:
-            str: 去除格式化后的HTML
-        """
-        if not html:
-            return html
-        # 移除标签之间的换行符和制表符
-        html = re.sub(r'>\s+<', '><', html)
-        # 移除行首尾无关的空白
-        html = re.sub(r'\n\s*', '', html)
-        return html
-
-    @staticmethod
-    def _load_placeholder_font(font_size: int) -> ImageFont.ImageFont:
-        """
-        加载占位图提示文案字体，优先使用可缩放字体，失败时回退到默认字体。
-
-        Args:
-            font_size: 期望字号
-
-        Returns:
-            ImageFont.ImageFont: 可用于绘制文本的字体对象
-        """
-        for font_name in (
-            "DejaVuSans.ttf",
-            "Arial.ttf",
-            "LiberationSans-Regular.ttf",
-        ):
-            try:
-                return ImageFont.truetype(font_name, font_size)
-            except OSError:
-                continue
-        return ImageFont.load_default()
-
-    def _create_text_placeholder(
-        self, size: tuple[int, int], lines: list[str]
-    ) -> Image.Image:
-        """
-        生成带提示文案的浅灰色占位图。
-
-        Args:
-            size: 占位图尺寸
-            lines: 需要绘制的多行提示文本
-
-        Returns:
-            Image.Image: 生成后的占位图
-        """
-        width = max(int(size[0]), 1)
-        height = max(int(size[1]), 1)
-        placeholder = Image.new("RGB", (width, height), (240, 240, 240))
-        draw = ImageDraw.Draw(placeholder)
-
-        border_width = max(1, min(width, height) // 80)
-        draw.rectangle(
-            (0, 0, width - 1, height - 1),
-            outline=(190, 190, 190),
-            width=border_width,
-        )
-
-        max_text_width = max(width - 16, 1)
-        max_text_height = max(height - 16, 1)
-        fallback_text = "WMF/EMF"
-        text = "\n".join(line for line in lines if line)
-        if not text:
-            text = fallback_text
-
-        font = None
-        spacing = 4
-        bbox = None
-        for font_size in range(max(min(width, height) // 7, 10), 7, -1):
-            font = self._load_placeholder_font(font_size)
-            spacing = max(2, font_size // 4)
-            bbox = draw.multiline_textbbox(
-                (0, 0), text, font=font, spacing=spacing, align="center"
-            )
-            text_width = bbox[2] - bbox[0]
-            text_height = bbox[3] - bbox[1]
-            if text_width <= max_text_width and text_height <= max_text_height:
-                break
-        else:
-            text = fallback_text
-            font = self._load_placeholder_font(max(min(width, height) // 5, 10))
-            spacing = 2
-            bbox = draw.multiline_textbbox(
-                (0, 0), text, font=font, spacing=spacing, align="center"
-            )
-
-        text_width = bbox[2] - bbox[0]
-        text_height = bbox[3] - bbox[1]
-        origin = ((width - text_width) / 2, (height - text_height) / 2)
-        draw.multiline_text(
-            origin,
-            text,
-            fill=(90, 90, 90),
-            font=font,
-            spacing=spacing,
-            align="center",
-        )
-        return placeholder
 
     @staticmethod
     def _escape_hyperlink_url(url: str) -> str:
@@ -365,6 +256,17 @@ class DocxConverter:
                 formatted_text = self._format_text_with_hyperlink(text, hyperlink, style_str)
                 result_parts.append(formatted_text)
         return "".join(result_parts) if result_parts else ""
+
+    @staticmethod
+    def _normalize_text_block_content(content: str) -> str:
+        """
+        规范化普通文本块导出内容。
+
+        DOCX 常用段首/段尾空格模拟版式对齐，导出普通文本块前去除这些前后空白。
+        """
+        if not content:
+            return content
+        return content.strip()
 
     @staticmethod
     def _split_paragraph_elements_at_eq_boundaries(
@@ -542,6 +444,125 @@ class DocxConverter:
 
         return "".join(result_parts)
 
+    @staticmethod
+    def _resolve_internal_relationship_target(
+        rels_path: str, target: Optional[str]
+    ) -> Optional[str]:
+        """Resolve an OOXML relationship target to a package member path."""
+        if not target:
+            return None
+
+        rels_posix = PurePosixPath(rels_path)
+        if rels_posix.parent.name != "_rels":
+            return None
+
+        base_dir = rels_posix.parent.parent.as_posix()
+        if target.startswith("/"):
+            resolved = posixpath.normpath(target.lstrip("/"))
+        else:
+            resolved = posixpath.normpath(posixpath.join(base_dir, target))
+
+        if resolved in {"", "."} or resolved.startswith("../"):
+            return None
+        return resolved
+
+    def _sanitize_missing_internal_relationships(self, file_bytes: bytes) -> bytes:
+        """Drop broken internal OOXML relationships so python-docx can best-effort load."""
+        try:
+            with ZipFile(BytesIO(file_bytes)) as source:
+                package_members = set(source.namelist())
+                rewritten_rels: dict[str, bytes] = {}
+
+                for info in source.infolist():
+                    if not info.filename.endswith(".rels"):
+                        continue
+
+                    try:
+                        root = etree.fromstring(source.read(info.filename))
+                    except Exception:
+                        continue
+
+                    removed_count = 0
+                    for relationship in list(root):
+                        if etree.QName(relationship).localname != "Relationship":
+                            continue
+                        if relationship.get("TargetMode") == "External":
+                            continue
+
+                        resolved_target = self._resolve_internal_relationship_target(
+                            info.filename, relationship.get("Target")
+                        )
+                        if (
+                            resolved_target is not None
+                            and resolved_target in package_members
+                        ):
+                            continue
+
+                        root.remove(relationship)
+                        removed_count += 1
+
+                    if removed_count == 0:
+                        continue
+
+                    logger.debug(
+                        "Removed {} broken internal DOCX relationships from {}",
+                        removed_count,
+                        info.filename,
+                    )
+                    rewritten_rels[info.filename] = etree.tostring(
+                        root,
+                        xml_declaration=True,
+                        encoding="UTF-8",
+                        standalone="yes",
+                    )
+
+                if not rewritten_rels:
+                    return file_bytes
+
+            output = BytesIO()
+            with ZipFile(BytesIO(file_bytes)) as source, ZipFile(output, "w", ZIP_DEFLATED) as target:
+                for info in source.infolist():
+                    data = rewritten_rels.get(info.filename, source.read(info.filename))
+                    target.writestr(info, data)
+            return output.getvalue()
+        except Exception:
+            return file_bytes
+
+    def _start_new_page(self) -> None:
+        self.cur_page = []
+        self.pages.append(self.cur_page)
+
+    def _is_layout_only_section_break(self, element: BaseOxmlElement) -> bool:
+        w_ns = DocxConverter._BLIP_NAMESPACES["w"]
+        p_pr = element.find(f"{{{w_ns}}}pPr")
+        sect_pr = p_pr.find(f"{{{w_ns}}}sectPr") if p_pr is not None else None
+        if sect_pr is None:
+            return False
+
+        paragraph = Paragraph(element, self.docx_obj)
+        if self._get_paragraph_text(paragraph).strip():
+            return False
+
+        if self.picture_xpath_expr(element):
+            return False
+
+        sect_type = sect_pr.find(f"{{{w_ns}}}type")
+        sect_val = (
+            sect_type.get(f"{{{w_ns}}}val", "continuous")
+            if sect_type is not None else "continuous"
+        )
+        if sect_val != "continuous":
+            return False
+
+        pg_mar = sect_pr.find(f"{{{w_ns}}}pgMar")
+        if pg_mar is None:
+            return False
+
+        for attr in ("header", "footer", "top", "bottom", "left", "right"):
+            if pg_mar.get(f"{{{w_ns}}}{attr}", "0") != "0":
+                return False
+        return True
+
     def convert(
         self,
         file_stream: BinaryIO,
@@ -555,31 +576,31 @@ class DocxConverter:
         self.list_counters = {}
         self.index_block_stack = []
         self.pre_index_ilevel = -1
+        self.plain_toc_base_level = None
         self.heading_list_numids = set()
-        self.numbering_abstract_defs = {}
-        self.numbering_instances = {}
-        self.numbering_counters = {}
-        self.numbering_prev_levels = {}
-        self.chart_list = []
         self.processed_textbox_elements = []
         self.toc_anchor_set = set()
-
+        self._numbering_root = None
+        self._numbering_root_loaded = False
+        self._numbering_level_cache = {}
         # 读取文件字节，以便 mammoth 和 python-docx 各自使用独立读取流
-        file_bytes = file_stream.read()
-        # 保存一份字节副本用于后续需要重新打开 ZIP 的方法
-        self._file_bytes = file_bytes
+        file_bytes = self._sanitize_missing_internal_relationships(file_stream.read())
         # 使用完整文档 mammoth 转换预解析所有表格，获得完整上下文（编号/图片/样式等）
         self._mammoth_tables_html = self._preparse_tables_with_mammoth(file_bytes)
         self._mammoth_table_idx = 0
         self.docx_obj = Document(BytesIO(file_bytes))
-        self._load_numbering_definitions()
         self.toc_anchor_set = self._collect_toc_anchor_set()
         # 预扫描文档，识别用作章节标题的列表numId
         self.heading_list_numids = self._detect_heading_list_numids()
         self.pages.append(self.cur_page)
         self._walk_linear(self.docx_obj.element.body)
         self._add_header_footer(self.docx_obj)
-        self._add_chart_table()
+
+    def _reset_index_state(self) -> None:
+        """重置目录索引栈，避免相隔的多个目录块被错误合并。"""
+        self.index_block_stack = []
+        self.pre_index_ilevel = -1
+        self.plain_toc_base_level = None
 
     def _collect_toc_anchor_set(self) -> set[str]:
         """Collect TOC hyperlink anchors from the entire document body."""
@@ -603,9 +624,7 @@ class DocxConverter:
             # 获取元素的标签名（去除命名空间前缀）
             tag_name = etree.QName(element).localname
             # 检查是否存在内联图像（blip元素）
-            drawing_blip = self.blip_xpath_expr(element)
-            vml_imagedata = self.vml_imagedata_xpath_expr(element)
-            image_elements = [*drawing_blip, *vml_imagedata]
+            picture_refs = self.picture_xpath_expr(element)
 
             # 查找所有绘图元素（用于处理DrawingML）
             drawingml_els = element.findall(
@@ -645,6 +664,9 @@ class DocxConverter:
                             text_content = " ".join(
                                 [t.text for t in shape_text_elements if t.text]
                             )
+                            text_content = self._normalize_text_block_content(
+                                text_content
+                            )
                             if text_content.strip():
                                 logger.debug(
                                     f"Found shape text: {text_content[:50]}..."
@@ -681,7 +703,7 @@ class DocxConverter:
                     # 如果表格解析失败，记录调试信息
                     logger.debug("could not parse a table, broken docx table")
             # 检查图片元素
-            elif image_elements:
+            elif picture_refs:
                 # 判断图片是否为锚定（浮动）图片
                 is_anchored = bool(
                     element.findall(
@@ -692,10 +714,10 @@ class DocxConverter:
                 # 锚定图片在段落中浮动定位，段落文本应出现在图片之前
                 if is_anchored and tag_name == "p":
                     self._handle_text_elements(element)
-                    self._handle_pictures(image_elements)
+                    self._handle_pictures(picture_refs)
                 else:
                     # 处理图片元素
-                    self._handle_pictures(image_elements)
+                    self._handle_pictures(picture_refs)
                     # 如果是段落元素，同时处理其中的文本内容（如描述性文字）
                     if tag_name == "p":
                         self._handle_text_elements(element)
@@ -1038,11 +1060,13 @@ class DocxConverter:
 
         """
         is_section_end = False
-        if element.find(".//w:sectPr", namespaces=DocxConverter._BLIP_NAMESPACES) is not None:
+        has_section_break = (
+            element.find(".//w:sectPr", namespaces=DocxConverter._BLIP_NAMESPACES) is not None
+        )
+        if has_section_break and not self._is_layout_only_section_break(element):
             # 如果没有text内容
             if element.text == "":
-                self.cur_page = []
-                self.pages.append(self.cur_page)
+                self._start_new_page()
             else:
                 # 标记本节结束，处理完文本之后再分节
                 is_section_end = True
@@ -1058,18 +1082,34 @@ class DocxConverter:
             return None
         text = text.strip()
 
+        if self._handle_plain_toc_paragraph_as_index(
+            paragraph=paragraph,
+            paragraph_element=element,
+            paragraph_elements=paragraph_elements,
+            text=text,
+            equations=equations,
+        ):
+            # 普通 TOC 是列表边界，避免后续同 numId 列表项继续合并到目录前的列表块。
+            if self.pre_num_id != -1:
+                self.pre_num_id = -1
+                self.pre_ilevel = -1
+                self.list_block_stack = []
+                self.list_counters = {}
+            # 普通 TOC 段落被转换为 INDEX 后，也要保留段落末尾分节分页语义。
+            if is_section_end:
+                self._start_new_page()
+            return None
+        self._reset_index_state()
+
         # 常见的项目符号和编号列表样式。
         # "List Bullet", "List Number", "List Paragraph"
         # 识别列表是否为编号列表
         p_style_id, p_level = self._get_label_and_level(paragraph)
+        p_style_id = p_style_id or "Normal"
         numid, ilevel = self._get_numId_and_ilvl(paragraph)
 
         if numid == 0:
             numid = None
-
-        numbering_text = None
-        if numid is not None and ilevel is not None:
-            numbering_text = self._advance_numbering_sequence(numid, ilevel)
 
         # 处理列表
         if (
@@ -1098,8 +1138,6 @@ class DocxConverter:
                         "is_numbered_style": is_numbered,
                         "content": content_text,
                     }
-                    if numbering_text:
-                        title_block["section_number"] = numbering_text
                     if paragraph_anchor:
                         title_block["anchor"] = paragraph_anchor
                     self.cur_page.append(title_block)
@@ -1109,7 +1147,6 @@ class DocxConverter:
                     ilevel=ilevel,
                     elements=paragraph_elements,
                     is_numbered=is_numbered,
-                    numbering_text=numbering_text,
                     text=text,
                     equations=equations,
                 )
@@ -1161,8 +1198,6 @@ class DocxConverter:
                     "is_numbered_style": is_numbered_style,
                     "content": content_text,
                 }
-                if is_numbered_style and numbering_text:
-                    h_block["section_number"] = numbering_text
                 if paragraph_anchor:
                     h_block["anchor"] = paragraph_anchor
                 self.cur_page.append(h_block)
@@ -1182,13 +1217,15 @@ class DocxConverter:
                 content_text = self._build_text_with_equations_and_hyperlinks(
                     paragraph_elements, text, equations
                 )
-                text_with_inline_eq_block = {
-                    "type": BlockType.TEXT,
-                    "content": content_text,
-                }
-                if paragraph_anchor:
-                    text_with_inline_eq_block["anchor"] = paragraph_anchor
-                self.cur_page.append(text_with_inline_eq_block)
+                content_text = self._normalize_text_block_content(content_text)
+                if content_text != "":
+                    text_with_inline_eq_block = {
+                        "type": BlockType.TEXT,
+                        "content": content_text,
+                    }
+                    if paragraph_anchor:
+                        text_with_inline_eq_block["anchor"] = paragraph_anchor
+                    self.cur_page.append(text_with_inline_eq_block)
         elif p_style_id in [
             "Paragraph",
             "Normal",
@@ -1203,6 +1240,7 @@ class DocxConverter:
             content_text = self._build_text_with_equations_and_hyperlinks(
                 paragraph_elements, text, equations
             )
+            content_text = self._normalize_text_block_content(content_text)
             if content_text != "":
                 text_block = {
                     "type": BlockType.TEXT,
@@ -1230,6 +1268,7 @@ class DocxConverter:
             content_text = self._build_text_with_equations_and_hyperlinks(
                 paragraph_elements, text, equations
             )
+            content_text = self._normalize_text_block_content(content_text)
             if content_text != "":
                 text_block = {
                     "type": BlockType.TEXT,
@@ -1240,98 +1279,72 @@ class DocxConverter:
                 self.cur_page.append(text_block)
 
         if is_section_end:
-            self.cur_page = []
-            self.pages.append(self.cur_page)
+            self._start_new_page()
 
-    def _handle_pictures(self, image_elements: Any):
+    def _handle_pictures(self, picture_refs: Any):
         """
         处理图片。
 
         Args:
-            image_elements: 图片引用元素列表，支持 DrawingML blip 和 VML imagedata
+            picture_refs: 图片引用元素列表
 
         Returns:
 
         """
 
-        def get_docx_image(image: Any) -> Optional[bytes]:
+        def get_docx_image_rel_id(image: Any) -> Optional[str]:
+            rel_id = image.get(
+                "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}embed"
+            )
+            if not rel_id:
+                rel_id = image.get(
+                    "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}id"
+                )
+            return rel_id
+
+        def get_docx_image_part(image: Any) -> Optional[Any]:
             """
-            获取 DOCX 图像数据。
+            获取 DOCX 图像 part。
 
             Args:
                 image: 单个 blip 元素
 
             Returns:
 
-                Optional[bytes]: 图像数据
+                Optional[Any]: 图像 part
             """
-            image_data: Optional[bytes] = None
-            rel_attr_names = (
-                "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}embed",
-                "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}id",
-                "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}link",
-            )
-            for rel_attr_name in rel_attr_names:
-                rId = image.get(rel_attr_name)
-                if not rId or rId not in self.docx_obj.part.rels:
-                    continue
-                rel = self.docx_obj.part.rels[rId]
-                target_part = getattr(rel, "target_part", None)
-                if target_part is not None and hasattr(target_part, "blob"):
-                    # 使用关系 ID 访问图像部分
-                    image_data = target_part.blob
-                    break
-            return image_data
+            rId = get_docx_image_rel_id(image)
+            if rId in self.docx_obj.part.rels:
+                # 使用关系 ID 访问图像部分
+                return self.docx_obj.part.rels[rId].target_part
+            return None
 
-        # 遍历所有图片引用元素，支持 group images（多个 blip）和 VML/OLE 预览图
-        for image in image_elements:
-            image_data: Optional[bytes] = get_docx_image(image)
-            if image_data is None:
+        seen_rel_ids: set[str] = set()
+        # 遍历所有图片引用元素，支持 DrawingML blip 和 VML imagedata。
+        for image in picture_refs:
+            rel_id = get_docx_image_rel_id(image)
+            if rel_id and rel_id in seen_rel_ids:
+                continue
+            if rel_id:
+                seen_rel_ids.add(rel_id)
+            image_part = get_docx_image_part(image)
+            if image_part is None:
                 logger.warning("Warning: image cannot be found")
-            else:
-                image_bytes = BytesIO(image_data)
-                pil_image = Image.open(image_bytes)
-                if pil_image.format in ("WMF", "EMF"):
-                    if is_windows_environment():
-                        # 在 Windows 上，Pillow 依赖底层的 Image.core.drawwmf 渲染
-                        # 有时需要显式调用 .load() 确保矢量图被光栅化到内存中
-                        try:
-                            pil_image.load()
-                            img_base64 = image_to_b64str(pil_image, image_format="PNG")
-                        except OSError as e:
-                            logger.warning(f"Failed to render {pil_image.format} image: {e}, size: {pil_image.size}. Using placeholder instead.")
-                            placeholder = self._create_text_placeholder(
-                                pil_image.size,
-                                [
-                                    f"{pil_image.format} placeholder",
-                                    "Windows rendering failed",
-                                ],
-                            )
-                            img_base64 = image_to_b64str(placeholder, image_format="JPEG")
-                    else:
-                        logger.warning(f"Skipping {pil_image.format} image on non-Windows environment, size: {pil_image.size}")
-                        placeholder = self._create_text_placeholder(
-                            pil_image.size,
-                            [
-                                f"{pil_image.format} placeholder",
-                                "Use Windows to parse",
-                                "the original image",
-                            ],
-                        )
-                        img_base64 = image_to_b64str(placeholder, image_format="JPEG")
-                else:
-                    # 处理常规图片
-                    if pil_image.mode != "RGB":
-                        # RGBA, P, L 等模式保留原貌并存为 PNG (PNG支持透明度)
-                        img_base64 = image_to_b64str(pil_image, image_format="PNG")
-                    else:
-                        # 纯 RGB 图片存为 JPEG 以减小体积
-                        img_base64 = image_to_b64str(pil_image, image_format="JPEG")
-                image_block = {
-                    "type": BlockType.IMAGE,
-                    "content": img_base64,
-                }
-                self.cur_page.append(image_block)
+                continue
+
+            img_base64 = serialize_office_image(
+                image_part.blob,
+                part_name=getattr(image_part, "partname", None),
+                content_type=getattr(image_part, "content_type", None),
+            )
+            if img_base64 is None:
+                continue
+
+            image_block = {
+                "type": BlockType.IMAGE,
+                "content": img_base64,
+            }
+            self.cur_page.append(image_block)
 
     def _get_paragraph_elements(self, paragraph: Paragraph):
         """
@@ -1516,6 +1529,7 @@ class DocxConverter:
         container: Optional[BaseOxmlElement] = None,
     ) -> Iterator[Union[Run, Hyperlink]]:
         """Yield visible paragraph inline containers in document order.
+
         python-docx only walks direct ``w:r`` and ``w:hyperlink`` children of ``w:p``.
         Inline ``w:sdt`` content controls are skipped entirely, which drops their text
         from both ``paragraph.text`` and ``paragraph.iter_inner_content()``. This walker
@@ -1673,7 +1687,11 @@ class DocxConverter:
                     only_texts.append(subt.text)
                     texts_and_equations.append(subt.text)
             elif "oMath" in subt.tag and "oMathPara" not in subt.tag:
-                latex_equation = str(oMath2Latex(subt)).strip()
+                try:
+                    latex_equation = str(oMath2Latex(subt)).strip()
+                except Exception as e:
+                    logger.debug(f"Failed to convert OMML equation to LaTeX: {e}")
+                    continue
                 if len(latex_equation) > 0:
                     only_equations.append(
                         self.equation_bookends.format(EQ=latex_equation)
@@ -1727,30 +1745,88 @@ class DocxConverter:
 
         label = paragraph.style.style_id
         name = paragraph.style.name
-        base_style_label = None
-        base_style_name = None
-        if base_style := getattr(paragraph.style, "base_style", None):
-            base_style_label = base_style.style_id
-            base_style_name = base_style.name
 
         if label is None:
             return "Normal", None
 
-        if ":" in label:
-            parts = label.split(":")
-            if len(parts) == 2:
-                return parts[0], self._str_to_int(parts[1], None)
+        for style in self._iter_style_chain(paragraph.style):
+            style_label = getattr(style, "style_id", None)
+            style_name = getattr(style, "name", None)
 
-        if "heading" in label.lower():
-            return self._get_heading_and_level(label)
-        if "heading" in name.lower():
-            return self._get_heading_and_level(name)
-        if base_style_label and "heading" in base_style_label.lower():
-            return self._get_heading_and_level(base_style_label)
-        if base_style_name and "heading" in base_style_name.lower():
-            return self._get_heading_and_level(base_style_name)
+            if style_label and ":" in style_label:
+                parts = style_label.split(":")
+                if len(parts) == 2:
+                    return parts[0], self._str_to_int(parts[1], None)
 
-        return name, None
+            for candidate in (style_label, style_name):
+                if candidate and "heading" in candidate.lower():
+                    return self._get_heading_and_level(candidate)
+
+        outline_level = self._get_effective_outline_level(paragraph)
+        if outline_level is not None:
+            return "Heading", outline_level + 1
+
+        return name or label or "Normal", None
+
+    def _iter_style_chain(self, style: Any) -> Iterator[Any]:
+        """Yield a style and its base-style chain once each."""
+        seen: set[int] = set()
+        current = style
+        while current is not None:
+            current_id = id(current)
+            if current_id in seen:
+                break
+            seen.add(current_id)
+            yield current
+            current = getattr(current, "base_style", None)
+
+    def _get_paragraph_property_child(
+        self, xml_element: Optional[BaseOxmlElement], child_tag: str
+    ) -> Optional[BaseOxmlElement]:
+        """Read a direct child from w:pPr without matching nested descendants."""
+        if xml_element is None:
+            return None
+
+        namespaces = getattr(xml_element, "nsmap", None) or DocxConverter._BLIP_NAMESPACES
+        pPr = xml_element.find("w:pPr", namespaces=namespaces)
+        if pPr is None:
+            return None
+        return pPr.find(child_tag, namespaces=namespaces)
+
+    def _get_effective_numPr(
+        self, paragraph: Paragraph
+    ) -> Optional[BaseOxmlElement]:
+        """Resolve paragraph numbering from direct properties, then style inheritance."""
+        numPr = self._get_paragraph_property_child(paragraph._element, "w:numPr")
+        if numPr is not None:
+            return numPr
+
+        for style in self._iter_style_chain(getattr(paragraph, "style", None)):
+            style_element = getattr(style, "element", None)
+            numPr = self._get_paragraph_property_child(style_element, "w:numPr")
+            if numPr is not None:
+                return numPr
+
+        return None
+
+    def _get_effective_outline_level(self, paragraph: Paragraph) -> Optional[int]:
+        """Resolve outline level from paragraph properties or inherited styles."""
+        outline_lvl = self._get_paragraph_property_child(
+            paragraph._element, "w:outlineLvl"
+        )
+        if outline_lvl is None:
+            for style in self._iter_style_chain(getattr(paragraph, "style", None)):
+                style_element = getattr(style, "element", None)
+                outline_lvl = self._get_paragraph_property_child(
+                    style_element, "w:outlineLvl"
+                )
+                if outline_lvl is not None:
+                    break
+
+        if outline_lvl is None:
+            return None
+
+        return self._str_to_int(outline_lvl.get(self.XML_KEY), None)
 
     def _get_numId_and_ilvl(
         self, paragraph: Paragraph
@@ -1764,274 +1840,76 @@ class DocxConverter:
         Returns:
             tuple[Optional[int], Optional[int]]: (numId, ilvl) 元组
         """
-        paragraph_num_pr = paragraph._element.find(
-            "./w:pPr/w:numPr", namespaces=paragraph._element.nsmap
-        )
-        style_element = getattr(paragraph.style, "element", None)
-        style_num_pr = None
-        if style_element is not None:
-            style_num_pr = style_element.find(
-                "./w:pPr/w:numPr", namespaces=paragraph._element.nsmap
-            )
+        numPr = self._get_effective_numPr(paragraph)
 
-        numid = self._extract_numpr_value(paragraph_num_pr, "numId")
-        ilevel = self._extract_numpr_value(paragraph_num_pr, "ilvl")
+        if numPr is not None:
+            # 获取 numId 元素并提取值
+            namespaces = getattr(numPr, "nsmap", None) or DocxConverter._BLIP_NAMESPACES
+            numId_elem = numPr.find("w:numId", namespaces=namespaces)
+            ilvl_elem = numPr.find("w:ilvl", namespaces=namespaces)
+            numId = numId_elem.get(self.XML_KEY) if numId_elem is not None else None
+            ilvl = ilvl_elem.get(self.XML_KEY) if ilvl_elem is not None else None
 
-        if numid is None:
-            numid = self._extract_numpr_value(style_num_pr, "numId")
-        if ilevel is None:
-            ilevel = self._extract_numpr_value(style_num_pr, "ilvl")
+            return self._str_to_int(numId, None), self._str_to_int(ilvl, None)
 
-        return numid, ilevel
+        return None, None  # 如果段落不是列表的一部分
 
-    def _extract_numpr_value(
-        self,
-        num_pr: Optional[BaseOxmlElement],
-        tag_name: str,
-    ) -> Optional[int]:
-        """Extract an integer value from a <w:numPr> child element."""
-        if num_pr is None:
-            return None
-        child = num_pr.find(f"w:{tag_name}", namespaces=num_pr.nsmap)
-        if child is None:
-            return None
-        value = child.get(self.XML_KEY)
-        return self._str_to_int(value, None)
+    def _get_numbering_root(self) -> Optional[BaseOxmlElement]:
+        """Load and cache word/numbering.xml once per conversion."""
+        if self._numbering_root_loaded:
+            return self._numbering_root
 
-    def _load_numbering_definitions(self) -> None:
-        """Load numbering definitions so heading/list counters follow DOCX rules."""
-        self.numbering_abstract_defs = {}
-        self.numbering_instances = {}
+        self._numbering_root_loaded = True
 
         if not hasattr(self.docx_obj, "part") or not hasattr(self.docx_obj.part, "package"):
-            return
+            return None
 
-        numbering_part = None
         for part in self.docx_obj.part.package.parts:
             if "numbering" in part.partname:
-                numbering_part = part
+                self._numbering_root = part.element
                 break
 
-        if numbering_part is None:
-            return
-
-        root = numbering_part.element
-        namespaces = {
-            "w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-        }
-
-        for abstract_num in root.findall("./w:abstractNum", namespaces=namespaces):
-            abstract_num_id = self._str_to_int(
-                abstract_num.get(
-                    "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}abstractNumId"
-                ),
-                None,
-            )
-            if abstract_num_id is None:
-                continue
-            levels: dict[int, dict[str, Any]] = {}
-            for level in abstract_num.findall("./w:lvl", namespaces=namespaces):
-                ilvl = self._str_to_int(
-                    level.get(
-                        "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}ilvl"
-                    ),
-                    None,
-                )
-                if ilvl is None:
-                    continue
-                levels[ilvl] = self._parse_numbering_level(level)
-            self.numbering_abstract_defs[abstract_num_id] = levels
-
-        for num in root.findall("./w:num", namespaces=namespaces):
-            num_id = self._str_to_int(
-                num.get("{http://schemas.openxmlformats.org/wordprocessingml/2006/main}numId"),
-                None,
-            )
-            if num_id is None:
-                continue
-
-            abstract_num_id_elem = num.find("./w:abstractNumId", namespaces=namespaces)
-            abstract_num_id = None
-            if abstract_num_id_elem is not None:
-                abstract_num_id = self._str_to_int(
-                    abstract_num_id_elem.get(self.XML_KEY),
-                    None,
-                )
-
-            overrides: dict[int, dict[str, Any]] = {}
-            for override in num.findall("./w:lvlOverride", namespaces=namespaces):
-                ilvl = self._str_to_int(
-                    override.get(
-                        "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}ilvl"
-                    ),
-                    None,
-                )
-                if ilvl is None:
-                    continue
-                override_data: dict[str, Any] = {}
-                start_override = override.find("./w:startOverride", namespaces=namespaces)
-                if start_override is not None:
-                    override_data["start"] = self._str_to_int(
-                        start_override.get(self.XML_KEY),
-                        1,
-                    )
-                override_level = override.find("./w:lvl", namespaces=namespaces)
-                if override_level is not None:
-                    override_data.update(self._parse_numbering_level(override_level))
-                overrides[ilvl] = override_data
-
-            self.numbering_instances[num_id] = {
-                "abstract_num_id": abstract_num_id,
-                "overrides": overrides,
-            }
-
-    def _parse_numbering_level(self, level_element: BaseOxmlElement) -> dict[str, Any]:
-        """Parse one numbering level definition from numbering.xml."""
-        namespaces = {
-            "w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-        }
-        start_elem = level_element.find("./w:start", namespaces=namespaces)
-        num_fmt_elem = level_element.find("./w:numFmt", namespaces=namespaces)
-        lvl_text_elem = level_element.find("./w:lvlText", namespaces=namespaces)
-        return {
-            "start": self._str_to_int(
-                start_elem.get(self.XML_KEY) if start_elem is not None else None,
-                1,
-            ),
-            "num_fmt": num_fmt_elem.get(self.XML_KEY) if num_fmt_elem is not None else "decimal",
-            "lvl_text": lvl_text_elem.get(self.XML_KEY) if lvl_text_elem is not None else None,
-        }
+        return self._numbering_root
 
     def _get_numbering_level_definition(
-        self, numid: int, ilevel: int
-    ) -> Optional[dict[str, Any]]:
-        """Resolve a numbering level definition with num-level overrides applied."""
-        num_info = self.numbering_instances.get(numid)
-        if not num_info:
-            return None
+        self, numId: int, ilvl: int
+    ) -> Optional[BaseOxmlElement]:
+        """Resolve and cache the numbering level definition for a numId/ilvl pair."""
+        cache_key = (numId, ilvl)
+        if cache_key in self._numbering_level_cache:
+            return self._numbering_level_cache[cache_key]
 
-        abstract_num_id = num_info.get("abstract_num_id")
-        base_level = (
-            self.numbering_abstract_defs.get(abstract_num_id, {}).get(ilevel, {}).copy()
-        )
-        override_level = num_info.get("overrides", {}).get(ilevel, {})
-        if not base_level and not override_level:
-            return None
-        base_level.update(override_level)
-        return base_level
+        numbering_root = self._get_numbering_root()
+        namespaces = {
+            "w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+        }
+        lvl_element: Optional[BaseOxmlElement] = None
 
-    def _advance_numbering_sequence(
-        self, numid: int, ilevel: int
-    ) -> Optional[str]:
-        """Advance a DOCX numbering sequence and render the visible numbering text."""
-        level_def = self._get_numbering_level_definition(numid, ilevel)
-        if level_def is None:
-            return None
+        if numbering_root is not None:
+            num_xpath = f".//w:num[@w:numId='{numId}']"
+            num_element = numbering_root.find(num_xpath, namespaces=namespaces)
 
-        counters = self.numbering_counters.setdefault(numid, {})
-        prev_level = self.numbering_prev_levels.get(numid)
-        start_value = max(level_def.get("start", 1) or 1, 1)
-
-        for ancestor in range(ilevel):
-            if ancestor in counters:
-                continue
-            ancestor_def = self._get_numbering_level_definition(numid, ancestor) or {}
-            counters[ancestor] = max(ancestor_def.get("start", 1) or 1, 1)
-
-        if prev_level is None:
-            counters[ilevel] = start_value
-        elif ilevel > prev_level:
-            for level in range(prev_level + 1, ilevel + 1):
-                child_def = self._get_numbering_level_definition(numid, level) or {}
-                counters[level] = max(child_def.get("start", 1) or 1, 1)
-        elif ilevel == prev_level:
-            counters[ilevel] = counters.get(ilevel, start_value - 1) + 1
-        else:
-            for level in list(counters.keys()):
-                if level > ilevel:
-                    del counters[level]
-            counters[ilevel] = counters.get(ilevel, start_value - 1) + 1
-
-        self.numbering_prev_levels[numid] = ilevel
-        return self._render_numbering_text(numid, ilevel, counters)
-
-    def _render_numbering_text(
-        self, numid: int, ilevel: int, counters: dict[int, int]
-    ) -> Optional[str]:
-        """Render the visible numbering prefix using lvlText and numFmt."""
-        level_def = self._get_numbering_level_definition(numid, ilevel)
-        if level_def is None:
-            return None
-
-        lvl_text = level_def.get("lvl_text") or f"%{ilevel + 1}"
-
-        def _replace(match: re.Match[str]) -> str:
-            placeholder_level = int(match.group(1)) - 1
-            placeholder_value = counters.get(placeholder_level)
-            if placeholder_value is None:
-                placeholder_def = (
-                    self._get_numbering_level_definition(numid, placeholder_level) or {}
+            if num_element is not None:
+                abstract_num_id_elem = num_element.find(
+                    ".//w:abstractNumId", namespaces=namespaces
                 )
-                placeholder_value = max(placeholder_def.get("start", 1) or 1, 1)
-                counters[placeholder_level] = placeholder_value
-            placeholder_level_def = (
-                self._get_numbering_level_definition(numid, placeholder_level) or {}
-            )
-            num_fmt = placeholder_level_def.get("num_fmt", "decimal")
-            return self._format_number_value(placeholder_value, num_fmt)
+                if abstract_num_id_elem is not None:
+                    abstract_num_id = abstract_num_id_elem.get(self.XML_KEY)
+                    if abstract_num_id is not None:
+                        abstract_num_xpath = (
+                            f".//w:abstractNum[@w:abstractNumId='{abstract_num_id}']"
+                        )
+                        abstract_num_element = numbering_root.find(
+                            abstract_num_xpath, namespaces=namespaces
+                        )
+                        if abstract_num_element is not None:
+                            lvl_xpath = f".//w:lvl[@w:ilvl='{ilvl}']"
+                            lvl_element = abstract_num_element.find(
+                                lvl_xpath, namespaces=namespaces
+                            )
 
-        return re.sub(r"%(\d+)", _replace, lvl_text)
-
-    def _format_number_value(self, value: int, num_fmt: str) -> str:
-        """Format one numbering value according to a subset of Word numFmt rules."""
-        if num_fmt == "decimalZero":
-            return f"{value:02d}"
-        if num_fmt == "lowerLetter":
-            return self._to_alpha(value).lower()
-        if num_fmt == "upperLetter":
-            return self._to_alpha(value).upper()
-        if num_fmt == "lowerRoman":
-            return self._to_roman(value).lower()
-        if num_fmt == "upperRoman":
-            return self._to_roman(value).upper()
-        if num_fmt == "decimalEnclosedCircleChinese":
-            circled = {
-                1: "①", 2: "②", 3: "③", 4: "④", 5: "⑤",
-                6: "⑥", 7: "⑦", 8: "⑧", 9: "⑨", 10: "⑩",
-                11: "⑪", 12: "⑫", 13: "⑬", 14: "⑭", 15: "⑮",
-                16: "⑯", 17: "⑰", 18: "⑱", 19: "⑲", 20: "⑳",
-            }
-            return circled.get(value, str(value))
-        return str(value)
-
-    def _to_alpha(self, value: int) -> str:
-        """Convert 1-based integers to Excel-style alphabetic numbering."""
-        if value <= 0:
-            return str(value)
-        chars = []
-        current = value
-        while current > 0:
-            current -= 1
-            chars.append(chr(ord("A") + (current % 26)))
-            current //= 26
-        return "".join(reversed(chars))
-
-    def _to_roman(self, value: int) -> str:
-        """Convert positive integers to Roman numerals."""
-        if value <= 0:
-            return str(value)
-        numerals = [
-            (1000, "M"), (900, "CM"), (500, "D"), (400, "CD"),
-            (100, "C"), (90, "XC"), (50, "L"), (40, "XL"),
-            (10, "X"), (9, "IX"), (5, "V"), (4, "IV"), (1, "I"),
-        ]
-        result = []
-        current = value
-        for arabic, roman in numerals:
-            while current >= arabic:
-                result.append(roman)
-                current -= arabic
-        return "".join(result)
+        self._numbering_level_cache[cache_key] = lvl_element
+        return lvl_element
 
     def _is_numbered_list(self, numId: int, ilvl: int) -> bool:
         """
@@ -2045,65 +1923,12 @@ class DocxConverter:
             bool: 如果是编号列表返回 True，否则返回 False
         """
         try:
-            # 访问文档的编号部分
-            if not hasattr(self.docx_obj, "part") or not hasattr(
-                self.docx_obj.part, "package"
-            ):
+            lvl_element = self._get_numbering_level_definition(numId, ilvl)
+            if lvl_element is None:
                 return False
-
-            numbering_part = None
-            # 查找编号部分
-            for part in self.docx_obj.part.package.parts:
-                if "numbering" in part.partname:
-                    numbering_part = part
-                    break
-
-            if numbering_part is None:
-                return False
-
-            # 解析编号 XML
-            numbering_root = numbering_part.element
             namespaces = {
                 "w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
             }
-
-            # 查找具有给定 numId 的编号定义
-            num_xpath = f".//w:num[@w:numId='{numId}']"
-            num_element = numbering_root.find(num_xpath, namespaces=namespaces)
-
-            if num_element is None:
-                return False
-
-            # 从 num 元素获取 abstractNumId
-            abstract_num_id_elem = num_element.find(
-                ".//w:abstractNumId", namespaces=namespaces
-            )
-            if abstract_num_id_elem is None:
-                return False
-
-            abstract_num_id = abstract_num_id_elem.get(
-                "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}val"
-            )
-            if abstract_num_id is None:
-                return False
-
-            # 查找抽象编号定义
-            abstract_num_xpath = (
-                f".//w:abstractNum[@w:abstractNumId='{abstract_num_id}']"
-            )
-            abstract_num_element = numbering_root.find(
-                abstract_num_xpath, namespaces=namespaces
-            )
-
-            if abstract_num_element is None:
-                return False
-
-            # 查找给定 ilvl 的层级定义
-            lvl_xpath = f".//w:lvl[@w:ilvl='{ilvl}']"
-            lvl_element = abstract_num_element.find(lvl_xpath, namespaces=namespaces)
-
-            if lvl_element is None:
-                return False
 
             # 获取 numFmt 元素
             num_fmt_element = lvl_element.find(".//w:numFmt", namespaces=namespaces)
@@ -2138,7 +1963,6 @@ class DocxConverter:
         ilevel: int,
         elements: list,
         is_numbered: bool = False,
-        numbering_text: Optional[str] = None,
         text: str = "",
         equations: list = None,
     ) -> list:
@@ -2177,10 +2001,12 @@ class DocxConverter:
         content_text = self._build_text_with_equations_and_hyperlinks(
             elements, text, equations
         )
+        content_text = self._normalize_text_block_content(content_text)
+        if content_text == "":
+            return None
 
         # 确定列表属性
         list_attribute = "ordered" if is_numbered else "unordered"
-        list_item_prefix = numbering_text if is_numbered and numbering_text else None
 
         # 情况 1: 不存在上一个列表ID，或遇到了不同 numId 的新列表，创建新的顶层列表
         if self.pre_num_id == -1 or self.pre_num_id != numid:
@@ -2207,8 +2033,6 @@ class DocxConverter:
                 "type": BlockType.TEXT,
                 "content": content_text,
             }
-            if list_item_prefix:
-                list_item["prefix"] = list_item_prefix
 
             list_block["content"].append(list_item)
             self.pre_num_id = numid
@@ -2228,6 +2052,22 @@ class DocxConverter:
                 "ilevel": ilevel,
             }
 
+            if not self.list_block_stack:
+                logger.warning(
+                    "Missing DOCX list parent for increased indent; "
+                    f"numid={numid}, ilevel={ilevel}. Starting a new list block."
+                )
+                self.cur_page.append(child_list_block)
+                self.list_block_stack.append(child_list_block)
+                child_list_block["content"].append(
+                    {
+                        "type": BlockType.TEXT,
+                        "content": content_text,
+                    }
+                )
+                self.pre_ilevel = ilevel
+                return None
+
             # 获取栈顶的列表块，将子列表直接添加到其content中
             parent_list_block = self.list_block_stack[-1]
             parent_list_block["content"].append(child_list_block)
@@ -2240,8 +2080,6 @@ class DocxConverter:
                 "type": BlockType.TEXT,
                 "content": content_text,
             }
-            if list_item_prefix:
-                list_item["prefix"] = list_item_prefix
             child_list_block["content"].append(list_item)
 
             # 更新目前缩进
@@ -2259,29 +2097,52 @@ class DocxConverter:
                 if top_list_block["ilevel"] == ilevel:
                     break
                 self.list_block_stack.pop()
-            list_block = self.list_block_stack[-1]
+            if not self.list_block_stack:
+                logger.warning(
+                    "Malformed DOCX list nesting; "
+                    f"numid={numid}, ilevel={ilevel}. Starting a new list block."
+                )
+                list_block = {
+                    "type": BlockType.LIST,
+                    "attribute": list_attribute,
+                    "content": [],
+                    "ilevel": ilevel,
+                }
+                self.cur_page.append(list_block)
+                self.list_block_stack.append(list_block)
+            else:
+                list_block = self.list_block_stack[-1]
 
             list_item = {
                 "type": BlockType.TEXT,
                 "content": content_text,
             }
-            if list_item_prefix:
-                list_item["prefix"] = list_item_prefix
             list_block["content"].append(list_item)
             self.pre_ilevel = ilevel
 
         # 情况 4: 同级列表项（相同缩进）
         elif self.pre_num_id == numid and self.pre_ilevel == ilevel:
-            # 获取栈顶的列表块
-            list_block = self.list_block_stack[-1]
-
+            if not self.list_block_stack:
+                logger.warning(
+                    "Missing DOCX list block for same indent; "
+                    f"numid={numid}, ilevel={ilevel}. Starting a new list block."
+                )
+                list_block = {
+                    "type": BlockType.LIST,
+                    "attribute": list_attribute,
+                    "content": [],
+                    "ilevel": ilevel,
+                }
+                self.cur_page.append(list_block)
+                self.list_block_stack.append(list_block)
+            else:
+                # 获取栈顶的列表块
+                list_block = self.list_block_stack[-1]
 
             list_item = {
                 "type": BlockType.TEXT,
                 "content": content_text,
             }
-            if list_item_prefix:
-                list_item["prefix"] = list_item_prefix
             list_block["content"].append(list_item)
 
         else:
@@ -2537,6 +2398,9 @@ class DocxConverter:
         content_text = self._build_text_with_equations_and_hyperlinks(
             elements, text, equations
         )
+        content_text = self._normalize_text_block_content(content_text)
+        if content_text == "":
+            return
 
         # 情况 1: 首个目录项，创建新的顶层索引块
         if self.pre_index_ilevel == -1:
@@ -2653,6 +2517,42 @@ class DocxConverter:
                 return anchor
         return anchors[0]
 
+    def _handle_plain_toc_paragraph_as_index(
+        self,
+        *,
+        paragraph: Paragraph,
+        paragraph_element: BaseOxmlElement,
+        paragraph_elements: list,
+        text: str,
+        equations: list,
+    ) -> bool:
+        """将未包裹在 SDT 中的普通目录段落转换为 INDEX 项。"""
+        toc_level = self._get_toc_item_level(paragraph)
+        if toc_level is None:
+            return False
+        if not text:
+            return True
+
+        target_anchor = self._extract_toc_target_anchor(paragraph_element)
+        # 只有已经进入目录序列后才允许无锚点条目，避免误收复用 TOC 样式的封面文本。
+        if not target_anchor and self.pre_index_ilevel == -1:
+            return False
+        if target_anchor and target_anchor.startswith("_Toc"):
+            self.toc_anchor_set.add(target_anchor)
+
+        if self.plain_toc_base_level is None:
+            self.plain_toc_base_level = toc_level
+        normalized_level = max(0, toc_level - self.plain_toc_base_level)
+        corrected_level = self._correct_toc_level_by_text(normalized_level, text)
+        self._add_index_item(
+            ilevel=corrected_level,
+            elements=paragraph_elements,
+            text=text,
+            equations=equations,
+            anchor=target_anchor,
+        )
+        return True
+
     def _handle_sdt_as_index(self, sdt_content: BaseOxmlElement) -> None:
         """
         处理目录SDT内容，将其转换为层级化的INDEX块。
@@ -2701,8 +2601,7 @@ class DocxConverter:
         is_flat = self._is_flat_list_toc(toc_items)
 
         # 重置索引状态，开始新的目录块
-        self.index_block_stack = []
-        self.pre_index_ilevel = -1
+        self._reset_index_state()
 
         for toc_level, text, elements, equations, target_anchor in toc_items:
             if is_flat:
@@ -2721,8 +2620,7 @@ class DocxConverter:
             )
 
         # 处理完成后重置索引状态
-        self.index_block_stack = []
-        self.pre_index_ilevel = -1
+        self._reset_index_state()
 
     def _get_heading_and_level(self, style_label: str) -> tuple[str, Optional[int]]:
         """
@@ -2909,57 +2807,65 @@ class DocxConverter:
         Returns:
 
         """
+        chart_rel_types = {
+            "http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart",
+            "http://purl.oclc.org/ooxml/officeDocument/relationships/chart",
+        }
+        package_rel_types = {
+            "http://schemas.openxmlformats.org/officeDocument/2006/relationships/package",
+            "http://purl.oclc.org/ooxml/officeDocument/relationships/package",
+        }
+        rel_id_attr = (
+            "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}id"
+        )
         for element in elements:
             chart = element.find(
                 ".//c:chart", namespaces=DocxConverter._BLIP_NAMESPACES
             )
-            if chart is not None:
-                # 如果找到 chart 元素，构造空的图表块，后续回填 html。
-                chart_block = {
-                    "type": BlockType.CHART,
-                    "content": "",
-                }
-                self.cur_page.append(chart_block)
-                self.chart_list.append(chart_block)
+            if chart is None:
+                continue
 
-    def _add_chart_table(self):
-        idx_xlsx_map = {}
-        rel_pattern = re.compile(r"word/charts/_rels/chart(\d+)\.xml\.rels$")
+            chart_block = {
+                "type": BlockType.CHART,
+                "content": "",
+            }
+            self.cur_page.append(chart_block)
 
-        # 定义命名空间
-        namespaces = {
-            "r": "http://schemas.openxmlformats.org/package/2006/relationships"
-        }
+            rel_id = chart.get(rel_id_attr)
+            if not rel_id:
+                continue
 
-        # first pass: read relationships from rewindable byte buffer
-        with zipfile.ZipFile(BytesIO(self._file_bytes), "r") as zf:
-            for name in zf.namelist():
-                match = rel_pattern.match(name)
-                if match:
-                    # 读取 .rels 文件内容
-                    rels_content = zf.read(name)
-                    # 解析 XML
-                    rels_root = etree.fromstring(rels_content)
+            try:
+                chart_rel = self.docx_obj.part.rels[rel_id]
+            except KeyError:
+                continue
 
-                    # 查找所有 Relationship 元素
-                    for rel in rels_root.findall(
-                        ".//r:Relationship", namespaces=namespaces
-                    ):
-                        target = rel.get("Target")
-                        if target and target.endswith(".xlsx"):
-                            path = Path(target)
-                            idx_xlsx_map[path.name] = int(match.group(1))
+            if chart_rel.reltype not in chart_rel_types:
+                continue
 
-        # second pass: again open buffer rather than original stream
-        with zipfile.ZipFile(BytesIO(self._file_bytes), "r") as zf:
-            for name in zf.namelist():
-                if name.startswith("word/embeddings/"):
-                    for path_name, chart_idx in idx_xlsx_map.items():
-                        if name.endswith(path_name):
-                            content = zf.read(name)
-                            excel_data = pd.read_excel(BytesIO(content))
-                            html = excel_data.to_html(index=False, header=True)
-                            self.chart_list[chart_idx - 1]["content"] = self._minify_html(html)
+            try:
+                chart_part = chart_rel.target_part
+                chart_xml = chart_part.blob
+            except Exception as e:
+                logger.warning(f"Warning: chart XML cannot be loaded: {e}")
+                continue
+
+            workbook_bytes = None
+            try:
+                for rel in chart_part.rels.values():
+                    if rel.reltype in package_rel_types:
+                        workbook_bytes = rel.target_part.blob
+                        break
+            except Exception as e:
+                logger.warning(f"Warning: chart workbook cannot be loaded: {e}")
+
+            try:
+                chart_html = extract_chart_html_from_ooxml(chart_xml, workbook_bytes)
+            except Exception as e:
+                logger.warning(f"Warning: chart HTML cannot be extracted: {e}")
+                continue
+            if chart_html:
+                chart_block["content"] = chart_html
 
     def _handle_textbox_content(
         self,

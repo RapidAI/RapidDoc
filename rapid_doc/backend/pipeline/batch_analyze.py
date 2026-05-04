@@ -15,7 +15,7 @@ from tqdm import tqdm
 from .analyze_utils import _extract_text_from_pdf, _run_ocr_det_batch, _process_single_table, _run_ocr_rec_postprocess
 from .model_init import AtomModelSingleton
 from .model_list import AtomicModel
-from ..utils import remove_layout_in_ori_images, filter_overlap_boxes
+from ..utils.utils import remove_layout_in_ori_images, filter_overlap_boxes
 from ...model.custom import CustomBaseModel
 from ...utils.boxbase import get_rotate_image, restore_poly
 from ...utils.checkbox_det_cls import checkbox_predict

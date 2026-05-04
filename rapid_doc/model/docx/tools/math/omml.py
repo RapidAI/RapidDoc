@@ -1,3 +1,4 @@
+# Copyright (c) Opendatalab. All rights reserved.
 """
 Office Math Markup Language (OMML)
 
@@ -51,6 +52,9 @@ SCR_TO_LATEX = {
     "monospace":    "\\mathtt{{{0}}}",         # 等宽字体
 }
 
+LOWER_GROUP_LIMITS = ("\\underbrace{", "\\underbracket{", "\\underparen{")
+UPPER_GROUP_LIMITS = ("\\overbrace{", "\\overbracket{", "\\overparen{")
+
 
 def load(stream):
     tree = ET.parse(stream)
@@ -82,6 +86,13 @@ def get_val(key, default=None, store=CHR):
         return key if not store else store.get(key, key)
     else:
         return default
+
+
+def _normalize_latex_delimiter(delimiter):
+    """将 Word OMML 定界符字符转换为 LaTeX/KaTeX 可渲染的定界符。"""
+    if delimiter in ("\u2225", "\u2016"):
+        return r"\|"
+    return delimiter
 
 
 class Tag2Method:
@@ -214,6 +225,34 @@ class oMath2Latex(Tag2Method):
     def latex(self):
         return self._latex
 
+    def _apply_limit_marker(self, base_text, limit_text):
+        if not isinstance(limit_text, str):
+            return None
+
+        latex_template = CHR.get(limit_text)
+        if latex_template and "{0}" in latex_template:
+            return latex_template.format(base_text)
+        return None
+
+    def _format_limit_like(self, base_text, limit_text, *, upper):
+        marker_wrapped = self._apply_limit_marker(base_text, limit_text)
+        if marker_wrapped is not None:
+            return marker_wrapped
+
+        if upper:
+            if isinstance(base_text, str) and base_text.lstrip().startswith(UPPER_GROUP_LIMITS):
+                return f"{base_text}{SUP.format(limit_text)}"
+            return LIM_UPP.format(lim=limit_text, text=base_text)
+
+        latex_s = LIM_FUNC.get(base_text)
+        if latex_s:
+            return latex_s.format(lim=limit_text)
+
+        if isinstance(base_text, str) and base_text.lstrip().startswith(LOWER_GROUP_LIMITS):
+            return f"{base_text}{SUB.format(limit_text)}"
+
+        return f"\\underset{{{limit_text}}}{{{base_text}}}"
+
     def do_acc(self, elm):
         """
         the accent function
@@ -241,8 +280,12 @@ class oMath2Latex(Tag2Method):
         pr = c_dict["dPr"]
         null = D_DEFAULT.get("null")
 
-        s_val = get_val(pr.begChr, default=D_DEFAULT.get("left"), store=T)
-        e_val = get_val(pr.endChr, default=D_DEFAULT.get("right"), store=T)
+        s_val = _normalize_latex_delimiter(
+            get_val(pr.begChr, default=D_DEFAULT.get("left"), store=T)
+        )
+        e_val = _normalize_latex_delimiter(
+            get_val(pr.endChr, default=D_DEFAULT.get("right"), store=T)
+        )
         delim = pr.text + D.format(
             left=null if not s_val else escape_latex(s_val),
             text=c_dict["e"],
@@ -366,18 +409,22 @@ class oMath2Latex(Tag2Method):
         the Lower-Limit object
         """
         t_dict = self.process_children_dict(elm, include=("e", "lim"))
-        latex_s = LIM_FUNC.get(t_dict["e"])
-        if not latex_s:
-            raise RuntimeError("Not support lim {}".format(t_dict["e"]))
-        else:
-            return latex_s.format(lim=t_dict.get("lim"))
+        return self._format_limit_like(
+            t_dict.get("e", ""),
+            t_dict.get("lim", ""),
+            upper=False,
+        )
 
     def do_limupp(self, elm):
         """
         the Upper-Limit object
         """
         t_dict = self.process_children_dict(elm, include=("e", "lim"))
-        return LIM_UPP.format(lim=t_dict.get("lim"), text=t_dict.get("e"))
+        return self._format_limit_like(
+            t_dict.get("e", ""),
+            t_dict.get("lim", ""),
+            upper=True,
+        )
 
     def do_lim(self, elm):
         """
@@ -420,6 +467,9 @@ class oMath2Latex(Tag2Method):
         return bo + BLANK.join(res)
 
     def process_unicode(self, s):
+        if s in CHARS:
+            return BACKSLASH + s
+
         # Check T dictionary first for known math-mode symbols.
         # The T dictionary holds explicit math-mode LaTeX mappings and takes precedence
         # over pylatexenc, which uses text-mode mappings by default and therefore produces
@@ -431,17 +481,19 @@ class oMath2Latex(Tag2Method):
 
         out_latex_str = self.u.unicode_to_latex(s)
 
-        if (
+        # pylatexenc常把数学字符包成 {\ensuremath{...}}，这里只剥离外层包装，
+        # 不能删除内部LaTeX命令的闭合花括号。
+        if out_latex_str.startswith(r"{\ensuremath{") and out_latex_str.endswith("}}"):
+            out_latex_str = out_latex_str[len(r"{\ensuremath{") : -2]
+        elif out_latex_str.startswith(r"\ensuremath{") and out_latex_str.endswith("}"):
+            out_latex_str = out_latex_str[len(r"\ensuremath{") : -1]
+        elif (
             s.startswith("{") is False
             and out_latex_str.startswith("{")
             and s.endswith("}") is False
             and out_latex_str.endswith("}")
         ):
             out_latex_str = f" {out_latex_str[1:-1]} "
-
-        if "ensuremath" in out_latex_str:
-            out_latex_str = out_latex_str.replace("\\ensuremath{", " ")
-            out_latex_str = out_latex_str.replace("}", " ")
 
         # Do NOT wrap remaining content in \text{}.
         # Previously this code matched any string starting with "\text" and wrapped it
