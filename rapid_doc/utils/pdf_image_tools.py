@@ -227,7 +227,7 @@ def get_crop_img(bbox: tuple, pil_img, scale=2):
     return pil_img.crop(scale_bbox)
 
 
-def get_crop_np_img(bbox: tuple, input_img, scale=2):
+def get_crop_np_img(bbox: tuple, input_img, scale=2, return_list=False):
 
     if isinstance(input_img, Image.Image):
         np_img = np.asarray(input_img)
@@ -242,6 +242,12 @@ def get_crop_np_img(bbox: tuple, input_img, scale=2):
         int(bbox[2] * scale),
         int(bbox[3] * scale),
     )
+    if return_list:
+        crop_xmin, crop_ymin, crop_xmax, crop_ymax = scale_bbox
+        cropped_img = np_img[crop_ymin:crop_ymax, crop_xmin:crop_xmax]
+        crop_new_height, crop_new_width = cropped_img.shape[:2]
+        return_list = [0, 0, crop_xmin, crop_ymin, crop_xmax, crop_ymax, crop_new_width, crop_new_height]
+        return np_img[scale_bbox[1]:scale_bbox[3], scale_bbox[0]:scale_bbox[2]], return_list
 
     return np_img[scale_bbox[1]:scale_bbox[3], scale_bbox[0]:scale_bbox[2]]
 

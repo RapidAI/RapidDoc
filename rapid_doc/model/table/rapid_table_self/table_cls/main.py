@@ -19,7 +19,7 @@ class TableCls:
         if cfg is None:
             cfg = RapidTableInput()
         if not cfg.model_type:
-            cfg.model_type = ModelType.Q_CLS
+            cfg.model_type = ModelType.PADDLE_CLS
 
         if not cfg.model_dir_or_path and cfg.model_type is not None:
             cfg.model_dir_or_path = ModelProcessor.get_model_path(cfg.model_type)

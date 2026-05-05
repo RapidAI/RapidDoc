@@ -17,11 +17,13 @@ from .model_init import AtomModelSingleton
 from .model_list import AtomicModel
 from ..utils.utils import remove_layout_in_ori_images, filter_overlap_boxes
 from ...model.custom import CustomBaseModel
+from ...utils.bbox_utils import normalize_to_int_bbox
 from ...utils.boxbase import get_rotate_image, restore_poly
 from ...utils.checkbox_det_cls import checkbox_predict
 from ...utils.config_reader import get_formula_enable, get_table_enable
 from ...utils.enum_class import CategoryId
 from ...utils.model_utils import crop_img, get_res_list_from_layout_res, clean_vram
+from ...utils.pdf_image_tools import get_crop_np_img
 from ...utils.span_pre_proc import extract_table_fill_image
 
 
@@ -69,11 +71,6 @@ class BatchAnalyze:
         self.formula_base_batch_size = self.formula_config.get("batch_num", 1)
         
         # 表格配置
-        self.table_force_ocr = self.table_config.get("force_ocr", False)
-        self.skip_text_in_image = self.table_config.get("skip_text_in_image", True)
-        self.use_img2table = self.table_config.get("use_img2table", False)
-        self.table_use_word_box = self.table_config.get("use_word_box", True)
-        self.table_formula_enable = self.table_config.get("table_formula_enable", True)
         self.table_image_enable = self.table_config.get("table_image_enable", True)
         self.table_extract_original_image = self.table_config.get("extract_original_image", False)
     
@@ -234,13 +231,22 @@ class BatchAnalyze:
 
             # 表格区域
             for table_res in table_res_list:
-                table_img, useful_list = crop_img(table_res, np_img)
-                rect_table_img, _ = crop_img(table_res, np_img, layout_shape_mode="rect")
+                def get_crop_table_img(scale):
+                    bbox = [table_res["poly"][0], table_res["poly"][1], table_res["poly"][4], table_res["poly"][5]]
+                    bbox = normalize_to_int_bbox(
+                        [float(v) / float(scale) for v in bbox]
+                    )
+                    if bbox is None:
+                        return np_img[0:0, 0:0]
+                    return get_crop_np_img(bbox, np_img, scale=scale, return_list=True)
+                table_img, useful_list = get_crop_table_img(scale=5)
+                # table_img, useful_list = crop_img(table_res, np_img)
+                # rect_table_img, _ = crop_img(table_res, np_img, layout_shape_mode="rect")
                 table_res_all_page.append({
                     'table_res': table_res,
                     'lang': _lang,
                     'table_img': table_img, #矩形框/异型框的表格
-                    'rect_table_img': rect_table_img, #矩形框的表格
+                    'rect_table_img': table_img, #矩形框的表格
                     'single_page_mfdetrec_res': formula_res_list,
                     'checkbox_res': checkbox_res,
                     'useful_list': useful_list,

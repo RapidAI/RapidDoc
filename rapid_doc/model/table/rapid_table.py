@@ -39,7 +39,7 @@ class RapidTableModel(object):
         #     self.engine_type = EngineType.OPENVINO
 
         if self.model_type == ModelType.UNET_SLANET_PLUS:
-            cls_input_args = RapidTableInput(model_type=table_config.get("cls.model_type", ModelType.Q_CLS), engine_type=self.engine_type,
+            cls_input_args = RapidTableInput(model_type=table_config.get("cls.model_type", ModelType.PADDLE_CLS), engine_type=self.engine_type,
                                             model_dir_or_path=table_config.get("cls.model_dir_or_path"),
                                             engine_cfg=engine_cfg, use_ocr=False)
             self.table_cls = TableCls(cls_input_args)
@@ -52,7 +52,7 @@ class RapidTableModel(object):
                                                   engine_cfg=engine_cfg, use_ocr=False)
             self.wireless_table_model = RapidTable(wireless_input_args)
         elif self.model_type == ModelType.UNET_UNITABLE:
-            cls_input_args = RapidTableInput(model_type=table_config.get("cls.model_type", ModelType.Q_CLS), engine_type=self.engine_type,
+            cls_input_args = RapidTableInput(model_type=table_config.get("cls.model_type", ModelType.PADDLE_CLS), engine_type=self.engine_type,
                                             model_dir_or_path=table_config.get("cls.model_dir_or_path"),
                                             engine_cfg=engine_cfg, use_ocr=False)
             self.table_cls = TableCls(cls_input_args)

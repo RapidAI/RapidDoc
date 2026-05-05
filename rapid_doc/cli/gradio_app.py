@@ -176,6 +176,14 @@ async def parse_doc(doc_path, output_dir, end_page_id, is_ocr, formula_enable, t
             env_name = parse_method
 
         local_image_dir, local_md_dir = prepare_env(output_dir, file_name, env_name)
+        from rapidocr import EngineType as OCREngineType, OCRVersion, ModelType as OCRModelType
+        ocr_config = {
+            # "Det.model_type": OCRModelType.SERVER,
+            # "Rec.model_type": OCRModelType.SERVER,
+        }
+        table_config = {
+            # "use_word_box": False,  # 使用单字坐标匹配单元格，默认 False
+        }
         await aio_do_parse(
             output_dir=output_dir,
             pdf_file_names=[file_name],
@@ -187,6 +195,8 @@ async def parse_doc(doc_path, output_dir, end_page_id, is_ocr, formula_enable, t
             table_enable=table_enable,
             backend=backend,
             server_url=url,
+            ocr_config=ocr_config,
+            table_config=table_config,
         )
         return local_md_dir, file_name
     except Exception as e:
@@ -272,7 +282,7 @@ def replace_image_with_base64(markdown_text, image_dir_path):
     return result
 
 
-async def to_markdown(file_path, end_pages=10, is_ocr=False, formula_enable=True, table_enable=True, language="ch", backend="pipeline", url=None):
+async def to_markdown(file_path, end_pages=10, is_ocr=False, formula_enable=True, table_enable=True, language="ch_lite", backend="pipeline", url=None):
     if file_path is None:
         return None, None, None, *build_preview_updates(None)
 
@@ -404,7 +414,7 @@ if not os.path.exists(header_path):
 with open(header_path, 'r') as header_file:
     header = header_file.read()
 
-all_lang = ['ch']
+all_lang = ['ch_lite']
 
 def safe_stem(file_path):
     stem = Path(file_path).stem
@@ -427,6 +437,8 @@ def to_pdf(file_path):
 
     # 将字节数据写入文件
     with open(tmp_file_path, 'wb') as tmp_pdf_file:
+        if isinstance(pdf_bytes, dict):
+            pdf_bytes = pdf_bytes["pdf_bytes"]
         tmp_pdf_file.write(pdf_bytes)
 
     return tmp_file_path
@@ -533,7 +545,7 @@ def main(ctx,
                         formula_enable = gr.Checkbox(label='Enable formula recognition', value=True)
                         table_enable = gr.Checkbox(label='Enable table recognition', value=True)
                     with gr.Column(visible=False) as ocr_options:
-                        language = gr.Dropdown(all_lang, label='Language', value='ch')
+                        language = gr.Dropdown(all_lang, label='Language', value='ch_lite')
                         is_ocr = gr.Checkbox(label='Force enable OCR', value=False)
                 with gr.Row():
                     change_bu = gr.Button('Convert')

@@ -142,7 +142,7 @@ formula_config = {
 |          use_img2table           | 是否优先使用img2table库提取表格  |             False              | 需要手动安装（pip install img2table），基于opencv识别准确度不如使用模型，但是速度很快，默认关闭 |
 |            model_type            |          模型           |        UNET_SLANET_PLUS        |                 有线表格使用unet，无线表格使用slanet_plus                  |
 |           engine_type            |         推理引擎          | OPENVINO（cpu）、ONNXRUNTIME（gpu） |                             None                              |  torch仅支持UNITABLE模型   |
-|           use_word_box           |      使用单字坐标匹配单元格      |              True              |                                                               |
+|           use_word_box           |      使用单字坐标匹配单元格      |              False              |                                                               |
 |        use_compare_table         | 启用表格结果比较（同时跑有线/无线并比对） |             False              |       如果开启，分类判断为有线表格时，也会用无线表格模型识别，然后比较两个模型选择有效单元格识别结果多的       |
 |       table_formula_enable       |        表格内公式识别        |              True              |                                                               |
 |        table_image_enable        |        表格内图片识别        |              True              |                                                               |

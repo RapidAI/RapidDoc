@@ -287,7 +287,7 @@ def _process_single_table(
     table_force_ocr = table_config.get("force_ocr", False)
     skip_text_in_image = table_config.get("skip_text_in_image", True)
     use_img2table = table_config.get("use_img2table", False)
-    table_use_word_box = table_config.get("use_word_box", True)
+    table_use_word_box = table_config.get("use_word_box", False)
     table_formula_enable = table_config.get("table_formula_enable", True)
     table_image_enable = table_config.get("table_image_enable", True)
     table_extract_original_image = table_config.get("extract_original_image", False)
@@ -341,6 +341,11 @@ def _process_single_table(
         rotate_table_image(table_res_dict, rotate_label)
         # 旋转后的表格需要重新获取文本框
         bgr_image = cv2.cvtColor(table_res_dict["table_img"], cv2.COLOR_RGB2BGR)
+        det_image = (
+            _apply_mask_boxes_to_image(bgr_image, adjusted_mfdetrec_res)
+            if adjusted_mfdetrec_res
+            else bgr_image
+        )
         det_res = ocr_model.ocr(det_image, mfd_res=adjusted_mfdetrec_res, rec=False)[0]
 
     ocr_result = []

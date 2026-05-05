@@ -42,7 +42,9 @@ ENV PIP_RETRIES=10
 RUN python3 -m pip install --upgrade pip setuptools wheel && \
     python3 -m pip install --no-cache-dir --prefer-binary \
         'rapid-doc[gpu]==0.9.2' \
-        'rapid-doc[api]==0.9.2' \
+        'rapid-doc[api]==0.9.2' && \
+    python3 -m pip uninstall -y onnxruntime || true && \
+    python3 -m pip install --no-cache-dir --prefer-binary \
         'onnxruntime-gpu==1.23.0' && \
     python3 -m pip cache purge
 
