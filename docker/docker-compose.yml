@@ -1,7 +1,7 @@
 services:
   rapid-doc-server:
     container_name: rapid-doc-server
-    image: hzkitty/rapid-doc:0.9.1
+    image: hzkitty/rapid-doc:0.9.2
     ports:
       - "8888:8888"
     environment:
