@@ -41,8 +41,8 @@ ENV PIP_RETRIES=10
 # 安装 Python 依赖
 RUN python3 -m pip install --upgrade pip setuptools wheel && \
     python3 -m pip install --no-cache-dir --prefer-binary \
-        'rapid-doc[gpu]==0.9.2' \
-        'rapid-doc[api]==0.9.2' && \
+        'rapid-doc[gpu]==0.9.3' \
+        'rapid-doc[api]==0.9.3' && \
     python3 -m pip uninstall -y onnxruntime || true && \
     python3 -m pip install --no-cache-dir --prefer-binary \
         'onnxruntime-gpu==1.23.0' && \
