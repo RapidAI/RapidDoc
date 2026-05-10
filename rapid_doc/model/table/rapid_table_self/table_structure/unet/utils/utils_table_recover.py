@@ -196,6 +196,36 @@ def box_4_2_poly_to_box_4_1(poly_box: Union[list, np.ndarray]) -> List[Any]:
     """
     return [poly_box[0][0], poly_box[0][1], poly_box[2][0], poly_box[2][1]]
 
+def _ocr_boxes_to_array(dt_rec_boxes: List[List[Union[Any, str]]]) -> np.ndarray:
+    """将 OCR 四点框批量转换为 [xmin, ymin, xmax, ymax]，保持旧逻辑使用第 0/2 点。"""
+    if len(dt_rec_boxes) == 0:
+        return np.empty((0, 4), dtype=np.float64)
+    return np.asarray(
+        [
+            [
+                gt_box[0][0][0],
+                gt_box[0][0][1],
+                gt_box[0][2][0],
+                gt_box[0][2][1],
+            ]
+            for gt_box in dt_rec_boxes
+        ],
+        dtype=np.float64,
+    )
+
+
+def _pred_boxes_to_array(pred_bboxes: np.ndarray) -> np.ndarray:
+    """将预测 cell 四点框批量转换为 [xmin, ymin, xmax, ymax]，保持旧逻辑使用第 0/2 点。"""
+    pred_bboxes = np.asarray(pred_bboxes)
+    if pred_bboxes.size == 0:
+        return np.empty((0, 4), dtype=np.float64)
+    return np.asarray(
+        [
+            [pred_box[0][0], pred_box[0][1], pred_box[2][0], pred_box[2][1]]
+            for pred_box in pred_bboxes
+        ],
+        dtype=np.float64,
+    )
 
 def match_ocr_cell(dt_rec_boxes: List[List[Union[Any, str]]], pred_bboxes: np.ndarray):
     """
@@ -203,27 +233,60 @@ def match_ocr_cell(dt_rec_boxes: List[List[Union[Any, str]]], pred_bboxes: np.nd
     :param pred_bboxes: shap (4,2)
     :return:
     """
+    ocr_boxes = _ocr_boxes_to_array(dt_rec_boxes)
+    pred_boxes = _pred_boxes_to_array(pred_bboxes)
+    if ocr_boxes.size == 0 or pred_boxes.size == 0:
+        return {}, []
+
+    ocr = ocr_boxes[:, None, :]
+    pred = pred_boxes[None, :, :]
+
+    no_intersection = (
+        (ocr[..., 2] < pred[..., 0])
+        | (ocr[..., 0] > pred[..., 2])
+        | (ocr[..., 3] < pred[..., 1])
+        | (ocr[..., 1] > pred[..., 3])
+    )
+    intersects = ~no_intersection
+
+    inter_x1 = np.maximum(ocr[..., 0], pred[..., 0])
+    inter_y1 = np.maximum(ocr[..., 1], pred[..., 1])
+    inter_x2 = np.minimum(ocr[..., 2], pred[..., 2])
+    inter_y2 = np.minimum(ocr[..., 3], pred[..., 3])
+    inter_area = np.maximum(0, inter_x2 - inter_x1) * np.maximum(0, inter_y2 - inter_y1)
+
+    ocr_area = (ocr[..., 2] - ocr[..., 0]) * (ocr[..., 3] - ocr[..., 1])
+    pred_area = (pred[..., 2] - pred[..., 0]) * (pred[..., 3] - pred[..., 1])
+
+    # 等价实现 is_box_contained(ocr_box, pred_box, 0.6) == 1。
+    ocr_outside_ratio = np.divide(
+        ocr_area - inter_area,
+        ocr_area,
+        out=np.zeros_like(inter_area, dtype=np.float64),
+        where=ocr_area > 0,
+    )
+    contained = intersects & (ocr_outside_ratio < 0.6)
+
+    # 等价实现 calculate_iou()，包括 union 为 0 时返回 1 的历史行为。
+    union_area = ocr_area + pred_area - inter_area
+    iou = np.divide(
+        inter_area,
+        union_area,
+        out=np.ones_like(inter_area, dtype=np.float64),
+        where=union_area != 0,
+    )
+    iou[no_intersection] = 0.0
+    matched_mask = contained | (iou > 0.8)
+
     matched = {}
     not_match_orc_boxes = []
     for i, gt_box in enumerate(dt_rec_boxes):
-        for j, pred_box in enumerate(pred_bboxes):
-            pred_box = [pred_box[0][0], pred_box[0][1], pred_box[2][0], pred_box[2][1]]
-            ocr_boxes = gt_box[0]
-            # xmin,ymin,xmax,ymax
-            ocr_box = (
-                ocr_boxes[0][0],
-                ocr_boxes[0][1],
-                ocr_boxes[2][0],
-                ocr_boxes[2][1],
-            )
-            contained = is_box_contained(ocr_box, pred_box, 0.6)
-            if contained == 1 or calculate_iou(ocr_box, pred_box) > 0.8:
-                if j not in matched:
-                    matched[j] = [gt_box]
-                else:
-                    matched[j].append(gt_box)
-            else:
-                not_match_orc_boxes.append(gt_box)
+        matched_indices = np.flatnonzero(matched_mask[i])
+        for j in matched_indices:
+            matched.setdefault(int(j), []).append(gt_box)
+        not_match_orc_boxes.extend(
+            [gt_box] * int(pred_boxes.shape[0] - matched_indices.size)
+        )
 
     return matched, not_match_orc_boxes
 
