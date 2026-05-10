@@ -75,7 +75,7 @@ class RapidLayoutModel(object):
         all_results = self.model(img_contents=processed_images, batch_size=batch_size, tqdm_enable=True)
         for img_idx, results in enumerate(all_results):
             # import uuid
-            # results.vis(f"output-PP_DOCLAYOUT/{uuid.uuid4().hex}__{img_idx}.png")
+            # results.vis(rf"D:\file\image\{uuid.uuid4().hex}__{img_idx}.png")
             layout_res = []
             boxes, scores, class_names = results.boxes, results.scores, results.class_names
             orders = results.orders if results.orders is not None else [-1] * len(boxes)

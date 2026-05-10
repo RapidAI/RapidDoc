@@ -19,12 +19,15 @@ class EngineType(Enum):
 
 class ModelType(Enum):
     SLANETPLUS = "slanet_plus"
+    SLANET1M = "slanet_1m"
     UNITABLE = "unitable"
     UNET = "unet" # 有线表格unet
     UNET_SLANET_PLUS = "unet_slanet_plus"  # 有线表格使用unet，无线表格使用slanet_plus
+    UNET_SLANET1M = "unet_slanet_1m"  # 有线表格使用unet，无线表格使用slanet_1m
     UNET_UNITABLE = "unet_unitable"  # 有线表格使用unet，无线表格使用unitable
-    PADDLE_CLS = "paddle_cls"
-    Q_CLS = "q_cls"
+    PADDLE_CLS = "paddle_cls" # paddle表格分类
+    Q_CLS = "q_cls" # Qanything 表格分类
+    PADDLE_Q_CLS = "paddle_q_cls"  # paddle + Qanything 表格分类（如果两个模型分类结果不一致，则视为无线表格）
 
 
 @dataclass

@@ -1,4 +1,5 @@
 import time
+from copy import deepcopy
 from typing import Optional, Union, List
 
 import cv2
@@ -21,17 +22,28 @@ class TableCls:
         if not cfg.model_type:
             cfg.model_type = ModelType.PADDLE_CLS
 
-        if not cfg.model_dir_or_path and cfg.model_type is not None:
+        if not cfg.model_dir_or_path and cfg.model_type is not None and cfg.model_type != ModelType.PADDLE_Q_CLS:
             cfg.model_dir_or_path = ModelProcessor.get_model_path(cfg.model_type)
 
+        self.table_engine2 = None
         if cfg.model_type == ModelType.Q_CLS:
             self.table_engine = QanythingCls(asdict(cfg))
         elif cfg.model_type == ModelType.PADDLE_CLS:
             self.table_engine = PaddleCls(asdict(cfg))
+        elif cfg.model_type == ModelType.PADDLE_Q_CLS:
+            cfg2 = deepcopy(cfg)
+            if not cfg.model_dir_or_path:
+                cfg.model_dir_or_path = ModelProcessor.get_model_path(ModelType.PADDLE_CLS)
+                cfg2.model_dir_or_path = ModelProcessor.get_model_path(ModelType.Q_CLS)
+            elif isinstance(cfg.model_dir_or_path, dict):
+                cfg.model_dir_or_path = cfg.model_dir_or_path.get(ModelType.PADDLE_CLS.value)
+                cfg2.model_dir_or_path = cfg2.model_dir_or_path.get(ModelType.Q_CLS.value)
+            self.table_engine = PaddleCls(asdict(cfg))
+            self.table_engine2 = QanythingCls(asdict(cfg2))
 
         self.load_img = LoadImage()
 
-    def __call__(self, img_contents: Union[List[InputType], InputType], batch_size: int = 1, tqdm_enable=False):
+    def __call__(self, img_contents: Union[List[InputType], InputType], batch_size: int = 4, tqdm_enable=False):
         ss = time.perf_counter()
         label_res = []
         if not isinstance(img_contents, list):
@@ -42,6 +54,13 @@ class TableCls:
             imgs = self._load_imgs(img_contents[start_i:end_i])
             x = self.table_engine.batch_preprocess(imgs)
             predict_cla = self.table_engine(x)
+            if self.table_engine2 is not None:
+                x2 = self.table_engine2.batch_preprocess(imgs)
+                predict_cla2 = self.table_engine2(x2)
+                predict_cla = [
+                    cla1 if cla1 == cla2 else "wireless"
+                    for cla1, cla2 in zip(predict_cla, predict_cla2)
+                ]
             label_res.extend(predict_cla)
         table_elapse = time.perf_counter() - ss
         return label_res, table_elapse

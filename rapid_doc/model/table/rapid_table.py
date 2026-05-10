@@ -39,7 +39,7 @@ class RapidTableModel(object):
         #     self.engine_type = EngineType.OPENVINO
 
         if self.model_type == ModelType.UNET_SLANET_PLUS:
-            cls_input_args = RapidTableInput(model_type=table_config.get("cls.model_type", ModelType.PADDLE_CLS), engine_type=self.engine_type,
+            cls_input_args = RapidTableInput(model_type=table_config.get("cls.model_type", ModelType.PADDLE_Q_CLS), engine_type=self.engine_type,
                                             model_dir_or_path=table_config.get("cls.model_dir_or_path"),
                                             engine_cfg=engine_cfg, use_ocr=False)
             self.table_cls = TableCls(cls_input_args)
@@ -52,7 +52,7 @@ class RapidTableModel(object):
                                                   engine_cfg=engine_cfg, use_ocr=False)
             self.wireless_table_model = RapidTable(wireless_input_args)
         elif self.model_type == ModelType.UNET_UNITABLE:
-            cls_input_args = RapidTableInput(model_type=table_config.get("cls.model_type", ModelType.PADDLE_CLS), engine_type=self.engine_type,
+            cls_input_args = RapidTableInput(model_type=table_config.get("cls.model_type", ModelType.PADDLE_Q_CLS), engine_type=self.engine_type,
                                             model_dir_or_path=table_config.get("cls.model_dir_or_path"),
                                             engine_cfg=engine_cfg, use_ocr=False)
             self.table_cls = TableCls(cls_input_args)
@@ -62,6 +62,19 @@ class RapidTableModel(object):
             self.wired_table_model = RapidTable(wired_input_args)
             wireless_input_args = RapidTableInput(model_type=ModelType.UNITABLE, engine_type=EngineType.TORCH,
                                                   model_dir_or_path=table_config.get("unitable.model_dir_or_path"),
+                                                  engine_cfg=engine_cfg, use_ocr=False)
+            self.wireless_table_model = RapidTable(wireless_input_args)
+        elif self.model_type == ModelType.UNET_SLANET1M:
+            cls_input_args = RapidTableInput(model_type=table_config.get("cls.model_type", ModelType.PADDLE_Q_CLS), engine_type=self.engine_type,
+                                            model_dir_or_path=table_config.get("cls.model_dir_or_path"),
+                                            engine_cfg=engine_cfg, use_ocr=False)
+            self.table_cls = TableCls(cls_input_args)
+            wired_input_args = RapidTableInput(model_type=ModelType.UNET, engine_type=self.engine_type,
+                                               model_dir_or_path=table_config.get("unet.model_dir_or_path"),
+                                               engine_cfg=engine_cfg, use_ocr=False)
+            self.wired_table_model = RapidTable(wired_input_args)
+            wireless_input_args = RapidTableInput(model_type=ModelType.SLANET1M, engine_type=self.engine_type,
+                                                  model_dir_or_path=table_config.get("slanet_1m.model_dir_or_path"),
                                                   engine_cfg=engine_cfg, use_ocr=False)
             self.wireless_table_model = RapidTable(wireless_input_args)
         else:
@@ -211,7 +224,7 @@ class RapidTableModel(object):
             ocr_result = [ocr_result]
             bgr_image = [bgr_image]
 
-            if self.model_type == ModelType.UNET_SLANET_PLUS or self.model_type == ModelType.UNET_UNITABLE:
+            if self.model_type in [ModelType.UNET_SLANET_PLUS, ModelType.UNET_SLANET1M, ModelType.UNET_UNITABLE]:
                 if not cls:
                     cls, elasp = self.table_cls(bgr_image)
                     cls = cls[0]

@@ -35,19 +35,19 @@ ENV PIP_RETRIES=10
 # 安装 Python 依赖
 RUN python3 -m pip install --upgrade pip setuptools wheel --break-system-packages && \
     python3 -m pip install --no-cache-dir --prefer-binary --break-system-packages \
-        'rapid-doc[cpu]==0.9.3' \
-        'rapid-doc[api]==0.9.3' && \
+        --index-url https://pypi.tuna.tsinghua.edu.cn/simple \
+        'rapid-doc[cpu,api]==0.9.3' && \
     python3 -m pip cache purge
 
 # 复制配置文件和脚本（优先复制，利用Docker缓存）
-COPY .env.example /app/
-COPY start_with_env.sh /app/
+COPY docker/.env.example /app/
+COPY docker/start_with_env.sh /app/
 
 # 设置启动脚本权限
 RUN sed -i 's/\r$//' /app/start_with_env.sh && chmod +x /app/start_with_env.sh
 
 # 复制应用代码（最后复制，避免频繁变更影响缓存）
-COPY app.py file_converter.py download_models.py models_download_utils.py /app/
+COPY docker/app.py docker/file_converter.py docker/download_file.py docker/download_models.py docker/models_download_utils.py /app/
 
 # 设置基础环境变量
 ENV PYTHONPATH=/app

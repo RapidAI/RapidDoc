@@ -23,10 +23,12 @@ from rapid_doc.utils.config_reader import get_device
 from rapid_doc.utils.model_utils import check_openvino
 from rapid_doc.utils.ocr_utils import check_img, preprocess_image, sorted_boxes, merge_det_boxes, update_det_boxes, get_rotate_crop_image
 from rapidocr.inference_engine.base import InferSession
+from importlib.metadata import version
+rapidocr_version = version("rapidocr")
 models_dir = os.getenv('RAPID_MODELS_DIR', None)
 if models_dir:
     # 从指定的文件夹内寻找模型文件
-    InferSession.DEFAULT_MODEL_PATH = Path(models_dir)
+    InferSession.DEFAULT_MODEL_PATH = Path(models_dir) # <v3.8.0
     from rapidocr.ch_ppocr_rec import main as rec_main
     rec_main.DEFAULT_MODEL_PATH = Path(models_dir)
 
@@ -61,6 +63,8 @@ class RapidOcrModel(object):
             "Det.use_dilation": use_dilation,
             "Det.unclip_ratio": det_db_unclip_ratio,
         }
+        if models_dir and rapidocr_version >= "3.8.0":
+            default_params["Global.model_root_dir"] = models_dir
 
         # 获取用户传入的 engine_type
         engine_type = ocr_config.get('engine_type') if ocr_config else None

@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Union
 from loguru import logger
 from omegaconf import DictConfig, OmegaConf
-from rapid_doc.utils.download_file import DownloadFileInput, DownloadFile
+from download_file import DownloadFileInput, DownloadFile
 
 def read_yaml(file_path: Union[str, Path]) -> DictConfig:
     return OmegaConf.load(file_path)
@@ -175,7 +175,7 @@ def download_pipeline_models():
         return False
 
 if __name__ == '__main__':
-    # os.environ['RAPID_MODELS_DIR'] = r'D:\CodeProjects\doc\RapidAI\models' #模型文件存储目录，如果不设置会默认下载到rapid_doc项目里面
+    os.environ['RAPID_MODELS_DIR'] = r'D:\CodeProjects\doc\RapidAI\models' #模型文件存储目录，如果不设置会默认下载到rapid_doc项目里面
     os.environ["MINERU_DEVICE_MODE"] = "cpu" # cpu、cuda、npu、all（all只是用来下载）
     success = download_pipeline_models()
     sys.exit(0 if success else 1)

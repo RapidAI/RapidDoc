@@ -98,7 +98,7 @@ class VisTable:
             img, 0, 0, 0, 100, cv2.BORDER_CONSTANT, value=[255, 255, 255]
         )
 
-        polygons = [[box[0], box[1], box[4], box[5]] for box in cell_bboxes]
+        polygons = [[box[0], box[1], box[2], box[3]] for box in cell_bboxes]
         for idx, polygon in enumerate(polygons):
             x0, y0, x1, y1 = polygon[0], polygon[1], polygon[2], polygon[3]
             x0 = round(x0)

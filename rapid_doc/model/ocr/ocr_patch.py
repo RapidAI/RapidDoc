@@ -28,7 +28,7 @@ from rapidocr.utils.utils import has_chinese_char, quads_to_rect_bbox
 from rapid_doc.utils.model_utils import import_package
 from importlib.metadata import version
 rapidocr_version = version("rapidocr")
-
+# print(f"rapidocr_version=={rapidocr_version}")
 
 def patch_text_detector():
     """修复 TextDetector 的 get_preprocess 方法"""

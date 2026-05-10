@@ -2,6 +2,7 @@
 # @Author: SWHL
 # @Contact: liekkaskono@163.com
 import argparse
+import os
 import time
 from dataclasses import asdict
 from pathlib import Path
@@ -34,7 +35,11 @@ class RapidTable:
             cfg = RapidTableInput()
 
         if not cfg.model_dir_or_path and cfg.model_type is not None:
-            cfg.model_dir_or_path = ModelProcessor.get_model_path(cfg.model_type)
+            if cfg.model_type == ModelType.SLANET1M:
+                rapid_doc_dir = Path(os.path.abspath(__file__)).parent.parent.parent.parent
+                cfg.model_dir_or_path = os.path.join(rapid_doc_dir, 'resources', 'slanet-1m.onnx')
+            else:
+                cfg.model_dir_or_path = ModelProcessor.get_model_path(cfg.model_type)
 
         self.cfg = cfg
         self.table_structure = self._init_table_structer()

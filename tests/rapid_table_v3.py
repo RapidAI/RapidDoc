@@ -24,14 +24,20 @@ default_params = {
 ocr_engine = RapidOCR(params=default_params)
 
 input_args = RapidTableInput(
-    model_type=ModelType.UNET,
-    engine_type=TableEngineType.OPENVINO
+    # model_type=ModelType.SLANET1M,
+    # engine_type=TableEngineType.OPENVINO
+    # model_dir_or_path=r"D:\CodeProjects\doc\RapidAI\models\table\slanet-1m.onnx"
+    # model_dir_or_path=r"D:\CodeProjects\doc\RapidAI\models\table\ch_ppstructure_mobile_v2_SLANet.onnx"
+
+    model_type= ModelType.SLANETPLUS,
+    # model_dir_or_path= r"D:\CodeProjects\doc\RapidAI\models\table\table2\model\inference.onnx"
 )
 
 table_engine = RapidTable(input_args)
 
 img_paths = [
-    "ab7679fef468a0a9e09f521d096ce9ed.png",
+    r"D:\CodeProjects\doc\RapidAI\RapidDoc\demo\images\table_16.png",
+    # "img.png"
     ]
 ocr_results_list = []
 return_word_box = False
@@ -52,4 +58,4 @@ for img in img_paths:
 
 results = table_engine(img_paths, ocr_results=ocr_results_list, batch_size=4)
 
-results.vis(save_dir=r"outputs3", save_name="vis")
+results.vis(save_dir=r"outputs-1m113", save_name="vis")

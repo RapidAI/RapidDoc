@@ -20,6 +20,7 @@ from rapid_doc.cli.common import prepare_env, read_fn, aio_do_parse, pdf_suffixe
 from rapid_doc.utils.hash_utils import str_sha256
 from rapid_doc.utils.office_converter import convert_legacy_office_to_modern
 from rapid_doc.version import __version__
+from rapid_doc.model.table.rapid_table_self import ModelType as TableModelType, EngineType as TableEngineType
 
 OFFICE_VIEWER_HEAD = """
 <link rel="stylesheet" href="https://unpkg.com/jit-viewer@1.1.0/dist/iife/jit-viewer.min.css">
@@ -183,6 +184,7 @@ async def parse_doc(doc_path, output_dir, end_page_id, is_ocr, formula_enable, t
         }
         table_config = {
             # "use_word_box": False,  # 使用单字坐标匹配单元格，默认 False
+            # "model_type": TableModelType.UNITABLE,
         }
         await aio_do_parse(
             output_dir=output_dir,
