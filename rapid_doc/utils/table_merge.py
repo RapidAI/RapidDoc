@@ -703,14 +703,14 @@ def adjust_table_rows_colspan(
         if current_row_effective_cols >= target_cols or current_row_cols >= target_cols:
             continue
 
-        if (
-            calculate_visual_columns(row) == reference_visual_cols
-            and check_row_columns_match(row, reference_row_copy)
-        ):
-            if len(cells) <= len(reference_structure):
+        if calculate_visual_columns(row) == reference_visual_cols:
+            if len(cells) == len(reference_structure):
                 for cell_idx, cell in enumerate(cells):
-                    if cell_idx < len(reference_structure) and reference_structure[cell_idx] > 1:
-                        cell["colspan"] = str(reference_structure[cell_idx])
+                    reference_colspan = reference_structure[cell_idx]
+                    if reference_colspan > 1:
+                        cell["colspan"] = str(reference_colspan)
+                    else:
+                        cell.attrs.pop("colspan", None)
         else:
             cols_diff = target_cols - current_row_effective_cols
             if cols_diff > 0:
