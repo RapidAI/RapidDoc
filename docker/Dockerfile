@@ -36,7 +36,7 @@ ENV PIP_RETRIES=10
 RUN python3 -m pip install --upgrade pip setuptools wheel --break-system-packages && \
     python3 -m pip install --no-cache-dir --prefer-binary --break-system-packages \
         --index-url https://pypi.tuna.tsinghua.edu.cn/simple \
-        'rapid-doc[cpu,api]==0.9.3' && \
+        'rapid-doc[cpu,api]==0.9.4' && \
     python3 -m pip cache purge
 
 # 复制配置文件和脚本（优先复制，利用Docker缓存）

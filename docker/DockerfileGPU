@@ -42,7 +42,7 @@ ENV PIP_RETRIES=10
 RUN python3 -m pip install --upgrade pip setuptools wheel && \
     python3 -m pip install --no-cache-dir --prefer-binary \
         --index-url https://pypi.tuna.tsinghua.edu.cn/simple \
-        'rapid-doc[gpu,api]==0.9.3' && \
+        'rapid-doc[gpu,api]==0.9.4' && \
     python3 -m pip uninstall -y onnxruntime onnxruntime-gpu || true && \
     python3 -m pip install --no-cache-dir --prefer-binary --force-reinstall \
         --index-url https://pypi.tuna.tsinghua.edu.cn/simple \
