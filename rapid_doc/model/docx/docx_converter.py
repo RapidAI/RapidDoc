@@ -1,10 +1,8 @@
 # Copyright (c) Opendatalab. All rights reserved.
-import posixpath
 import re
 from io import BytesIO
-from pathlib import Path, PurePosixPath
+from pathlib import Path
 from typing import BinaryIO, Optional, Union, Any, Final, Iterator
-from zipfile import ZIP_DEFLATED, ZipFile
 
 from loguru import logger
 from docx import Document
@@ -18,6 +16,7 @@ from pydantic import AnyUrl
 from mammoth.conversion import convert_document_element_to_html
 from mammoth.docx import body_xml
 
+from rapid_doc.model.docx.package_normalizer import normalize_docx_package
 from rapid_doc.model.docx.tools.office_xml import read_str
 from rapid_doc.model.docx.tools.math.omml import oMath2Latex
 from rapid_doc.utils.docx_formatting import Formatting, Script
@@ -445,89 +444,9 @@ class DocxConverter:
 
         return "".join(result_parts)
 
-    @staticmethod
-    def _resolve_internal_relationship_target(
-        rels_path: str, target: Optional[str]
-    ) -> Optional[str]:
-        """Resolve an OOXML relationship target to a package member path."""
-        if not target:
-            return None
-
-        rels_posix = PurePosixPath(rels_path)
-        if rels_posix.parent.name != "_rels":
-            return None
-
-        base_dir = rels_posix.parent.parent.as_posix()
-        if target.startswith("/"):
-            resolved = posixpath.normpath(target.lstrip("/"))
-        else:
-            resolved = posixpath.normpath(posixpath.join(base_dir, target))
-
-        if resolved in {"", "."} or resolved.startswith("../"):
-            return None
-        return resolved
-
     def _sanitize_missing_internal_relationships(self, file_bytes: bytes) -> bytes:
-        """Drop broken internal OOXML relationships so python-docx can best-effort load."""
-        try:
-            with ZipFile(BytesIO(file_bytes)) as source:
-                package_members = set(source.namelist())
-                rewritten_rels: dict[str, bytes] = {}
-
-                for info in source.infolist():
-                    if not info.filename.endswith(".rels"):
-                        continue
-
-                    try:
-                        root = etree.fromstring(source.read(info.filename))
-                    except Exception:
-                        continue
-
-                    removed_count = 0
-                    for relationship in list(root):
-                        if etree.QName(relationship).localname != "Relationship":
-                            continue
-                        if relationship.get("TargetMode") == "External":
-                            continue
-
-                        resolved_target = self._resolve_internal_relationship_target(
-                            info.filename, relationship.get("Target")
-                        )
-                        if (
-                            resolved_target is not None
-                            and resolved_target in package_members
-                        ):
-                            continue
-
-                        root.remove(relationship)
-                        removed_count += 1
-
-                    if removed_count == 0:
-                        continue
-
-                    logger.debug(
-                        "Removed {} broken internal DOCX relationships from {}",
-                        removed_count,
-                        info.filename,
-                    )
-                    rewritten_rels[info.filename] = etree.tostring(
-                        root,
-                        xml_declaration=True,
-                        encoding="UTF-8",
-                        standalone="yes",
-                    )
-
-                if not rewritten_rels:
-                    return file_bytes
-
-            output = BytesIO()
-            with ZipFile(BytesIO(file_bytes)) as source, ZipFile(output, "w", ZIP_DEFLATED) as target:
-                for info in source.infolist():
-                    data = rewritten_rels.get(info.filename, source.read(info.filename))
-                    target.writestr(info, data)
-            return output.getvalue()
-        except Exception:
-            return file_bytes
+        """规范化 DOCX 包，兼容缺失内部关系和损坏图片成员。"""
+        return normalize_docx_package(file_bytes)
 
     def _start_new_page(self) -> None:
         self.cur_page = []
