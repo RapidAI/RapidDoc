@@ -18,6 +18,7 @@ from rapid_doc.cli.common import image_suffixes, office_suffixes, old_office_suf
 from rapid_doc.data.data_reader_writer import FileBasedDataWriter
 from rapid_doc.data.data_reader_writer.base import DataWriter
 from rapid_doc.utils.draw_bbox import draw_layout_bbox, draw_span_bbox
+from rapid_doc.utils.empty_office import normalize_empty_office_bytes
 from rapid_doc.utils.enum_class import MakeMode
 from rapid_doc.utils.config_reader import get_processing_window_size
 from rapid_doc.utils.guess_suffix_or_lang import guess_suffix_by_bytes
@@ -609,6 +610,7 @@ class RapidDoc:
     ) -> dict[str, Any]:
         doc_name = name or f"document_{index + 1}"
         file_suffix = suffix.lower().lstrip(".") if suffix else ""
+        raw_bytes = normalize_empty_office_bytes(raw_bytes, file_suffix)
         if not file_suffix:
             file_suffix = guess_suffix_by_bytes(raw_bytes)
 

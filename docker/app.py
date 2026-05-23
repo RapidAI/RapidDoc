@@ -21,6 +21,7 @@ from loguru import logger
 
 from file_converter import ensure_pdf, OFFICE_EXTENSIONS
 from rapid_doc.cli.common import aio_do_parse, old_office_suffixes, pdf_suffixes, image_suffixes, office_suffixes
+from rapid_doc.utils.empty_office import normalize_empty_office_bytes
 from rapid_doc.utils.office_converter import convert_legacy_office_to_modern
 from rapid_doc.utils.pdf_image_tools import images_bytes_to_pdf_bytes
 from rapid_doc.model.custom.paddleocr_vl.paddleocr_vl import PaddleOCRVLTableModel, PaddleOCRVLOCRModel, PaddleOCRVLFormulaModel
@@ -220,6 +221,7 @@ async def file_parse(
                 )
             if file_suffix in pdf_suffixes + image_suffixes + office_suffixes:
                 content = await file.read()
+                content = normalize_empty_office_bytes(content, file_suffix)
                 if file_suffix in image_suffixes:
                     content = images_bytes_to_pdf_bytes(content)
             else:

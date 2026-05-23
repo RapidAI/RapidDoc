@@ -17,6 +17,7 @@ from rapid_doc.utils.pdf_image_tools import images_bytes_to_pdf_bytes
 from rapid_doc.backend.office.office_middle_json_mkcontent import union_make as office_union_make
 from rapid_doc.backend.office.office_analyze import office_analyze
 from rapid_doc.utils.config_reader import get_processing_window_size
+from rapid_doc.utils.empty_office import normalize_empty_office_bytes
 from rapid_doc.utils.pdf_page_id import get_end_page_id
 
 pdf_suffixes = ["pdf"]
@@ -34,6 +35,9 @@ def read_fn(path, file_suffix: str | None = None):
         path = Path(path)
     with open(str(path), "rb") as input_file:
         file_bytes = input_file.read()
+        if file_suffix is None and not file_bytes:
+            file_suffix = path.suffix.lower().lstrip(".")
+        file_bytes = normalize_empty_office_bytes(file_bytes, file_suffix)
         if file_suffix is None:
             file_suffix = guess_suffix_by_bytes(file_bytes, path)
         if file_suffix in image_suffixes:
