@@ -164,7 +164,6 @@ def _run_ocr_det_batch(
 
         ocr_model = atom_model_manager.get_atom_model(
             atom_model_name=AtomicModel.OCR,
-            det_db_box_thresh=0.3,
             lang=lang,
             ocr_config=ocr_config,
         )
@@ -248,7 +247,6 @@ def _run_ocr_rec_postprocess(images_layout_res: List[List[Dict]], ocr_config):
 
         ocr_model = atom_model_manager.get_atom_model(
             atom_model_name=AtomicModel.OCR,
-            det_db_box_thresh=0.3,
             lang=lang,
             ocr_config=ocr_config,
         )

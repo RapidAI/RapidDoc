@@ -350,8 +350,8 @@ def txt_spans_extract(pdf_page_or_dict, spans, input_img, scale, all_bboxes, all
                 spans.remove(span)
                 continue
             span_img = cv2.cvtColor(span_pil_img, cv2.COLOR_RGB2BGR)
-            # 计算span的对比度，低于0.20的span不进行ocr
-            if calculate_contrast(span_img, img_mode='bgr') <= 0.17:
+            # 计算span的对比度，低于0.17的span不进行ocr，等于0.17的临界框保留给后置OCR。
+            if calculate_contrast(span_img, img_mode='bgr') < 0.17:
                 spans.remove(span)
                 continue
 

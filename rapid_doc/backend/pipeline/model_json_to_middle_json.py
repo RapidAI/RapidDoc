@@ -248,7 +248,6 @@ def result_to_middle_json(
     atom_model_manager = AtomModelSingleton()
     ocr_model = atom_model_manager.get_atom_model(
         atom_model_name='ocr',
-        det_db_box_thresh=0.3,
         lang=lang,
         ocr_config=ocr_config,
     )
@@ -317,7 +316,6 @@ def _post_process_ocr(middle_json, lang, ocr_config):
         atom_model_manager = AtomModelSingleton()
         ocr_model = atom_model_manager.get_atom_model(
             atom_model_name='ocr',
-            det_db_box_thresh=0.3,
             lang=lang,
             ocr_config=ocr_config,
         )

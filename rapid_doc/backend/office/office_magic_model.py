@@ -1,3 +1,4 @@
+# Copyright (c) Opendatalab. All rights reserved.
 import re
 from typing import Literal
 
@@ -33,6 +34,7 @@ class MagicModel:
                 "chart_caption",
                 "header",
                 "footer",
+                "page_footnote",
             ]:
                 span = parse_text_block_spans(block_content)
 
@@ -108,9 +110,6 @@ class MagicModel:
             if block_type == BlockType.TITLE:
                 block["is_numbered_style"] = block_info.get("is_numbered_style", False)
                 block["level"] = block_info.get("level", 1)
-                section_number = block_info.get("section_number")
-                if isinstance(section_number, str) and section_number.strip():
-                    block["section_number"] = section_number.strip()
             blocks.append(block)
 
         self.image_blocks = []
@@ -185,6 +184,44 @@ class MagicModel:
         return self.discarded_blocks
 
 
+def _parse_style_list(style_str: str | None) -> list:
+    """解析逗号分隔的 Office inline style 字符串。"""
+    if not style_str:
+        return []
+    return [style.strip() for style in style_str.split(',') if style.strip()]
+
+
+def _parse_hyperlink_text_children(hyperlink_content: str, text_tag_re) -> tuple:
+    """解析一个 hyperlink 内部的多个 text 子片段，并保留每段样式。"""
+    url_start = hyperlink_content.find('<url>')
+    url_end = hyperlink_content.find('</url>')
+    if url_start == -1 or url_end == -1 or url_end < url_start:
+        return [], ''
+
+    children = []
+    pos = 0
+    while pos < url_start:
+        text_match = text_tag_re.search(hyperlink_content, pos)
+        if text_match is None or text_match.start() >= url_start:
+            break
+
+        text_end = hyperlink_content.find('</text>', text_match.end())
+        if text_end == -1 or text_end > url_start:
+            return [], ''
+
+        child = {
+            "type": ContentType.TEXT,
+            "content": hyperlink_content[text_match.end():text_end],
+        }
+        style = _parse_style_list(text_match.group(1))
+        if style:
+            child["style"] = style
+        children.append(child)
+        pos = text_end + 7
+
+    return children, hyperlink_content[url_start + 5:url_end]
+
+
 def parse_text_block_spans(content: str) -> list:
     """
     解析文本类block的content，提取其中的文本、行内公式、超链接和字体样式。
@@ -194,7 +231,7 @@ def parse_text_block_spans(content: str) -> list:
     - <hyperlink><text [style="..."]>...</text><url>...</url></hyperlink>: 超链接（支持样式）
     - <text style="...">...</text>: 带字体样式的普通文本
 
-    字体样式值（逗号分隔）：bold, italic, underline, strikethrough
+    字体样式值（逗号分隔）：bold, italic, underline, emphasis, strikethrough, superscript, subscript
 
     Args:
         content: 文本块的content字符串，可能包含特殊标签
@@ -305,25 +342,31 @@ def parse_text_block_spans(content: str) -> list:
                 # 提取超链接内容
                 hyperlink_content = content[next_tag_pos + 11:hyperlink_end]
 
-                # 解析内部的 <text [style="..."]> 和 <url> 标签
-                inner_text_match = _text_tag_re.search(hyperlink_content)
-                text_end_in_hl = hyperlink_content.find('</text>')
-                url_start = hyperlink_content.find('<url>')
-                url_end = hyperlink_content.find('</url>')
+                # 解析内部的一个或多个 <text [style="..."]> 和一个 <url> 标签
+                children, link_url = _parse_hyperlink_text_children(
+                    hyperlink_content,
+                    _text_tag_re,
+                )
 
-                if inner_text_match and text_end_in_hl != -1 and url_start != -1 and url_end != -1:
-                    style_str = inner_text_match.group(1)
-                    link_text_start = inner_text_match.end()  # 开始标签结束后的位置
-                    link_text = hyperlink_content[link_text_start:text_end_in_hl]
-                    link_url = hyperlink_content[url_start + 5:url_end]
-
-                    span = {
-                        "type": ContentType.HYPERLINK,
-                        "content": link_text,
-                        "url": link_url
-                    }
-                    if style_str:
-                        span["style"] = [s.strip() for s in style_str.split(',') if s.strip()]
+                if children and link_url:
+                    if len(children) == 1:
+                        child = children[0]
+                        span = {
+                            "type": ContentType.HYPERLINK,
+                            "content": child["content"],
+                            "url": link_url,
+                        }
+                        if child.get("style"):
+                            span["style"] = child["style"]
+                    else:
+                        span = {
+                            "type": ContentType.HYPERLINK,
+                            "content": ''.join(
+                                child["content"] for child in children
+                            ),
+                            "url": link_url,
+                            "children": children,
+                        }
                     spans.append(span)
                     pos = hyperlink_end + 12  # 跳过</hyperlink>
                     last_end = pos
@@ -372,9 +415,6 @@ def parse_list_block(list_block: dict):
                 "type": BlockType.TEXT,
                 "lines": [{"spans": spans}]
             }
-            prefix = item.get("prefix")
-            if isinstance(prefix, str) and prefix.strip():
-                text_block["prefix"] = prefix.strip()
             blocks.append(text_block)
 
         elif item_type == "list":
@@ -390,6 +430,8 @@ def parse_list_block(list_block: dict):
         "ilevel": list_block.get("ilevel", 0),
         "blocks": blocks
     }
+    if "start" in list_block:
+        result["start"] = list_block["start"]
 
     return result
 

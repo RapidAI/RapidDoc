@@ -42,7 +42,7 @@ def layout_model_init(layout_config=None):
     model = RapidLayoutModel(layout_config)
     return model
 
-def ocr_model_init(det_db_box_thresh=0.3, lang=None, ocr_config=None, det_db_unclip_ratio=1.8, enable_merge_det_boxes=True, is_seal=False):
+def ocr_model_init(det_db_box_thresh=0.5, lang=None, ocr_config=None, det_db_unclip_ratio=1.8, enable_merge_det_boxes=True, is_seal=False):
     model = RapidOcrModel(
             det_db_box_thresh=det_db_box_thresh,
             lang=lang,
@@ -164,7 +164,6 @@ class MineruPipelineModel:
         # 初始化ocr
         self.ocr_model = atom_model_manager.get_atom_model(
             atom_model_name=AtomicModel.OCR,
-            det_db_box_thresh=0.3,
             lang=self.lang,
             ocr_config=self.ocr_config,
         )

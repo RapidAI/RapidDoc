@@ -4,24 +4,17 @@ from io import BytesIO
 
 from loguru import logger
 from rapid_doc.backend.office.model_output_to_middle_json import result_to_middle_json
-from rapid_doc.utils.guess_suffix_or_lang import guess_suffix_by_bytes
 
-def office_analyze(
+from rapid_doc.model.docx.main import convert_binary
+
+
+def office_docx_analyze(
         file_bytes,
         image_writer=None
 ):
     infer_start = time.time()
-    file_type = guess_suffix_by_bytes(file_bytes)
-    file_stream = BytesIO(file_bytes)
 
-    if file_type == "docx":
-        from rapid_doc.model.docx.main import convert_binary
-    elif file_type == "pptx":
-        from rapid_doc.model.pptx.main import convert_binary
-    elif file_type == "xlsx":
-        from rapid_doc.model.xlsx.main import convert_binary
-    else:
-        raise ValueError(f"Unsupported or unknown office file type: {file_type}")
+    file_stream = BytesIO(file_bytes)
     results = convert_binary(file_stream)
 
     infer_time = round(time.time() - infer_start, 2)
@@ -44,16 +37,16 @@ if __name__ == '__main__':
     import argparse
 
     script_root = Path(__file__).resolve().parent.parent.parent.parent
-    default_docx = script_root / "demo" / "docx" / "demo1.docx"
+    default_docx = script_root / "demo" / "office_docs" / "docx_01.docx"
 
     parser = argparse.ArgumentParser(
-        description="Quick demo runner for office_analyze"
+        description="Quick demo runner for office_docx_analyze"
     )
     parser.add_argument(
         "docx",
         nargs="?",
         default=str(default_docx),
-        help="path to docx file (defaults to demo/docx/demo1.docx relative to project root)"
+        help="path to docx file (defaults to demo/office_docs/docx_01.docx relative to project root)"
     )
     parser.add_argument(
         "--output-images",
@@ -63,12 +56,12 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     docx_path = Path(args.docx)
-    from rapid_doc.data.data_reader_writer import FileBasedDataWriter
+    from mineru.data.data_reader_writer import FileBasedDataWriter
 
     with open(docx_path, 'rb') as f:
         file_bytes = f.read()
     image_writer = FileBasedDataWriter(args.output_images)
-    middle_json, results = office_analyze(
+    middle_json, results = office_docx_analyze(
         file_bytes,
         image_writer=image_writer,
     )

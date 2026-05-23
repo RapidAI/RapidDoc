@@ -40,7 +40,7 @@ DEFAULT_SEAL_DEBUG_DIR = os.path.join(
 )
 
 class RapidOcrModel(object):
-    def __init__(self, det_db_box_thresh=0.3, lang=None, ocr_config=None, use_dilation=True, det_db_unclip_ratio=1.8, enable_merge_det_boxes=True, is_seal=False):
+    def __init__(self, det_db_box_thresh=0.5, lang=None, ocr_config=None, use_dilation=True, det_db_unclip_ratio=1.8, enable_merge_det_boxes=True, is_seal=False):
         self.drop_score = 0.5
         self.enable_merge_det_boxes = enable_merge_det_boxes
         self.is_seal = is_seal
