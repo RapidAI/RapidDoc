@@ -136,6 +136,20 @@ def result_to_middle_json(model_output_blocks_list, image_writer):
                 continue
             level = block.get("level", 1)
             if block.get("is_numbered_style", False):
+                existing_section_number = block.get("section_number")
+                if isinstance(existing_section_number, str) and existing_section_number.strip():
+                    parts = [
+                        int(part)
+                        for part in re.findall(r"\d+", existing_section_number)
+                    ]
+                    if parts:
+                        for k, v in enumerate(parts, start=1):
+                            section_counters[k] = v
+                        for deeper in list(section_counters.keys()):
+                            if deeper > len(parts):
+                                section_counters[deeper] = 0
+                    continue
+
                 # Ensure all ancestor levels start at 1 (never 0)
                 for ancestor in range(1, level):
                     if section_counters[ancestor] == 0:

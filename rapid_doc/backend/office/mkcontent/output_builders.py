@@ -93,7 +93,11 @@ def _flatten_list_items(list_block, root_ilevel: int | None = None):
             item_text = merge_para_with_text(block, escape_text_block_prefix=False)
             if item_text.strip():
                 if attribute == 'ordered':
-                    items.append(f"{indent}{ordered_counter}. {item_text}")
+                    prefix = block.get('prefix')
+                    if isinstance(prefix, str) and prefix.strip():
+                        items.append(f"{indent}{prefix.strip()} {item_text}")
+                    else:
+                        items.append(f"{indent}{ordered_counter}. {item_text}")
                     ordered_counter += 1
                 else:
                     items.append(f"{indent}- {item_text}")
@@ -117,7 +121,11 @@ def _flatten_list_items_v2(list_block, root_ilevel: int | None = None):
             item_content = merge_para_with_text_v2(block)
             if item_content:
                 if attribute == 'ordered':
-                    prefix = f"{'    ' * relative_ilevel}{ordered_counter}."
+                    block_prefix = block.get('prefix')
+                    if isinstance(block_prefix, str) and block_prefix.strip():
+                        prefix = f"{'    ' * relative_ilevel}{block_prefix.strip()}"
+                    else:
+                        prefix = f"{'    ' * relative_ilevel}{ordered_counter}."
                     ordered_counter += 1
                 else:
                     prefix = f"{'    ' * relative_ilevel}-"
