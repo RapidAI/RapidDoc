@@ -285,7 +285,7 @@ def _process_single_table(
     table_force_ocr = table_config.get("force_ocr", False)
     skip_text_in_image = table_config.get("skip_text_in_image", True)
     use_img2table = table_config.get("use_img2table", False)
-    table_use_word_box = table_config.get("use_word_box", False)
+    table_use_word_box = table_config.get("use_word_box", True)
     table_formula_enable = table_config.get("table_formula_enable", True)
     table_image_enable = table_config.get("table_image_enable", True)
     table_extract_original_image = table_config.get("extract_original_image", False)

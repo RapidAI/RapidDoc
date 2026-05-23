@@ -183,7 +183,7 @@ async def parse_doc(doc_path, output_dir, end_page_id, is_ocr, formula_enable, t
             # "Rec.model_type": OCRModelType.SERVER,
         }
         table_config = {
-            # "use_word_box": False,  # 使用单字坐标匹配单元格，默认 False
+            # "use_word_box": True,  # 使用单字坐标匹配单元格，默认 True
             # "model_type": TableModelType.UNITABLE,
         }
         await aio_do_parse(
