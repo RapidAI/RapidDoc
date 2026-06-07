@@ -1,7 +1,7 @@
 import os
 import cv2
 from pathlib import Path
-from rapid_orientation import RapidOrientation
+from rapid_doc.model.orientation.rapid_orientation import RapidOrientation
 
 class RapidOrientationModel(object):
     def __init__(self):

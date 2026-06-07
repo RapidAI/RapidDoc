@@ -26,9 +26,6 @@ from ...utils.span_pre_proc import (
     txt_most_angle_extract_table, extract_table_fill_image
 )
 
-from rapid_orientation import RapidOrientation
-orientation_engine = RapidOrientation()
-
 
 # =================================== OCR-det ===================================
 def _extract_text_from_pdf(

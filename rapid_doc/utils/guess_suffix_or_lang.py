@@ -5,7 +5,7 @@ from zipfile import BadZipFile, ZipFile
 from xml.etree import ElementTree
 
 from loguru import logger
-from magika import Magika
+from rapid_doc.model.magika.magika import Magika
 
 
 DEFAULT_LANG = "txt"
