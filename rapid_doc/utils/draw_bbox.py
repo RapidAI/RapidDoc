@@ -1,12 +1,14 @@
 import json
 from io import BytesIO
-
+import logging
 from loguru import logger
 from pypdf import PdfReader, PdfWriter, PageObject
 from reportlab.pdfgen import canvas
 
 from rapid_doc.data.data_reader_writer import DataWriter
 from .enum_class import BlockType, ContentType, SplitFlag
+
+logging.getLogger("pypdf").setLevel(logging.ERROR)
 
 
 def cal_canvas_rect(page, bbox):

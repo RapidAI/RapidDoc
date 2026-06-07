@@ -28,14 +28,14 @@ RUN sed -i 's|http://deb.debian.org/debian|https://mirrors.tuna.tsinghua.edu.cn/
 WORKDIR /app
 
 # 配置 pip 国内镜像与超时，降低大包下载超时概率
-ENV PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple
+ENV PIP_INDEX_URL=https://pypi.org/simple
 ENV PIP_DEFAULT_TIMEOUT=300
 ENV PIP_RETRIES=10
 
 # 安装 Python 依赖
 RUN python3 -m pip install --upgrade pip setuptools wheel --break-system-packages && \
     python3 -m pip install --no-cache-dir --prefer-binary --break-system-packages \
-        --index-url https://pypi.tuna.tsinghua.edu.cn/simple \
+        --index-url https://pypi.org/simple \
         'rapid-doc[cpu,api]==0.9.5' && \
     python3 -m pip cache purge
 

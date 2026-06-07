@@ -7,6 +7,7 @@ from PIL import Image
 from pypdfium2 import PdfBitmap, PdfDocument, PdfPage
 
 from rapid_doc.utils import PyPDFium2Parser
+from rapid_doc.utils.pdfium_guard import pdfium_guard
 
 
 def page_to_image(
@@ -14,27 +15,24 @@ def page_to_image(
     dpi: int = 200, # changed from 200 to 144 （200会导致版面识别结果偶尔不准，在rapid_layout处理）
     max_width_or_height: int = 3500,  # changed from 4500 to 3500
 ) -> (Image.Image, float):
-    scale = dpi / 72
+    with pdfium_guard():
+        scale = dpi / 72
 
-    bitmap = None
-    try:
-        with PyPDFium2Parser.lock:
-            long_side_length = max(*page.get_size())
-            if (long_side_length * scale) > max_width_or_height:
-                scale = max_width_or_height / long_side_length
+        long_side_length = max(*page.get_size())
+        if (long_side_length*scale) > max_width_or_height:
+            scale = max_width_or_height / long_side_length
 
+        bitmap: PdfBitmap | None = None
+        try:
             bitmap = page.render(scale=scale)  # type: ignore
-            image = bitmap.to_pil()
-        return image, scale
-    finally:
-        if bitmap is not None:
-            try:
-                with PyPDFium2Parser.lock:
+            image = bitmap.to_pil().copy()
+        finally:
+            if bitmap is not None:
+                try:
                     bitmap.close()
-            except Exception as e:
-                logger.error(f"Failed to close bitmap: {e}")
-
-
+                except Exception as e:
+                    logger.error(f"Failed to close bitmap: {e}")
+    return image, scale
 
 
 def image_to_bytes(

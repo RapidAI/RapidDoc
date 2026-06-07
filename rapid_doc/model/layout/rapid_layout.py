@@ -84,8 +84,8 @@ class RapidLayoutModel(object):
             restore_scale = 1.0 / scale
             temp_results = []
             for xyxy, polygon_points, conf, cla, order in zip(boxes, polygon_pointses, scores, class_names, orders):
-                xmin, ymin, xmax, ymax = [round(float(p), 2) for p in xyxy]
-                # xmin, ymin, xmax, ymax = [p for p in xyxy]
+                # xmin, ymin, xmax, ymax = [round(float(p), 2) for p in xyxy]
+                xmin, ymin, xmax, ymax = [p for p in xyxy]
                 if self.model_type == ModelType.PP_DOCLAYOUT_PLUS_L:
                     category_id = self.pp_doclayout_plus_cls_dict[cla]
                 elif self.model_type in [ModelType.PP_DOCLAYOUTV2, ModelType.PP_DOCLAYOUTV3]:
@@ -112,10 +112,10 @@ class RapidLayoutModel(object):
 
             for item in temp_results:
                 xmin, ymin, xmax, ymax = item["bbox"]
-                xmin *= restore_scale
-                ymin *= restore_scale
-                xmax *= restore_scale
-                ymax *= restore_scale
+                xmin = round(float(xmin * restore_scale), 2)
+                ymin = round(float(ymin * restore_scale), 2)
+                xmax = round(float(xmax * restore_scale), 2)
+                ymax = round(float(ymax * restore_scale), 2)
                 polygon_points = item["polygon_points"]
                 if polygon_points is not None:
                     polygon_points = [

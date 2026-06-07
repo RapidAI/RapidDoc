@@ -1,4 +1,5 @@
 FROM docker.1ms.run/library/python:3.10.16-slim
+#FROM docker.1ms.run/library/python:3.14-slim
 
 ARG DEBIAN_FRONTEND=noninteractive
 

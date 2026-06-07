@@ -7,11 +7,9 @@ from typing import Iterator
 
 import cv2
 import numpy as np
-from scipy.spatial import distance as dist
-from skimage import measure
 
 class ConnectedComponent:
-    """保存连通域的 bbox、bbox 面积和懒加载坐标，字段语义对齐 skimage.regionprops。"""
+    """保存连通域的 bbox、bbox 面积和懒加载坐标，字段语义对齐旧版 regionprops。"""
 
     def __init__(
         self,
@@ -29,7 +27,7 @@ class ConnectedComponent:
 
     @property
     def coords(self) -> np.ndarray:
-        """在组件 bbox 内提取 row/col 坐标，保持 skimage 的行优先顺序。"""
+        """在组件 bbox 内提取 row/col 坐标，保持历史行优先顺序。"""
         if self._coords is None:
             min_row, min_col, max_row, max_col = self.bbox
             label_roi = self._labels[min_row:max_row, min_col:max_col]
@@ -173,7 +171,7 @@ def _order_points(pts):
     left_most = left_most[np.argsort(left_most[:, 1]), :]
     (tl, bl) = left_most
 
-    distance = dist.cdist(tl[np.newaxis], right_most, "euclidean")[0]
+    distance = np.linalg.norm(right_most - tl, axis=1)
     (br, tr) = right_most[np.argsort(distance)[::-1], :]
 
     return np.array([tl, tr, br, bl], dtype="float32")
@@ -294,10 +292,10 @@ def min_area_rect_box(
     """
     boxes = []
     for region in regions:
-        bbox_area = getattr(region, "area_bbox", None)
-        if bbox_area is None:
-            bbox_area = region.bbox_area
-        if bbox_area  > H * W * 3 / 4:  # 过滤大的单元格
+        region_bbox_area = getattr(region, "bbox_area", None)
+        if region_bbox_area is None:
+            region_bbox_area = region.area_bbox
+        if region_bbox_area > H * W * 3 / 4:  # 过滤大的单元格
             continue
         rect = cv2.minAreaRect(region.coords[:, ::-1])
 

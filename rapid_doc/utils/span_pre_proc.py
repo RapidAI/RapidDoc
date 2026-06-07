@@ -161,10 +161,10 @@ def txt_spans_bbox_extract(page_dict, input_res, mfd_res, scale, useful_list):
     # 转换为和ocr-det一样的格式
     for bbox in page_text_bbox:
         bbox = [bbox[0]*scale, bbox[1]*scale, bbox[2]*scale, bbox[3]*scale]
-        p1 = [bbox[0] + paste_x - xmin, bbox[1] + paste_y - ymin]
-        p2 = [bbox[2] + paste_x - xmin, bbox[1] + paste_y - ymin]
-        p3 = [bbox[2] + paste_x - xmin, bbox[3] + paste_y - ymin]
-        p4 = [bbox[0] + paste_x - xmin, bbox[3] + paste_y - ymin]
+        p1 = [round(bbox[0] + paste_x - xmin, 2), round(bbox[1] + paste_y - ymin, 2)]
+        p2 = [round(bbox[2] + paste_x - xmin, 2), round(bbox[1] + paste_y - ymin, 2)]
+        p3 = [round(bbox[2] + paste_x - xmin, 2), round(bbox[3] + paste_y - ymin, 2)]
+        p4 = [round(bbox[0] + paste_x - xmin, 2), round(bbox[3] + paste_y - ymin, 2)]
         bbox = [p1, p2, p3, p4]
         dt_boxes.append(bbox)
     # 根据公式位置更新检测框

@@ -19,7 +19,6 @@ from ...utils.typings import EngineType
 
 import copy
 import math
-from skimage import measure
 from .utils.utils import resize_img
 from .utils.utils_table_line_rec import (
     get_table_line,

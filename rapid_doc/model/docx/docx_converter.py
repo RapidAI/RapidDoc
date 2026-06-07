@@ -7,6 +7,7 @@ from typing import BinaryIO, Optional, Union, Any, Final, Iterator
 from loguru import logger
 from docx import Document
 from docx.document import Document as DocxDocument
+from docx.enum.style import WD_STYLE_TYPE
 from docx.oxml.xmlchemy import BaseOxmlElement
 from docx.text.paragraph import Paragraph
 from docx.text.hyperlink import Hyperlink
@@ -38,6 +39,7 @@ from rapid_doc.backend.utils.office_image import (
     serialize_office_image,
 )
 from rapid_doc.backend.utils.office_chart import extract_chart_html_from_ooxml
+
 
 class DocxConverter:
     _BLIP_NAMESPACES: Final = {
@@ -90,8 +92,8 @@ class DocxConverter:
         self.docx_obj = None
         self.pages = []
         self.cur_page = []
-        self._mammoth_tables_html: list = []   # 与正文顶层表格对齐的 mammoth 预解析 HTML，None 表示回退解析
-        self._mammoth_table_idx: int = 0       # 当前预解析表格游标
+        self._mammoth_tables_html: list = []  # 与正文顶层表格对齐的 mammoth 预解析 HTML，None 表示回退解析
+        self._mammoth_table_idx: int = 0  # 当前预解析表格游标
         self.pre_num_id: int = -1  # 上一个处理元素的 numId
         self.pre_ilevel: int = -1  # 上一个处理元素的缩进等级, 用于判断列表层级
         self.list_block_stack: list = []  # 列表块堆栈
@@ -111,6 +113,8 @@ class DocxConverter:
             tuple[int, int], Optional[BaseOxmlElement]
         ] = {}
         self._numbering_start_cache: dict[tuple[int, int], int] = {}
+        self._style_lookup_cache: dict[tuple[Any, Optional[str]], Any] = {}
+        self._style_bool_cache: dict[tuple[int, str], Optional[bool]] = {}
         self._numbering_counter_state: dict[tuple[int, int], int] = {}
 
     @staticmethod
@@ -123,6 +127,85 @@ class DocxConverter:
             return etree.QName(tag).localname
         except ValueError:
             return None
+
+    def _reset_style_caches(self) -> None:
+        """重置样式查询缓存，避免同一 converter 实例多次转换时复用旧文档样式。"""
+        self._style_lookup_cache = {}
+        self._style_bool_cache = {}
+
+    def _get_style_id_from_property(
+            self,
+            xml_element: Optional[BaseOxmlElement],
+            property_tag: str,
+            style_tag: str,
+    ) -> Optional[str]:
+        """从段落或 run 的直接属性节点读取样式 ID，避免触发 python-docx 样式查找。"""
+        if xml_element is None:
+            return None
+
+        property_element = xml_element.find(
+            property_tag,
+            namespaces=DocxConverter._BLIP_NAMESPACES,
+        )
+        if property_element is None:
+            return None
+
+        style_element = property_element.find(
+            style_tag,
+            namespaces=DocxConverter._BLIP_NAMESPACES,
+        )
+        if style_element is None:
+            return None
+
+        return style_element.get(self.XML_KEY) or None
+
+    def _get_cached_docx_style(
+            self,
+            part: Any,
+            style_id: Optional[str],
+            style_type: Any,
+    ) -> Any:
+        """按 style id 和类型缓存 python-docx 样式对象，避免大 styles.xml 被反复线性扫描。"""
+        if part is None:
+            return None
+
+        cache_key = (style_type, style_id)
+        if cache_key not in self._style_lookup_cache:
+            self._style_lookup_cache[cache_key] = part.get_style(
+                style_id,
+                style_type,
+            )
+        return self._style_lookup_cache[cache_key]
+
+    def _get_paragraph_style(self, paragraph: Optional[Paragraph]) -> Any:
+        """读取段落样式；无显式 pStyle 时缓存默认段落样式查询结果。"""
+        if paragraph is None:
+            return None
+        style_id = self._get_style_id_from_property(
+            paragraph._element,
+            "w:pPr",
+            "w:pStyle",
+        )
+        return self._get_cached_docx_style(
+            paragraph.part,
+            style_id,
+            WD_STYLE_TYPE.PARAGRAPH,
+        )
+
+    def _get_run_style(self, run: Optional[Run]) -> Any:
+        """读取 run 字符样式；无显式 rStyle 时缓存默认字符样式查询结果。"""
+        if run is None:
+            return None
+        style_id = self._get_style_id_from_property(
+            run._element,
+            "w:rPr",
+            "w:rStyle",
+        )
+        return self._get_cached_docx_style(
+            run.part,
+            style_id,
+            WD_STYLE_TYPE.CHARACTER,
+        )
 
     @staticmethod
     def _escape_hyperlink_text(text: str) -> str:
@@ -193,11 +276,11 @@ class DocxConverter:
 
     @classmethod
     def _normalize_format_for_text(
-        cls,
-        format_obj: Optional[Formatting],
-        text: str,
-        *,
-        preserve_blank_non_visible_style: bool = False,
+            cls,
+            format_obj: Optional[Formatting],
+            text: str,
+            *,
+            preserve_blank_non_visible_style: bool = False,
     ) -> Optional[Formatting]:
         """按文本内容收敛 run 格式，避免空白 run 把不可见样式传给输出。
 
@@ -210,12 +293,11 @@ class DocxConverter:
             preserve_blank_non_visible_style=preserve_blank_non_visible_style,
         )
 
-    @classmethod
     def _find_adjacent_non_blank_run_format(
-        cls,
-        inline_contents: list[Any],
-        current_index: int,
-        step: int,
+            self,
+            inline_contents: list[Any],
+            current_index: int,
+            step: int,
     ) -> Optional[Formatting]:
         """查找相邻方向上最近的非空白普通 run 格式，用于判断空白 run 是否属于同一段样式文本。"""
         index = current_index + step
@@ -227,30 +309,29 @@ class DocxConverter:
             if not isinstance(content, Run):
                 index += step
                 continue
-            if cls._is_hidden_run(content):
+            if self._is_hidden_run(content):
                 index += step
                 continue
             text = content.text or ""
             if text.strip():
-                return cls._get_format_from_run(content)
+                return self._get_format_from_run(content)
             index += step
         return None
 
-    @classmethod
     def _should_preserve_blank_non_visible_style(
-        cls,
-        inline_contents: list[Any],
-        current_index: int,
-        text: str,
-        format_obj: Optional[Formatting],
+            self,
+            inline_contents: list[Any],
+            current_index: int,
+            text: str,
+            format_obj: Optional[Formatting],
     ) -> bool:
         """判断空白 run 的 bold/italic 是否应保留，以便连续同样式文本合并成一个 span。"""
         if not text or text.strip():
             return False
-        if not cls._has_non_visible_text_style(format_obj):
+        if not self._has_non_visible_text_style(format_obj):
             return False
 
-        previous_format = cls._find_adjacent_non_blank_run_format(
+        previous_format = self._find_adjacent_non_blank_run_format(
             inline_contents,
             current_index,
             -1,
@@ -258,7 +339,7 @@ class DocxConverter:
         if format_obj == previous_format:
             return True
 
-        next_format = cls._find_adjacent_non_blank_run_format(
+        next_format = self._find_adjacent_non_blank_run_format(
             inline_contents,
             current_index,
             1,
@@ -267,11 +348,11 @@ class DocxConverter:
 
     @classmethod
     def _should_keep_group_text(
-        cls,
-        text: str,
-        format_obj: Optional[Formatting],
-        *,
-        preserve_plain_blank: bool = False,
+            cls,
+            text: str,
+            format_obj: Optional[Formatting],
+            *,
+            preserve_plain_blank: bool = False,
     ) -> bool:
         """判断当前累积 run 是否需要输出，保留夹在可见样式之间的普通空白。"""
         return should_keep_group_text(
@@ -282,12 +363,12 @@ class DocxConverter:
 
     @staticmethod
     def _append_paragraph_element(
-        paragraph_elements: list[
-            tuple[str, Optional[Formatting], Optional[Union[AnyUrl, Path, str]]]
-        ],
-        text: str,
-        format_obj: Optional[Formatting],
-        hyperlink: Optional[Union[AnyUrl, Path, str]],
+            paragraph_elements: list[
+                tuple[str, Optional[Formatting], Optional[Union[AnyUrl, Path, str]]]
+            ],
+            text: str,
+            format_obj: Optional[Formatting],
+            hyperlink: Optional[Union[AnyUrl, Path, str]],
     ) -> None:
         """追加段落元素；相邻同超链接且同格式的 run 合并为一个元素。"""
         append_rich_text_element(paragraph_elements, text, format_obj, hyperlink)
@@ -309,10 +390,10 @@ class DocxConverter:
 
     @classmethod
     def _format_text_with_hyperlink(
-        cls,
-        text: str,
-        hyperlink: Optional[Union[AnyUrl, Path, str]],
-        style_str: Optional[str] = None,
+            cls,
+            text: str,
+            hyperlink: Optional[Union[AnyUrl, Path, str]],
+            style_str: Optional[str] = None,
     ) -> str:
         """
         将文本和超链接格式化，支持字体样式标记。
@@ -332,46 +413,46 @@ class DocxConverter:
 
     @staticmethod
     def _format_text_tag(
-        text: str,
-        style_str: Optional[str] = None,
-        *,
-        force_tag: bool = False,
+            text: str,
+            style_str: Optional[str] = None,
+            *,
+            force_tag: bool = False,
     ) -> str:
         """生成内部富文本标记；无样式时普通文本不额外包裹。"""
         return format_text_tag(text, style_str, force_tag=force_tag)
 
     @staticmethod
     def _is_valid_hyperlink_target(
-        hyperlink: Optional[Union[AnyUrl, Path, str]],
+            hyperlink: Optional[Union[AnyUrl, Path, str]],
     ) -> bool:
         """判断 hyperlink 是否是可输出的真实链接目标。"""
         return is_valid_hyperlink_target(hyperlink)
 
     @classmethod
     def _format_hyperlink_group(
-        cls,
-        group: list[
-            tuple[str, Optional[Formatting], Optional[Union[AnyUrl, Path, str]]]
-        ],
+            cls,
+            group: list[
+                tuple[str, Optional[Formatting], Optional[Union[AnyUrl, Path, str]]]
+            ],
     ) -> str:
         """将连续同 URL 的 hyperlink 片段输出为一个外层 hyperlink 标记。"""
         return format_hyperlink_group(group)
 
     @classmethod
     def _build_text_mappings_from_elements(
-        cls,
-        paragraph_elements: list[
-            tuple[str, Optional[Formatting], Optional[Union[AnyUrl, Path, str]]]
-        ],
+            cls,
+            paragraph_elements: list[
+                tuple[str, Optional[Formatting], Optional[Union[AnyUrl, Path, str]]]
+            ],
     ) -> list[tuple[str, str]]:
         """按连续同 URL hyperlink 分组，生成原文到富文本标记的映射。"""
         return build_text_mappings_from_elements(paragraph_elements)
 
     def _build_text_from_elements(
-        self,
-        paragraph_elements: list[
-            tuple[str, Optional[Formatting], Optional[Union[AnyUrl, Path, str]]]
-        ],
+            self,
+            paragraph_elements: list[
+                tuple[str, Optional[Formatting], Optional[Union[AnyUrl, Path, str]]]
+            ],
     ) -> str:
         """
         从 paragraph_elements 重组文本，应用超链接格式和字体样式。
@@ -403,8 +484,8 @@ class DocxConverter:
 
     @staticmethod
     def _split_paragraph_elements_at_eq_boundaries(
-        paragraph_elements: list,
-        non_eq_segments: list,
+            paragraph_elements: list,
+            non_eq_segments: list,
     ) -> list:
         """
         在公式边界处拆分段落元素，解决格式标注跨公式边界失效的问题。
@@ -431,7 +512,7 @@ class DocxConverter:
         # 计算各非公式片段的累积结束位置，作为分割边界
         boundaries: set[int] = set()
         pos = 0
-        for seg in non_eq_segments[:-1]:   # 最后一个片段后无需分割
+        for seg in non_eq_segments[:-1]:  # 最后一个片段后无需分割
             pos += len(seg)
             boundaries.add(pos)
 
@@ -480,8 +561,8 @@ class DocxConverter:
 
     @staticmethod
     def _group_paragraph_elements_by_non_eq_segments(
-        paragraph_elements: list,
-        non_eq_segments: list,
+            paragraph_elements: list,
+            non_eq_segments: list,
     ) -> list[list]:
         """按公式切分出的非公式文本片段分组，避免 hyperlink 跨公式合并。"""
         if len(non_eq_segments) <= 1:
@@ -516,8 +597,8 @@ class DocxConverter:
                 current_len = 0
                 segment_index += 1
                 while (
-                    segment_index < len(non_eq_segments)
-                    and non_eq_segments[segment_index] == ""
+                        segment_index < len(non_eq_segments)
+                        and non_eq_segments[segment_index] == ""
                 ):
                     groups.append([])
                     segment_index += 1
@@ -529,12 +610,12 @@ class DocxConverter:
         return groups
 
     def _build_text_with_equations_and_hyperlinks(
-        self,
-        paragraph_elements: list[
-            tuple[str, Optional[Formatting], Optional[Union[AnyUrl, Path, str]]]
-        ],
-        text_with_equations: str,
-        equations: list,
+            self,
+            paragraph_elements: list[
+                tuple[str, Optional[Formatting], Optional[Union[AnyUrl, Path, str]]]
+            ],
+            text_with_equations: str,
+            equations: list,
     ) -> str:
         """
         构建同时包含公式、超链接和字体样式的文本。
@@ -560,12 +641,12 @@ class DocxConverter:
         # 检查是否有字体样式
         has_style = any(
             fmt is not None and (
-                fmt.bold
-                or fmt.italic
-                or fmt.underline
-                or fmt.emphasis
-                or fmt.strikethrough
-                or fmt.script != Script.BASELINE
+                    fmt.bold
+                    or fmt.italic
+                    or fmt.underline
+                    or fmt.emphasis
+                    or fmt.strikethrough
+                    or fmt.script != Script.BASELINE
             )
             for _, fmt, _ in paragraph_elements
         )
@@ -589,8 +670,8 @@ class DocxConverter:
         # 1. 记录每个元素的原始文本和对应的格式化结果
         element_mappings = []
         for segment_elements in self._group_paragraph_elements_by_non_eq_segments(
-            paragraph_elements,
-            non_eq_segments,
+                paragraph_elements,
+                non_eq_segments,
         ):
             element_mappings.extend(
                 self._build_text_mappings_from_elements(segment_elements)
@@ -608,7 +689,7 @@ class DocxConverter:
         return result_text
 
     def _replace_text_outside_equations(
-        self, text: str, old_text: str, new_text: str
+            self, text: str, old_text: str, new_text: str
     ) -> str:
         """
         在公式标记外替换文本。
@@ -676,8 +757,8 @@ class DocxConverter:
         return True
 
     def convert(
-        self,
-        file_stream: BinaryIO,
+            self,
+            file_stream: BinaryIO,
     ):
         # 重置所有实例状态，确保同一实例多次调用 convert() 时不会残留上次的数据
         self.pages = []
@@ -696,6 +777,7 @@ class DocxConverter:
         self._numbering_root_loaded = False
         self._numbering_level_cache = {}
         self._numbering_start_cache = {}
+        self._reset_style_caches()
         self._numbering_counter_state = {}
         # 读取文件字节，以便 mammoth 和 python-docx 各自使用独立读取流
         file_bytes = self._sanitize_missing_internal_relationships(file_stream.read())
@@ -729,7 +811,7 @@ class DocxConverter:
         )
         anchors: set[str] = set()
         for hl in self.docx_obj.element.body.findall(
-            ".//w:hyperlink", namespaces=DocxConverter._BLIP_NAMESPACES
+                ".//w:hyperlink", namespaces=DocxConverter._BLIP_NAMESPACES
         ):
             anchor = hl.get(anchor_attr, "").strip()
             if anchor and anchor.startswith("_Toc"):
@@ -737,8 +819,8 @@ class DocxConverter:
         return anchors
 
     def _walk_linear(
-        self,
-        body: BaseOxmlElement,
+            self,
+            body: BaseOxmlElement,
     ):
         for element in body:
             # 获取元素的标签名（去除命名空间前缀）
@@ -987,18 +1069,18 @@ class DocxConverter:
 
         if xml_signature["text"] or html_signature["text"]:
             if not DocxConverter._table_text_matches(
-                xml_signature["text"], html_signature["text"]
+                    xml_signature["text"], html_signature["text"]
             ):
                 return False
             return (
-                xml_signature["cell_count"] == html_signature["cell_count"]
-                or xml_signature["row_count"] == html_signature["row_count"]
+                    xml_signature["cell_count"] == html_signature["cell_count"]
+                    or xml_signature["row_count"] == html_signature["row_count"]
             )
 
         return (
-            xml_signature["row_count"] == html_signature["row_count"]
-            and xml_signature["cell_count"] == html_signature["cell_count"]
-            and xml_signature["image_count"] == html_signature["image_count"]
+                xml_signature["row_count"] == html_signature["row_count"]
+                and xml_signature["cell_count"] == html_signature["cell_count"]
+                and xml_signature["image_count"] == html_signature["image_count"]
         )
 
     @staticmethod
@@ -1294,8 +1376,8 @@ class DocxConverter:
             return html
 
     def _handle_text_elements(
-        self,
-        element: BaseOxmlElement,
+            self,
+            element: BaseOxmlElement,
     ):
         """
         处理文本元素。
@@ -1309,7 +1391,7 @@ class DocxConverter:
         """
         is_section_end = False
         has_section_break = (
-            element.find(".//w:sectPr", namespaces=DocxConverter._BLIP_NAMESPACES) is not None
+                element.find(".//w:sectPr", namespaces=DocxConverter._BLIP_NAMESPACES) is not None
         )
         if has_section_break and not self._is_layout_only_section_break(element):
             # 如果没有text内容
@@ -1331,11 +1413,11 @@ class DocxConverter:
         text = text.strip()
 
         if self._handle_plain_toc_paragraph_as_index(
-            paragraph=paragraph,
-            paragraph_element=element,
-            paragraph_elements=paragraph_elements,
-            text=text,
-            equations=equations,
+                paragraph=paragraph,
+                paragraph_element=element,
+                paragraph_elements=paragraph_elements,
+                text=text,
+                equations=equations,
         ):
             # 普通 TOC 是列表边界，避免后续同 numId 列表项继续合并到目录前的列表块。
             if self.pre_num_id != -1:
@@ -1358,9 +1440,9 @@ class DocxConverter:
 
         # 处理列表
         if (
-            numid is not None
-            and ilevel is not None
-            and p_style_id not in ["Title", "Heading"]
+                numid is not None
+                and ilevel is not None
+                and p_style_id not in ["Title", "Heading"]
         ):
             # 通过检查 numFmt 来确认这是否实际上是编号列表
             is_numbered = self._is_numbered_list(numid, ilevel)
@@ -1399,9 +1481,9 @@ class DocxConverter:
             # 列表项已处理，返回
             return None
         elif (  # 列表结束处理
-            numid is None
-            and self.pre_num_id != -1
-            and p_style_id not in ["Title", "Heading"]
+                numid is None
+                and self.pre_num_id != -1
+                and p_style_id not in ["Title", "Heading"]
         ):  # 关闭列表
             # 重置列表状态
             self._close_active_list()
@@ -1424,9 +1506,9 @@ class DocxConverter:
 
         elif "Heading" in p_style_id:
             is_numbered_style = (
-                numid is not None
-                and ilevel is not None
-                and self._is_numbered_list(numid, ilevel)
+                    numid is not None
+                    and ilevel is not None
+                    and self._is_numbered_list(numid, ilevel)
             )
             # 构建包含公式和超链接的文本
             content_text = self._build_text_with_equations_and_hyperlinks(
@@ -1449,7 +1531,7 @@ class DocxConverter:
 
         elif len(equations) > 0:
             if (paragraph_text is None or len(paragraph_text.strip()) == 0) and len(
-                text
+                    text
             ) > 0:
                 # 独立公式
                 eq_block = {
@@ -1626,10 +1708,10 @@ class DocxConverter:
 
         # 字段代码超链接内联检测状态（处理 w:fldChar + w:instrText 形式的超链接）
         _W_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-        _field_in = False       # 当前是否在字段域内
-        _field_url = None       # 当前字段域解析出的 URL
-        _field_phase = None     # 'instr' 或 'result'
-        _field_acc_text = ""    # 累积的显示文本
+        _field_in = False  # 当前是否在字段域内
+        _field_url = None  # 当前字段域解析出的 URL
+        _field_phase = None  # 'instr' 或 'result'
+        _field_acc_text = ""  # 累积的显示文本
         _field_acc_format = None  # 首个显示 run 的格式
 
         # 遍历段落的 runs 并按格式分组
@@ -1761,26 +1843,26 @@ class DocxConverter:
             is_blank_text = bool(text) and not text.strip()
             format_changed = format != previous_format
             has_visible_boundary = (
-                self._has_visible_style(previous_format)
-                or self._has_visible_style(format)
+                    self._has_visible_style(previous_format)
+                    or self._has_visible_style(format)
             )
             should_split_blank_boundary = (
-                is_blank_text
-                and bool(group_text)
-                and format_changed
-                and has_visible_boundary
+                    is_blank_text
+                    and bool(group_text)
+                    and format_changed
+                    and has_visible_boundary
             )
             if (has_visible_content and format_changed) or should_split_blank_boundary or (
-                hyperlink is not None
+                    hyperlink is not None
             ):
                 # 前一组有实质内容（非空或带可见样式的空白）时才保存
                 preserve_plain_blank = (
-                    bool(group_text)
-                    and not group_text.strip()
-                    and (
-                        self._has_visible_style(previous_format)
-                        or self._has_visible_style(format)
-                    )
+                        bool(group_text)
+                        and not group_text.strip()
+                        and (
+                                self._has_visible_style(previous_format)
+                                or self._has_visible_style(format)
+                        )
                 )
                 prev_has_visible = self._should_keep_group_text(
                     group_text,
@@ -1815,9 +1897,9 @@ class DocxConverter:
         return paragraph_elements
 
     def _iter_paragraph_inner_content(
-        self,
-        paragraph: Paragraph,
-        container: Optional[BaseOxmlElement] = None,
+            self,
+            paragraph: Paragraph,
+            container: Optional[BaseOxmlElement] = None,
     ) -> Iterator[Union[Run, Hyperlink]]:
         """Yield visible paragraph inline containers in document order.
 
@@ -1850,7 +1932,7 @@ class DocxConverter:
 
     @staticmethod
     def _get_paragraph_text_from_contents(
-        inner_contents: list[Union[Run, Hyperlink]],
+            inner_contents: list[Union[Run, Hyperlink]],
     ) -> str:
         """Rebuild paragraph plain text from visible inline containers."""
         return "".join(content.text or "" for content in inner_contents)
@@ -1861,14 +1943,21 @@ class DocxConverter:
             list(self._iter_paragraph_inner_content(paragraph))
         )
 
-    @classmethod
     def _resolve_style_chain_bool(
-        cls,
-        style_obj,
-        attr_name: str,
+            self,
+            style_obj,
+            attr_name: str,
     ) -> Optional[bool]:
         """从样式继承链中解析布尔字体属性。"""
+        if style_obj is None:
+            return None
+
+        cache_key = (id(style_obj), attr_name)
+        if cache_key in self._style_bool_cache:
+            return self._style_bool_cache[cache_key]
+
         style = style_obj
+        result = None
         while style is not None:
             font = getattr(style, "font", None)
             if font is not None:
@@ -1879,15 +1968,16 @@ class DocxConverter:
                 else:
                     value = getattr(font, attr_name, None)
                 if value is not None:
-                    return bool(value)
+                    result = bool(value)
+                    break
             style = getattr(style, "base_style", None)
-        return None
+        self._style_bool_cache[cache_key] = result
+        return result
 
-    @classmethod
     def _resolve_run_bool_with_inheritance(
-        cls,
-        run: Run,
-        attr_name: str,
+            self,
+            run: Run,
+            attr_name: str,
     ) -> bool:
         """解析 run 的字体属性，支持 run/字符样式/段落样式继承。"""
         if attr_name == "underline":
@@ -1902,20 +1992,23 @@ class DocxConverter:
 
         # 先看 run 级字符样式链（跳过 Hyperlink 默认字符样式，避免把默认下划线
         # 误当作正文强调样式注入到解析结果中）
-        run_style = getattr(run, "style", None)
+        run_style = self._get_run_style(run)
         run_style_id = str(getattr(run_style, "style_id", "") or "").lower()
         run_style_name = str(getattr(run_style, "name", "") or "").lower()
         is_hyperlink_style = (
-            run_style_id == "hyperlink" or "hyperlink" in run_style_name
+                run_style_id == "hyperlink" or "hyperlink" in run_style_name
         )
         if not is_hyperlink_style:
-            inherited = cls._resolve_style_chain_bool(run_style, attr_name)
+            inherited = self._resolve_style_chain_bool(run_style, attr_name)
             if inherited is not None:
                 return inherited
 
         # 再看所在段落样式链
         parent = getattr(run, "_parent", None)
-        inherited = cls._resolve_style_chain_bool(getattr(parent, "style", None), attr_name)
+        inherited = self._resolve_style_chain_bool(
+            self._get_paragraph_style(parent),
+            attr_name,
+        )
         if inherited is not None:
             return inherited
 
@@ -1933,8 +2026,7 @@ class DocxConverter:
             return ""
         return underline.get(f"{{{_W}}}val", "single")
 
-    @classmethod
-    def _get_format_from_run(cls, run: Run) -> Optional[Formatting]:
+    def _get_format_from_run(self, run: Run) -> Optional[Formatting]:
         """
         从 Run 对象获取格式信息。
 
@@ -1944,11 +2036,11 @@ class DocxConverter:
         Returns:
             Optional[Formatting]: 格式对象
         """
-        is_bold = cls._resolve_run_bool_with_inheritance(run, "bold")
-        is_italic = cls._resolve_run_bool_with_inheritance(run, "italic")
-        is_strikethrough = cls._resolve_run_bool_with_inheritance(run, "strikethrough")
-        is_underline = cls._resolve_run_bool_with_inheritance(run, "underline")
-        underline_style = cls._get_direct_underline_style(run)
+        is_bold = self._resolve_run_bool_with_inheritance(run, "bold")
+        is_italic = self._resolve_run_bool_with_inheritance(run, "italic")
+        is_strikethrough = self._resolve_run_bool_with_inheritance(run, "strikethrough")
+        is_underline = self._resolve_run_bool_with_inheritance(run, "underline")
+        underline_style = self._get_direct_underline_style(run)
 
         # 检测着重符号 (w:em)：独立保留为 emphasis，避免和真实下划线混淆。
         is_emphasis = False
@@ -2016,8 +2108,8 @@ class DocxConverter:
             return text, []
 
         if (
-            re.sub(r"\s+", "", "".join(only_texts)).strip()
-            != re.sub(r"\s+", "", text).strip()
+                re.sub(r"\s+", "", "".join(only_texts)).strip()
+                != re.sub(r"\s+", "", text).strip()
         ):
             # 如果我们无法重构初始原始文本
             # 不要尝试解析公式并返回原始文本
@@ -2052,16 +2144,17 @@ class DocxConverter:
         Returns:
             tuple[str, Optional[int]]: (标签, 层级) 元组
         """
-        if paragraph.style is None:
+        paragraph_style = self._get_paragraph_style(paragraph)
+        if paragraph_style is None:
             return "Normal", None
 
-        label = paragraph.style.style_id
-        name = paragraph.style.name
+        label = paragraph_style.style_id
+        name = paragraph_style.name
 
         if label is None:
             return "Normal", None
 
-        for style in self._iter_style_chain(paragraph.style):
+        for style in self._iter_style_chain(paragraph_style):
             style_label = getattr(style, "style_id", None)
             style_name = getattr(style, "name", None)
 
@@ -2093,7 +2186,7 @@ class DocxConverter:
             current = getattr(current, "base_style", None)
 
     def _get_paragraph_property_child(
-        self, xml_element: Optional[BaseOxmlElement], child_tag: str
+            self, xml_element: Optional[BaseOxmlElement], child_tag: str
     ) -> Optional[BaseOxmlElement]:
         """Read a direct child from w:pPr without matching nested descendants."""
         if xml_element is None:
@@ -2106,14 +2199,14 @@ class DocxConverter:
         return pPr.find(child_tag, namespaces=namespaces)
 
     def _get_effective_numPr(
-        self, paragraph: Paragraph
+            self, paragraph: Paragraph
     ) -> Optional[BaseOxmlElement]:
         """Resolve paragraph numbering from direct properties, then style inheritance."""
         numPr = self._get_paragraph_property_child(paragraph._element, "w:numPr")
         if numPr is not None:
             return numPr
 
-        for style in self._iter_style_chain(getattr(paragraph, "style", None)):
+        for style in self._iter_style_chain(self._get_paragraph_style(paragraph)):
             style_element = getattr(style, "element", None)
             numPr = self._get_paragraph_property_child(style_element, "w:numPr")
             if numPr is not None:
@@ -2127,7 +2220,7 @@ class DocxConverter:
             paragraph._element, "w:outlineLvl"
         )
         if outline_lvl is None:
-            for style in self._iter_style_chain(getattr(paragraph, "style", None)):
+            for style in self._iter_style_chain(self._get_paragraph_style(paragraph)):
                 style_element = getattr(style, "element", None)
                 outline_lvl = self._get_paragraph_property_child(
                     style_element, "w:outlineLvl"
@@ -2141,7 +2234,7 @@ class DocxConverter:
         return self._str_to_int(outline_lvl.get(self.XML_KEY), None)
 
     def _get_numId_and_ilvl(
-        self, paragraph: Paragraph
+            self, paragraph: Paragraph
     ) -> tuple[Optional[int], Optional[int]]:
         """
         获取段落的列表编号ID和层级。
@@ -2191,7 +2284,7 @@ class DocxConverter:
         )
 
     def _get_abstract_numbering_element(
-        self, numId: int
+            self, numId: int
     ) -> Optional[BaseOxmlElement]:
         """根据 numId 获取对应的 abstractNum 定义，用于复用编号层级解析逻辑。"""
         numbering_root = self._get_numbering_root()
@@ -2219,7 +2312,7 @@ class DocxConverter:
         return numbering_root.find(abstract_num_xpath, namespaces=namespaces)
 
     def _infer_numbering_ilvl_from_style(
-        self, numId: int, paragraph: Paragraph
+            self, numId: int, paragraph: Paragraph
     ) -> Optional[int]:
         """当 numPr 只有 numId 时，根据 numbering.xml 中的 pStyle 反查编号层级。"""
         abstract_num_element = self._get_abstract_numbering_element(numId)
@@ -2228,7 +2321,7 @@ class DocxConverter:
 
         style_ids = {
             str(getattr(style, "style_id", "") or "")
-            for style in self._iter_style_chain(getattr(paragraph, "style", None))
+            for style in self._iter_style_chain(self._get_paragraph_style(paragraph))
         }
         style_ids.discard("")
         if not style_ids:
@@ -2239,7 +2332,7 @@ class DocxConverter:
         }
         ilvl_attr = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}ilvl"
         for lvl_element in abstract_num_element.findall(
-            ".//w:lvl", namespaces=namespaces
+                ".//w:lvl", namespaces=namespaces
         ):
             p_style = lvl_element.find("w:pStyle", namespaces=namespaces)
             if p_style is None:
@@ -2266,7 +2359,7 @@ class DocxConverter:
         return self._numbering_root
 
     def _get_numbering_level_definition(
-        self, numId: int, ilvl: int
+            self, numId: int, ilvl: int
     ) -> Optional[BaseOxmlElement]:
         """Resolve and cache the numbering level definition for a numId/ilvl pair."""
         cache_key = (numId, ilvl)
@@ -2521,14 +2614,14 @@ class DocxConverter:
             return False
 
     def _add_list_item(
-        self,
-        *,
-        numid: int,
-        ilevel: int,
-        elements: list,
-        is_numbered: bool = False,
-        text: str = "",
-        equations: list = None,
+            self,
+            *,
+            numid: int,
+            ilevel: int,
+            elements: list,
+            is_numbered: bool = False,
+            text: str = "",
+            equations: list = None,
     ) -> list:
         """
         添加列表项。
@@ -2610,9 +2703,9 @@ class DocxConverter:
 
         # 情况 2: 增加缩进，打开子列表
         elif (
-            self.pre_num_id == numid  # 同一个列表
-            and self.pre_ilevel != -1  # 上一个缩进级别已知
-            and self.pre_ilevel < ilevel  # 当前层级比之前更缩进
+                self.pre_num_id == numid  # 同一个列表
+                and self.pre_ilevel != -1  # 上一个缩进级别已知
+                and self.pre_ilevel < ilevel  # 当前层级比之前更缩进
         ):
             # 创建新的子列表块
             child_list_block = {
@@ -2651,9 +2744,9 @@ class DocxConverter:
 
         # 情况3: 减少缩进，关闭子列表
         elif (
-            self.pre_num_id == numid  # 同一个列表
-            and self.pre_ilevel != -1  # 上一个缩进级别已知
-            and ilevel < self.pre_ilevel  # 当前层级比之前更少缩进
+                self.pre_num_id == numid  # 同一个列表
+                and self.pre_ilevel != -1  # 上一个缩进级别已知
+                and ilevel < self.pre_ilevel  # 当前层级比之前更少缩进
         ):
             # 出栈，直到找到匹配的 ilevel
             while self.list_block_stack:
@@ -2751,10 +2844,10 @@ class DocxConverter:
                     continue
 
                 if (
-                    numid is not None
-                    and ilevel is not None
-                    and p_style_id not in ["Title", "Heading"]
-                    and text
+                        numid is not None
+                        and ilevel is not None
+                        and p_style_id not in ["Title", "Heading"]
+                        and text
                 ):
                     items.append(("list", numid, ilevel))
                     if numid not in numid_ilvels:
@@ -2837,10 +2930,11 @@ class DocxConverter:
             for p in paragraphs[:5]:  # 只检查前5个段落即可判断
                 try:
                     p_obj = Paragraph(p, self.docx_obj)
-                    if p_obj.style and p_obj.style.name:
-                        style_name = p_obj.style.name
+                    paragraph_style = self._get_paragraph_style(p_obj)
+                    if paragraph_style and paragraph_style.name:
+                        style_name = paragraph_style.name
                         if re.match(r'^TOC\s*\d+$', style_name, re.IGNORECASE) or \
-                           re.match(r'^目录\s*\d+$', style_name):
+                                re.match(r'^目录\s*\d+$', style_name):
                             return True
                 except Exception:
                     continue
@@ -2861,9 +2955,10 @@ class DocxConverter:
         Returns:
             Optional[int]: 层级（0-based），如果不是目录样式则返回 None
         """
-        if paragraph.style is None:
+        paragraph_style = self._get_paragraph_style(paragraph)
+        if paragraph_style is None:
             return None
-        style_name = paragraph.style.name
+        style_name = paragraph_style.name
         if style_name:
             match = re.match(r'^(?:TOC|目录)\s*(\d+)$', style_name, re.IGNORECASE)
             if match:
@@ -2872,7 +2967,7 @@ class DocxConverter:
         return None
 
     def _is_flat_list_toc(
-        self, items: list[tuple[int, str, list, list, Optional[str]]]
+            self, items: list[tuple[int, str, list, list, Optional[str]]]
     ) -> bool:
         """
         检测目录是否为扁平列表（插图清单、列表清单等），
@@ -2888,7 +2983,7 @@ class DocxConverter:
                 continue
             total_count += 1
             if re.match(r'^[图表][\d\s.]', stripped) or re.match(
-                r'^(Figure|Table)\s+\d', stripped, re.IGNORECASE
+                    r'^(Figure|Table)\s+\d', stripped, re.IGNORECASE
             ):
                 match_count += 1
         if total_count == 0:
@@ -2918,13 +3013,13 @@ class DocxConverter:
         return toc_level
 
     def _add_index_item(
-        self,
-        *,
-        ilevel: int,
-        elements: list,
-        text: str = "",
-        equations: list = None,
-        anchor: Optional[str] = None,
+            self,
+            *,
+            ilevel: int,
+            elements: list,
+            text: str = "",
+            equations: list = None,
+            anchor: Optional[str] = None,
     ) -> None:
         """
         添加目录项到索引块。
@@ -3049,7 +3144,7 @@ class DocxConverter:
         )
         names = []
         for bm in paragraph_element.findall(
-            ".//w:bookmarkStart", namespaces=DocxConverter._BLIP_NAMESPACES
+                ".//w:bookmarkStart", namespaces=DocxConverter._BLIP_NAMESPACES
         ):
             name = bm.get(bookmark_name_attr, "").strip()
             if not name:
@@ -3076,7 +3171,7 @@ class DocxConverter:
         )
         anchors = []
         for hl in paragraph_element.findall(
-            ".//w:hyperlink", namespaces=DocxConverter._BLIP_NAMESPACES
+                ".//w:hyperlink", namespaces=DocxConverter._BLIP_NAMESPACES
         ):
             anchor = hl.get(anchor_attr, "").strip()
             if anchor:
@@ -3089,13 +3184,13 @@ class DocxConverter:
         return anchors[0]
 
     def _handle_plain_toc_paragraph_as_index(
-        self,
-        *,
-        paragraph: Paragraph,
-        paragraph_element: BaseOxmlElement,
-        paragraph_elements: list,
-        text: str,
-        equations: list,
+            self,
+            *,
+            paragraph: Paragraph,
+            paragraph_element: BaseOxmlElement,
+            paragraph_elements: list,
+            text: str,
+            equations: list,
     ) -> bool:
         """将未包裹在 SDT 中的普通目录段落转换为 INDEX 项。"""
         toc_level = self._get_toc_item_level(paragraph)
@@ -3237,7 +3332,7 @@ class DocxConverter:
             return [input_string]
 
     def _str_to_int(
-        self, s: Optional[str], default: Optional[int] = 0
+            self, s: Optional[str], default: Optional[int] = 0
     ) -> Optional[int]:
         """
         将字符串转换为整数。
@@ -3367,7 +3462,7 @@ class DocxConverter:
                 return True
 
         return False
-    
+
     def _handle_drawingml(self, elements: list[BaseOxmlElement]):
         """
         处理 DrawingML 元素，目前先处理 chart 元素。
@@ -3439,8 +3534,8 @@ class DocxConverter:
                 chart_block["content"] = chart_html
 
     def _handle_textbox_content(
-        self,
-        textbox_elements: list,
+            self,
+            textbox_elements: list,
     ):
         """
         处理文本框内容并将其添加到文档结构。
@@ -3560,8 +3655,8 @@ class DocxConverter:
         """
         # 先尝试直接从包含顺序相关属性的 w:p 元素获取索引
         if (
-            hasattr(paragraph_element, "getparent")
-            and paragraph_element.getparent() is not None
+                hasattr(paragraph_element, "getparent")
+                and paragraph_element.getparent() is not None
         ):
             parent = paragraph_element.getparent()
             # 获取所有段落兄弟节点

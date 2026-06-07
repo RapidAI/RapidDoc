@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 from collections import Counter
-import matplotlib.pyplot as plt
 
 
 def detect_checkboxes(image, line_min_width=15, line_max_width=15):
@@ -104,6 +103,8 @@ def process_image(image_path, plt_show=False, debug_show=False):
 
         checkboxes = classify_checkboxes(image, stats, img_bin_final, debug_show=debug_show)
         if plt_show:
+            # "matplotlib>=3.10,<4"
+            import matplotlib.pyplot as plt
             import matplotlib
             matplotlib.use("TkAgg")
 

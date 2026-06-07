@@ -1,3 +1,4 @@
+# Copyright (c) Opendatalab. All rights reserved.
 import os
 import unicodedata
 
@@ -9,7 +10,8 @@ if not os.getenv("FTLANG_CACHE"):
     os.environ["FTLANG_CACHE"] = str(ftlang_cache_dir)
     # print(os.getenv("FTLANG_CACHE"))
 
-from fast_langdetect import detect_language
+# from fast_langdetect import detect_language
+from rapid_doc.model.fast_langdetect import detect_language
 
 
 def remove_invalid_surrogates(text):

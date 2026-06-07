@@ -1,7 +1,5 @@
 from copy import deepcopy
-from typing import Any, List, Dict, Tuple, Optional, Union
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
+from typing import List, Tuple, Optional, Union
 
 def caculate_bbox_area(bbox):
     """Calculate bounding box area"""
