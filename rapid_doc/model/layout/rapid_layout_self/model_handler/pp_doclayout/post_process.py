@@ -39,7 +39,6 @@ class PPPostProcess:
         layout_unclip_ratio = self.layout_unclip_ratio
         if layout_shape_mode == "rect":
             masks = None
-        boxes[:, 2:6] = np.round(boxes[:, 2:6]).astype(int)
         if isinstance(threshold, float):
             expect_boxes = (boxes[:, 1] > threshold) & (boxes[:, 0] > -1)
             boxes = boxes[expect_boxes, :]
@@ -587,10 +586,10 @@ def restructured_boxes(
 
     for idx, box in enumerate(boxes):
         xmin, ymin, xmax, ymax = box[2:]
-        xmin = int(max(0, xmin))
-        ymin = int(max(0, ymin))
-        xmax = int(min(w, xmax))
-        ymax = int(min(h, ymax))
+        xmin = float(max(0, xmin))
+        ymin = float(max(0, ymin))
+        xmax = float(min(w, xmax))
+        ymax = float(min(h, ymax))
         if xmax <= xmin or ymax <= ymin:
             continue
         res = {

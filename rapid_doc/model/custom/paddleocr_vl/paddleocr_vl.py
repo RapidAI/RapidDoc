@@ -31,7 +31,7 @@ class VLModelPool:
                         raise RuntimeError(
                             "PADDLEOCRVL_VERSION not set — VL OCR is disabled. "
                             "Please set environment variable PADDLEOCRVL_VERSION "
-                            "(e.g. v1 or v1.5)."
+                            "(e.g. v1 or v1.5 or v1.6)."
                         )
                     if not server_url:
                         raise RuntimeError(
@@ -50,10 +50,12 @@ class VLModelPool:
                         model_name = "PaddleOCR-VL-0.9B"
                     elif paddleocrvl_version == "v1.5":
                         model_name = "PaddleOCR-VL-1.5-0.9B"
+                    elif paddleocrvl_version == "v1.6":
+                        model_name = "PaddleOCR-VL-1.6-0.9B"
                     else:
                         raise ValueError(
                             f"environment PADDLEOCRVL_VERSION Unsupported: {paddleocrvl_version}. "
-                            "Supported versions: v1, v1.5"
+                            "Supported versions: v1, v1.5, v1.6"
                         )
                     cls._vl_model = DocVLMPredictor(
                         model_name=model_name,

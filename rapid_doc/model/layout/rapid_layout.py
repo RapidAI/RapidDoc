@@ -7,7 +7,7 @@ from rapid_doc.utils.boxbase import calculate_iou
 
 class RapidLayoutModel(object):
     def __init__(self, layout_config=None):
-        cfg = RapidLayoutInput(model_type=ModelType.PP_DOCLAYOUTV2)
+        cfg = RapidLayoutInput(model_type=ModelType.PP_DOCLAYOUTV3)
 
         device = get_device()
         if device.startswith('cuda'):
@@ -52,36 +52,14 @@ class RapidLayoutModel(object):
     def predict(self, image):
         return self.batch_predict(images=[image], batch_size=1)[0]
 
-    def batch_predict(self, images: list, batch_size: int, dpi=200) -> list:
+    def batch_predict(self, images: list, batch_size: int) -> list:
         images_layout_res = []
-        processed_images = []
-        scales = []
-
-        # 判断是否需要缩放到144 DPI
-        for img in images:
-            h, w = img.shape[:2]
-            # 以A4纸200DPI为基准，判断是否太大
-            if max(h, w) > 2200:
-                scale = 144 / dpi
-                resized = cv2.resize(img, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
-            else:
-                scale = 1.0
-                resized = img
-            # import uuid
-            # cv2.imwrite(rf"C:\ocr\img\test\output-images\{uuid.uuid4().hex}.png", resized)
-            processed_images.append(resized)
-            scales.append(scale)
-
-        all_results = self.model(img_contents=processed_images, batch_size=batch_size, tqdm_enable=True)
+        all_results = self.model(img_contents=images, batch_size=batch_size, tqdm_enable=True)
         for img_idx, results in enumerate(all_results):
-            # import uuid
-            # results.vis(rf"D:\file\image\{uuid.uuid4().hex}__{img_idx}.png")
             layout_res = []
             boxes, scores, class_names = results.boxes, results.scores, results.class_names
             orders = results.orders if results.orders is not None else [-1] * len(boxes)
             polygon_pointses = results.polygon_points if results.polygon_points is not None else [None] * len(boxes)
-            scale = scales[img_idx]
-            restore_scale = 1.0 / scale
             temp_results = []
             for xyxy, polygon_points, conf, cla, order in zip(boxes, polygon_pointses, scores, class_names, orders):
                 # xmin, ymin, xmax, ymax = [round(float(p), 2) for p in xyxy]
@@ -112,14 +90,10 @@ class RapidLayoutModel(object):
 
             for item in temp_results:
                 xmin, ymin, xmax, ymax = item["bbox"]
-                xmin = round(float(xmin * restore_scale), 2)
-                ymin = round(float(ymin * restore_scale), 2)
-                xmax = round(float(xmax * restore_scale), 2)
-                ymax = round(float(ymax * restore_scale), 2)
-                polygon_points = item["polygon_points"]
+                polygon_points = item.get("polygon_points")
                 if polygon_points is not None:
                     polygon_points = [
-                        [float(x * restore_scale), float(y * restore_scale)]
+                        [float(x), float(y)]
                         for x, y in polygon_points
                     ]
                 layout_res.append({

@@ -56,6 +56,7 @@ def span_block_type_compatible(span_type, block_type):
             BlockType.IMAGE_FOOTNOTE,
             BlockType.TABLE_CAPTION,
             BlockType.TABLE_FOOTNOTE,
+            BlockType.FORMULA_NUMBER,
             BlockType.DISCARDED
         ]
     elif span_type == ContentType.INTERLINE_EQUATION:
@@ -242,7 +243,8 @@ def fix_block_spans(block_with_spans):
 
         if block_type in [BlockType.TEXT, BlockType.TITLE,
                           BlockType.IMAGE_CAPTION, BlockType.IMAGE_CAPTION,
-                          BlockType.TABLE_CAPTION, BlockType.TABLE_FOOTNOTE
+                          BlockType.TABLE_CAPTION, BlockType.TABLE_FOOTNOTE,
+                          BlockType.FORMULA_NUMBER
                           ]:
             block = fix_text_block(block)
         elif block_type in [BlockType.INTERLINE_EQUATION, BlockType.IMAGE_BODY, BlockType.TABLE_BODY]:

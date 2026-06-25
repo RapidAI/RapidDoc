@@ -175,7 +175,7 @@ def get_res_list_from_layout_res(layout_res, np_img, overlap_threshold=0.8):
             res['bbox'] = [int(res['poly'][0]), int(res['poly'][1]), int(res['poly'][4]), int(res['poly'][5])]
             single_page_mfdetrec_res.append(res)
         # elif category_id in [0, 2, 4, 6, 7, 3]:  # OCR regions # 相信版面结果，图片就是图片，不再尝试转为文本块
-        elif category_id in [0, 1, 2, 4, 6, 7]:  # OCR regions
+        elif category_id in [0, 1, 2, 4, 6, 7, 9]:  # OCR regions
             ocr_res_list.append(res)
         elif category_id == 5:  # Table regions
             table_res_list.append(res)

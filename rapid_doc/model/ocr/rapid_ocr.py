@@ -26,11 +26,12 @@ from rapidocr.inference_engine.base import InferSession
 from importlib.metadata import version
 rapidocr_version = version("rapidocr")
 models_dir = os.getenv('RAPID_MODELS_DIR', None)
+models_root_path = Path(models_dir) if models_dir else None
 if models_dir:
     # 从指定的文件夹内寻找模型文件
-    InferSession.DEFAULT_MODEL_PATH = Path(models_dir) # <v3.8.0
+    InferSession.DEFAULT_MODEL_PATH = models_root_path # <v3.8.0
     from rapidocr.ch_ppocr_rec import main as rec_main
-    rec_main.DEFAULT_MODEL_PATH = Path(models_dir)
+    rec_main.DEFAULT_MODEL_PATH = models_root_path
 
 root_dir = os.path.join(Path(__file__).resolve().parent.parent, 'utils')
 DEFAULT_SEAL_DEBUG_DIR = os.path.join(
@@ -63,12 +64,12 @@ class RapidOcrModel(object):
             "Det.use_dilation": use_dilation,
             "Det.unclip_ratio": det_db_unclip_ratio,
         }
-        if models_dir and rapidocr_version >= "3.8.0":
-            default_params["Global.model_root_dir"] = models_dir
+        if models_root_path and rapidocr_version >= "3.8.0":
+            default_params["Global.model_root_dir"] = models_root_path
 
         # 获取用户传入的 engine_type
         engine_type = ocr_config.get('engine_type') if ocr_config else None
-
+        rapid_doc_dir = Path(os.path.abspath(__file__)).parent.parent.parent
         # CPU 上优先使用 OpenVINO（如果可用且用户未指定 engine_type）
         if device.startswith('cpu') and check_openvino() and not engine_type:
             default_params["Det.engine_type"] = EngineType.OPENVINO
@@ -105,6 +106,19 @@ class RapidOcrModel(object):
         default_params.pop('custom_model', None)
         default_params.pop('seal_enable', None)
 
+        if default_params["Det.engine_type"] in [EngineType.ONNXRUNTIME, EngineType.OPENVINO]:
+            v6_det_small_path = os.path.join(rapid_doc_dir, 'resources', 'ch_PP-OCRv6_det_small.onnx')
+            default_params["Det.model_path"] = v6_det_small_path
+            v6_rec_small_path = os.path.join(rapid_doc_dir, 'resources', 'ch_PP-OCRv6_rec_small.onnx')
+            default_params["Rec.model_path"] = v6_rec_small_path
+        # elif default_params["Det.engine_type"] in [EngineType.TORCH]:
+        #     v6_det_small_path = os.path.join(rapid_doc_dir, 'resources', 'ch_PP-OCRv6_det_small.safetensors')
+        #     default_params["Det.model_path"] = v6_det_small_path
+        #     v6_rec_small_path = os.path.join(rapid_doc_dir, 'resources', 'ch_PP-OCRv6_rec_small.safetensors')
+        #     default_params["Rec.model_path"] = v6_rec_small_path
+        #     v6_dict_path = os.path.join(rapid_doc_dir, 'resources', 'ppocrv6_small_dict.txt')
+        #     default_params["Rec.rec_keys_path"] = v6_dict_path
+
         if self.is_seal:
             # 印章识别参数
             default_params['Det.limit_side_len'] = 736
@@ -116,9 +130,14 @@ class RapidOcrModel(object):
             default_params['Det.box_type'] = 'poly'
             default_params['Det.use_dilation'] = False
             default_params['Det.ocr_version'] = OCRVersion.PPOCRV4
-            default_params['Rec.ocr_version'] = OCRVersion.PPOCRV4 #印章使用v4的rec模型效果更好
+            # default_params['Rec.ocr_version'] = OCRVersion.PPOCRV4 #印章使用v4的rec模型效果更好
+            if device.startswith('cpu') and check_openvino() and not engine_type:
+                default_params["Det.engine_type"] = EngineType.OPENVINO
+                default_params["Rec.engine_type"] = EngineType.OPENVINO
+            else:
+                default_params["Det.engine_type"] = EngineType.ONNXRUNTIME
+                default_params["Rec.engine_type"] = EngineType.ONNXRUNTIME
 
-            rapid_doc_dir = Path(os.path.abspath(__file__)).parent.parent.parent
             seal_det_model_path = os.path.join(rapid_doc_dir, 'resources', 'pp-ocrv4_mobile_seal_det.onnx')
             default_params['Det.model_path'] = seal_det_model_path
             self.enable_merge_det_boxes = False

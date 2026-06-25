@@ -167,11 +167,16 @@ def classify(pdf_bytes):
                 )
                 return "ocr"
 
-            if (
-                get_high_image_coverage_ratio_pdfium(pdf, page_indices)
-                >= HIGH_IMAGE_COVERAGE_THRESHOLD
-            ):
-                return "ocr"
+            high_image_coverage_ratio = get_high_image_coverage_ratio_pdfium(
+                pdf,
+                page_indices,
+            )
+            if high_image_coverage_ratio >= HIGH_IMAGE_COVERAGE_THRESHOLD:
+                logger.debug(
+                    "Keep PDF as text despite high sampled-page image coverage "
+                    "because extracted text passed quality checks: "
+                    f"ratio={high_image_coverage_ratio:.4f}"
+                )
 
     except Exception as e:
         logger.error(f"Failed to classify PDF: {e}")
@@ -711,7 +716,9 @@ def get_high_image_coverage_ratio_pdfium(pdf_doc, page_indices):
                     filter=[pdfium_c.FPDF_PAGEOBJ_IMAGE], max_depth=3
                 ):
                     try:
-                        left, bottom, right, top = page_object.get_pos()
+                        left, bottom, right, top = _get_pdfium_page_object_bounds(
+                            page_object
+                        )
                         image_area += max(0.0, right - left) * max(0.0, top - bottom)
                     finally:
                         close_pdfium_child(page_object)
@@ -727,6 +734,26 @@ def get_high_image_coverage_ratio_pdfium(pdf_doc, page_indices):
     if not page_indices:
         return 0.0
     return high_image_coverage_pages / len(page_indices)
+
+
+def _get_pdfium_page_object_bounds(page_object):
+    """Return page object bounds across pypdfium2 API versions."""
+    get_pos = getattr(page_object, "get_pos", None)
+    if callable(get_pos):
+        return get_pos()
+
+    get_bounds = getattr(page_object, "get_bounds", None)
+    if callable(get_bounds):
+        return get_bounds()
+
+    get_quad_points = getattr(page_object, "get_quad_points", None)
+    if callable(get_quad_points):
+        points = get_quad_points()
+        x_values = [point[0] for point in points]
+        y_values = [point[1] for point in points]
+        return min(x_values), min(y_values), max(x_values), max(y_values)
+
+    raise AttributeError("PDFium page object does not expose bounds")
 
 
 if __name__ == "__main__":

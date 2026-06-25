@@ -3,6 +3,7 @@
 # @Contact: liekkaskono@163.com
 import logging
 import sys
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional, Union
@@ -24,6 +25,8 @@ class DownloadFileInput:
 class DownloadFile:
     BLOCK_SIZE = 1024  # 1 KiB
     REQUEST_TIMEOUT = 60
+    MAX_RETRIES = 3
+    RETRY_INTERVAL = 2
 
     @classmethod
     def run(cls, input_params: DownloadFileInput):
@@ -34,12 +37,50 @@ class DownloadFile:
         if cls._should_skip_download(save_path, input_params.sha256, logger):
             return
 
-        response = cls._make_http_request(input_params.file_url, logger)
-        cls._save_response_with_progress(response, save_path, logger)
+        last_error = None
+        for attempt in range(1, cls.MAX_RETRIES + 1):
+            response = None
+            try:
+                response = cls._make_http_request(input_params.file_url, logger)
+                cls._save_response_with_progress(response, save_path, logger)
+                return
+            except requests.RequestException as e:
+                last_error = e
+                cls._remove_partial_file(save_path, logger)
+                if attempt >= cls.MAX_RETRIES:
+                    break
+                logger.warning(
+                    "Download interrupted, retrying %s/%s: %s",
+                    attempt,
+                    cls.MAX_RETRIES,
+                    input_params.file_url,
+                )
+                time.sleep(cls.RETRY_INTERVAL)
+            finally:
+                if response is not None:
+                    response.close()
+
+        logger.error(
+            "Download failed after %s attempts: %s",
+            cls.MAX_RETRIES,
+            input_params.file_url,
+        )
+        raise DownloadFileException(
+            f"Failed to download {input_params.file_url}"
+        ) from last_error
 
     @staticmethod
     def _ensure_parent_dir_exists(path: Path):
         path.parent.mkdir(parents=True, exist_ok=True)
+
+    @staticmethod
+    def _remove_partial_file(path: Path, logger: logging.Logger):
+        if not path.exists():
+            return
+        try:
+            path.unlink()
+        except OSError as e:
+            logger.warning("Failed to remove partial download %s: %s", path, e)
 
     @classmethod
     def _should_skip_download(
@@ -68,7 +109,7 @@ class DownloadFile:
             return response
         except requests.RequestException as e:
             logger.error("Download failed: %s", url)
-            raise DownloadFileException(f"Failed to download {url}") from e
+            raise
 
     @classmethod
     def _save_response_with_progress(

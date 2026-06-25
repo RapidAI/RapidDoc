@@ -15,7 +15,7 @@ from tqdm import tqdm
 from .analyze_utils import _extract_text_from_pdf, _run_ocr_det_batch, _process_single_table, _run_ocr_rec_postprocess
 from .model_init import AtomModelSingleton
 from .model_list import AtomicModel
-from ..utils.utils import remove_layout_in_ori_images, filter_overlap_boxes
+from ..utils.utils import remove_layout_in_ori_images, filter_overlap_boxes, _expand_formula_crop_res
 from ...model.custom import CustomBaseModel
 from ...utils.bbox_utils import normalize_to_int_bbox
 from ...utils.boxbase import get_rotate_image, restore_poly
@@ -69,6 +69,7 @@ class BatchAnalyze:
         # 公式配置
         self.formula_level = self.formula_config.get("formula_level", 0)
         self.formula_base_batch_size = self.formula_config.get("batch_num", 1)
+        self.formula_bbox_expand_px = int(self.formula_config.get("bbox_expand_px", 2))
         
         # 表格配置
         self.table_image_enable = self.table_config.get("table_image_enable", True)
@@ -256,7 +257,10 @@ class BatchAnalyze:
 
             # 公式区域
             for formula_res in formula_res_list:
-                formula_img, _ = crop_img(formula_res, np_img)
+                formula_crop_res = _expand_formula_crop_res(
+                    formula_res, layout_res, np_img.shape, self.formula_bbox_expand_px
+                )
+                formula_img, _ = crop_img(formula_crop_res, np_img)
                 formula_res_all_page.append({
                     'formula_res': formula_res,
                     'lang': _lang,

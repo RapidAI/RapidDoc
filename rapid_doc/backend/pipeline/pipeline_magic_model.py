@@ -312,6 +312,10 @@ class MagicModel:
         )
         
         return inline_equations, interline_equations, interline_equation_blocks
+
+    def get_formula_numbers(self) -> List[Dict]:
+        """获取公式编号区块"""
+        return self.__get_blocks_by_type(CategoryId.InterlineEquationNumber_Layout)
     
     def get_discarded(self) -> List[Dict]:
         """获取废弃区块"""

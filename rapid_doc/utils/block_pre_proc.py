@@ -44,8 +44,10 @@ def prepare_block_bboxes(
     interline_equation_blocks,
     page_w,
     page_h,
+    formula_number_blocks=None,
 ):
     all_bboxes = []
+    formula_number_blocks = formula_number_blocks or []
 
     add_bboxes(img_body_blocks, BlockType.IMAGE_BODY, all_bboxes)
     add_bboxes(img_caption_blocks, BlockType.IMAGE_CAPTION, all_bboxes)
@@ -56,6 +58,7 @@ def prepare_block_bboxes(
     add_bboxes(text_blocks, BlockType.TEXT, all_bboxes)
     add_bboxes(title_blocks, BlockType.TITLE, all_bboxes)
     add_bboxes(interline_equation_blocks, BlockType.INTERLINE_EQUATION, all_bboxes)
+    add_bboxes(formula_number_blocks, BlockType.FORMULA_NUMBER, all_bboxes)
 
     """block嵌套问题解决"""
     """文本框与标题框重叠，优先信任文本框"""

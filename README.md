@@ -29,8 +29,8 @@
   
 - **版面识别**
   - 模型使用 `PP-DocLayout` 系列 ONNX 模型（v2、plus-L、L、M、S）
-    - **PP-DocLayoutV2**：自带阅读顺序，效果最好，默认使用
-    - **PP-DocLayoutV3**：自带阅读顺序，支持异形框
+    - **PP-DocLayoutV3**：自带阅读顺序，支持异形框，默认使用
+    - **PP-DocLayoutV2**：自带阅读顺序
     - **PP-DocLayout_plus-L**：效果好运行稳定
     - **PP-DocLayout-L**：速度快，效果也不错
     - **PP-DocLayout-S**：速度极快，存在部分漏检
@@ -380,7 +380,7 @@ os.environ['MINERU_DEVICE_MODE'] = "cuda:1"
 vl模型的部署，参考[官方文档](https://www.paddleocr.ai/main/version3.x/pipeline_usage/PaddleOCR-VL.html#31-vlm) 
 ```python
 import os
-os.environ['PADDLEOCRVL_VERSION'] = "v1.5"
+os.environ['PADDLEOCRVL_VERSION'] = "v1.6"
 os.environ['PADDLEOCRVL_VL_REC_BACKEND'] = "vllm-server"
 os.environ['PADDLEOCRVL_VL_VL_REC_SERVER_URL'] = "http://localhost:8118/v1"
 

@@ -193,10 +193,10 @@ def _build_config():
     from rapid_doc.model.table.rapid_table_self import ModelType as TableModelType, EngineType as TableEngineType
     from rapid_doc.model.custom.paddleocr_vl.paddleocr_vl import PaddleOCRVLTableModel, PaddleOCRVLOCRModel, PaddleOCRVLFormulaModel
     layout_config = {
-        # "model_type": LayoutModelType.PP_DOCLAYOUTV2,
+        # "model_type": LayoutModelType.PP_DOCLAYOUTV3,
         # "conf_thresh": 0.4,
         # "batch_num": 1,
-        # "model_dir_or_path": r"C:\ocr\models\ppmodel\layout\PP-DocLayoutV2\pp_doclayoutv2.onnx",
+        # "model_dir_or_path": r"C:\ocr\models\ppmodel\layout\PP-DocLayoutV3\pp_doclayoutv3.onnx",
         # "markdown_ignore_labels": ["number", "footnote", "header", "header_image", "footer", "footer_image", "aside_text",],
     }
 
@@ -205,11 +205,6 @@ def _build_config():
         # "Det.model_path": r"C:\ocr\models\ppmodel\ocr\v4\ch_PP-OCRv4_det_infer\openvino\ch_PP-OCRv4_det_infer.onnx",
         # "Rec.model_path": r"C:\ocr\models\ppmodel\ocr\v4\ch_PP-OCRv4_rec_infer\openvino\ch_PP-OCRv4_rec_infer.onnx",
         # "Rec.rec_batch_num": 1,
-
-        # "Det.ocr_version": OCRVersion.PPOCRV5,
-        # "Rec.ocr_version": OCRVersion.PPOCRV5,
-        # "Det.model_type": OCRModelType.SERVER,
-        # "Rec.model_type": OCRModelType.SERVER,
 
         # 新增的自定义参数
         # "engine_type": OCREngineType.TORCH, # 统一设置推理引擎

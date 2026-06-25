@@ -4,6 +4,7 @@ from loguru import logger
 from rapid_doc.utils.config_reader import get_latex_delimiter_config
 from rapid_doc.backend.pipeline.para_split import ListLineTag
 from rapid_doc.utils.enum_class import BlockType, ContentType, MakeMode
+from rapid_doc.utils.guess_suffix_or_lang import guess_language_by_text
 from rapid_doc.utils.language import detect_lang
 
 
@@ -143,6 +144,10 @@ inline_left_delimiter = delimiters['inline']['left']
 inline_right_delimiter = delimiters['inline']['right']
 
 def merge_para_with_text(para_block):
+    is_algorithm_block = _is_algorithm_block(para_block)
+    if is_algorithm_block:
+        return _merge_algorithm_block(para_block)
+
     block_text = ''
     for line in para_block['lines']:
         for span in line['spans']:
@@ -195,6 +200,41 @@ def merge_para_with_text(para_block):
                 continue
 
     return para_text
+
+
+def _merge_algorithm_block(para_block):
+    code_lines = []
+    for line in para_block.get('lines', []):
+        line_text = ''
+        for span in line.get('spans', []):
+            span_type = span.get('type')
+            if span_type == ContentType.TEXT:
+                line_text += full_to_half(str(span.get('content', '')))
+            elif span_type == ContentType.INLINE_EQUATION:
+                line_text += str(span.get('content', ''))
+            elif span_type == ContentType.INTERLINE_EQUATION:
+                line_text += str(span.get('content', ''))
+            elif span_type == ContentType.CHECKBOX:
+                line_text += str(span.get('content', ''))
+        code_lines.append(line_text.rstrip())
+
+    code_text = '\n'.join(code_lines).strip('\n')
+    if not code_text:
+        return ''
+
+    guess_lang = guess_language_by_text(code_text)
+    return f"```{guess_lang}\n{code_text}\n```"
+
+
+def _is_algorithm_block(para_block):
+    if para_block.get('original_label') == BlockType.ALGORITHM:
+        return True
+
+    for line in para_block.get('lines', []):
+        for span in line.get('spans', []):
+            if span.get('original_label') == BlockType.ALGORITHM:
+                return True
+    return False
 
 
 def make_blocks_to_content_list(para_block, img_buket_path, page_idx, page_size):

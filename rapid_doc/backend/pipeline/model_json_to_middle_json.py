@@ -7,13 +7,14 @@ from tqdm import tqdm
 
 from rapid_doc.backend.utils.utils import cross_page_table_merge
 from rapid_doc.model.custom import CustomBaseModel
+from rapid_doc.utils.char_utils import full_to_half
 from rapid_doc.utils.config_reader import get_device, get_formula_enable
 from rapid_doc.backend.pipeline.model_init import AtomModelSingleton
 from rapid_doc.backend.pipeline.para_split import para_split
 from rapid_doc.utils.block_pre_proc import prepare_block_bboxes, process_groups
 from rapid_doc.utils.block_sort import sort_blocks_by_bbox
 from rapid_doc.utils.cut_image import cut_image_and_table
-from rapid_doc.utils.enum_class import ContentType
+from rapid_doc.utils.enum_class import BlockType, ContentType
 from rapid_doc.utils.model_utils import clean_memory
 from rapid_doc.backend.pipeline.pipeline_magic_model import MagicModel
 from rapid_doc.utils.ocr_utils import OcrConfidence
@@ -78,6 +79,7 @@ def page_model_info_to_page_info(
     text_blocks = magic_model.get_text_blocks()
     title_blocks = magic_model.get_title_blocks()
     inline_equations, interline_equations, interline_equation_blocks = magic_model.get_equations()
+    formula_number_blocks = magic_model.get_formula_numbers()
     
     img_groups = magic_model.get_imgs()
     table_groups = magic_model.get_tables()
@@ -124,6 +126,7 @@ def page_model_info_to_page_info(
             table_body_blocks, table_caption_blocks, table_footnote_blocks,
             discarded_blocks, text_blocks, title_blocks,
             interline_equation_blocks, page_w, page_h,
+            formula_number_blocks=formula_number_blocks,
         )
     else:
         all_bboxes, all_discarded_blocks, footnote_blocks = prepare_block_bboxes(
@@ -131,6 +134,7 @@ def page_model_info_to_page_info(
             table_body_blocks, table_caption_blocks, table_footnote_blocks,
             discarded_blocks, text_blocks, title_blocks,
             interline_equations, page_w, page_h,
+            formula_number_blocks=formula_number_blocks,
         )
     
     # 过滤 spans
@@ -207,6 +211,87 @@ def _process_vl_ocr_spans(spans, vl_ocr_spans, all_bboxes, all_discarded_blocks)
     return spans
 
 
+def _extract_text_from_block(block):
+    text_parts = []
+    for line in block.get("lines", []):
+        for span in line.get("spans", []):
+            if span.get("type") == ContentType.TEXT:
+                text_parts.append(span.get("content", ""))
+    return "".join(text_parts).strip()
+
+
+def _normalize_formula_tag_content(tag_content):
+    tag_content = full_to_half(tag_content.strip())
+    if tag_content.startswith("("):
+        tag_content = tag_content[1:].strip()
+    if tag_content.endswith(")"):
+        tag_content = tag_content[:-1].strip()
+    return tag_content
+
+
+def _get_interline_equation_span(block):
+    for line in block.get("lines", []):
+        for span in line.get("spans", []):
+            if span.get("type") == ContentType.INTERLINE_EQUATION:
+                return span
+    return None
+
+
+def _append_formula_number_tag(equation_block, formula_number_block):
+    equation_span = _get_interline_equation_span(equation_block)
+    tag_content = _normalize_formula_tag_content(
+        _extract_text_from_block(formula_number_block)
+    )
+    if equation_span is None or not tag_content:
+        return False
+
+    formula = equation_span.get("content", "")
+    if not formula:
+        return False
+
+    equation_span["content"] = f"{formula}\\tag{{{tag_content}}}"
+    return True
+
+
+def _optimize_formula_number_blocks(pdf_info_list):
+    for page_info in pdf_info_list:
+        optimized_blocks = []
+        blocks = page_info.get("preproc_blocks", [])
+        for index, block in enumerate(blocks):
+            if block.get("type") != BlockType.FORMULA_NUMBER:
+                optimized_blocks.append(block)
+                continue
+
+            prev_block = blocks[index - 1] if index > 0 else None
+            if (
+                prev_block
+                and prev_block.get("type") == BlockType.INTERLINE_EQUATION
+                and _append_formula_number_tag(prev_block, block)
+            ):
+                continue
+
+            next_block = blocks[index + 1] if index + 1 < len(blocks) else None
+            next_next_block = blocks[index + 2] if index + 2 < len(blocks) else None
+            if (
+                next_block
+                and next_block.get("type") == BlockType.INTERLINE_EQUATION
+                and (
+                    next_next_block is None
+                    or next_next_block.get("type") != BlockType.FORMULA_NUMBER
+                )
+                and _append_formula_number_tag(next_block, block)
+            ):
+                continue
+
+            if not _extract_text_from_block(block):
+                continue
+
+            block["type"] = BlockType.TEXT
+            optimized_blocks.append(block)
+
+        page_info["preproc_blocks"] = optimized_blocks
+
+
 def result_to_middle_json(
     model_list,
     images_list,
@@ -273,6 +358,8 @@ def result_to_middle_json(
     if not use_vl_ocr:
         _post_process_ocr(middle_json, lang, ocr_config)
     
+    _optimize_formula_number_blocks(middle_json["pdf_info"])
+    
     # 分段处理
     para_split(middle_json["pdf_info"])
     
@@ -298,7 +385,7 @@ def _post_process_ocr(middle_json, lang, ocr_config):
                 for sub_block in block['blocks']:
                     if sub_block['type'] in ['image_caption', 'image_footnote', 'table_caption', 'table_footnote']:
                         text_block_list.append(sub_block)
-            elif block['type'] in ['text', 'title']:
+            elif block['type'] in ['text', 'title', 'formula_number']:
                 text_block_list.append(block)
         
         for block in page_info['discarded_blocks']:

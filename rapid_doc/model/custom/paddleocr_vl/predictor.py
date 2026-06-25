@@ -25,7 +25,7 @@ from rapid_doc.model.custom.paddleocr_vl.genai import GenAIClient, GenAIConfig
 class DocVLMPredictor():
 
     model_group = {
-        "PaddleOCR-VL": {"PaddleOCR-VL-0.9B", "PaddleOCR-VL-1.5-0.9B"},
+        "PaddleOCR-VL": {"PaddleOCR-VL-0.9B", "PaddleOCR-VL-1.5-0.9B", "PaddleOCR-VL-1.6-0.9B"},
     }
 
     def __init__(

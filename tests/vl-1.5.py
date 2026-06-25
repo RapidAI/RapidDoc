@@ -2,28 +2,6 @@ from paddleocr import PaddleOCRVL
 
 # 英伟达 GPU
 pipeline = PaddleOCRVL(pipeline_version="v1.5", vl_rec_backend="vllm-server", vl_rec_server_url="http://localhost:8118/v1")
-# 昆仑芯 XPU
-# pipeline = PaddleOCRVL(device="xpu")
-# 海光 DCU
-# pipeline = PaddleOCRVL(device="dcu")
-# pipeline = PaddleOCRVL(use_doc_orientation_classify=True) # 通过 use_doc_orientation_classify 指定是否使用文档方向分类模型
-# pipeline = PaddleOCRVL(use_doc_unwarping=True) # 通过 use_doc_unwarping 指定是否使用文本图像矫正模块
-# pipeline = PaddleOCRVL(use_layout_detection=False) # 通过 use_layout_detection 指定是否使用版面区域检测排序模块
-
-
-# path = r'D:\CodeProjects\doc\RapidAI\RapidDoc\demo\pdfs\demo1111.pdf'
-
-# path = r'D:\CodeProjects\doc\RapidAI\RapidDoc\demo\images\table_06.png'
-
-# path = r"D:/file/text-pdf/test.pdf"
-
-path1 = [
-    # r"D:\file\text-pdf\images\vl1.55.png",
-
-# r'D:\CodeProjects\doc\RapidAI\RapidDoc\output\vl1.57\auto\vl1.57_origin.pdf'
-    # r"D:\file\text-pdf\images\vl1.57.png",
-    # r"D:\file\text-pdf\images\vl1.59.png",
-]
 
 path = r'D:\CodeProjects\doc\RapidAI\RapidDoc\demo\pdfs\示例1-论文模板1.pdf'
 output = pipeline.predict(path, merge_layout_blocks=False)

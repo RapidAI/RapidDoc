@@ -1,11 +1,11 @@
 import os
 from pathlib import Path
 # # 使用默认 GPU（cuda:0）
-os.environ['MINERU_DEVICE_MODE'] = "cuda"
+# os.environ['MINERU_DEVICE_MODE'] = "cuda"
 # # 或指定 GPU 编号，例如使用第二块 GPU（cuda:1）
 # os.environ['MINERU_DEVICE_MODE'] = "cuda:1"
 # # 模型文件存储目录
-os.environ['RAPID_MODELS_DIR'] = r'/root/hzkitty/models' #模型文件存储目录，如果不设置会默认下载到rapid_doc项目里面
+os.environ['RAPID_MODELS_DIR'] = r'/web/hzkitty/models' #模型文件存储目录，如果不设置会默认下载到rapid_doc项目里面
 # os.environ['RAPID_MODELS_DIR'] = r'D:\CodeProjects\doc\RapidAI\models' #模型文件存储目录，如果不设置会默认下载到rapid_doc项目里面
 
 from loguru import logger
@@ -31,29 +31,31 @@ def do_parse(
     end_page_id=None,
 ):
     layout_config = {
-        "model_type": LayoutModelType.PP_DOCLAYOUTV2,
+        "model_type": LayoutModelType.PP_DOCLAYOUTV3,
+        "engine_cfg": {'use_cuda': True, "cuda_ep_cfg.device_id": 0},
     }
-
+    from rapidocr import EngineType as OCREngineType
     ocr_config = {
+        "engine_type": OCREngineType.OPENVINO,  # 统一设置推理引擎
     }
-
+    from rapid_doc.model.formula.rapid_formula_self import ModelType as FormulaModelType, \
+        EngineType as FormulaEngineType
     formula_config = {
+        "model_type": FormulaModelType.PP_FORMULANET_PLUS_M,
+        "engine_type": FormulaEngineType.TORCH,
+        "engine_cfg": {'use_cuda': True, "gpu_id": 0},
     }
-
+    from rapid_doc.model.table.rapid_table_self import ModelType as TableModelType
     table_config = {
-    }
-
-    checkbox_config = {
-    }
-
-    image_config = {
+        # "cls.model_type": TableModelType.PADDLE_CLS,  # 表格分类模型
+        # "use_compare_table": True,  # 启用表格结果比较（同时跑有线/无线并比对），默认 False
     }
     for idx, pdf_bytes in enumerate(pdf_bytes_list):
         new_pdf_bytes = convert_pdf_bytes_to_bytes_by_pypdfium2(pdf_bytes, start_page_id, end_page_id)
         pdf_bytes_list[idx] = new_pdf_bytes
 
     infer_results, all_image_lists, all_page_dicts, lang_list, ocr_enabled_list = pipeline_doc_analyze(pdf_bytes_list, parse_method=parse_method, formula_enable=formula_enable,table_enable=table_enable
-                                                                                                     ,layout_config=layout_config, ocr_config=ocr_config, formula_config=formula_config, table_config=table_config, checkbox_config=checkbox_config)
+                                                                                                     ,layout_config=layout_config, ocr_config=ocr_config, formula_config=formula_config, table_config=table_config)
 
     def prepare_env(output_dir, pdf_file_name, parse_method):
         local_md_dir = output_dir
@@ -72,7 +74,7 @@ def do_parse(
         pdf_dict = all_page_dicts[idx]
         _lang = lang_list[idx]
         _ocr_enable = ocr_enabled_list[idx]
-        middle_json = pipeline_result_to_middle_json(model_list, images_list, pdf_dict, image_writer, _lang, _ocr_enable, formula_enable, ocr_config=ocr_config, image_config=image_config)
+        middle_json = pipeline_result_to_middle_json(model_list, images_list, pdf_dict, image_writer, _lang, _ocr_enable, formula_enable, ocr_config=ocr_config)
 
         pdf_info = middle_json["pdf_info"]
 
@@ -98,6 +100,9 @@ def parse_doc(
         pdf_bytes_list = []
         for path in path_list:
             file_name = str(Path(path).stem)
+            save_result_path = os.path.join(output_dir, file_name + '.md')
+            if os.path.exists(save_result_path):
+                continue
             pdf_bytes = read_fn(path)
             file_name_list.append(file_name)
             pdf_bytes_list.append(pdf_bytes)
@@ -114,11 +119,11 @@ def parse_doc(
 
 
 if __name__ == '__main__':
-    files_dir = r"/root/hzkitty/OmniDocBenchFiles/pdfs"
-    output_dir = r"/root/hzkitty/OmniDocBenchFiles/layout_v2-ocr_mobile-pdf"
+    files_dir = r"/web/hzkitty/OmniDocBenchFiles/pdfs"
+    output_dir = r"/web/hzkitty/OmniDocBenchFiles/layout_v3-ocrv6_smail_rect_use_compare_table-pdf"
 
     # files_dir = r"D:\Download\OmniDocBench\pdfs"
-    # output_dir = r"D:\Download\OmniDocBench\layout_v2-ocr_mobile-pdf"
+    # output_dir = r"D:\Download\OmniDocBench\layout_v3-ocrv6_smail_cpu-pdf"
 
     # suffixes = [".pdf", ".png", ".jpg", ".jpeg"]
     suffixes = [".pdf"]
@@ -132,10 +137,19 @@ if __name__ == '__main__':
         if doc_path.suffix.lower() in suffixes:
             doc_path_list.append(doc_path)
 
+            # if len(doc_path_list) >= 10:
+            #     break
+
+    total_batches = (len(doc_path_list) + batch_size - 1) // batch_size
+
     # 按批次运行 parse_doc
-    for i in range(0, len(doc_path_list), batch_size):
+    for batch_idx, i in enumerate(range(0, len(doc_path_list), batch_size), start=1):
         batch = doc_path_list[i:i + batch_size]
-        print(f"处理第 {i // batch_size + 1} 批，共 {len(batch)} 个文件")
+        print(
+            f"处理第 {batch_idx}/{total_batches} 批，"
+            f"当前批次 {len(batch)} 个文件，"
+            f"共 {len(doc_path_list)} 个文件"
+        )
         parse_doc(batch, output_dir)
 
     print(f"总运行时间: {time.time() - start_time} 秒")
