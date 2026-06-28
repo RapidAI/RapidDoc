@@ -1,4 +1,6 @@
-# RapidDoc – 高速文档解析系统
+# RapidDoc - 高速文档解析系统
+
+[English](README_EN.md) | [中文](README.md)
 
 ## 😺 项目介绍
 
@@ -61,11 +63,11 @@
 
 ### 1. OmniDocBench
 
-以下是RapidDoc在 OmniDocBench 上的评估结果。
+以下是RapidDoc在 OmniDocBench v1.6 上的评估结果。
 
-Pipeline 模型使用 PP-DocLayoutV2、PP-OCRv5-mobile、PP-FormulaNet_plus-M、UNET_SLANET_PLUS。
+Pipeline 模型使用 PP-DocLayoutV3、PP-OCRv6-small、PP-FormulaNet_plus-M、UNET_SLANET_PLUS。
 <table style="width:100%; border-collapse: collapse;">
-    <caption>Comprehensive evaluation of document parsing on OmniDocBench (v1.5)</caption>
+    <caption>Comprehensive evaluation of document parsing on OmniDocBench (v1.6_full)</caption>
     <thead>
         <tr>
             <th>Model Type</th>
@@ -81,265 +83,356 @@ Pipeline 模型使用 PP-DocLayoutV2、PP-OCRv5-mobile、PP-FormulaNet_plus-M、
     </thead>
     <tbody>
         <tr>
-            <td rowspan="16"><strong>Specialized</strong><br><strong>VLMs</strong></td>
-            <td>PaddleOCR-VL</td>
+            <td>MinerU2.5-Pro</td>
+            <td>Specialized VLMs</td>
+            <td>1.2B</td>
+            <td><strong>95.75</strong></td>
+            <td><ins>0.036<ins></td>
+            <td><strong>97.45</strong></td>
+            <td><strong>93.42</strong></td>
+            <td><strong>95.92</strong></td>
+            <td><ins>0.120<ins></td>
+        </tr>
+        <tr>    
+            <td>GLM-OCR</td>
+            <td>Specialized VLMs</td>
             <td>0.9B</td>
-            <td><strong>92.86</strong></td>
-            <td><strong>0.035</strong></td>
-            <td><strong>91.22</strong></td>
-            <td><strong>90.89</strong></td>
-            <td><strong>94.76</strong></td>
-            <td><strong>0.043</strong></td>
+            <td><ins>95.22<ins></td>
+            <td>0.044</td>
+            <td><ins>97.18<ins></td>
+            <td><ins>92.83<ins></td>
+            <td><ins>95.39<ins></td>
+            <td>0.133</td>
         </tr>
-            <td>MinerU2.5</td>
-            <td>1.2B</td>
-            <td><ins>90.67</ins></td>
-            <td><ins>0.047</ins></td>
-            <td><ins>88.46</ins></td>
-            <td><ins>88.22</ins></td>
-            <td><ins>92.38</ins></td>
-            <td><ins>0.044</ins></td>
+        <tr>    
+            <td>PaddleOCR-VL-1.5</td>
+            <td>Specialized VLMs</td>
+            <td>0.9B</td>
+            <td>94.93</td>
+            <td>0.038</td>
+            <td>96.89</td>
+            <td>91.67</td>
+            <td>94.37</td>
+            <td>0.130</td>
+        </tr>
+        <tr>    
+            <td>PaddleOCR-VL</td>
+            <td>Specialized VLMs</td>
+            <td>0.9B</td>
+            <td>94.18</td>
+            <td>0.040</td>
+            <td>95.91</td>
+            <td>90.65</td>
+            <td>93.74</td>
+            <td>0.135</td>
         </tr>
         <tr>
-            <td>MonkeyOCR-pro-3B</td>
-            <td>3B</td>
-            <td>88.85</td>
-            <td>0.075</td>
-            <td>87.25</td>
-            <td>86.78</td>
-            <td>90.63</td>
-            <td>0.128</td>
+            <td>Youtu-Parsing</td>
+            <td>Specialized VLMs</td>
+            <td>2.5B</td>
+            <td>93.74</td>
+            <td>0.044</td>
+            <td>93.63</td>
+            <td>92.02</td>
+            <td>95.00</td>
+            <td><strong>0.116<strong></td>
         </tr>
         <tr>
-            <td>OCRVerse</td>
+            <td>Qianfan-OCR</td>
+            <td>Specialized VLMs</td>
             <td>4B</td>
-            <td>88.56</td>
-            <td>0.058</td>
-            <td>86.91</td>
-            <td>84.55</td>
-            <td>88.45</td>
-            <td>0.071</td>
+            <td>93.90</td>
+            <td>0.04</td>
+            <td>95.08</td>
+            <td>90.53</td>
+            <td>93.31</td>
+            <td>0.13</td>
         </tr>
         <tr>
-            <td>dots.ocr</td>
-            <td>3B</td>
-            <td>88.41</td>
-            <td>0.048</td>
-            <td>83.22</td>
-            <td>86.78</td>
-            <td>90.62</td>
-            <td>0.053</td>
+            <td>Ovis2.6-30B-A3B</td>
+            <td>General VLMs</td>
+            <td>30B</td>
+            <td>93.70</td>
+            <td><strong>0.035<strong></td>
+            <td>95.17</td>
+            <td>89.44</td>
+            <td>92.40</td>
+            <td>0.135</td>
         </tr>
         <tr>
-            <td>MonkeyOCR-3B</td>
-            <td>3B</td>
-            <td>87.13</td>
-            <td>0.075</td>
-            <td>87.45</td>
-            <td>81.39</td>
-            <td>85.92</td>
-            <td>0.129</td>
+            <td>Logics-Parsing-v2</td>
+            <td>Specialized VLMs</td>
+            <td>4B</td>
+            <td>93.33</td>
+            <td>0.041</td>
+            <td>95.65</td>
+            <td>88.42</td>
+            <td>91.98</td>
+            <td>0.137</td>
+        </tr>
+         <tr>
+            <td>ABot-OCR</td>
+            <td>Specialized VLMs</td>
+            <td>2B</td>
+            <td>93.30</td>
+            <td>0.037</td>
+            <td>94.86</td>
+            <td>88.69</td>
+            <td>91.87</td>
+            <td>0.137</td>
         </tr>
         <tr>
-            <td>Deepseek-OCR</td>
-            <td>3B</td>
-            <td>87.01</td>
-            <td>0.073</td>
-            <td>83.37</td>
-            <td>84.97</td>
-            <td>88.80</td>
-            <td>0.086</td>
+            <td>FireRed-OCR</td>
+            <td>Specialized VLMs</td>
+            <td>2B</td>
+            <td>93.26</td>
+            <td>0.037</td>
+            <td>95.44</td>
+            <td>88.04</td>
+            <td>91.06</td>
+            <td>0.131</td>
         </tr>
         <tr>
-            <td>MonkeyOCR-pro-1.2B</td>
+            <td>MinerU-2.5</td>
+            <td>Specialized VLMs</td>
             <td>1.2B</td>
-            <td>86.96</td>
-            <td>0.084</td>
-            <td>85.02</td>
-            <td>84.24</td>
-            <td>89.02</td>
+            <td>93.04</td>
+            <td>0.045</td>
+            <td>95.77</td>
+            <td>87.88</td>
+            <td>91.47</td>
             <td>0.130</td>
         </tr>
         <tr>
-            <td>Nanonets-OCR-s</td>
-            <td>3B</td>
-            <td>85.59</td>
-            <td>0.093</td>
-            <td>85.90</td>
-            <td>80.14</td>
-            <td>85.57</td>
-            <td>0.108</td>
-        </tr>
-        <tr>
-            <td>MinerU2-VLM</td>
-            <td>0.9B</td>
-            <td>85.56</td>
-            <td>0.078</td>
-            <td>80.95</td>
-            <td>83.54</td>
-            <td>87.66</td>
-            <td>0.086</td>
-        </tr>
-        <tr>
-            <td>olmOCR</td>
-            <td>7B</td>
-            <td>81.79</td>
-            <td>0.096</td>
-            <td>86.04</td>
-            <td>68.92</td>
-            <td>74.77</td>
-            <td>0.121</td>
-        </tr>
-        <tr>
-            <td>Dolphin-1.5</td>
-            <td>0.3B</td>
-            <td>83.21</td>
-            <td>0.092</td>
-            <td>80.78</td>
-            <td>78.06</td>
-            <td>84.10</td>
-            <td>0.080</td>
-        </tr>
-        <tr>
-            <td>POINTS-Reader</td>
-            <td>3B</td>
-            <td>80.98</td>
-            <td>0.134</td>
-            <td>79.20</td>
-            <td>77.13</td>
-            <td>81.66</td>
-            <td>0.145</td>
-        </tr>
-        <tr>
-            <td>Mistral OCR</td>
+            <td>Gemini 3 Pro</td>
+            <td>General VLMs</td>
             <td>-</td>
-            <td>78.83</td>
-            <td>0.164</td>
-            <td>82.84</td>
-            <td>70.03</td>
-            <td>78.04</td>
+            <td>92.91</td>
+            <td>0.064</td>
+            <td>95.99</td>
+            <td>89.15</td>
+            <td>92.96</td>
+            <td>0.165</td>
+        </tr>
+        <tr>
+            <td>Gemini 3 Flash</td>
+            <td>General VLMs</td>
+            <td>-</td>
+            <td>92.62</td>
+            <td>0.066</td>
+            <td>95.16</td>
+            <td>89.29</td>
+            <td>93.51</td>
+            <td>0.172</td>
+        </tr>
+        <tr>
+            <td>dots.ocr</td>
+            <td>Specialized VLMs</td>
+            <td>3B</td>
+            <td>90.77</td>
+            <td>0.048</td>
+            <td>89.95</td>
+            <td>87.18</td>
+            <td>90.58</td>
+            <td>0.138</td>
+        </tr>
+        <tr>
+            <td>OpenDoc-0.1B</td>
+            <td>Specialized VLMs</td>
+            <td>0.1B</td>
+            <td>90.67</td>
+            <td>0.049</td>
+            <td>93.02</td>
+            <td>83.88</td>
+            <td>87.45</td>
+            <td>0.140</td>
+        </tr>
+        <tr>
+            <td>DeepSeek-OCR 2</td>
+            <td>Specialized VLMs</td>
+            <td>3B</td>
+            <td>90.25</td>
+            <td>0.050</td>
+            <td>91.84</td>
+            <td>83.89</td>
+            <td>87.75</td>
             <td>0.144</td>
         </tr>
         <tr>
-            <td>OCRFlux</td>
-            <td>3B</td>
-            <td>74.82</td>
-            <td>0.193</td>
-            <td>68.03</td>
-            <td>75.75</td>
-            <td>80.23</td>
-            <td>0.202</td>
-        </tr>
-        <tr>
-            <td>Dolphin</td>
-            <td>0.3B</td>
-            <td>74.67</td>
-            <td>0.125</td>
-            <td>67.85</td>
-            <td>68.70</td>
-            <td>77.77</td>
-            <td>0.124</td>
-        </tr>
-        <tr>
-            <td rowspan="6"><strong>General</strong><br><strong>VLMs</strong></td>
-            <td>Qwen3-VL-235B-A22B-Instruct</td>
-            <td>235B</td>
-            <td>89.15</td>
-            <td>0.069</td>
-            <td>88.14</td>
-            <td>86.21</td>
-            <td>90.55</td>
-            <td>0.068</td>
-        </tr>
-            <td>Gemini-2.5 Pro</td>
-            <td>-</td>
-            <td>88.03</td>
-            <td>0.075</td>
-            <td>85.82</td>
-            <td>85.71</td>
-            <td>90.29</td>
-            <td>0.097</td>
-        </tr>
-        <tr>
-            <td>Qwen2.5-VL</td>
-            <td>72B</td>
-            <td>87.02</td>
-            <td>0.094</td>
-            <td>88.27</td>
-            <td>82.15</td>
-            <td>86.22</td>
-            <td>0.102</td>
-        </tr>
-        <tr>
-            <td>InternVL3.5</td>
-            <td>241B</td>
-            <td>82.67</td>
-            <td>0.142</td>
-            <td>87.23</td>
-            <td>75.00</td>
-            <td>81.28</td>
-            <td>0.125</td>
-        </tr>
-        <tr>
-            <td>InternVL3</td>
-            <td>78B</td>
-            <td>80.33</td>
-            <td>0.131</td>
-            <td>83.42</td>
-            <td>70.64</td>
-            <td>77.74</td>
-            <td>0.113</td>
-        </tr>
-        <tr>
-            <td>GPT-4o</td>
-            <td>-</td>
-            <td>75.02</td>
-            <td>0.217</td>
-            <td>79.70</td>
-            <td>67.07</td>
-            <td>76.09</td>
-            <td>0.148</td>
-        </tr>
-        <tr>
-            <td rowspan="4"><strong>Pipeline</strong><br><strong>Tools</strong></td>
             <td><strong>RapidDoc</strong></td>
-            <td>-</td>
-            <td>87.81</td>
-            <td>0.065</td>
-            <td>89.348</td>
-            <td>80.59</td>
-            <td>87.90</td>
-            <td>0.053</td>
+            <td><strong>Pipeline Tools</strong></td>
+            <td><strong>-</strong></td>
+            <td><strong>90.157</strong></td>
+            <td><strong>0.047</strong></td>
+            <td><strong>93.777</strong></td>
+            <td><strong>81.394</strong></td>
+            <td><strong>88.402</strong></td>
+            <td><strong>0.136</strong></td>
         </tr>
         <tr>
-            <td>PP-StructureV3</td>
-            <td>-</td>
-            <td>86.73</td>
-            <td>0.073</td>
-            <td>85.79</td>
-            <td>81.68</td>
-            <td>89.48</td>
-            <td>0.073</td>
+            <td>HunyuanOCR</td>
+            <td>Specialized VLMs</td>
+            <td>1B</td>
+            <td>89.95</td>
+            <td>0.088</td>
+            <td>87.68</td>
+            <td>91.01</td>
+            <td>93.23</td>
+            <td>0.171</td>
         </tr>
         <tr>
-            <td>Mineru2-pipeline</td>
-            <td>-</td>
-            <td>75.51</td>
-            <td>0.209</td>
-            <td>76.55</td>
-            <td>70.90</td>
-            <td>79.11</td>
-            <td>0.225</td>
+            <td>Qwen3-VL-235B</td>
+            <td>General VLMs</td>
+            <td>235B</td>
+            <td>89.78</td>
+            <td>0.063</td>
+            <td>92.55</td>
+            <td>83.07</td>
+            <td>86.75</td>
+            <td>0.166</td>
         </tr>
         <tr>
-            <td>Marker-1.8.2</td>
+            <td>Dolphin-v2</td>
+            <td>Specialized VLMs</td>
+            <td>3B</td>
+            <td>89.50</td>
+            <td>0.069</td>
+            <td>91.01</td>
+            <td>84.40</td>
+            <td>87.44</td>
+            <td>0.150</td>
+        </tr>
+        <tr>
+            <td>OCRVerse</td>
+            <td>Specialized VLMs</td>
+            <td>4B</td>
+            <td>88.60</td>
+            <td>0.063</td>
+            <td>89.61</td>
+            <td>82.44</td>
+            <td>86.27</td>
+            <td>0.163</td>
+        </tr>
+        <tr>
+            <td>MonkeyOCR-pro-3B</td>
+            <td>Specialized VLMs</td>
+            <td>3B</td>
+            <td>88.57</td>
+            <td>0.074</td>
+            <td>88.74</td>
+            <td>84.35</td>
+            <td>88.62</td>
+            <td>0.189</td>
+        </tr>
+        <tr>
+            <td>GPT-5.2</td>
+            <td>General VLMs</td>
             <td>-</td>
-            <td>71.30</td>
-            <td>0.206</td>
-            <td>76.66</td>
-            <td>57.88</td>
-            <td>71.17</td>
-            <td>0.250</td>
+            <td>86.59</td>
+            <td>0.114</td>
+            <td>88.21</td>
+            <td>82.95</td>
+            <td>87.93</td>
+            <td>0.193</td>
+        </tr>
+        <tr>
+            <td>Dolphin-1.5</td>
+            <td>Specialized VLMs</td>
+            <td>0.3B</td>
+            <td>86.52</td>
+            <td>0.094</td>
+            <td>87.49</td>
+            <td>81.43</td>
+            <td>84.82</td>
+            <td>0.167</td>
+        </tr>
+        <tr>
+            <td>MinerU-Pipeline</td>
+            <td>Pipeline Tools</td>
+            <td>-</td>
+            <td>86.47</td>
+            <td>0.055</td>
+            <td>83.07</td>
+            <td>81.88</td>
+            <td>88.68</td>
+            <td>0.153</td>
+        </tr>
+        <tr>
+            <td>olmOCR</td>
+            <td>Specialized VLMs</td>
+            <td>7B</td>
+            <td>85.74</td>
+            <td>0.139</td>
+            <td>88.10</td>
+            <td>83.00</td>
+            <td>87.17</td>
+            <td>0.216</td>
+        </tr>
+        <tr>
+            <td>Mistral OCR</td>
+            <td>Specialized VLMs</td>
+            <td>-</td>
+            <td>85.66</td>
+            <td>0.097</td>
+            <td>89.91</td>
+            <td>76.78</td>
+            <td>80.93</td>
+            <td>0.171</td>
+        </tr>
+        <tr>
+            <td>Kimi K2.5</td>
+            <td>General VLMs</td>
+            <td>1T</td>
+            <td>84.53</td>
+            <td>0.107</td>
+            <td>83.50</td>
+            <td>80.76</td>
+            <td>84.00</td>
+            <td>0.211</td>
+        </tr>
+        <tr>
+            <td>InternVL3.5-241B</td>
+            <td>General VLMs</td>
+            <td>241B</td>
+            <td>83.76</td>
+            <td>0.130</td>
+            <td>89.95</td>
+            <td>74.35</td>
+            <td>79.78</td>
+            <td>0.215</td>
+        </tr>
+        <tr>
+            <td>Nanonets-OCR-s</td>
+            <td>Specialized VLMs</td>
+            <td>3B</td>
+            <td>83.61</td>
+            <td>0.108</td>
+            <td>81.46</td>
+            <td>80.18</td>
+            <td>84.51</td>
+            <td>0.213</td>
+        </tr>
+        <tr>
+            <td>POINTS-Reader</td>
+            <td>Specialized VLMs</td>
+            <td>3B</td>
+            <td>83.37</td>
+            <td>0.096</td>
+            <td>85.72</td>
+            <td>73.98</td>
+            <td>77.40</td>
+            <td>0.198</td>
+        </tr>
+        <tr>
+            <td>Marker</td>
+            <td>Pipeline Tools</td>
+            <td>-</td>
+            <td>78.44</td>
+            <td>0.157</td>
+            <td>85.24</td>
+            <td>65.77</td>
+            <td>73.24</td>
+            <td>0.243</td>
         </tr>
     </tbody>
 </table>
