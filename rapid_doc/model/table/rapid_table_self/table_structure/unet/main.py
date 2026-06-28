@@ -209,6 +209,13 @@ class TSRUnetStructurer:
     def unrotate_polygons(
         self, polygons: np.ndarray, angle: float, img_shape: tuple
     ) -> np.ndarray:
+        if polygons is None:
+            return np.empty((0, 4, 2), dtype=np.float32)
+
+        polygons = np.asarray(polygons, dtype=np.float32)
+        if polygons.size == 0:
+            return np.empty((0, 4, 2), dtype=np.float32)
+
         # 将多边形旋转回原始位置
         (h, w) = img_shape
         center = (w // 2, h // 2)
@@ -219,6 +226,8 @@ class TSRUnetStructurer:
 
         # 批量逆旋转
         unrotated_polygons = cv2.transform(polygons_reshaped, M_inv)
+        if unrotated_polygons is None:
+            return np.empty((0, 4, 2), dtype=np.float32)
 
         # 将 (N, 4, 2) 转换回 (N, 8)
         unrotated_polygons = unrotated_polygons.reshape(-1, 8)

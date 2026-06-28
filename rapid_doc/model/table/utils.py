@@ -1,4 +1,70 @@
-from bs4 import BeautifulSoup
+import html
+import re
+
+from bs4 import BeautifulSoup, NavigableString
+
+
+TABLE_OCR_REC_SINGLE_CHAR_REPLACEMENTS = {
+    "香": "否",
+    "哦樂": "哦",
+}
+
+TABLE_OCR_REC_REGEX_REPLACEMENTS = (
+    # Normalize a full "single digit + 號" OCR artifact without touching normal
+    # strings such as "10號" or "第6號".
+    (re.compile(r"^([0-9])號$"), r"\1"),
+)
+
+CJK_RE = re.compile(r"[\u3400-\u9fff]")
+CJK_PUNCT_RE = r"，。、“”‘’；：？！、：（）《》【】"
+
+
+def normalize_table_ocr_text(text):
+    """Normalize and HTML-escape OCR text before table matching."""
+    if text is None:
+        return ""
+    if not isinstance(text, str):
+        text = str(text)
+    text = text.strip()
+    if text in TABLE_OCR_REC_SINGLE_CHAR_REPLACEMENTS:
+        text = TABLE_OCR_REC_SINGLE_CHAR_REPLACEMENTS[text]
+    for pattern, replacement in TABLE_OCR_REC_REGEX_REPLACEMENTS:
+        match = pattern.fullmatch(text)
+        if match:
+            text = match.expand(replacement)
+            break
+    return html.escape(text)
+
+
+def normalize_table_cell_text(text):
+    """Remove OCR-inserted spaces inside Chinese table cell text."""
+    if not text or not CJK_RE.search(text):
+        return text
+
+    text = re.sub(rf"(?<=[\u3400-\u9fff])\s+(?=[\u3400-\u9fff])", "", text)
+    text = re.sub(rf"(?<=[\u3400-\u9fffA-Za-z0-9$])\s+(?=[{CJK_PUNCT_RE}])", "", text)
+    text = re.sub(rf"(?<=[{CJK_PUNCT_RE}])\s+(?=[\u3400-\u9fffA-Za-z0-9$])", "", text)
+    text = re.sub(r"(?<=[A-Za-z0-9$])\s+(?=[\u3400-\u9fff])", "", text)
+    text = re.sub(r"(?<=[\u3400-\u9fff])\s+(?=[A-Za-z0-9$])", "", text)
+    return text
+
+
+def normalize_table_html_cell_text(html_code):
+    """Normalize OCR text inside table cells without touching tag attributes."""
+    if not html_code:
+        return html_code
+
+    soup = BeautifulSoup(html_code, "html.parser")
+    changed = False
+    for cell in soup.find_all(["td", "th"]):
+        for node in list(cell.children):
+            if not isinstance(node, NavigableString):
+                continue
+            normalized = normalize_table_cell_text(str(node))
+            if normalized != str(node):
+                node.replace_with(normalized)
+                changed = True
+    return str(soup) if changed else html_code
 
 def count_table_cells_physical(html_code):
     """计算表格的物理单元格数量（合并单元格算一个）"""
@@ -43,6 +109,8 @@ def select_best_table_model(ocr_result, wired_html_code, wireless_html_code):
     # 计算非空单元格数量
     wireless_non_blank_count = wireless_len - wireless_blank_count
     wired_non_blank_count = wired_len - wired_blank_count
+    if wired_text_count > wireless_text_count and wired_non_blank_count >= wireless_non_blank_count:
+        return wired_html_code
     # 无线表非空格数量大于有线表非空格数量时，才考虑切换
     switch_flag = False
     if wireless_non_blank_count > wired_non_blank_count:
@@ -59,7 +127,7 @@ def select_best_table_model(ocr_result, wired_html_code, wireless_html_code):
     if (
             switch_flag
             or (0 <= gap_of_len <= 5 and wired_len <= round(wireless_len * 0.75))  # 两者相差不大但有线模型结果较少
-            or (gap_of_len == 0 and wired_len <= 4)  # 单元格数量完全相等且总量小于等于4
+            or (gap_of_len == 0 and wired_len <= 4 and wireless_text_count >= wired_text_count)  # 单元格数量完全相等且总量小于等于4
             or (wired_text_count <= wireless_text_count * 0.6 and wireless_text_count >= 10)  # 有线模型填入的文字明显少于无线模型
     ):
         # logger.debug("fall back to wireless table model")

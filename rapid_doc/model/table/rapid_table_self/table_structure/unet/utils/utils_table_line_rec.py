@@ -147,9 +147,13 @@ def calculate_center_rotate_angle(box):
         np.sqrt((x2 - x3) ** 2 + (y2 - y3) ** 2)
         + np.sqrt((x1 - x4) ** 2 + (y1 - y4) ** 2)
     ) / 2
+    denom = h * h + w * w
+    if denom <= 1e-6:
+        return 0, w, h, cx, cy
     # x = cx-w/2
     # y = cy-h/2
-    sinA = (h * (x1 - cx) - w * (y1 - cy)) * 1.0 / (h * h + w * w) * 2
+    sinA = (h * (x1 - cx) - w * (y1 - cy)) * 1.0 / denom * 2
+    sinA = np.clip(sinA, -1.0, 1.0)
     angle = np.arcsin(sinA)
     return angle, w, h, cx, cy
 

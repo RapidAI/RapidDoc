@@ -13,6 +13,7 @@ from tqdm import tqdm
 
 from .model_init import AtomModelSingleton
 from .model_list import AtomicModel
+from ...model.table.utils import normalize_table_ocr_text
 from ...utils.bbox_utils import normalize_to_int_bbox
 from ...utils.boxbase import rotate_table_image
 from ...utils.enum_class import CategoryId
@@ -248,7 +249,29 @@ def _run_ocr_rec_postprocess(images_layout_res: List[List[Dict]], ocr_config):
             ocr_config=ocr_config,
         )
 
-        ocr_res_list = ocr_model.ocr(img_crop_list, det=False, tqdm_enable=True)[0]
+        try:
+            ocr_res_list = ocr_model.ocr(img_crop_list, det=False, tqdm_enable=True)[0]
+        except Exception as exc:
+            logger.warning(f'OCR-rec batch failed, retry one by one: {exc}')
+            ocr_res_list = []
+            safe_items = []
+            for item, img_crop in zip(need_ocr_by_lang[lang], img_crop_list):
+                try:
+                    one_res = ocr_model.ocr([img_crop], det=False, tqdm_enable=False)[0]
+                except Exception as one_exc:
+                    logger.warning(f'skip failed OCR-rec crop: {one_exc}')
+                    item['text'] = ''
+                    item['score'] = 0.0
+                    item['category_id'] = CategoryId.LowScoreText
+                    continue
+                if not one_res:
+                    item['text'] = ''
+                    item['score'] = 0.0
+                    item['category_id'] = CategoryId.LowScoreText
+                    continue
+                ocr_res_list.append(one_res[0])
+                safe_items.append(item)
+            need_ocr_by_lang[lang] = safe_items
 
         assert len(ocr_res_list) == len(need_ocr_by_lang[lang])
 
@@ -376,7 +399,8 @@ def _process_single_table(
     html_code = table_model.predict(
         table_res_dict['table_img'], ocr_result,
         fill_image_res, adjusted_mfdetrec_res,
-        skip_text_in_image, use_img2table
+        skip_text_in_image, use_img2table,
+        skip_table_orientation=True,
     )
 
     if html_code and '<table>' in html_code and '</table>' in html_code:
@@ -431,7 +455,7 @@ def _extract_table_text_from_pdf(
 
         if table_use_word_box:
             filtered = [
-                (w[2], w[0], w[1])
+                (w[2], normalize_table_ocr_text(w[0]), w[1])
                 for item in ocr_spans
                 for group in [item.get('word_result')]
                 if group
@@ -440,7 +464,7 @@ def _extract_table_text_from_pdf(
             ]
         else:
             filtered = [
-                [item['ori_bbox'], item['content'], item['score']]
+                [item['ori_bbox'], normalize_table_ocr_text(item['content']), item['score']]
                 for item in ocr_spans if item.get('content')
             ]
 
@@ -464,19 +488,52 @@ def _run_table_ocr(
         })
 
     cropped_img_list = [item["cropped_img"] for item in rec_img_list]
-    ocr_res_list = ocr_model.ocr(
-        cropped_img_list, det=False, tqdm_enable=False,
-        return_word_box=table_use_word_box, ori_img=bgr_image, dt_boxes=det_res
-    )[0]
+    ocr_res_list = None
+    try:
+        ocr_res_list = ocr_model.ocr(
+            cropped_img_list, det=False, tqdm_enable=False,
+            return_word_box=table_use_word_box, ori_img=bgr_image, dt_boxes=det_res
+        )[0]
+    except Exception as exc:
+        if table_use_word_box:
+            logger.warning(f'table OCR word-box recognition failed, retry line-level OCR: {exc}')
+            table_use_word_box = False
+            try:
+                ocr_res_list = ocr_model.ocr(
+                    cropped_img_list, det=False, tqdm_enable=False,
+                    return_word_box=False, ori_img=bgr_image, dt_boxes=det_res
+                )[0]
+            except Exception as retry_exc:
+                logger.warning(f'table OCR batch recognition failed, retry one by one: {retry_exc}')
+        else:
+            logger.warning(f'table OCR batch recognition failed, retry one by one: {exc}')
+
+    if ocr_res_list is None:
+        ocr_res_list = []
+        rec_img_list_safe = []
+        for img_dict in rec_img_list:
+            try:
+                one_res = ocr_model.ocr(
+                    [img_dict["cropped_img"]], det=False, tqdm_enable=False,
+                    return_word_box=False, ori_img=bgr_image, dt_boxes=[img_dict["dt_box"]]
+                )[0]
+            except Exception as exc:
+                logger.warning(f'skip failed table OCR crop: {exc}')
+                continue
+            if not one_res:
+                continue
+            ocr_res_list.append(one_res[0])
+            rec_img_list_safe.append(img_dict)
+        rec_img_list = rec_img_list_safe
 
     ocr_result = []
     for img_dict, ocr_res in zip(rec_img_list, ocr_res_list):
         if table_use_word_box:
             ocr_result.extend([
-                [word_result[2], word_result[0], word_result[1]]
+                [word_result[2], normalize_table_ocr_text(word_result[0]), word_result[1]]
                 for word_result in ocr_res[2]
             ])
         else:
-            ocr_result.append([img_dict["dt_box"], ocr_res[0], ocr_res[1]])
+            ocr_result.append([img_dict["dt_box"], normalize_table_ocr_text(ocr_res[0]), ocr_res[1]])
 
     return [list(x) for x in zip(*ocr_result)] if ocr_result else []

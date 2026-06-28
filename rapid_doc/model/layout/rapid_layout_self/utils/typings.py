@@ -166,7 +166,7 @@ class RapidLayoutInput:
 
     conf_thresh: Union[float, dict] = None
     iou_thresh: float = 0.5
-    layout_shape_mode: Optional[str] = "rect" # "rect" / "auto"
+    layout_shape_mode: Optional[str] = "auto" # "rect" / "auto"
 
 
 @dataclass

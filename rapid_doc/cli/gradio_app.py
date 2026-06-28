@@ -2,6 +2,7 @@
 
 import base64
 import html
+import inspect
 import os
 import re
 import time
@@ -12,6 +13,7 @@ from urllib.parse import quote
 import click
 import gradio as gr
 from dotenv import load_dotenv
+load_dotenv()
 from gradio_pdf import PDF
 from loguru import logger
 
@@ -21,6 +23,27 @@ from rapid_doc.utils.hash_utils import str_sha256
 from rapid_doc.utils.office_converter import convert_legacy_office_to_modern
 from rapid_doc.version import __version__
 from rapid_doc.model.table.rapid_table_self import ModelType as TableModelType, EngineType as TableEngineType
+
+
+def copy_button_kwargs(component_cls, buttons):
+    params = inspect.signature(component_cls).parameters
+    if "buttons" in params:
+        return {"buttons": buttons}
+    if "show_copy_button" in params:
+        return {"show_copy_button": True}
+    return {}
+
+
+def blocks_head_kwargs():
+    if "head" in inspect.signature(gr.Blocks.launch).parameters:
+        return {}, {"head": OFFICE_VIEWER_HEAD}
+    return {"head": OFFICE_VIEWER_HEAD}, {}
+
+
+def launch_kwargs(**kwargs):
+    params = inspect.signature(gr.Blocks.launch).parameters
+    return {key: value for key, value in kwargs.items() if key in params}
+
 
 OFFICE_VIEWER_HEAD = """
 <link rel="stylesheet" href="https://unpkg.com/jit-viewer@1.1.0/dist/iife/jit-viewer.min.css">
@@ -527,7 +550,8 @@ def main(ctx,
 
     # suffixes = [f".{suffix}" for suffix in pdf_suffixes + image_suffixes]
     suffixes = [f".{suffix}" for suffix in pdf_suffixes + image_suffixes + office_suffixes + old_office_suffixes]
-    with gr.Blocks(head=OFFICE_VIEWER_HEAD) as demo:
+    blocks_kwargs, launch_head_kwargs = blocks_head_kwargs()
+    with gr.Blocks(**blocks_kwargs) as demo:
         gr.HTML(header)
         with gr.Row():
             with gr.Column(variant='panel', scale=5):
@@ -574,11 +598,12 @@ def main(ctx,
                 output_file = gr.File(label='convert result', interactive=False)
                 with gr.Tabs():
                     with gr.Tab('Markdown rendering'):
-                        md = gr.Markdown(label='Markdown rendering', height=1100, show_copy_button=True,
+                        md = gr.Markdown(label='Markdown rendering', height=1100,
+                                         **copy_button_kwargs(gr.Markdown, ["copy"]),
                                          latex_delimiters=latex_delimiters,
                                          line_breaks=True)
                     with gr.Tab('Markdown text'):
-                        md_text = gr.TextArea(lines=45, show_copy_button=True)
+                        md_text = gr.TextArea(lines=45, **copy_button_kwargs(gr.TextArea, ["copy"]))
 
         # 添加事件处理
         backend.change(
@@ -621,9 +646,14 @@ def main(ctx,
         logger.info("new server_name is 0.0.0.0")
         server_name="0.0.0.0"
 
-    demo.launch(server_name=server_name, server_port=server_port, show_api=api_enable, allowed_paths=[output_root])
+    demo.launch(**launch_kwargs(
+        server_name=server_name,
+        server_port=server_port,
+        show_api=api_enable,
+        allowed_paths=[output_root],
+        **launch_head_kwargs,
+    ))
 
 
 if __name__ == '__main__':
-    load_dotenv()
     main()

@@ -45,10 +45,8 @@ def do_parse(
         "engine_type": FormulaEngineType.TORCH,
         "engine_cfg": {'use_cuda': True, "gpu_id": 0},
     }
-    from rapid_doc.model.table.rapid_table_self import ModelType as TableModelType
     table_config = {
-        # "cls.model_type": TableModelType.PADDLE_CLS,  # 表格分类模型
-        # "use_compare_table": True,  # 启用表格结果比较（同时跑有线/无线并比对），默认 False
+
     }
     for idx, pdf_bytes in enumerate(pdf_bytes_list):
         new_pdf_bytes = convert_pdf_bytes_to_bytes_by_pypdfium2(pdf_bytes, start_page_id, end_page_id)
@@ -120,7 +118,7 @@ def parse_doc(
 
 if __name__ == '__main__':
     files_dir = r"/web/hzkitty/OmniDocBenchFiles/pdfs"
-    output_dir = r"/web/hzkitty/OmniDocBenchFiles/layout_v3-ocrv6_smail_rect_use_compare_table-pdf"
+    output_dir = r"/web/hzkitty/OmniDocBenchFiles/layout_v3-ocrv6_smail_rect_tablev3"
 
     # files_dir = r"D:\Download\OmniDocBench\pdfs"
     # output_dir = r"D:\Download\OmniDocBench\layout_v3-ocrv6_smail_cpu-pdf"
