@@ -111,13 +111,13 @@ class RapidOcrModel(object):
             default_params["Det.model_path"] = v6_det_small_path
             v6_rec_small_path = os.path.join(rapid_doc_dir, 'resources', 'ch_PP-OCRv6_rec_small.onnx')
             default_params["Rec.model_path"] = v6_rec_small_path
-        # elif default_params["Det.engine_type"] in [EngineType.TORCH]:
-        #     v6_det_small_path = os.path.join(rapid_doc_dir, 'resources', 'ch_PP-OCRv6_det_small.safetensors')
-        #     default_params["Det.model_path"] = v6_det_small_path
-        #     v6_rec_small_path = os.path.join(rapid_doc_dir, 'resources', 'ch_PP-OCRv6_rec_small.safetensors')
-        #     default_params["Rec.model_path"] = v6_rec_small_path
-        #     v6_dict_path = os.path.join(rapid_doc_dir, 'resources', 'ppocrv6_small_dict.txt')
-        #     default_params["Rec.rec_keys_path"] = v6_dict_path
+        elif default_params["Det.engine_type"] in [EngineType.TORCH]:
+            v6_det_small_path = os.path.join(rapid_doc_dir, 'resources', 'ch_PP-OCRv6_det_small.safetensors')
+            default_params["Det.model_path"] = v6_det_small_path
+            v6_rec_small_path = os.path.join(rapid_doc_dir, 'resources', 'ch_PP-OCRv6_rec_small.safetensors')
+            default_params["Rec.model_path"] = v6_rec_small_path
+            v6_dict_path = os.path.join(rapid_doc_dir, 'resources', 'ppocrv6_small_dict.txt')
+            default_params["Rec.rec_keys_path"] = v6_dict_path
 
         if self.is_seal:
             # 印章识别参数
@@ -140,6 +140,14 @@ class RapidOcrModel(object):
 
             seal_det_model_path = os.path.join(rapid_doc_dir, 'resources', 'pp-ocrv4_mobile_seal_det.onnx')
             default_params['Det.model_path'] = seal_det_model_path
+            if default_params["Rec.engine_type"] in [EngineType.ONNXRUNTIME, EngineType.OPENVINO]:
+                v6_rec_small_path = os.path.join(rapid_doc_dir, 'resources', 'ch_PP-OCRv6_rec_small.onnx')
+                default_params["Rec.model_path"] = v6_rec_small_path
+            elif default_params["Rec.engine_type"] == EngineType.TORCH:
+                v6_rec_small_path = os.path.join(rapid_doc_dir, 'resources', 'ch_PP-OCRv6_rec_small.safetensors')
+                default_params["Rec.model_path"] = v6_rec_small_path
+                v6_dict_path = os.path.join(rapid_doc_dir, 'resources', 'ppocrv6_small_dict.txt')
+                default_params["Rec.rec_keys_path"] = v6_dict_path
             self.enable_merge_det_boxes = False
 
         self.ocr_engine = RapidOCR(params=default_params)

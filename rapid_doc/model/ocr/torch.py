@@ -7,19 +7,23 @@ from importlib.metadata import version
 rapidocr_version = version("rapidocr")
 
 if rapidocr_version >= "3.4.3":
-    from rapidocr.inference_engine.pytorch.networks.architectures.base_model import BaseModel
     from rapidocr.inference_engine.pytorch.networks.backbones.rec_hgnet import ConvBNAct
 else:
-    from rapidocr.networks.architectures.base_model import BaseModel
     from rapidocr.networks.backbones.rec_hgnet import ConvBNAct
 from rapidocr.utils.download_file import DownloadFile, DownloadFileInput
 from rapidocr.utils.log import logger
 from rapidocr.inference_engine.base import FileInfo, InferSession
 import rapidocr as rapidocr_pkg
 
+from rapid_doc.model.ocr.ppocrv6_pytorch.modeling.architectures.base_model import BaseModel
+
 root_dir = Path(rapidocr_pkg.__path__[0])
-# root_dir = Path(__file__).resolve().parent.parent
-DEFAULT_CFG_PATH = root_dir / "networks" / "arch_config.yaml"
+RAPID_DOC_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_CFG_PATH = RAPID_DOC_ROOT / "resources" / "arch_config.yaml"
+ARCH_NAME_ALIASES = {
+    "ch_PP-OCRv6_rec_small": "ch_PP-OCRv6_small_rec_infer",
+    "ch_PP-OCRv6_det_small": "ch_PP-OCRv6_det_small",
+}
 
 def mkdir(dir_path):
     Path(dir_path).mkdir(parents=True, exist_ok=True)
@@ -65,17 +69,51 @@ class TorchInferSession(InferSession):
     def _load_arch_config(self, model_path: Path):
         all_arch_config = OmegaConf.load(DEFAULT_CFG_PATH)
 
-        file_name = model_path.stem
+        file_name = ARCH_NAME_ALIASES.get(model_path.stem, model_path.stem)
         if file_name not in all_arch_config:
             raise ValueError(f"architecture {file_name} is not in arch_config.yaml")
 
         return all_arch_config.get(file_name)
 
     def _build_and_load_model(self, arch_config, model_path: Path):
-        model = BaseModel(arch_config)
-        state_dict = torch.load(model_path, map_location="cpu", weights_only=False)
+        state_dict = self._load_state_dict(model_path)
+        kwargs = {}
+        out_channels = self._get_rec_out_channels(state_dict)
+        if out_channels is not None:
+            kwargs["out_channels"] = out_channels
+
+        model = BaseModel(arch_config, **kwargs)
         model.load_state_dict(state_dict)
         return model
+
+    def _load_state_dict(self, model_path: Path):
+        if model_path.suffix == ".safetensors":
+            try:
+                from safetensors.torch import load_file
+            except ImportError as exc:
+                raise TorchInferError(
+                    "safetensors is required for PP-OCRv6 PyTorch OCR weights. "
+                    "Please install rapid-doc[gpu] or `pip install safetensors`."
+                ) from exc
+            state_dict = load_file(str(model_path), device="cpu")
+        else:
+            try:
+                state_dict = torch.load(model_path, map_location="cpu", weights_only=True)
+            except TypeError:
+                state_dict = torch.load(model_path, map_location="cpu")
+
+        if any(key.startswith("model.") for key in state_dict):
+            state_dict = {
+                key.removeprefix("model."): value
+                for key, value in state_dict.items()
+            }
+        return state_dict
+
+    @staticmethod
+    def _get_rec_out_channels(state_dict):
+        if "head.head.weight" in state_dict:
+            return int(state_dict["head.head.weight"].shape[0])
+        return None
 
     def _setup_device(self, cfg):
         self.device, self.use_gpu, self.use_npu = self._resolve_device_config(cfg)
@@ -137,11 +175,27 @@ class TorchInferSession(InferSession):
                 inp = inp.to(self.device)
 
             # 适配跟onnx对齐取值逻辑
-            outputs = self.predictor(inp).cpu().numpy()
-            return outputs
+            outputs = self.predictor(inp)
+            return self._to_numpy_output(outputs)
+
+    @staticmethod
+    def _to_numpy_output(outputs):
+        if isinstance(outputs, dict):
+            if "maps" in outputs:
+                outputs = outputs["maps"]
+            elif "ctc_logits" in outputs:
+                outputs = torch.softmax(outputs["ctc_logits"], dim=2)
+            elif "res" in outputs:
+                outputs = outputs["res"]
+            else:
+                outputs = next(iter(outputs.values()))
+        return outputs.cpu().numpy()
 
     def have_key(self, key: str = "character") -> bool:
         return False
+
+    def get_character_list(self, key: str = "character"):
+        return []
 
 
 class TorchInferError(Exception):

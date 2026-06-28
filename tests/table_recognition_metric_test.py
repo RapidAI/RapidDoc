@@ -62,8 +62,11 @@ def image_to_jpeg_bytes(image, quality: int = 95) -> bytes:
         with io.BytesIO() as buf:
             img.save(buf, format="JPEG", quality=quality)
             return buf.getvalue()
-
-engine = RapidDoc()
+from rapidocr import EngineType as OCREngineType
+ocr_config = {
+    "engine_type": OCREngineType.TORCH,  # 统一设置推理引擎
+}
+engine = RapidDoc(ocr_config=ocr_config)
 content = []
 structure_only_content = []
 run_dir = Path(os.environ.get("RAPIDDOC_TABLE_METRIC_DIR", "tests/.table_metric_runs")) / time.strftime("%Y%m%d-%H%M%S")
@@ -145,6 +148,9 @@ print(f"metric details saved to: {csv_path}")
 # TEDS-only-structure: 0.00000
 
 # TEDS: 0.79625
+# TEDS-only-structure: 0.89790
+
+# TEDS: 0.84444
 # TEDS-only-structure: 0.89790
 
 # TEDS: 0.84444

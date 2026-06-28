@@ -61,6 +61,7 @@ gpu = [
     "onnxruntime-gpu<=1.23.0",
     "torch>=2.6.0,<3",
     "torchvision",
+    "safetensors>=0.4.0",
 ]
 
 api = [
@@ -122,6 +123,8 @@ namespaces = false
 rapid_doc = [
     "**/*.yaml",
     "resources/*.onnx",
+    "resources/*.safetensors",
+    "resources/*.txt",
     "resources/*.html",
     "resources/fasttext-langdetect/*",
     "model/magika/config/*.json",

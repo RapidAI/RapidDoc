@@ -246,7 +246,8 @@ def __is_list_or_index_block(block):
                         ):
                             line[ListLineTag.IS_LIST_END_LINE] = True
                             line_start_flag = True
-            # 一种有缩进的特殊有序list,start line 左侧不贴边且以数字开头，end line 以 IS_LIST_END_FLAG 结尾且数量和start line 一致
+            # 一种有缩进的特殊有序 list，start line 左侧不贴边且以数字开头，
+            # end line 以 IS_LIST_END_FLAG 结尾且数量和 start line 一致。
             elif num_start_count >= 2 and num_start_count == flag_end_count:
                 for i, line in enumerate(block['lines']):
                     if len(lines_text_list[i]) > 0:
@@ -270,7 +271,7 @@ def __is_list_or_index_block(block):
 
 
 def __merge_2_text_blocks(block1, block2):
-    if len(block1['lines']) > 0:
+    if len(block1['lines']) > 0 and len(block2['lines']) > 0:
         first_line = block1['lines'][0]
         line_height = first_line['bbox'][3] - first_line['bbox'][1]
         block1_weight = block1['bbox'][2] - block1['bbox'][0]
@@ -297,6 +298,10 @@ def __merge_2_text_blocks(block1, block2):
                             and not span_start_with_num
                             # 下一个block的第一个字符是大写字母
                             and not span_start_with_big_char
+                            # 下一个块的y0要比上一个块的y1小
+                            and block1['bbox'][1] < block2['bbox'][3]
+                            # 两个块任意一个块需要大于1行
+                            and (len(block1['lines']) > 1 or len(block2['lines']) > 1)
                         ):
                             if block1['page_num'] != block2['page_num']:
                                 for line in block1['lines']:

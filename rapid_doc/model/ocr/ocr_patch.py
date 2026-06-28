@@ -95,10 +95,14 @@ def patch_torch_ocr():
     # 替换 rapidocr 的 TorchInferSession
     if rapidocr_version >= "3.4.3":
         from rapidocr.inference_engine.pytorch import main as rapidocr_torch
+        import rapidocr.inference_engine.pytorch as rapidocr_torch_pkg
     else:
         from rapidocr.inference_engine import torch as rapidocr_torch
+        rapidocr_torch_pkg = None
     from rapid_doc.model.ocr.torch import TorchInferSession
     rapidocr_torch.TorchInferSession = TorchInferSession
+    if rapidocr_torch_pkg is not None:
+        rapidocr_torch_pkg.TorchInferSession = TorchInferSession
 
 def patch_openvino_ocr():
     """优化 openvino OCR 推理，使用异步推理替代同步，修复并发识别报错"""

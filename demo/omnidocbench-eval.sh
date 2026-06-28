@@ -1,8 +1,8 @@
 docker run --rm `
   --entrypoint bash `
   -v "D:\Download\OmniDocBench\OmniDocBench.json:/workspace/gt/OmniDocBench.json:ro" `
-  -v "D:\Download\OmniDocBench\layout_v3-ocrv6_smail_auto_tablev3:/workspace/data_md/predictions:ro" `
-  -v "D:\Download\OmniDocBench\result_layout_v3-ocrv6_smail_auto_tablev3:/workspace/result" `
+  -v "D:\Download\OmniDocBench\layout_v3-ocrv6_smail_pytorch_tablev3:/workspace/data_md/predictions:ro" `
+  -v "D:\Download\OmniDocBench\result_layout_v3-ocrv6_smail_pytorch_tablev3:/workspace/result" `
   ghcr.io/zeng-weijun/omnidocbench-eval:repro-ubuntu2204 `
   -c "cat > configs/custom.yaml << 'EOF'
 end2end_eval:

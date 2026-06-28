@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 # # 使用默认 GPU（cuda:0）
-# os.environ['MINERU_DEVICE_MODE'] = "cuda"
+os.environ['MINERU_DEVICE_MODE'] = "cuda"
 # # 或指定 GPU 编号，例如使用第二块 GPU（cuda:1）
 # os.environ['MINERU_DEVICE_MODE'] = "cuda:1"
 # # 模型文件存储目录
@@ -31,19 +31,19 @@ def do_parse(
     end_page_id=None,
 ):
     layout_config = {
-        "model_type": LayoutModelType.PP_DOCLAYOUTV3,
-        "engine_cfg": {'use_cuda': True, "cuda_ep_cfg.device_id": 0},
+        # "model_type": LayoutModelType.PP_DOCLAYOUTV3,
+        # "engine_cfg": {'use_cuda': True, "cuda_ep_cfg.device_id": 0},
     }
     from rapidocr import EngineType as OCREngineType
     ocr_config = {
-        "engine_type": OCREngineType.OPENVINO,  # 统一设置推理引擎
+        # "engine_type": OCREngineType.OPENVINO,  # 统一设置推理引擎
     }
     from rapid_doc.model.formula.rapid_formula_self import ModelType as FormulaModelType, \
         EngineType as FormulaEngineType
     formula_config = {
-        "model_type": FormulaModelType.PP_FORMULANET_PLUS_M,
-        "engine_type": FormulaEngineType.TORCH,
-        "engine_cfg": {'use_cuda': True, "gpu_id": 0},
+        # "model_type": FormulaModelType.PP_FORMULANET_PLUS_M,
+        # "engine_type": FormulaEngineType.TORCH,
+        # "engine_cfg": {'use_cuda': True, "gpu_id": 0},
     }
     table_config = {
 
@@ -118,7 +118,7 @@ def parse_doc(
 
 if __name__ == '__main__':
     files_dir = r"/web/hzkitty/OmniDocBenchFiles/pdfs"
-    output_dir = r"/web/hzkitty/OmniDocBenchFiles/layout_v3-ocrv6_smail_rect_tablev3"
+    output_dir = r"/web/hzkitty/OmniDocBenchFiles/layout_v3-ocrv6_smail_pytorch_tablev3"
 
     # files_dir = r"D:\Download\OmniDocBench\pdfs"
     # output_dir = r"D:\Download\OmniDocBench\layout_v3-ocrv6_smail_cpu-pdf"
@@ -143,11 +143,12 @@ if __name__ == '__main__':
     # 按批次运行 parse_doc
     for batch_idx, i in enumerate(range(0, len(doc_path_list), batch_size), start=1):
         batch = doc_path_list[i:i + batch_size]
-        print(
-            f"处理第 {batch_idx}/{total_batches} 批，"
-            f"当前批次 {len(batch)} 个文件，"
-            f"共 {len(doc_path_list)} 个文件"
-        )
-        parse_doc(batch, output_dir)
+        if batch_idx == 15:
+            print(
+                f"处理第 {batch_idx}/{total_batches} 批，"
+                f"当前批次 {len(batch)} 个文件，"
+                f"共 {len(doc_path_list)} 个文件"
+            )
+            parse_doc(batch, output_dir)
 
     print(f"总运行时间: {time.time() - start_time} 秒")
