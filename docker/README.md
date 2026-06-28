@@ -12,10 +12,10 @@
 cd docker
 
 # 1. CPU 模式
-docker build -f Dockerfile -t hzkitty/rapid-doc:0.9.7 .
+docker build -f Dockerfile -t hzkitty/rapid-doc:0.9.8 .
 
 # 2. GPU 模式
-docker build -f DockerfileGPU -t hzkitty/rapid-doc:0.9.7-gpu .
+docker build -f DockerfileGPU -t hzkitty/rapid-doc:0.9.8-gpu .
 ```
 
 

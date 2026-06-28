@@ -35,7 +35,7 @@ dependencies = [
     "ftfy>=6.3.1,<7",
     "shapely>=2.0.7,<3",
     "tokenizers>=0.13.2",
-    "rapidocr>=3.4.0,<=3.8.1",
+    "rapidocr>=3.4.0,<=3.9.0",
     "openai>=1.63",
     "python-docx>=1.2.0,<2",
     'pypptx-with-oxml>=1.0.3,<2',

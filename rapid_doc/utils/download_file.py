@@ -18,15 +18,15 @@ class DownloadFileInput:
 
 CPU_MODEL = [
     # layout
-    "pp_doclayoutv2.onnx",
+    "pp_doclayoutv3.onnx",
     # formula
     "pp_formulanet_plus_m.onnx",
     # ocr
-    "ch_PP-OCRv5_rec_mobile.onnx",
-    "ch_PP-OCRv5_det_mobile.onnx",
-    "ch_PP-OCRv4_rec_mobile.onnx",
+    # "ch_PP-OCRv5_rec_mobile.onnx",
+    # "ch_PP-OCRv5_det_mobile.onnx",
+    # "ch_PP-OCRv4_rec_mobile.onnx",
     "ch_ppocr_mobile_v2.0_cls_mobile.onnx",
-    "ppocrv5_dict.txt",
+    # "ppocrv5_dict.txt",
     "FZYTK.TTF",
     # table
     "paddle_cls.onnx",
