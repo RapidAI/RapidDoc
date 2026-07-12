@@ -1,14 +1,103 @@
 # Copyright (c) Opendatalab. All rights reserved.
 import math
-from typing import List
+from typing import Any, List
 
+import numpy as np
 import pypdfium2 as pdfium
 import pypdfium2.raw as pdfium_c
 from ctypes import c_float, c_int
 from pdftext.pdf.chars import deduplicate_chars, get_chars
 from pdftext.pdf.pages import assign_scripts, get_blocks, get_lines, get_spans
 
+try:
+    from pdftext.pdf.chars import PageChars
+    from pdftext.schema import Bbox
+except ImportError:  # pdftext 0.6.x
+    PageChars = None
+    Bbox = None
+
 from rapid_doc.utils.pdfium_guard import close_pdfium_child, pdfium_guard
+
+
+def _is_page_chars(chars: Any) -> bool:
+    """Return whether chars uses pdftext 0.7's column-oriented container."""
+    return PageChars is not None and isinstance(chars, PageChars)
+
+
+def _materialize_page_chars(chars) -> list[dict[str, Any]]:
+    """Convert pdftext 0.7 PageChars to RapidDoc's legacy char dictionaries."""
+    boxes = chars.boxes.tolist()
+    rotations = chars.rotations.tolist()
+    font_ids = chars.font_ids.tolist()
+    char_indices = chars.char_indices.tolist()
+    return [
+        {
+            "bbox": Bbox([float(value) for value in boxes[index]]),
+            "char": chars.text[index],
+            "rotation": float(rotations[index]),
+            "font": chars.fonts[int(font_ids[index])],
+            "char_idx": int(char_indices[index]),
+        }
+        for index in range(len(chars))
+    ]
+
+
+def _ensure_legacy_chars(chars) -> list[dict[str, Any]]:
+    """Expose one stable char schema to RapidDoc across pdftext versions."""
+    if _is_page_chars(chars):
+        return _materialize_page_chars(chars)
+    return chars
+
+
+def _bbox_coords(char: dict[str, Any]) -> list[float]:
+    bbox = char.get("bbox")
+    bbox = getattr(bbox, "bbox", bbox)
+    return [float(value) for value in bbox]
+
+
+def _legacy_chars_to_page_chars(chars):
+    """Pack legacy chars for pdftext 0.7 get_spans; 0.6 keeps the list input."""
+    if PageChars is None or _is_page_chars(chars):
+        return chars
+
+    fonts: list[dict[str, Any]] = []
+    font_ids_by_key: dict[tuple[Any, ...], int] = {}
+    text_parts, codes, rotations, boxes, font_ids, char_indices = [], [], [], [], [], []
+    for fallback_index, char in enumerate(chars):
+        text = str(char.get("char", ""))[:1] or "\uFFFD"
+        font = char.get("font") or {}
+        font_key = (
+            font.get("name"), font.get("flags"), font.get("size"), font.get("weight")
+        )
+        font_id = font_ids_by_key.get(font_key)
+        if font_id is None:
+            font_id = len(fonts)
+            font_ids_by_key[font_key] = font_id
+            fonts.append(dict(font))
+        text_parts.append(text)
+        codes.append(ord(text))
+        rotations.append(float(char.get("rotation") or 0.0))
+        boxes.append(_bbox_coords(char))
+        font_ids.append(font_id)
+        char_indices.append(int(char.get("char_idx", fallback_index)))
+
+    return PageChars(
+        "".join(text_parts),
+        np.asarray(codes, dtype=np.uint32),
+        np.asarray(rotations, dtype=np.float64),
+        np.asarray(boxes, dtype=np.float64).reshape((-1, 4)),
+        np.asarray(font_ids, dtype=np.int32),
+        fonts,
+        np.asarray(char_indices, dtype=np.int64),
+    )
+
+
+def _get_pdf_object_bounds(obj) -> tuple[float, float, float, float]:
+    """Read object bounds across pypdfium2 4.x and 5.x."""
+    get_bounds = getattr(obj, "get_bounds", None)
+    if get_bounds is not None:
+        return get_bounds()
+    return obj.get_pos()
 
 
 def get_page(
@@ -43,8 +132,8 @@ def get_page_vector_lines(page: pdfium.PdfPage, max_depth: int = 8) -> list[dict
 
     Only line geometry is retained. Curves, fills and styling are deliberately
     ignored: the ruled-table detector needs borders, not a rendering model.
-    ``get_pos`` is used as a conservative rectangle fallback for PDF producers
-    that encode cell borders as closed paths without useful line segments.
+    Object bounds are used as a conservative rectangle fallback for PDF
+    producers that encode cell borders as filled or closed paths.
     """
     with pdfium_guard():
         page_width, page_height = page.get_size()
@@ -67,7 +156,7 @@ def get_page_vector_lines(page: pdfium.PdfPage, max_depth: int = 8) -> list[dict
                     # primitives too; reduce each one to its center line.
                     if fill_mode.value == pdfium_c.FPDF_FILLMODE_NONE:
                         continue
-                    left, bottom, right, top = obj.get_pos()
+                    left, bottom, right, top = _get_pdf_object_bounds(obj)
                     width, height = abs(right-left), abs(top-bottom)
                     if min(width, height) <= 2.0 and max(width, height) > 1.0:
                         if width >= height:
@@ -108,7 +197,7 @@ def get_page_vector_lines(page: pdfium.PdfPage, max_depth: int = 8) -> list[dict
                             useful += 1
                         prev = (x, y)
                 if useful == 0:
-                    left, bottom, right, top = obj.get_pos()
+                    left, bottom, right, top = _get_pdf_object_bounds(obj)
                     if right-left > 1.0 and top-bottom > 1.0:
                         y0, y1 = page_height-top, page_height-bottom
                         lines.extend([
@@ -153,6 +242,7 @@ def get_page_chars(
             chars = deduplicate_chars(
                 get_chars(textpage, page_bbox, page_rotation, quote_loosebox)
             )
+            chars = _ensure_legacy_chars(chars)
             page_size = page.get_size()
     finally:
         if owns_textpage:
@@ -175,6 +265,7 @@ def get_lines_from_chars(
     line_distance_threshold: float = 0.1,
 ):
     """从已提取的字符构建 pdftext lines，避免重复读取 PDFium textpage。"""
+    chars = _legacy_chars_to_page_chars(chars)
     spans = get_spans(
         chars,
         superscript_height_threshold=superscript_height_threshold,
