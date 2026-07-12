@@ -338,21 +338,40 @@ def result_to_middle_json(
     )
     use_vl_ocr = isinstance(ocr_model, CustomBaseModel)
     
-    for page_index, page_model_info in tqdm(enumerate(model_list), total=len(model_list), desc="Processing pages"):
-        page_dict = page_dict_list[page_index]
-        image_dict = images_list[page_index]
-        
-        page_info = page_model_info_to_page_info(
-            page_model_info, image_dict, page_dict, image_writer, page_index + batch_idx * pdf_pages_batch,
-            ocr_enable=ocr_enable, formula_enabled=formula_enabled,
-            image_config=image_config, use_vl_ocr=use_vl_ocr
-        )
-        
-        if page_info is None:
-            page_w, page_h = map(int, page_dict['size'])
-            page_info = make_page_info_dict([], page_index + batch_idx * pdf_pages_batch, page_w, page_h, [])
-        
-        middle_json["pdf_info"].append(page_info)
+    try:
+        for page_index, page_model_info in tqdm(enumerate(model_list), total=len(model_list), desc="Processing pages"):
+            page_dict = page_dict_list[page_index]
+            image_dict = images_list[page_index]
+
+            page_info = page_model_info_to_page_info(
+                page_model_info, image_dict, page_dict, image_writer, page_index + batch_idx * pdf_pages_batch,
+                ocr_enable=ocr_enable, formula_enabled=formula_enabled,
+                image_config=image_config, use_vl_ocr=use_vl_ocr
+            )
+
+            if page_info is None:
+                page_w, page_h = map(int, page_dict['size'])
+                page_info = make_page_info_dict([], page_index + batch_idx * pdf_pages_batch, page_w, page_h, [])
+
+            middle_json["pdf_info"].append(page_info)
+    finally:
+        # 页面信息生成后，原始页面图和 PDF 内嵌图都不再参与后处理。
+        for image_dict in images_list:
+            pil_image = image_dict.get('img_pil')
+            if pil_image is not None:
+                try:
+                    pil_image.close()
+                except Exception:
+                    pass
+        for page_dict in page_dict_list:
+            for image_dict in page_dict.get('ori_image_list', []):
+                pil_image = image_dict.get('pil_image')
+                if pil_image is not None:
+                    try:
+                        pil_image.close()
+                    except Exception:
+                        pass
+            page_dict['ori_image_list'] = []
     
     # 后置 OCR 处理 (仅在非 VL OCR 模式下)
     if not use_vl_ocr:
@@ -367,7 +386,7 @@ def result_to_middle_json(
     cross_page_table_merge(middle_json["pdf_info"])
     
     # 清理内存
-    if os.getenv('MINERU_DONOT_CLEAN_MEM') is None and len(model_list) >= 10:
+    if os.getenv('MINERU_DONOT_CLEAN_MEM') is None:
         clean_memory(get_device())
     
     return middle_json
