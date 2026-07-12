@@ -129,6 +129,4 @@ RapidDoc is evaluated on OmniDocBench v1.6 using a pipeline with PP-DocLayoutV3,
 
 ## License
 
-RapidDoc is derived from [MinerU](https://github.com/opendatalab/MinerU). The original YOLO model components under AGPL have been removed and replaced with PP-StructureV3 ONNX models.
-
 This project is released under the [Apache 2.0 license](LICENSE).

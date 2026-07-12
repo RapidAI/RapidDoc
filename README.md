@@ -584,7 +584,4 @@ for output in outputs:
 
 ## ⚖️ 开源许可
 
-基于 [MinerU](https://github.com/opendatalab/MinerU) 改造而来，已**移除原项目中的 YOLO 模型**，并替换为 **PP-StructureV3 系列 ONNX 模型**。  
-由于已移除 AGPL 授权的 YOLO 模型部分，本项目整体不再受 AGPL 约束。
-
 该项目采用 [Apache 2.0 license](LICENSE) 开源许可证。

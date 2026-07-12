@@ -9,6 +9,8 @@ from ctypes import c_float, c_int
 from pdftext.pdf.chars import deduplicate_chars, get_chars
 from pdftext.pdf.pages import assign_scripts, get_blocks, get_lines, get_spans
 
+from rapid_doc.utils.pdf_classify import _get_pdfium_page_object_bounds
+
 try:
     from pdftext.pdf.chars import PageChars
     from pdftext.schema import Bbox
@@ -17,6 +19,11 @@ except ImportError:  # pdftext 0.6.x
     Bbox = None
 
 from rapid_doc.utils.pdfium_guard import close_pdfium_child, pdfium_guard
+
+NEAR_IDENTICAL_CHAR_BBOX_TOLERANCE = 1.0
+OFFSET_DUPLICATE_CHAR_BBOX_TOLERANCE = 2.5
+OFFSET_DUPLICATE_TRANSLATION_TOLERANCE = 0.1
+OFFSET_DUPLICATE_MIN_BBOX_OVERLAP_RATIO = 0.45
 
 
 def _is_page_chars(chars: Any) -> bool:
@@ -55,6 +62,104 @@ def _bbox_coords(char: dict[str, Any]) -> list[float]:
     return [float(value) for value in bbox]
 
 
+def _get_visible_char_signature(
+    char: dict[str, Any],
+) -> tuple[str, tuple[Any, Any, Any, Any], float]:
+    """生成不含坐标的可见字符签名。"""
+    font = char.get("font") or {}
+    font_key = (
+        font.get("name"),
+        font.get("flags"),
+        font.get("size"),
+        font.get("weight"),
+    )
+    rotation_key = round(float(char.get("rotation") or 0.0), 3)
+    return char.get("char", ""), font_key, rotation_key
+
+
+def _calculate_bbox_overlap_in_smaller_area(
+    bbox_a: list[float],
+    bbox_b: list[float],
+) -> float:
+    """计算两个字符框交集占较小字符框面积的比例。"""
+    intersection_width = max(
+        0.0,
+        min(bbox_a[2], bbox_b[2]) - max(bbox_a[0], bbox_b[0]),
+    )
+    intersection_height = max(
+        0.0,
+        min(bbox_a[3], bbox_b[3]) - max(bbox_a[1], bbox_b[1]),
+    )
+    bbox_a_area = max(0.0, bbox_a[2] - bbox_a[0]) * max(
+        0.0, bbox_a[3] - bbox_a[1]
+    )
+    bbox_b_area = max(0.0, bbox_b[2] - bbox_b[0]) * max(
+        0.0, bbox_b[3] - bbox_b[1]
+    )
+    smaller_area = min(bbox_a_area, bbox_b_area)
+    if smaller_area == 0:
+        return 0.0
+    return intersection_width * intersection_height / smaller_area
+
+
+def _is_adjacent_offset_duplicate_char(
+    previous_char: dict[str, Any],
+    current_char: dict[str, Any],
+) -> bool:
+    """识别相邻字符中由对角平移阴影产生的第二个重复字符。"""
+    if _get_visible_char_signature(previous_char) != _get_visible_char_signature(
+        current_char
+    ):
+        return False
+
+    previous_bbox = _bbox_coords(previous_char)
+    current_bbox = _bbox_coords(current_char)
+    x_start_offset = current_bbox[0] - previous_bbox[0]
+    y_start_offset = current_bbox[1] - previous_bbox[1]
+    x_end_offset = current_bbox[2] - previous_bbox[2]
+    y_end_offset = current_bbox[3] - previous_bbox[3]
+
+    if (
+        abs(x_start_offset - x_end_offset) > OFFSET_DUPLICATE_TRANSLATION_TOLERANCE
+        or abs(y_start_offset - y_end_offset)
+        > OFFSET_DUPLICATE_TRANSLATION_TOLERANCE
+    ):
+        return False
+
+    if not (
+        NEAR_IDENTICAL_CHAR_BBOX_TOLERANCE
+        < abs(x_start_offset)
+        <= OFFSET_DUPLICATE_CHAR_BBOX_TOLERANCE
+        and NEAR_IDENTICAL_CHAR_BBOX_TOLERANCE
+        < abs(y_start_offset)
+        <= OFFSET_DUPLICATE_CHAR_BBOX_TOLERANCE
+    ):
+        return False
+
+    return (
+        _calculate_bbox_overlap_in_smaller_area(previous_bbox, current_bbox)
+        >= OFFSET_DUPLICATE_MIN_BBOX_OVERLAP_RATIO
+    )
+
+
+def _deduplicate_adjacent_offset_chars(
+    chars: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """移除 pdftext 常规去重未覆盖的相邻偏移重影字符。"""
+    deduplicated_chars = []
+    for char in chars:
+        text = char.get("char", "")
+        if not text or text.isspace():
+            deduplicated_chars.append(char)
+            continue
+        if deduplicated_chars and _is_adjacent_offset_duplicate_char(
+            deduplicated_chars[-1], char
+        ):
+            continue
+        deduplicated_chars.append(char)
+    return deduplicated_chars
+
+
 def _legacy_chars_to_page_chars(chars):
     """Pack legacy chars for pdftext 0.7 get_spans; 0.6 keeps the list input."""
     if PageChars is None or _is_page_chars(chars):
@@ -90,14 +195,6 @@ def _legacy_chars_to_page_chars(chars):
         fonts,
         np.asarray(char_indices, dtype=np.int64),
     )
-
-
-def _get_pdf_object_bounds(obj) -> tuple[float, float, float, float]:
-    """Read object bounds across pypdfium2 4.x and 5.x."""
-    get_bounds = getattr(obj, "get_bounds", None)
-    if get_bounds is not None:
-        return get_bounds()
-    return obj.get_pos()
 
 
 def get_page(
@@ -156,7 +253,7 @@ def get_page_vector_lines(page: pdfium.PdfPage, max_depth: int = 8) -> list[dict
                     # primitives too; reduce each one to its center line.
                     if fill_mode.value == pdfium_c.FPDF_FILLMODE_NONE:
                         continue
-                    left, bottom, right, top = _get_pdf_object_bounds(obj)
+                    left, bottom, right, top = _get_pdfium_page_object_bounds(obj)
                     width, height = abs(right-left), abs(top-bottom)
                     if min(width, height) <= 2.0 and max(width, height) > 1.0:
                         if width >= height:
@@ -197,7 +294,7 @@ def get_page_vector_lines(page: pdfium.PdfPage, max_depth: int = 8) -> list[dict
                             useful += 1
                         prev = (x, y)
                 if useful == 0:
-                    left, bottom, right, top = _get_pdf_object_bounds(obj)
+                    left, bottom, right, top = _get_pdfium_page_object_bounds(obj)
                     if right-left > 1.0 and top-bottom > 1.0:
                         y0, y1 = page_height-top, page_height-bottom
                         lines.extend([
@@ -243,6 +340,7 @@ def get_page_chars(
                 get_chars(textpage, page_bbox, page_rotation, quote_loosebox)
             )
             chars = _ensure_legacy_chars(chars)
+            chars = _deduplicate_adjacent_offset_chars(chars)
             page_size = page.get_size()
     finally:
         if owns_textpage:
