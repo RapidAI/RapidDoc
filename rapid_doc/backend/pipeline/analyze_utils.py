@@ -293,6 +293,45 @@ def _run_ocr_rec_postprocess(images_layout_res: List[List[Dict]], ocr_config):
                     item['category_id'] = CategoryId.LowScoreText
 
 # =================================== OCR-rec ===================================
+def _detect_table_text(
+        ocr_model,
+        det_image: np.ndarray,
+        mfd_res,
+        retry_padding: int = 8,
+        retry_short_side: int = 32,
+):
+    """Detect table text, retrying boundary-clipped thin crops with white padding."""
+    det_res = ocr_model.ocr(det_image, mfd_res=mfd_res, rec=False)[0]
+    if det_res is not None and len(det_res) > 0:
+        return det_res
+
+    height, width = det_image.shape[:2]
+    padding = max(0, int(retry_padding))
+    if padding == 0 or min(height, width) >= int(retry_short_side):
+        return det_res
+
+    padded_image = cv2.copyMakeBorder(
+        det_image,
+        padding, padding, padding, padding,
+        cv2.BORDER_CONSTANT,
+        value=(255, 255, 255),
+    )
+    # Formula regions are already masked in det_image. Omitting mfd_res here
+    # avoids mixing original-image coordinates with the padded retry image.
+    padded_res = ocr_model.ocr(padded_image, mfd_res=None, rec=False)[0]
+    if padded_res is None or len(padded_res) == 0:
+        return det_res
+
+    restored = np.asarray(padded_res, dtype=np.float32).copy()
+    restored[..., 0] = np.clip(restored[..., 0] - padding, 0, max(0, width - 1))
+    restored[..., 1] = np.clip(restored[..., 1] - padding, 0, max(0, height - 1))
+    logger.debug(
+        f'table OCR-det recovered {len(restored)} box(es) with {padding}px edge padding '
+        f'for image shape {det_image.shape}'
+    )
+    return restored.tolist()
+
+
 def _process_single_table(
         table_res_dict: Dict,
         page_dict: Dict,
@@ -312,6 +351,8 @@ def _process_single_table(
     table_extract_original_image = table_config.get("extract_original_image", False)
     use_rule_table = table_config.get("use_rule_table", True)
     rule_table_score_threshold = float(table_config.get("rule_table_score_threshold", 0.90))
+    ocr_det_retry_padding = int(table_config.get("ocr_det_retry_padding", 8))
+    ocr_det_retry_short_side = int(table_config.get("ocr_det_retry_short_side", 32))
 
 
     _lang = table_res_dict['lang']
@@ -393,7 +434,13 @@ def _process_single_table(
         if adjusted_mfdetrec_res
         else bgr_image
     )
-    det_res = ocr_model.ocr(det_image, mfd_res=adjusted_mfdetrec_res, rec=False)[0]
+    det_res = _detect_table_text(
+        ocr_model,
+        det_image,
+        adjusted_mfdetrec_res,
+        retry_padding=ocr_det_retry_padding,
+        retry_short_side=ocr_det_retry_short_side,
+    )
 
     angles = []
     rotate_label = "0"
@@ -415,7 +462,13 @@ def _process_single_table(
             if adjusted_mfdetrec_res
             else bgr_image
         )
-        det_res = ocr_model.ocr(det_image, mfd_res=adjusted_mfdetrec_res, rec=False)[0]
+        det_res = _detect_table_text(
+            ocr_model,
+            det_image,
+            adjusted_mfdetrec_res,
+            retry_padding=ocr_det_retry_padding,
+            retry_short_side=ocr_det_retry_short_side,
+        )
 
     ocr_result = []
 
