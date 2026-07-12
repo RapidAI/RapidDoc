@@ -14,6 +14,7 @@ from tqdm import tqdm
 from .model_init import AtomModelSingleton
 from .model_list import AtomicModel
 from ...model.table.utils import normalize_table_ocr_text
+from ...model.table.rule_table import build_rule_table, build_track_table
 from ...utils.bbox_utils import normalize_to_int_bbox
 from ...utils.boxbase import rotate_table_image
 from ...utils.enum_class import CategoryId
@@ -305,10 +306,12 @@ def _process_single_table(
     table_force_ocr = table_config.get("force_ocr", False)
     skip_text_in_image = table_config.get("skip_text_in_image", True)
     use_img2table = table_config.get("use_img2table", False)
-    table_use_word_box = table_config.get("use_word_box", True)
+    table_use_word_box = table_config.get("use_word_box", False)
     table_formula_enable = table_config.get("table_formula_enable", True)
     table_image_enable = table_config.get("table_image_enable", True)
     table_extract_original_image = table_config.get("extract_original_image", False)
+    use_rule_table = table_config.get("use_rule_table", True)
+    rule_table_score_threshold = float(table_config.get("rule_table_score_threshold", 0.90))
 
 
     _lang = table_res_dict['lang']
@@ -320,6 +323,55 @@ def _process_single_table(
             table_res_dict['single_page_mfdetrec_res'] + table_res_dict['checkbox_res'],
             useful_list, return_text=True
         )
+
+    # Resolve the configured model route before OCR. For combined models this
+    # classification is cached and reused if the native rule result falls
+    # back, avoiding the former second classification.
+    table_model = atom_model_manager.get_atom_model(
+        atom_model_name='table', lang=_lang, ocr_config=ocr_config,
+        table_config=table_config,
+    )
+    table_class = None
+    table_class_score = 1.0
+    pdf_not_rotate = page_dict.get("rotate_label") not in ["90", "180", "270"]
+    native_rule_candidate = (
+        use_rule_table
+        and not table_force_ocr
+        and not table_res_dict['ocr_enable']
+        and pdf_not_rotate
+        and hasattr(table_model, 'rule_table_class')
+    )
+    if native_rule_candidate:
+        try:
+            table_class, table_class_score = table_model.rule_table_class(table_res_dict['table_img'])
+            if table_class == "wired":
+                poly = table_res_dict['table_res']['poly']
+                table_bbox = [poly[0] / scale, poly[1] / scale, poly[4] / scale, poly[5] / scale]
+                table_bbox_scaled = [poly[0], poly[1], poly[4], poly[5]]
+                has_embedded_formula = any(
+                    item.get('bbox') and _box_center_in(table_bbox_scaled, item['bbox'])
+                    for item in table_res_dict['single_page_mfdetrec_res'] + table_res_dict['checkbox_res']
+                )
+                # Native images make cell semantics ambiguous. Skip even when
+                # table_image_enable is disabled, since this is a rule-parser
+                # safety decision rather than an output feature switch.
+                has_native_image = any(
+                    img.get('bbox') and _boxes_overlap(table_bbox, img['bbox'])
+                    for img in page_dict.get('ori_image_list', [])
+                )
+                if not has_native_image and not has_embedded_formula:
+                    rule_result = (
+                        build_rule_table(page_dict, table_bbox)
+                        or build_track_table(page_dict, table_bbox)
+                    )
+                    if rule_result and rule_result.score >= rule_table_score_threshold:
+                        table_res_dict['table_res'].pop('layout_image_list', None)
+                        table_res_dict['table_res']['html'] = rule_result.html
+                        table_res_dict['table_res']['rule_table_score'] = rule_result.score
+                        table_res_dict['table_res']['table_parse_method'] = 'pdfium_rule'
+                        return
+        except Exception as exc:
+            logger.warning(f'PDFium rule table failed, fallback to model: {exc}')
 
     ocr_config_clean = None
     if ocr_config is not None:
@@ -345,7 +397,6 @@ def _process_single_table(
 
     angles = []
     rotate_label = "0"
-    pdf_not_rotate = page_dict.get("rotate_label") not in ["90", "180", "270"]
     if pdf_not_rotate:
         # 检测文字旋转
         rotate_label, angles = txt_most_angle_extract_table(page_dict, table_res_dict, scale=scale)
@@ -378,14 +429,6 @@ def _process_single_table(
     if not ocr_result and det_res:
         ocr_result = _run_table_ocr(ocr_model, bgr_image, det_res, table_use_word_box)
 
-    # 表格识别
-    table_model = atom_model_manager.get_atom_model(
-        atom_model_name='table',
-        lang=_lang,
-        ocr_config=ocr_config,
-        table_config=table_config,
-    )
-
     fill_image_res = []
     if table_image_enable:
         if not pdf_not_rotate:
@@ -396,11 +439,17 @@ def _process_single_table(
 
     table_res_dict['table_res'].pop('layout_image_list', None)
 
+    predict_kwargs = {'skip_table_orientation': True}
+    if hasattr(table_model, 'rule_table_class'):
+        predict_kwargs.update(
+            table_class=table_class,
+            table_class_score=table_class_score,
+        )
     html_code = table_model.predict(
         table_res_dict['table_img'], ocr_result,
         fill_image_res, adjusted_mfdetrec_res,
         skip_text_in_image, use_img2table,
-        skip_table_orientation=True,
+        **predict_kwargs,
     )
 
     if html_code and '<table>' in html_code and '</table>' in html_code:
@@ -425,6 +474,15 @@ def _process_single_table(
             ]
     else:
         logger.warning('table recognition processing fails')
+
+
+def _boxes_overlap(a, b) -> bool:
+    return min(a[2], b[2]) > max(a[0], b[0]) and min(a[3], b[3]) > max(a[1], b[1])
+
+
+def _box_center_in(container, item) -> bool:
+    cx, cy = (item[0] + item[2]) / 2, (item[1] + item[3]) / 2
+    return container[0] <= cx <= container[2] and container[1] <= cy <= container[3]
 
 def _extract_table_text_from_pdf(
         table_res_dict: Dict,

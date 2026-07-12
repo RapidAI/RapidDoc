@@ -721,6 +721,8 @@ def adjust_table_rows_colspan(
 
 def _cell_has_semantic_content(cell) -> bool:
     """判断单元格是否仍包含用户可见的语义内容。"""
+    if cell is None:
+        return False
     if cell.get_text(strip=True):
         return True
 
@@ -854,6 +856,68 @@ def _apply_cell_merge(
             rows2.remove(first_data_row)
 
 
+def _infer_sparse_continuation_cell_merge(
+    previous_state: TableMergeState,
+    current_state: TableMergeState,
+    header_count: int,
+) -> list[int] | None:
+    """Infer a page-break continuation row split across matching table cells.
+
+    A continuation is deliberately recognized only when the next-page first
+    data row is sparse, has no key in its first visual column, and every piece
+    continues an already populated cell in the preceding row.  Requiring a
+    following anchored row avoids consuming a legitimate last/only data row.
+    """
+    if current_state.owner_block.get("cell_merge") or not previous_state.rows:
+        return None
+    if header_count + 1 >= len(current_state.rows):
+        return None
+    if previous_state.total_cols != current_state.total_cols:
+        return None
+
+    previous_row = previous_state.rows[-1]
+    continuation_row = current_state.rows[header_count]
+    following_row = current_state.rows[header_count + 1]
+    previous_cells = previous_row.find_all(["td", "th"])
+    continuation_cells = continuation_row.find_all(["td", "th"])
+    following_cells = following_row.find_all(["td", "th"])
+    if not previous_cells or not continuation_cells or not following_cells:
+        return None
+
+    def visual_cells(rows, row_idx, cells):
+        result = {}
+        for cell, start in zip(cells, build_visual_col_mapping(rows, row_idx)):
+            for col in range(start, start + int(cell.get("colspan", 1))):
+                result[col] = cell
+        return result
+
+    previous_map = visual_cells(previous_state.rows, len(previous_state.rows) - 1, previous_cells)
+    continuation_map = visual_cells(current_state.rows, header_count, continuation_cells)
+    following_map = visual_cells(current_state.rows, header_count + 1, following_cells)
+
+    # Both the preceding and following rows must carry a first-column key;
+    # the continuation itself must not, which is the page-break signature.
+    if not _cell_has_semantic_content(previous_map.get(0)):
+        return None
+    if _cell_has_semantic_content(continuation_map.get(0)):
+        return None
+    if not _cell_has_semantic_content(following_map.get(0)):
+        return None
+
+    populated = sorted({col for col, cell in continuation_map.items() if _cell_has_semantic_content(cell)})
+    max_sparse = max(2, previous_state.total_cols // 3)
+    if not populated or len(populated) > max_sparse:
+        return None
+    if any(not _cell_has_semantic_content(previous_map.get(col)) for col in populated):
+        return None
+
+    flags = [0] * previous_state.total_cols
+    for col in populated:
+        if col < len(flags):
+            flags[col] = 1
+    return flags
+
+
 def perform_table_merge(
     previous_state: TableMergeState,
     current_state: TableMergeState,
@@ -910,6 +974,11 @@ def perform_table_merge(
     if previous_adjusted:
         _refresh_table_state_metrics(previous_state)
 
+    inferred_cell_merge = _infer_sparse_continuation_cell_merge(
+        previous_state, current_state, header_count
+    )
+    if inferred_cell_merge:
+        current_state.owner_block["cell_merge"] = inferred_cell_merge
     _apply_cell_merge(previous_state, current_state, header_count)
 
     appended_rows = rows2[header_count:]

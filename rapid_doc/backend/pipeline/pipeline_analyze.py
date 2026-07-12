@@ -175,6 +175,9 @@ def doc_analyze(
                 pdf_page = pdf_doc_list[page_index]
             # 获取pdf的文字和图片的字典对象
             page_dict = get_page(pdf_page)
+            if not _ocr_enable and page_dict['blocks']:
+                from rapid_doc.utils.pdf_text_tool import get_page_vector_lines
+                page_dict['vector_lines'] = get_page_vector_lines(pdf_page)
             if page_dict['blocks']:
                 page_dict['ori_image_list'] = get_ori_image(pdf_page) # 从 PDF 中提取所有原始图片
             else:
