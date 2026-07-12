@@ -11,9 +11,24 @@ class CTCHead(nn.Module):
         fc_decay=0.0004,
         mid_channels=None,
         return_feats=False,
+        use_guide=False,
         **kwargs
     ):
         super(CTCHead, self).__init__()
+        self.use_guide = use_guide
+        if use_guide:
+            self.conv1 = nn.Conv1d(
+                in_channels,
+                in_channels,
+                kernel_size=5,
+                padding=2,
+                groups=in_channels,
+                bias=False,
+            )
+            self.norm1 = nn.BatchNorm1d(in_channels)
+            self.conv2 = nn.Conv1d(in_channels, in_channels, kernel_size=1, bias=False)
+            self.norm2 = nn.BatchNorm1d(in_channels)
+            self.act_fn = nn.Hardswish()
         if mid_channels is None:
             self.fc = nn.Linear(
                 in_channels,
@@ -37,6 +52,11 @@ class CTCHead(nn.Module):
         self.return_feats = return_feats
 
     def forward(self, x, labels=None):
+        if self.use_guide:
+            x = x.transpose(1, 2)
+            x = self.act_fn(self.norm1(self.conv1(x)))
+            x = self.act_fn(self.norm2(self.conv2(x)))
+            x = x.transpose(1, 2)
         if self.mid_channels is None:
             predicts = self.fc(x)
         else:

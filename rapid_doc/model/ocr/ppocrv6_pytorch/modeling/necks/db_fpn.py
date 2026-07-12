@@ -415,6 +415,114 @@ class RepLKFPN(nn.Module):
         return torch.cat(processed[::-1], dim=1)
 
 
+class RepLKPANIntraclassBlock(nn.Module):
+    """PP-OCRv6 medium det 的 IntraCL block，名称与官方 safetensors 对齐。"""
+
+    def __init__(self, in_channels, reduce_factor=2):
+        super().__init__()
+        reduced_channels = in_channels // reduce_factor
+        self.conv_reduce_channel = nn.Conv2d(in_channels, reduced_channels, 1)
+        self.vertical_long_to_small_conv_longratio = nn.Conv2d(reduced_channels, reduced_channels, (7, 1), padding=(3, 0))
+        self.vertical_long_to_small_conv_midratio = nn.Conv2d(reduced_channels, reduced_channels, (5, 1), padding=(2, 0))
+        self.vertical_long_to_small_conv_shortratio = nn.Conv2d(reduced_channels, reduced_channels, (3, 1), padding=(1, 0))
+        self.horizontal_small_to_long_conv_longratio = nn.Conv2d(reduced_channels, reduced_channels, (1, 7), padding=(0, 3))
+        self.horizontal_small_to_long_conv_midratio = nn.Conv2d(reduced_channels, reduced_channels, (1, 5), padding=(0, 2))
+        self.horizontal_small_to_long_conv_shortratio = nn.Conv2d(reduced_channels, reduced_channels, (1, 3), padding=(0, 1))
+        self.symmetric_conv_long_longratio = nn.Conv2d(reduced_channels, reduced_channels, 7, padding=3)
+        self.symmetric_conv_long_midratio = nn.Conv2d(reduced_channels, reduced_channels, 5, padding=2)
+        self.symmetric_conv_long_shortratio = nn.Conv2d(reduced_channels, reduced_channels, 3, padding=1)
+        self.conv_final = RepLKPANConvBatchnormLayer(reduced_channels, in_channels)
+
+    def forward(self, hidden_states):
+        residual = hidden_states
+        hidden_states = self.conv_reduce_channel(hidden_states)
+        hidden_states = (
+            self.symmetric_conv_long_longratio(hidden_states)
+            + self.vertical_long_to_small_conv_longratio(hidden_states)
+            + self.horizontal_small_to_long_conv_longratio(hidden_states)
+        )
+        hidden_states = (
+            self.symmetric_conv_long_midratio(hidden_states)
+            + self.vertical_long_to_small_conv_midratio(hidden_states)
+            + self.horizontal_small_to_long_conv_midratio(hidden_states)
+        )
+        hidden_states = (
+            self.symmetric_conv_long_shortratio(hidden_states)
+            + self.vertical_long_to_small_conv_shortratio(hidden_states)
+            + self.horizontal_small_to_long_conv_shortratio(hidden_states)
+        )
+        return residual + self.conv_final(hidden_states)
+
+
+class RepLKPANConvBatchnormLayer(nn.Module):
+    """IntraCL 的 Conv-BN-ReLU 输出层。"""
+
+    def __init__(self, in_channels, out_channels):
+        super().__init__()
+        self.convolution = nn.Conv2d(in_channels, out_channels, 1, bias=True)
+        self.norm = nn.BatchNorm2d(out_channels)
+        self.act_fn = nn.ReLU()
+
+    def forward(self, hidden_states):
+        return self.act_fn(self.norm(self.convolution(hidden_states)))
+
+
+class RepLKPAN(nn.Module):
+    """PP-OCRv6 medium det 使用的大核 Path Aggregation neck。"""
+
+    def __init__(self, in_channels, out_channels=256, reduce_factor=2, interpolate_mode="nearest", **kwargs):
+        super().__init__()
+        self.out_channels = out_channels
+        self.interpolate_mode = interpolate_mode
+        feature_channels = out_channels // 4
+        self.input_channel_adjustment_convolution = nn.ModuleList(
+            [nn.Conv2d(channels, out_channels, 1, bias=False) for channels in in_channels]
+        )
+        self.input_feature_projection_convolution = nn.ModuleList(
+            [nn.Conv2d(out_channels, feature_channels, 9, padding=4, bias=True) for _ in in_channels]
+        )
+        self.path_aggregation_head_convolution = nn.ModuleList(
+            [nn.Conv2d(feature_channels, feature_channels, 3, stride=2, padding=1, bias=False) for _ in in_channels[1:]]
+        )
+        self.path_aggregation_lateral_convolution = nn.ModuleList(
+            [nn.Conv2d(feature_channels, feature_channels, 9, padding=4, bias=True) for _ in in_channels]
+        )
+        self.intraclass_blocks = nn.ModuleList(
+            [RepLKPANIntraclassBlock(feature_channels, reduce_factor) for _ in in_channels]
+        )
+
+    def forward(self, feature_maps):
+        adjusted = [conv(feature) for conv, feature in zip(self.input_channel_adjustment_convolution, feature_maps)]
+        top_down = [None] * len(adjusted)
+        top_down[-1] = adjusted[-1]
+        for idx in range(len(adjusted) - 2, -1, -1):
+            upsampled = F.interpolate(top_down[idx + 1], size=adjusted[idx].shape[-2:], mode=self.interpolate_mode)
+            top_down[idx] = adjusted[idx] + upsampled
+
+        projected = [
+            conv(top_down[idx] if idx < len(top_down) - 1 else adjusted[-1])
+            for idx, conv in enumerate(self.input_feature_projection_convolution)
+        ]
+        bottom_up = [projected[0]]
+        for idx in range(1, len(projected)):
+            downsampled = self.path_aggregation_head_convolution[idx - 1](bottom_up[-1])
+            if downsampled.shape[-2:] != projected[idx].shape[-2:]:
+                downsampled = F.interpolate(downsampled, size=projected[idx].shape[-2:], mode=self.interpolate_mode)
+            bottom_up.append(projected[idx] + downsampled)
+
+        refined = []
+        for idx, (conv, block) in enumerate(zip(self.path_aggregation_lateral_convolution, self.intraclass_blocks)):
+            feature = projected[0] if idx == 0 else bottom_up[idx]
+            refined.append(block(conv(feature)))
+
+        output_size = refined[0].shape[-2:]
+        upsampled = [
+            feature if feature.shape[-2:] == output_size else F.interpolate(feature, size=output_size, mode=self.interpolate_mode)
+            for feature in refined
+        ]
+        return torch.cat(upsampled[::-1], dim=1)
+
+
 class LKPAN(nn.Module):
     def __init__(self, in_channels, out_channels, mode="large", **kwargs):
         super(LKPAN, self).__init__()

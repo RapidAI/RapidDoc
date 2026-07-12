@@ -591,7 +591,7 @@ class MarkdownTextSplitter:
 
 
 if __name__ == '__main__':
-    markdown_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'mineru.md')
+    markdown_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'rapiddoc.md')
 
     with open(markdown_path, 'r', encoding='utf-8') as f:
         txt = f.read()

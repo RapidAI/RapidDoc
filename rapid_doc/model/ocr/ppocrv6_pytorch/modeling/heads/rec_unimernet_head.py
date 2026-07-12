@@ -15,7 +15,7 @@ from torch import Tensor
 import torch.nn.functional as F
 from torch.nn import CrossEntropyLoss
 
-from mineru.utils.config_reader import get_device
+from rapid_doc.utils.config_reader import get_device
 
 
 class ModelOutput(OrderedDict):

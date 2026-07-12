@@ -69,7 +69,7 @@ class TorchInferSession(InferSession):
     def _load_arch_config(self, model_path: Path):
         all_arch_config = OmegaConf.load(DEFAULT_CFG_PATH)
 
-        file_name = ARCH_NAME_ALIASES.get(model_path.stem, model_path.stem)
+        file_name = model_path.stem
         if file_name not in all_arch_config:
             raise ValueError(f"architecture {file_name} is not in arch_config.yaml")
 

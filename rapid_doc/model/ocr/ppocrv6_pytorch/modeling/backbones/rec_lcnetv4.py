@@ -5,11 +5,45 @@ from torch import nn
 
 
 NET_CONFIG_DET = {
+    "tiny": {
+        "stem_channels": [3, 16, 32],
+        "block_configs": [
+            [
+                [3, 32, 32, 1, True],
+                [3, 32, 32, 1, False],
+            ],
+            [
+                [3, 32, 48, 2, False],
+                [3, 48, 48, 1, True],
+                [3, 48, 48, 1, False],
+            ],
+            [
+                [3, 48, 64, 2, False],
+                [3, 64, 64, 1, True],
+                [3, 64, 64, 1, False],
+                [3, 64, 64, 1, True],
+                [3, 64, 64, 1, False],
+            ],
+            [
+                [3, 64, 160, 2, False],
+                [3, 160, 160, 1, True],
+                [3, 160, 160, 1, False],
+            ],
+        ],
+    },
+
     "small": {
         "stem_channels": [3, 24, 48],
         "block_configs": [
-            [[3, 48, 48, 1, True], [3, 48, 48, 1, False]],
-            [[3, 48, 96, 2, False], [3, 96, 96, 1, True], [3, 96, 96, 1, False]],
+            [
+                [3, 48, 48, 1, True],
+                [3, 48, 48, 1, False],
+            ],
+            [
+                [3, 48, 96, 2, False],
+                [3, 96, 96, 1, True],
+                [3, 96, 96, 1, False],
+            ],
             [
                 [3, 96, 192, 2, False],
                 [3, 192, 192, 1, True],
@@ -17,18 +51,79 @@ NET_CONFIG_DET = {
                 [3, 192, 192, 1, True],
                 [3, 192, 192, 1, False],
             ],
-            [[3, 192, 384, 2, False], [3, 384, 384, 1, True], [3, 384, 384, 1, False]],
+            [
+                [3, 192, 384, 2, False],
+                [3, 384, 384, 1, True],
+                [3, 384, 384, 1, False],
+            ],
+        ],
+    },
+
+    "medium": {
+        "stem_channels": [3, 64, 128],
+        "block_configs": [
+            [
+                [3, 128, 128, 1, True],
+                [3, 128, 128, 1, False],
+            ],
+            [
+                [3, 128, 256, 2, False],
+                [3, 256, 256, 1, True],
+                [3, 256, 256, 1, False],
+            ],
+            [
+                [3, 256, 512, 2, False],
+                [3, 512, 512, 1, True],
+                [3, 512, 512, 1, False],
+                [3, 512, 512, 1, True],
+                [3, 512, 512, 1, False],
+            ],
+            [
+                [3, 512, 896, 2, False],
+                [3, 896, 896, 1, True],
+                [3, 896, 896, 1, False],
+            ],
         ],
     },
 }
 
 
 NET_CONFIG_REC = {
+    "tiny": {
+        "stem_channels": [3, 24, 48],
+        "stem_type": "simple",
+        "block_configs": [
+            [
+                [3, 48, 48, 1, True],
+            ],
+            [
+                [3, 48, 48, 1, False],
+            ],
+            [
+                [3, 48, 96, (2, 1), False],
+                [3, 96, 96, 1, True],
+                [3, 96, 96, 1, False],
+            ],
+            [
+                [3, 96, 160, (2, 1), False],
+                [3, 160, 160, 1, True],
+                [3, 160, 160, 1, False],
+                [3, 160, 160, 1, False],
+            ],
+        ],
+    },
+
     "small": {
         "stem_channels": [3, 48, 96],
+        "stem_type": "branch",
         "block_configs": [
-            [[3, 96, 96, 1, True]],
-            [[3, 96, 96, 1, False], [3, 96, 96, 1, False]],
+            [
+                [3, 96, 96, 1, True],
+            ],
+            [
+                [3, 96, 96, 1, False],
+                [3, 96, 96, 1, False],
+            ],
             [
                 [3, 96, 192, (2, 1), False],
                 [3, 192, 192, 1, True],
@@ -38,14 +133,26 @@ NET_CONFIG_REC = {
                 [3, 192, 192, 1, True],
                 [3, 192, 192, 1, False],
             ],
-            [[3, 192, 384, (2, 1), False], [3, 384, 384, 1, True], [3, 384, 384, 1, False]],
+            [
+                [3, 192, 384, (2, 1), False],
+                [3, 384, 384, 1, True],
+                [3, 384, 384, 1, False],
+            ],
         ],
     },
+
     "medium": {
         "stem_channels": [3, 64, 128],
+        "stem_type": "branch",
         "block_configs": [
-            [[3, 128, 128, 1, True]],
-            [[3, 128, 256, 1, False], [3, 256, 256, 1, False], [3, 256, 256, 1, True]],
+            [
+                [3, 128, 128, 1, True],
+            ],
+            [
+                [3, 128, 256, 1, False],
+                [3, 256, 256, 1, False],
+                [3, 256, 256, 1, True],
+            ],
             [
                 [3, 256, 512, (2, 1), False],
                 [3, 512, 512, 1, True],
@@ -55,7 +162,11 @@ NET_CONFIG_REC = {
                 [3, 512, 512, 1, True],
                 [3, 512, 512, 1, False],
             ],
-            [[3, 512, 768, (2, 1), False], [3, 768, 768, 1, True], [3, 768, 768, 1, False]],
+            [
+                [3, 512, 768, (2, 1), False],
+                [3, 768, 768, 1, True],
+                [3, 768, 768, 1, False],
+            ],
         ],
     },
 }
@@ -169,6 +280,22 @@ class PPLCNetV4LargeStem(nn.Module):
         return embedding
 
 
+class PPLCNetV4SimpleStem(nn.Module):
+    """PP-OCRv6 tiny rec 的两层 stride-2 stem。"""
+
+    def __init__(self, stem_channels):
+        super().__init__()
+        self.conv1 = PPLCNetV4ConvLayer(
+            stem_channels[0], stem_channels[1], kernel_size=3, stride=2, activation="gelu"
+        )
+        self.conv2 = PPLCNetV4ConvLayer(
+            stem_channels[1], stem_channels[2], kernel_size=3, stride=2, activation=None
+        )
+
+    def forward(self, pixel_values):
+        return self.conv2(self.conv1(pixel_values))
+
+
 class PPLCNetV4DepthwiseSeparableConvLayer(nn.Module):
     """PP-LCNetV4 block 中的 token mixer 和 channel mixer。"""
 
@@ -264,10 +391,11 @@ class PPLCNetV4Block(nn.Module):
 class PPLCNetV4Encoder(nn.Module):
     """PP-LCNetV4 编码器，保留 `encoder.convolution` 和 `encoder.blocks` 命名。"""
 
-    def __init__(self, stem_channels, block_configs):
+    def __init__(self, stem_channels, block_configs, stem_type="branch"):
         """初始化 stem 和四个 stage。"""
         super().__init__()
-        self.convolution = PPLCNetV4LargeStem(stem_channels)
+        stem_class = PPLCNetV4SimpleStem if stem_type == "simple" else PPLCNetV4LargeStem
+        self.convolution = stem_class(stem_channels)
         self.blocks = nn.ModuleList([PPLCNetV4Block(stage_configs) for stage_configs in block_configs])
 
     def forward(self, pixel_values):
@@ -294,7 +422,11 @@ class PPLCNetV4(nn.Module):
             mode = "det" if det else "rec"
             raise ValueError(f"PPLCNetV4 {mode} model_size must be one of {list(config_dict)}, got {model_size}.")
         config = config_dict[model_size]
-        self.encoder = PPLCNetV4Encoder(config["stem_channels"], config["block_configs"])
+        self.encoder = PPLCNetV4Encoder(
+            config["stem_channels"],
+            config["block_configs"],
+            stem_type=config.get("stem_type", "branch"),
+        )
         stage_out_channels = [stage[-1][2] for stage in config["block_configs"]]
         self.out_channels = stage_out_channels if det else stage_out_channels[-1]
 

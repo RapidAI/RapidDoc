@@ -24,7 +24,7 @@ from dataclasses import dataclass, fields, is_dataclass
 
 from sympy import totient
 
-from mineru.utils.config_reader import get_device
+from rapid_doc.utils.config_reader import get_device
 from .rec_unimernet_head import (
     MBartForCausalLM,
     MBartDecoder,

@@ -56,7 +56,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     xlsx_path = Path(args.xlsx)
-    from mineru.data.data_reader_writer import FileBasedDataWriter
+    from rapid_doc.data.data_reader_writer import FileBasedDataWriter
 
     with open(xlsx_path, "rb") as f:
         file_bytes = f.read()
