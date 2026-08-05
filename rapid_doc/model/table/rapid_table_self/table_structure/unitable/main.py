@@ -56,6 +56,7 @@ class UniTableStructure:
 
         self.preprocess_op = TablePreprocess(self.device)
 
+    @torch.inference_mode()
     def __call__(self, imgs: List[np.ndarray]):
         img_batch, ori_shapes = self.preprocess_op(imgs)
         memory_batch = self.encoder(img_batch)
