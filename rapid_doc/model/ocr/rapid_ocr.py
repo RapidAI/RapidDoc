@@ -119,15 +119,15 @@ class RapidOcrModel(object):
             if not default_params.get("Rec.model_path"):
                 v6_rec_small_path = os.path.join(rapid_doc_dir, 'resources', 'PP-OCRv6_rec_small.onnx')
                 default_params["Rec.model_path"] = v6_rec_small_path
-        # elif default_params["Det.engine_type"] in [EngineType.TORCH]:
-        #     if not default_params.get("Det.model_path"):
-        #         v6_det_small_path = os.path.join(rapid_doc_dir, 'resources', 'PP-OCRv6_det_small.safetensors')
-        #         default_params["Det.model_path"] = v6_det_small_path
-        #     if not default_params.get("Rec.model_path"):
-        #         v6_rec_small_path = os.path.join(rapid_doc_dir, 'resources', 'PP-OCRv6_rec_small.safetensors')
-        #         default_params["Rec.model_path"] = v6_rec_small_path
-        #         v6_dict_path = os.path.join(rapid_doc_dir, 'resources', 'ppocrv6_dict.txt')
-        #         default_params["Rec.rec_keys_path"] = v6_dict_path
+        elif default_params["Det.engine_type"] in [EngineType.TORCH]:
+            if not default_params.get("Det.model_path"):
+                v6_det_small_path = os.path.join(rapid_doc_dir, 'resources', 'PP-OCRv6_det_small.safetensors')
+                default_params["Det.model_path"] = v6_det_small_path
+            if not default_params.get("Rec.model_path"):
+                v6_rec_small_path = os.path.join(rapid_doc_dir, 'resources', 'PP-OCRv6_rec_small.safetensors')
+                default_params["Rec.model_path"] = v6_rec_small_path
+                v6_dict_path = os.path.join(rapid_doc_dir, 'resources', 'ppocrv6_dict.txt')
+                default_params["Rec.rec_keys_path"] = v6_dict_path
 
         if self.is_seal:
             # 印章识别参数
