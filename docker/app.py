@@ -169,6 +169,7 @@ async def file_parse(
     response_format_zip: bool = Form(False),
     start_page_id: int = Form(0),
     end_page_id: int = Form(99999),
+    gap_tolerance: Optional[int] = Form(None),
 ):
     """
     Parse files using RapidDoc - Compatible with official API
@@ -277,6 +278,7 @@ async def file_parse(
                 end_page_id=end_page_id,
                 layout_config = layout_config, ocr_config = ocr_config, formula_config = formula_config,
                 table_config = table_config, checkbox_config = checkbox_config, image_config = image_config,
+                gap_tolerance = gap_tolerance,
             )
 
         # 根据 response_format_zip 决定返回类型

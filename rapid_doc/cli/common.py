@@ -363,6 +363,7 @@ def _process_office_doc(
         f_dump_orig_file=True,
         f_dump_content_list=True,
         f_make_md_mode=MakeMode.MM_MD,
+        gap_tolerance: int | None = None,
 ):
     need_remove_index = []
     for i, file_bytes in enumerate(pdf_bytes_list):
@@ -377,6 +378,7 @@ def _process_office_doc(
             middle_json, infer_result = office_analyze(
                 file_bytes,
                 image_writer=image_writer,
+                gap_tolerance=gap_tolerance,
             )
 
             f_draw_layout_bbox = False
@@ -429,6 +431,7 @@ def do_parse(
         f_dump_orig_file=f_dump_orig_pdf,
         f_dump_content_list=f_dump_content_list,
         f_make_md_mode=f_make_md_mode,
+        gap_tolerance=kwargs.get("gap_tolerance"),
     )
     for index in sorted(need_remove_index, reverse=True):
         del pdf_bytes_list[index]
@@ -488,6 +491,7 @@ async def aio_do_parse(
         f_dump_orig_file=f_dump_orig_pdf,
         f_dump_content_list=f_dump_content_list,
         f_make_md_mode=f_make_md_mode,
+        gap_tolerance=kwargs.get("gap_tolerance"),
     )
     for index in sorted(need_remove_index, reverse=True):
         del pdf_bytes_list[index]
