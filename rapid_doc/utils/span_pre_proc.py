@@ -514,6 +514,7 @@ def chars_to_content(span, return_word_box=False, useful_list=None, scale=None):
         char_widths = [char['bbox'][2] - char['bbox'][0] for char in span['chars']]
         # Calculate the median width
         median_width = statistics.median(char_widths)
+        has_explicit_whitespace = any(char['char'].isspace() for char in span['chars'])
 
         content = ''
         word_result = []
@@ -521,7 +522,7 @@ def chars_to_content(span, return_word_box=False, useful_list=None, scale=None):
             # 如果下一个char的x0和上一个char的x1距离超过0.25个字符宽度，则需要在中间插入一个空格
             char1 = char
             char2 = span['chars'][span['chars'].index(char) + 1] if span['chars'].index(char) + 1 < len(span['chars']) else None
-            if not return_word_box and char2 and char2['bbox'][0] - char1['bbox'][2] > median_width * 0.25 and char['char'] != ' ' and char2['char'] != ' ':
+            if not return_word_box and not has_explicit_whitespace and char2 and char2['bbox'][0] - char1['bbox'][2] > median_width * 0.25 and char['char'] != ' ' and char2['char'] != ' ':
                 new_char = f"{char['char']} "
             else:
                 new_char = char['char']
