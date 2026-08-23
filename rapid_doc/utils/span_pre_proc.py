@@ -17,6 +17,27 @@ from rapid_doc.utils.pdf_image_tools import get_crop_np_img
 from rapid_doc.utils.pdf_text_tool import get_page
 
 
+_STANDARD_TEXT_ROTATIONS_DEGREES = (0.0, 90.0, 180.0, 270.0)
+_ROTATION_TOLERANCE_DEGREES = 0.1
+
+
+def _is_supported_rotation(rotation) -> bool:
+    """Return whether a pdftext radian angle is an orthogonal text direction."""
+    try:
+        rotation_radians = float(rotation or 0.0)
+    except (TypeError, ValueError):
+        return False
+    if not math.isfinite(rotation_radians):
+        return False
+
+    rotation_degrees = math.degrees(rotation_radians) % 360.0
+    return any(
+        abs((rotation_degrees - angle + 180.0) % 360.0 - 180.0)
+        < _ROTATION_TOLERANCE_DEGREES
+        for angle in _STANDARD_TEXT_ROTATIONS_DEGREES
+    )
+
+
 def remove_outside_spans(spans, all_bboxes, all_discarded_blocks):
     def get_block_bboxes(blocks, block_type_list):
         return [block[0:4] for block in blocks if block[7] in block_type_list]
@@ -146,8 +167,8 @@ def txt_spans_bbox_extract(page_dict, input_res, mfd_res, scale, useful_list):
     page_text_span = []
     for block in page_dict['blocks']:
         for line in block['lines']:
-            if 0 < abs(line['rotation']) < 90:
-                # 旋转角度在0-90度之间的行，直接跳过
+            if not _is_supported_rotation(line.get('rotation', 0.0)):
+                # 跳过非 0/90/180/270 度的斜向文字。
                 continue
             for span in line['spans']:
                 bbox = span['bbox'].bbox  # 获取坐标框
@@ -181,17 +202,33 @@ def txt_most_angle_extract_table(page_dict, table_res_dict, scale):
     input_res = table_res_dict['table_res']
     poly = input_res['poly']
     input_res_bbox = [poly[0]/scale, poly[1]/scale, poly[4]/scale, poly[5]/scale]
+    try:
+        page_rotation = float(page_dict.get('rotation', 0) or 0)
+    except (TypeError, ValueError):
+        page_rotation = 0.0
+    if not math.isfinite(page_rotation):
+        page_rotation = 0.0
+    page_rotation %= 360.0
+
     angles = []  # 所有行的旋转角度
     page_text_span = []
     for block in page_dict['blocks']:
         for line in block['lines']:
-            # if 0 < abs(line['rotation']) < 90:
-            #     # 旋转角度在0-90度之间的行，直接跳过
-            #     continue
-            angle_deg = int(round(line['rotation'] * 180 / math.pi)) % 360
+            try:
+                line_rotation = float(line.get('rotation', 0) or 0)
+            except (TypeError, ValueError):
+                continue
+            if not math.isfinite(line_rotation):
+                continue
+
+            # pdftext 返回字符在 PDF 原始坐标系中的弧度方向；渲染图片已应用
+            # 页面 /Rotate，因此表格方向必须使用二者叠加后的视觉角度。
+            angle_deg = int(round(math.degrees(line_rotation) + page_rotation)) % 360
             for span in line['spans']:
                 bbox = span['bbox'].bbox  # 获取坐标框
                 text = span['text']  # 获取文字内容
+                if not text or not text.strip():
+                    continue
                 if calculate_text_in_span(bbox, input_res_bbox, text):
                     angles.append(angle_deg)
                     page_text_span.append(span)
@@ -278,8 +315,8 @@ def txt_spans_extract(pdf_page_or_dict, spans, input_img, scale, all_bboxes, all
     page_all_lines = []
     for block in page_dict['blocks']:
         for line in block['lines']:
-            if 0 < abs(line['rotation']) < 90:
-                # 旋转角度在0-90度之间的行，直接跳过
+            if not _is_supported_rotation(line.get('rotation', 0.0)):
+                # 跳过非 0/90/180/270 度的斜向文字。
                 continue
             page_all_lines.append(line)
             for span in line['spans']:
