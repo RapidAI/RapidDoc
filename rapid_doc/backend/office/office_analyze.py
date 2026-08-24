@@ -8,7 +8,8 @@ from rapid_doc.utils.guess_suffix_or_lang import guess_suffix_by_bytes
 
 def office_analyze(
         file_bytes,
-        image_writer=None
+        image_writer=None,
+        gap_tolerance: int | None = None,
 ):
     infer_start = time.time()
     file_type = guess_suffix_by_bytes(file_bytes)
@@ -22,7 +23,11 @@ def office_analyze(
         from rapid_doc.model.xlsx.main import convert_binary
     else:
         raise ValueError(f"Unsupported or unknown office file type: {file_type}")
-    results = convert_binary(file_stream)
+
+    if file_type == "xlsx":
+        results = convert_binary(file_stream, gap_tolerance=gap_tolerance)
+    else:
+        results = convert_binary(file_stream)
 
     infer_time = round(time.time() - infer_start, 2)
     safe_time = max(infer_time, 0.01)
