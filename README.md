@@ -278,17 +278,6 @@ Pipeline 模型使用 PP-DocLayoutV3、PP-OCRv6-small、PP-FormulaNet_plus-M、U
             <td>0.140</td>
         </tr>
         <tr>
-            <td>DeepSeek-OCR 2</td>
-            <td>Specialized VLMs</td>
-            <td>3B</td>
-            <td>90.25</td>
-            <td>0.050</td>
-            <td>91.84</td>
-            <td>83.89</td>
-            <td>87.75</td>
-            <td>0.144</td>
-        </tr>
-        <tr>
             <td><strong>RapidDoc</strong></td>
             <td><strong>Pipeline Tools</strong></td>
             <td><strong>-</strong></td>
@@ -298,6 +287,17 @@ Pipeline 模型使用 PP-DocLayoutV3、PP-OCRv6-small、PP-FormulaNet_plus-M、U
             <td><strong>81.797</strong></td>
             <td><strong>88.433</strong></td>
             <td><strong>0.135</strong></td>
+        </tr>
+        <tr>
+            <td>DeepSeek-OCR 2</td>
+            <td>Specialized VLMs</td>
+            <td>3B</td>
+            <td>90.25</td>
+            <td>0.050</td>
+            <td>91.84</td>
+            <td>83.89</td>
+            <td>87.75</td>
+            <td>0.144</td>
         </tr>
         <tr>
             <td>HunyuanOCR</td>
