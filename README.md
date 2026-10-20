@@ -50,6 +50,30 @@
     - **表格分类**（区分有线/无线表格）
     - **[有线表格识别UNET](https://github.com/RapidAI/TableStructureRec)** + SLANET_plus/UNITABLE（作为无线表格识别）
 
+### 可选的 DocVortex 原生 PDF 解析
+
+非扫描 PDF 可使用 DocVortex 的规则版面识别和原生表格结构恢复：
+
+```bash
+pip install "rapid-doc[docvortex]"
+```
+
+```python
+from rapid_doc import RapidDoc
+
+parser = RapidDoc(
+    layout_config={
+        "model_type": "pp_doclayoutv2",  # 扫描页和原生解析失败时的兜底模型
+        "docvortex_mode": "rule",  # 电子版快速模式
+        # "docvortex_mode": "rule_plus_s",  # PP-DocLayout-S 补公式、公式编号和印章
+    },
+    table_config={"rule_table_engine": "docvortex"},
+)
+result = parser("document.pdf")
+```
+
+`docvortex_mode` 默认为 `off`，此时直接使用 `model_type`。`rule` 优先用 DocVortex 解析电子版 PDF；`rule_plus_s` 额外用 PP-DocLayout-S 定位公式、公式编号和印章。配置 PP 版面模型作为 `model_type` 时，扫描页或 DocVortex 异常页逐页回退到该模型。只配置 `model_type="docvortex_rule"` 时保留原始 DocVortex 结果，不执行 PP 版面兜底，便于对比效果；没有原生版面结果的页面会为空。若同时设置 `docvortex_mode="rule_plus_s"`，仍会运行 PP-DocLayout-S 补充识别。表格优先使用 DocVortex 已生成的 HTML，或按表格区域恢复原生结构；未命中时使用现有表格模型。
+
 - **阅读顺序恢复**
   - PP-DocLayoutV2和PP-DocLayoutV3使用版面模型自带的阅读顺序
   - 其余版面模型，使用 PP-StructureV3 阅读顺序恢复算法，基于xycut算法和版面的结果

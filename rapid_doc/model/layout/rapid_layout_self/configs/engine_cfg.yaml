@@ -1,4 +1,6 @@
 onnxruntime:
+    io_binding: true
+    mask_uint8: true
     intra_op_num_threads: -1
     inter_op_num_threads: -1
     enable_cpu_mem_arena: false

@@ -19,6 +19,7 @@ classifiers = [
 ]
 
 dependencies = [
+    "onnx>=1.17.0,<2",
     "loguru>=0.6.0",
     "numpy>=1.21.6",
     "tqdm>=4.67.1",
@@ -46,6 +47,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+docvortex = ["docvortex>=0.4.21,<1"]
 test = [
     "rapid-doc[cpu]",
     "pytest",
@@ -54,14 +56,14 @@ test = [
 
 cpu = [
     "onnxruntime>=1.18.0",
-    "openvino>=2024.6.0,<=2026.1.0",
+#    "openvino>=2024.6.0,<=2026.1.0",
 ]
 
 gpu = [
     "onnxruntime-gpu<=1.23.0",
-    "torch>=2.6.0,<3",
-    "torchvision",
-    "safetensors>=0.4.0",
+#    "torch>=2.6.0,<3",
+#    "torchvision",
+#    "safetensors>=0.4.0",
 ]
 
 api = [
@@ -102,9 +104,9 @@ npu = [
     "attrs",
     "psutil",
     "onnxruntime-cann==1.22.0",
-    "torch==2.5.1",
-    "torch-npu==2.5.1",
-    "torchvision",
+#    "torch==2.5.1",
+#    "torch-npu==2.5.1",
+#    "torchvision",
 ]
 
 [project.urls]
@@ -130,6 +132,9 @@ rapid_doc = [
     "model/magika/config/*.json",
     "model/magika/models/**/*.json",
     "model/magika/models/**/*.onnx",
+    "backend/onnx_ops/licenses/*.txt",
+    "backend/onnx_ops/lib/*.so",
+    "backend/onnx_ops/lib/*.dll",
 ]
 
 [tool.setuptools]

@@ -28,6 +28,7 @@ from rapidocr.utils.utils import has_chinese_char, quads_to_rect_bbox
 from rapid_doc.utils.model_utils import import_package
 from importlib.metadata import version
 rapidocr_version = version("rapidocr")
+_patches_applied = False
 # print(f"rapidocr_version=={rapidocr_version}")
 
 def patch_text_detector():
@@ -99,7 +100,7 @@ def patch_torch_ocr():
     else:
         from rapidocr.inference_engine import torch as rapidocr_torch
         rapidocr_torch_pkg = None
-    from rapid_doc.model.ocr.torch import TorchInferSession
+    from rapid_doc.model.ocr.torch_backend import TorchInferSession
     rapidocr_torch.TorchInferSession = TorchInferSession
     if rapidocr_torch_pkg is not None:
         rapidocr_torch_pkg.TorchInferSession = TorchInferSession
@@ -122,7 +123,7 @@ def patch_openvino_ocr():
 
     # 替换 rapidocr 的 openvino
     from rapidocr import inference_engine
-    from rapid_doc.model.ocr import openvino as self_openvino
+    from rapid_doc.model.ocr import openvino_backend as self_openvino
     inference_engine.openvino = self_openvino
 
 def patch_seal_det():
@@ -389,9 +390,13 @@ def patch_word_box():
     CTCLabelDecode.get_word_info = get_word_info
 
 def apply_ocr_patch():
-    """统一入口：应用所有 OCR 相关补丁"""
+    """统一入口：每个进程只应用一次，避免重复包装方法。"""
+    global _patches_applied
+    if _patches_applied:
+        return
     patch_text_detector()
     patch_torch_ocr()
     patch_openvino_ocr()
     patch_seal_det()
     patch_word_box()
+    _patches_applied = True

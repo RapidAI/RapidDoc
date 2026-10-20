@@ -1,4 +1,5 @@
 import json
+from copy import deepcopy
 import os
 import traceback
 from pathlib import Path
@@ -6,7 +7,7 @@ from typing import Any, List, Dict
 
 import numpy as np
 from omegaconf import DictConfig
-from onnxruntime import GraphOptimizationLevel, InferenceSession, SessionOptions
+from onnxruntime import GraphOptimizationLevel, SessionOptions
 
 from ...model_handler.utils import ModelProcessor
 from ...utils.logger import Logger
@@ -28,17 +29,23 @@ class OrtInferSession(InferSession):
         self.logger.info(f"Using {model_path}")
 
         engine_cfg = self.update_params(
-            self.engine_cfg[cfg.engine_type.value], cfg.engine_cfg
+            deepcopy(self.engine_cfg[cfg.engine_type.value]), cfg.engine_cfg
         )
 
         sess_opt = self._init_sess_opts(engine_cfg)
 
         provider_cfg = ProviderConfig(engine_cfg=engine_cfg)
-        self.session = InferenceSession(
+        from rapid_doc.backend.onnx_ops import create_formula_session
+
+        self.session = create_formula_session(
             model_path,
             sess_options=sess_opt,
             providers=provider_cfg.get_ep_list(),
+            enabled=engine_cfg.get("onnx_ops", True),
+            library=engine_cfg.get("onnx_ops_library", None),
+            fallback=engine_cfg.get("onnx_ops_fallback", True),
         )
+        self.logger.info("Formula ONNX optimization: %s", self.session.optimization_report)
         provider_cfg.verify_providers(self.session.get_providers())
 
     @staticmethod

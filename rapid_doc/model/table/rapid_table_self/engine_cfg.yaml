@@ -1,7 +1,10 @@
 onnxruntime:
-    intra_op_num_threads: -1
-    inter_op_num_threads: -1
+    intra_op_num_threads: 4
+    inter_op_num_threads: 1
     enable_cpu_mem_arena: false
+    slanet_partition: true
+    unet_conv_cache: true
+    cls_output_type: auto
 
     cpu_ep_cfg:
         arena_extend_strategy: "kSameAsRequested"

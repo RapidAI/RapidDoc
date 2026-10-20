@@ -1,4 +1,7 @@
 onnxruntime:
+    onnx_ops: true
+    onnx_ops_library: null
+    onnx_ops_fallback: true
     intra_op_num_threads: -1
     inter_op_num_threads: -1
     enable_cpu_mem_arena: false

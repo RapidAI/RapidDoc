@@ -3,6 +3,7 @@
 # @Contact: liekkaskono@163.com
 import os
 import traceback
+from copy import deepcopy
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -13,11 +14,13 @@ from onnxruntime import GraphOptimizationLevel, InferenceSession, SessionOptions
 from ...utils.logger import Logger
 from ..base import InferSession
 from .provider_config import ProviderConfig
+from ...utils.typings import ModelType
 
 
 class OrtInferSession(InferSession):
     def __init__(self, cfg: Optional[Dict[str, Any]] = None):
         self.logger = Logger(logger_name=__name__).get_log()
+        self.decoder_session = None
 
         # support custom session (PR #451)
         session = cfg.get("session", None)
@@ -37,16 +40,36 @@ class OrtInferSession(InferSession):
         self._verify_model(model_path)
 
         engine_cfg = self.update_params(
-            self.engine_cfg[cfg["engine_type"].value], cfg["engine_cfg"]
+            deepcopy(self.engine_cfg[cfg["engine_type"].value]), cfg["engine_cfg"]
         )
 
         sess_opt = self._init_sess_opts(engine_cfg)
         provider_cfg = ProviderConfig(engine_cfg=engine_cfg)
-        self.session = InferenceSession(
-            model_path,
-            sess_options=sess_opt,
-            providers=provider_cfg.get_ep_list(),
-        )
+        providers = provider_cfg.get_ep_list()
+        cuda = bool(providers) and providers[0][0] == "CUDAExecutionProvider"
+        model_type = cfg.get("model_type")
+        self.session = None
+        if cuda and model_type == ModelType.SLANETPLUS and engine_cfg.get("slanet_partition", True):
+            try:
+                from .optimization import partition_slanet
+                encoder, decoder = partition_slanet(model_path)
+                gpu_session = InferenceSession(encoder, sess_options=sess_opt, providers=providers)
+                if "CUDAExecutionProvider" not in gpu_session.get_providers():
+                    raise RuntimeError("CUDA encoder failed to load")
+                cpu_session = InferenceSession(decoder, sess_options=sess_opt, providers=["CPUExecutionProvider"])
+                self.session, self.decoder_session = gpu_session, cpu_session
+                self.logger.info("SLANet: CUDA encoder and CPU decoder")
+            except Exception as exc:
+                self.logger.warning("SLANet partition unavailable, using standard ORT: %s", exc)
+        if self.session is None and cuda and model_type == ModelType.UNET and engine_cfg.get("unet_conv_cache", True):
+            try:
+                from rapid_doc.backend.onnx_ops import create_session
+                self.session = create_session(model_path, providers=providers, sess_options=sess_opt,
+                                              conv_api="classic", reductions=False)
+            except (ImportError, OSError, ValueError, RuntimeError) as exc:
+                self.logger.warning("UNet convolution cache unavailable: %s", exc)
+        if self.session is None:
+            self.session = InferenceSession(model_path, sess_options=sess_opt, providers=providers)
         provider_cfg.verify_providers(self.session.get_providers())
 
     @staticmethod
@@ -70,6 +93,11 @@ class OrtInferSession(InferSession):
     def __call__(self, input_content: np.ndarray) -> np.ndarray:
         input_dict = dict(zip(self.get_input_names(), [input_content]))
         try:
+            if self.decoder_session is not None:
+                input_dict = {k: np.ascontiguousarray(v) for k, v in input_dict.items()}
+                values = self.session.run(None, input_dict)
+                encoded = dict(zip([v.name for v in self.session.get_outputs()], values))
+                return self.decoder_session.run(None, {v.name: encoded[v.name] for v in self.decoder_session.get_inputs()})
             return self.session.run(self.get_output_names(), input_dict)
         except Exception as e:
             error_info = traceback.format_exc()
@@ -79,7 +107,8 @@ class OrtInferSession(InferSession):
         return [v.name for v in self.session.get_inputs()]
 
     def get_output_names(self) -> List[str]:
-        return [v.name for v in self.session.get_outputs()]
+        session = self.decoder_session if self.decoder_session is not None else self.session
+        return [v.name for v in session.get_outputs()]
 
     def get_character_list(self, key: str = "character") -> List[str]:
         meta_dict = self.session.get_modelmeta().custom_metadata_map

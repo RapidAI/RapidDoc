@@ -24,6 +24,7 @@ class ConnectedComponent:
         self.bbox = bbox
         self.bbox_area = bbox_area
         self._coords = None
+        self._boundary_coords = None
 
     @property
     def coords(self) -> np.ndarray:
@@ -34,6 +35,25 @@ class ConnectedComponent:
             ys, xs = np.nonzero(label_roi == self._label_id)
             self._coords = np.column_stack((ys + min_row, xs + min_col))
         return self._coords
+
+    @property
+    def boundary_coords(self) -> np.ndarray:
+        """Row endpoints have the same convex hull as every component pixel."""
+        if self._boundary_coords is None:
+            top, left, bottom, right = self.bbox
+            mask = self._labels[top:bottom, left:right] == self._label_id
+            if not mask.size:
+                self._boundary_coords = np.empty((0, 2), dtype=np.int32)
+                return self._boundary_coords
+            rows = np.flatnonzero(mask.any(axis=1))
+            xmin = mask.argmax(axis=1)[rows]
+            xmax = mask.shape[1] - 1 - mask[:, ::-1].argmax(axis=1)[rows]
+            points = np.empty((2 * len(rows), 2), dtype=np.int32)
+            points[0::2, 0] = points[1::2, 0] = rows + top
+            points[0::2, 1] = xmin + left
+            points[1::2, 1] = xmax + left
+            self._boundary_coords = points
+        return self._boundary_coords
 
 
 def _iter_connected_component_coords(binary_mask: np.ndarray) -> Iterator[ConnectedComponent]:
@@ -73,13 +93,13 @@ def get_table_line(binimg, axis=0, lineW=10):
     components = _iter_connected_component_coords(binimg > 0)
     if axis == 1:
         lineboxes = [
-            min_area_rect(component.coords)
+            min_area_rect(component.boundary_coords)
             for component in components
             if component.bbox[2] - component.bbox[0] > lineW
         ]
     else:
         lineboxes = [
-            min_area_rect(component.coords)
+            min_area_rect(component.boundary_coords)
             for component in components
             if component.bbox[3] - component.bbox[1] > lineW
         ]
@@ -335,7 +355,7 @@ def min_area_rect_box_from_components(
     for component in components:
         if component.bbox_area > H * W * 3 / 4:  # 过滤大的单元格
             continue
-        rect = cv2.minAreaRect(component.coords[:, ::-1])
+        rect = cv2.minAreaRect(component.boundary_coords[:, ::-1])
 
         box = cv2.boxPoints(rect)
         box = box.reshape((8,)).tolist()

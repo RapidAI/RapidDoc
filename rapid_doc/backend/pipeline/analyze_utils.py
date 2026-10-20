@@ -15,6 +15,7 @@ from .model_init import AtomModelSingleton
 from .model_list import AtomicModel
 from ...model.table.utils import normalize_table_ocr_text
 from ...model.table.rule_table import build_rule_table, build_track_table
+from ...model.docvortex_adapter import recover_docvortex_table
 from ...utils.bbox_utils import normalize_to_int_bbox
 from ...utils.boxbase import rotate_table_image
 from ...utils.enum_class import CategoryId
@@ -55,6 +56,17 @@ def _extract_text_from_pdf(
                     continue
 
                 for res in ocr_res_dict['ocr_res_list']:
+                    if res.get('native_text'):
+                        ocr_res_dict['layout_res'].append({
+                            'poly': res['poly'],
+                            'category_id': CategoryId.OcrText,
+                            'score': 1.0,
+                            'text': res['native_text'],
+                            'docvortex_native_text': True,
+                            'original_label': res.get('original_label'),
+                            'original_order': res.get('original_order'),
+                        })
+                        continue
                     new_image, useful_list = crop_img(
                         res, ocr_res_dict['np_img'], crop_paste_x=50, crop_paste_y=50
                     )
@@ -350,6 +362,7 @@ def _process_single_table(
     table_image_enable = table_config.get("table_image_enable", True)
     table_extract_original_image = table_config.get("extract_original_image", False)
     use_rule_table = table_config.get("use_rule_table", True)
+    rule_table_engine = table_config.get("rule_table_engine", "docvortex")
     rule_table_score_threshold = float(table_config.get("rule_table_score_threshold", 0.90))
     ocr_det_retry_padding = int(table_config.get("ocr_det_retry_padding", 8))
     ocr_det_retry_short_side = int(table_config.get("ocr_det_retry_short_side", 32))
@@ -365,18 +378,47 @@ def _process_single_table(
             useful_list, return_text=True
         )
 
-    # Resolve the configured model route before OCR. For combined models this
-    # classification is cached and reused if the native rule result falls
-    # back, avoiding the former second classification.
+    table_class = None
+    table_class_score = 1.0
+    pdf_not_rotate = page_dict.get("rotate_label") not in ["90", "180", "270"]
+    if (
+        use_rule_table and rule_table_engine == "docvortex"
+        and not table_force_ocr and not table_res_dict['ocr_enable']
+        and pdf_not_rotate and '_source_pdf_bytes' in page_dict
+    ):
+        poly = table_res_dict['table_res']['poly']
+        table_bbox = (poly[0] / scale, poly[1] / scale, poly[4] / scale, poly[5] / scale)
+        table_bbox_scaled = (poly[0], poly[1], poly[4], poly[5])
+        has_embedded_formula = any(
+            item.get('bbox') and _box_center_in(table_bbox_scaled, item['bbox'])
+            for item in table_res_dict['single_page_mfdetrec_res'] + table_res_dict['checkbox_res']
+        )
+        has_native_image = any(
+            img.get('bbox') and _boxes_overlap(table_bbox, img['bbox'])
+            for img in page_dict.get('ori_image_list', [])
+        )
+        if not has_embedded_formula and not has_native_image:
+            try:
+                native_result = recover_docvortex_table(page_dict, table_bbox)
+                if (native_result is not None and native_result.html.strip()
+                        and native_result.confidence >= rule_table_score_threshold):
+                    table_res_dict['table_res'].pop('layout_image_list', None)
+                    table_res_dict['table_res']['html'] = native_result.html
+                    table_res_dict['table_res']['rule_table_score'] = native_result.confidence
+                    table_res_dict['table_res']['table_parse_method'] = 'docvortex_native'
+                    return
+            except ImportError:
+                raise
+            except Exception as exc:
+                logger.warning(f'DocVortex table failed, fallback to model: {exc}')
+
+    # The model is initialized only after the native route declines this table.
     table_model = atom_model_manager.get_atom_model(
         atom_model_name='table', lang=_lang, ocr_config=ocr_config,
         table_config=table_config,
     )
-    table_class = None
-    table_class_score = 1.0
-    pdf_not_rotate = page_dict.get("rotate_label") not in ["90", "180", "270"]
     native_rule_candidate = (
-        use_rule_table
+        use_rule_table and rule_table_engine == "legacy"
         and not table_force_ocr
         and not table_res_dict['ocr_enable']
         and pdf_not_rotate

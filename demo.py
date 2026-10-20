@@ -194,6 +194,7 @@ def _build_config():
     from rapid_doc.model.custom.paddleocr_vl.paddleocr_vl import PaddleOCRVLTableModel, PaddleOCRVLOCRModel, PaddleOCRVLFormulaModel
     layout_config = {
         # "model_type": LayoutModelType.PP_DOCLAYOUTV3,
+        # "docvortex_mode": "rule_plus_s",  # off / rule / rule_plus_s
         # "conf_thresh": 0.4,
         # "batch_num": 1,
         # "model_dir_or_path": r"C:\ocr\models\ppmodel\layout\PP-DocLayoutV3\pp_doclayoutv3.onnx",

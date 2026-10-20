@@ -3,6 +3,9 @@ from typing import List, Dict, Any
 
 from rapid_doc.model.ocr.ocr_patch import apply_ocr_patch
 from rapid_doc.model.ocr.seal_crop import SortPolyBoxes, CropByPolys
+from rapid_doc.model.ocr.onnx_ops_session import (
+    ops_settings, install_onnx_ops, configure_cuda_onnx,
+)
 
 # 应用所有 OCR 相关补丁
 apply_ocr_patch()
@@ -42,6 +45,8 @@ DEFAULT_SEAL_DEBUG_DIR = os.path.join(
 
 class RapidOcrModel(object):
     def __init__(self, det_db_box_thresh=0.5, lang=None, ocr_config=None, use_dilation=True, det_db_unclip_ratio=1.8, enable_merge_det_boxes=True, is_seal=False):
+        ocr_config = dict(ocr_config or {})
+        onnx_ops_settings = ops_settings(ocr_config.pop("onnx_ops", True))
         self.drop_score = 0.5
         self.enable_merge_det_boxes = enable_merge_det_boxes
         self.is_seal = is_seal
@@ -72,8 +77,8 @@ class RapidOcrModel(object):
         rapid_doc_dir = Path(os.path.abspath(__file__)).parent.parent.parent
         # CPU 上优先使用 OpenVINO（如果可用且用户未指定 engine_type）
         if device.startswith('cpu') and check_openvino() and not engine_type:
-            default_params["Det.engine_type"] = EngineType.OPENVINO
-            default_params["Rec.engine_type"] = EngineType.OPENVINO
+            default_params["Det.engine_type"] = EngineType.ONNXRUNTIME
+            default_params["Rec.engine_type"] = EngineType.ONNXRUNTIME
         if engine_type == EngineType.TORCH:
             default_params["Det.engine_type"] = EngineType.TORCH
             default_params["Rec.engine_type"] = EngineType.TORCH
@@ -85,9 +90,11 @@ class RapidOcrModel(object):
 
         if device.startswith('cuda'):
             if not engine_type:
-                # cuda 环境默认使用 torch
-                default_params["Det.engine_type"] = EngineType.TORCH
-                default_params["Rec.engine_type"] = EngineType.TORCH
+                # The plugin opt-in selects ONNX; otherwise keep the Torch default.
+                cuda_engine = EngineType.ONNXRUNTIME if onnx_ops_settings else EngineType.TORCH
+                for task in ("Det", "Rec"):
+                    if not onnx_ops_settings or f"{task}.engine_type" not in ocr_config:
+                        default_params[f"{task}.engine_type"] = cuda_engine
             gpu_id = int(device.split(':')[1]) if ':' in device else 0 # GPU 编号
             if default_params.get('Det.engine_type') == EngineType.TORCH:
                 default_params['EngineConfig.torch.use_cuda'] = True
@@ -111,6 +118,8 @@ class RapidOcrModel(object):
         default_params.pop('use_det_mode', None)
         default_params.pop('custom_model', None)
         default_params.pop('seal_enable', None)
+
+        configure_cuda_onnx(default_params, device, rapidocr_version)
 
         if default_params["Det.engine_type"] in [EngineType.ONNXRUNTIME, EngineType.OPENVINO]:
             if not default_params.get("Det.model_path"):
@@ -161,6 +170,10 @@ class RapidOcrModel(object):
             self.enable_merge_det_boxes = False
 
         self.ocr_engine = RapidOCR(params=default_params)
+        self.onnx_ops_reports = install_onnx_ops(self.ocr_engine, onnx_ops_settings)
+        if self.onnx_ops_reports:
+            for task, report in self.onnx_ops_reports.items():
+                logger.info("OCR {} ONNX ops: {}", task, report)
         self.text_detector = self.ocr_engine.text_det
         self.text_recognizer = self.ocr_engine.text_rec
         self.rec_batch_num = self.text_recognizer.rec_batch_num
@@ -551,12 +564,20 @@ class RapidOcrModel(object):
 
 
 if __name__ == '__main__':
-    rapid_ocr = RapidOcrModel()
-    img = cv2.imread("C:\\ocr\\img\\aaa.png")
+    from rapidocr import EngineType as OCREngineType, OCRVersion, ModelType as OCRModelType
+    ocr_config = {
+        # 新增的自定义参数
+        "engine_type": OCREngineType.ONNXRUNTIME, # 统一设置推理引擎 总运行时间: 5.039876222610474秒
+        # "engine_type": OCREngineType.OPENVINO,  # 统一设置推理引擎 总运行时间: 4.724567413330078秒
+        # "engine_type": OCREngineType.TORCH,  # 统一设置推理引擎 总运行时间: 4.724567413330078秒
+    }
+    rapid_ocr = RapidOcrModel(ocr_config=ocr_config)
+    # rapid_ocr = RapidOcrModel()
+    img = cv2.imread("reader_order_01.png")
     start_time1 = time.time()
-    for i in range(10):
+    for i in range(1):
         start_time = time.time()
-        ocr_res = rapid_ocr.ocr(img=img, det=True, rec=False)
+        ocr_res = rapid_ocr.ocr(img=img, det=True, rec=True)
         print(f"运行时间: {time.time() - start_time}秒")
     print(f"总运行时间: {time.time() - start_time1}秒")
 

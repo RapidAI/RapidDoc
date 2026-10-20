@@ -140,6 +140,7 @@ PP_DOCLAYOUTV2_layout_merge_bboxes_mode= {
 }
 
 class ModelType(Enum):
+    DOCVORTEX_RULE = "docvortex_rule"
     PP_DOCLAYOUT_PLUS_L = "pp_doclayout_plus_l"
     PP_DOCLAYOUTV2 = "pp_doclayoutv2"
     PP_DOCLAYOUTV3 = "pp_doclayoutv3"

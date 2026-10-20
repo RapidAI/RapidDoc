@@ -1,15 +1,15 @@
 onnxruntime:
   pp_formulanet_plus_s:
-    model_dir_or_path: https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/v1.0.0/formula/PP-FormulaNet_plus-S/pp_formulanet_plus_s.onnx
-    SHA256: 30998d10c94ccff1ad8981df0c71048cb1f3eec7b1e515b809767f1f72aebe3b
+    model_dir_or_path: https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/v1.0.1/formula/PP-FormulaNet_plus-S/pp_formulanet_plus_s.onnx
+    SHA256: a97f156a3d5fc957f29321083cba1517ffde29e99fbd6d2d36958f1fe128fbbf
 
   pp_formulanet_plus_m:
-    model_dir_or_path: https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/v1.0.0/formula/PP-FormulaNet_plus-M/pp_formulanet_plus_m.onnx
-    SHA256: 71b6d389cf7b857e45252a4b98cfced1a3ffca7bf24d9497d02d052a41d9493b
+    model_dir_or_path: https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/v1.0.1/formula/PP-FormulaNet_plus-M/pp_formulanet_plus_m.onnx
+    SHA256: 52afa60ff51ad66cd7840a74188a058fe99081e617d3bd780117a2d67d94f50d
 
   pp_formulanet_plus_l:
-    model_dir_or_path: https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/v1.0.0/formula/PP-FormulaNet_plus-L/pp_formulanet_plus_l.onnx
-    SHA256: 5ef81a0b197ea2c8c1463b31c3eb2ad0ae1eb655fb1ff3b550858c7d85bc84e8
+    model_dir_or_path: https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/v1.0.1/formula/PP-FormulaNet_plus-L/pp_formulanet_plus_l.onnx
+    SHA256: f6686782c2bb5f84000ff9da4788ac672e736fa2d0652f483a140fa8401b3d32
 
 torch:
   pp_formulanet_plus_m:

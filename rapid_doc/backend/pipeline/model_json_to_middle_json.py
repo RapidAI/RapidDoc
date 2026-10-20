@@ -249,6 +249,8 @@ def _append_formula_number_tag(equation_block, formula_number_block):
     if not formula:
         return False
 
+    if "\\tag{" in formula:
+        return f"\\tag{{{tag_content}}}" in formula
     equation_span["content"] = f"{formula}\\tag{{{tag_content}}}"
     return True
 
@@ -282,6 +284,32 @@ def _optimize_formula_number_blocks(pdf_info_list):
                 and _append_formula_number_tag(next_block, block)
             ):
                 continue
+
+            # Reading order may put a paragraph between a displayed equation
+            # and its right-aligned number. Pair by the shared horizontal row.
+            number_box = block["bbox"]
+            page_width = page_info.get("page_size", [0])[0]
+            row_equations = []
+            for candidate in blocks:
+                if candidate.get("type") != BlockType.INTERLINE_EQUATION:
+                    continue
+                equation_box = candidate["bbox"]
+                overlap = max(0, min(number_box[3], equation_box[3])
+                              - max(number_box[1], equation_box[1]))
+                min_height = min(number_box[3] - number_box[1],
+                                 equation_box[3] - equation_box[1])
+                gap = max(0, number_box[0] - equation_box[2])
+                if (min_height > 0 and overlap / min_height >= 0.5
+                        and number_box[0] >= equation_box[0]
+                        and gap <= 0.4 * page_width):
+                    row_equations.append(candidate)
+            if row_equations:
+                closest = min(row_equations, key=lambda candidate: abs(
+                    (candidate["bbox"][1] + candidate["bbox"][3])
+                    - (number_box[1] + number_box[3])
+                ))
+                if _append_formula_number_tag(closest, block):
+                    continue
 
             if not _extract_text_from_block(block):
                 continue

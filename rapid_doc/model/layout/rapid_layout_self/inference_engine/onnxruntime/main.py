@@ -1,4 +1,5 @@
 import os
+from copy import deepcopy
 import traceback
 from pathlib import Path
 from typing import Any, List
@@ -9,7 +10,7 @@ from onnxruntime import GraphOptimizationLevel, InferenceSession, SessionOptions
 
 from ...model_handler.utils import ModelProcessor
 from ...utils.logger import Logger
-from ...utils.typings import RapidLayoutInput
+from ...utils.typings import RapidLayoutInput, ModelType
 from ..base import InferSession
 from .provider_config import ProviderConfig
 
@@ -27,18 +28,48 @@ class OrtInferSession(InferSession):
         self.logger.info(f"Using {model_path}")
 
         engine_cfg = self.update_params(
-            self.engine_cfg[cfg.engine_type.value], cfg.engine_cfg
+            deepcopy(self.engine_cfg[cfg.engine_type.value]), cfg.engine_cfg
         )
 
         sess_opt = self._init_sess_opts(engine_cfg)
 
         provider_cfg = ProviderConfig(engine_cfg=engine_cfg)
-        self.session = InferenceSession(
-            model_path,
-            sess_options=sess_opt,
-            providers=provider_cfg.get_ep_list(),
-        )
+        providers = provider_cfg.get_ep_list()
+        cuda_requested = any((p[0] if isinstance(p, tuple) else p) == "CUDAExecutionProvider"
+                             for p in providers)
+        source = model_path
+        self.mask_uint8 = False
+        if cuda_requested and cfg.model_type == ModelType.PP_DOCLAYOUTV3 and engine_cfg.get("mask_uint8", True):
+            try:
+                import onnx
+                from .optimization import compact_binary_mask
+
+                model = compact_binary_mask(onnx.load(model_path))
+                if model is not None:
+                    onnx.external_data_helper.convert_model_from_external_data(model)
+                    source = model.SerializeToString()
+                    self.mask_uint8 = True
+                else:
+                    self.logger.info("Layout binary mask compression skipped: unsupported graph")
+            except Exception as error:
+                self.logger.warning("Layout mask compression disabled: %s", error)
+        try:
+            self.session = InferenceSession(source, sess_options=sess_opt, providers=providers)
+        except Exception:
+            if not self.mask_uint8:
+                raise
+            self.logger.warning("Layout compact session failed; loading original model", exc_info=True)
+            self.mask_uint8 = False
+            self.session = InferenceSession(model_path, sess_options=sess_opt, providers=providers)
+        if self.mask_uint8 and "CUDAExecutionProvider" not in self.session.get_providers():
+            self.mask_uint8 = False
+            self.session = InferenceSession(model_path, sess_options=sess_opt, providers=providers)
         provider_cfg.verify_providers(self.session.get_providers())
+        self.io_binding = (cuda_requested and "CUDAExecutionProvider" in self.session.get_providers()
+                           and cfg.model_type in (ModelType.PP_DOCLAYOUTV2, ModelType.PP_DOCLAYOUTV3)
+                           and engine_cfg.get("io_binding", True))
+        self.cuda_device_id = int(self.session.get_provider_options().get("CUDAExecutionProvider", {}).get("device_id", 0))
+        self.logger.info("Layout ONNX optimization: mask_uint8=%s, io_binding=%s", self.mask_uint8, self.io_binding)
 
     @staticmethod
     def _init_sess_opts(cfg: DictConfig) -> SessionOptions:
@@ -68,10 +99,20 @@ class OrtInferSession(InferSession):
                 input_dict["scale_factor"] = scale_factor
             if "im_shape" in input_names:
                 h, w = input_content.shape[-2:]
-                input_dict["im_shape"] = np.array([[h, w]], dtype=np.float32)
+                input_dict["im_shape"] = np.tile(np.array([[h, w]], dtype=np.float32), (input_content.shape[0], 1))
         else:
             input_dict = dict(zip(self.get_input_names(), [input_content]))
         try:
+            if self.io_binding:
+                # Per-call bindings support changing batch sizes and concurrent callers.
+                binding = self.session.io_binding()
+                for name, value in input_dict.items():
+                    binding.bind_cpu_input(name, np.ascontiguousarray(value))
+                for name in self.get_output_names():
+                    binding.bind_output(name, "cuda", self.cuda_device_id)
+                self.session.run_with_iobinding(binding)
+                binding.synchronize_outputs()
+                return binding.copy_outputs_to_cpu()
             return self.session.run(self.get_output_names(), input_dict)
         except Exception as e:
             error_info = traceback.format_exc()

@@ -2,6 +2,7 @@
 import re
 from ctypes import byref, c_int, create_string_buffer
 from io import BytesIO
+from math import ceil
 
 import pypdfium2 as pdfium
 import pypdfium2.raw as pdfium_c
@@ -12,6 +13,7 @@ from rapid_doc.utils.pdfium_guard import (
     close_pdfium_document,
     open_pdfium_document,
     pdfium_guard,
+    rewrite_pdf_bytes_with_pdfium,
 )
 
 MAX_SAMPLE_PAGES = 10
@@ -93,6 +95,17 @@ def _is_disallowed_control_unicode(unicode_code: int) -> bool:
     )
 
 
+def _has_widespread_sampled_page_issue(text_samples, is_bad_page) -> bool:
+    """Require a page-local defect on at least half the sampled pages."""
+    if not text_samples:
+        return False
+
+    required_pages = (
+        1 if len(text_samples) == 1 else max(2, ceil(len(text_samples) / 2))
+    )
+    return sum(bool(is_bad_page(sample)) for sample in text_samples) >= required_pages
+
+
 def classify(pdf_bytes):
     """
     Fast PDF classification path.
@@ -140,6 +153,14 @@ def classify(pdf_bytes):
             if (
                 unicode_map_error_signal["unicode_map_error_ratio"]
                 >= UNICODE_MAP_ERROR_RATIO_THRESHOLD
+                and _has_widespread_sampled_page_issue(
+                    text_samples,
+                    lambda sample: (
+                        sample["char_count"] > 0
+                        and sample["unicode_map_error_count"] / sample["char_count"]
+                        >= UNICODE_MAP_ERROR_RATIO_THRESHOLD
+                    ),
+                )
             ):
                 logger.debug(
                     "Classify PDF as OCR due to PDFium Unicode map errors: "
@@ -197,6 +218,19 @@ def classify(pdf_bytes):
             if (
                 total_chars >= TEXT_QUALITY_MIN_CHARS
                 and abnormal_ratio >= TEXT_QUALITY_BAD_THRESHOLD
+                and _has_widespread_sampled_page_issue(
+                    text_samples,
+                    lambda sample: (
+                        sample["char_count"] > 0
+                        and (
+                            sample["null_char_count"]
+                            + sample["replacement_char_count"]
+                            + sample["control_char_count"]
+                            + sample["private_use_char_count"]
+                        ) / sample["char_count"]
+                        >= TEXT_QUALITY_BAD_THRESHOLD
+                    ),
+                )
             ):
                 return "ocr"
 
@@ -231,7 +265,12 @@ def classify(pdf_bytes):
             ascii_punct_signal = _get_sampled_ascii_punct_signal_from_samples(
                 text_samples
             )
-            if ascii_punct_signal["triggered"]:
+            if ascii_punct_signal["triggered"] and _has_widespread_sampled_page_issue(
+                text_samples,
+                lambda sample: _get_sampled_ascii_punct_signal_from_samples(
+                    [sample]
+                )["triggered"],
+            ):
                 logger.debug(
                     "Classify PDF as OCR due to suspicious sampled-page ASCII punctuation "
                     f"text: page={ascii_punct_signal['page_index'] + 1}, "
@@ -250,6 +289,28 @@ def classify(pdf_bytes):
                 pdf,
                 page_indices,
             )
+            if high_image_coverage_ratio > 0:
+                from rapid_doc.utils.pdf_image_text_probe import image_backed_text_signal
+
+                for page_index in page_indices:
+                    page = None
+                    try:
+                        page = pdf[page_index]
+                        signal = image_backed_text_signal(
+                            page, _get_pdfium_page_object_bounds,
+                            min_chars=CHARS_THRESHOLD,
+                            min_coverage=HIGH_IMAGE_COVERAGE_THRESHOLD,
+                        )
+                        if signal['image_backed_ocr']:
+                            logger.debug(
+                                'Classify PDF as OCR because native text over page images '
+                                f'is not painted: page={page_index + 1}, '
+                                f"unpainted_chars={signal['unpainted_chars']}, "
+                                f"candidate_chars={signal['candidate_chars']}"
+                            )
+                            return 'ocr'
+                    finally:
+                        close_pdfium_child(page)
             if high_image_coverage_ratio >= HIGH_IMAGE_COVERAGE_THRESHOLD:
                 logger.debug(
                     "Keep PDF as text despite high sampled-page image coverage "
@@ -1133,7 +1194,46 @@ def _get_pdfium_page_object_bounds(page_object):
     raise AttributeError("PDFium page object does not expose bounds")
 
 
+def classify_pdf_by_page_chunks(pdf_bytes, pages_per_chunk: int):
+    """按固定页数切分 PDF，并返回每段原始页码范围及分类结果。"""
+    if not isinstance(pages_per_chunk, int) or isinstance(pages_per_chunk, bool):
+        raise TypeError("pages_per_chunk must be an integer")
+    if pages_per_chunk <= 0:
+        raise ValueError("pages_per_chunk must be greater than 0")
+
+    pdf = None
+    try:
+        with pdfium_guard():
+            pdf = open_pdfium_document(pdfium.PdfDocument, pdf_bytes)
+            page_count = len(pdf)
+    finally:
+        close_pdfium_document(pdf)
+
+    results = []
+    for start_page_id in range(0, page_count, pages_per_chunk):
+        end_page_id = min(start_page_id + pages_per_chunk, page_count) - 1
+        chunk_bytes = rewrite_pdf_bytes_with_pdfium(
+            pdf_bytes,
+            start_page_id=start_page_id,
+            end_page_id=end_page_id,
+        )
+        result = classify(chunk_bytes)
+        results.append(
+            {
+                "start_page": start_page_id + 1,
+                "end_page": end_page_id + 1,
+                "result": result,
+            }
+        )
+
+    return results
+
 if __name__ == "__main__":
-    with open("/Users/myhloli/pdf/luanma2x10.pdf", "rb") as f:
+    with open(r"D:\file\text-pdf\xxx.pdf", "rb") as f:
         p_bytes = f.read()
-        logger.info(f"PDF classify result: {classify(p_bytes)}")
+
+    for chunk in classify_pdf_by_page_chunks(p_bytes, pages_per_chunk=64):
+        logger.info(
+            f"PDF pages {chunk['start_page']}-{chunk['end_page']} "
+            f"classify result: {chunk['result']}"
+        )

@@ -41,11 +41,11 @@ ENV PIP_RETRIES=10
 # 安装 Python 依赖
 RUN python3 -m pip install --upgrade pip setuptools wheel && \
     python3 -m pip install --no-cache-dir --prefer-binary \
-        --index-url https://mirrors.aliyun.com/pypi/simple \
+        --index-url https://pypi.org/simple \
         'rapid-doc[gpu,api]==0.9.10' && \
     python3 -m pip uninstall -y onnxruntime onnxruntime-gpu || true && \
     python3 -m pip install --no-cache-dir --prefer-binary --force-reinstall \
-        --index-url https://mirrors.aliyun.com/pypi/simple \
+        --index-url https://pypi.org/simple \
         'onnxruntime-gpu==1.23.0' && \
     python3 -m pip cache purge
 

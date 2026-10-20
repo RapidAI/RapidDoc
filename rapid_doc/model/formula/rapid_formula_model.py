@@ -5,21 +5,30 @@ from rapid_doc.utils.config_reader import get_device
 
 class RapidFormulaModel(object):
     def __init__(self, formula_config=None):
-        cfg = RapidFormulaInput(model_type=ModelType.PP_FORMULANET_PLUS_M)
-        # TODO cuda环境，默认使用torch推理，公式模型onnx gpu推理会报错
+        cfg = RapidFormulaInput(model_type=ModelType.PP_FORMULANET_PLUS_M, engine_type=EngineType.ONNXRUNTIME)
         device = get_device()
         if device.startswith('cuda'):
             device_id = int(device.split(':')[1]) if ':' in device else 0  # GPU 编号
-            engine_cfg = {'use_cuda': True, "gpu_id": device_id}
+            # Keep gpu_id for explicit Torch overrides; ORT uses cuda_ep_cfg.
+            engine_cfg = {'use_cuda': True, "gpu_id": device_id,
+                          "cuda_ep_cfg.device_id": device_id}
             cfg.engine_cfg = engine_cfg
-            cfg.model_type = ModelType.PP_FORMULANET_PLUS_M
-            cfg.engine_type = EngineType.TORCH
+            model_type = formula_config.get('model_type') if formula_config else None
+            if model_type:
+                cfg.model_type = model_type
+            engine_type = formula_config.get('engine_type') if formula_config else None
+            if engine_type:
+                cfg.engine_type = engine_type
         elif device.startswith('npu'):
             device_id = int(device.split(':')[1]) if ':' in device else 0  # npu 编号
             engine_cfg = {'use_npu': True, "npu_id": device_id}
             cfg.engine_cfg = engine_cfg
-            cfg.model_type = ModelType.PP_FORMULANET_PLUS_M
-            cfg.engine_type = EngineType.TORCH
+            model_type = formula_config.get('model_type') if formula_config else None
+            if model_type:
+                cfg.model_type = model_type
+            engine_type = formula_config.get('engine_type') if formula_config else None
+            if engine_type:
+                cfg.engine_type = engine_type
         # 如果传入了 formula_config，则用传入配置覆盖默认配置
         if formula_config is not None:
             # 遍历字典，把传入配置设置到 default_cfg 对象中
@@ -43,10 +52,10 @@ class RapidFormulaModel(object):
 
 if __name__ == "__main__":
     # cfg = RapidFormulaInput(model_type=ModelType.PP_FORMULANET_PLUS_M, engine_type=EngineType.ONNXRUNTIME)
-    cfg = RapidFormulaInput(model_type=ModelType.PP_FORMULANET_PLUS_M, engine_type=EngineType.TORCH)
+    cfg = RapidFormulaInput(model_type=ModelType.PP_FORMULANET_PLUS_M, engine_type=EngineType.ONNXRUNTIME)
 
-    # engine_cfg = {'use_cuda': True, "cuda_ep_cfg.device_id": 0} #onnx
-    engine_cfg = {'use_cuda': True, "gpu_id": 0} #torch
+    engine_cfg = {'use_cuda': True, "cuda_ep_cfg.device_id": 0} #onnx
+    # engine_cfg = {'use_cuda': True, "gpu_id": 0} #torch
     cfg.engine_cfg = engine_cfg
     layout_engine = RapidFormula(cfg=cfg)
 

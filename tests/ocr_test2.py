@@ -1,8 +1,9 @@
+import os
 import time
 
 import cv2
 import numpy as np
-
+os.environ["MINERU_DEVICE_MODE"] = "cuda" # cpu、cuda、npu、all（all只是用来下载）
 from rapid_doc.model.ocr.rapid_ocr import RapidOcrModel
 from rapid_doc.utils.ocr_utils import get_rotate_crop_image
 from rapidocr import EngineType as OCREngineType, OCRVersion, ModelType as OCRModelType
@@ -10,9 +11,11 @@ from rapidocr import EngineType as OCREngineType, OCRVersion, ModelType as OCRMo
 if __name__ == '__main__':
     ocr_config = {
         # 新增的自定义参数
-        "engine_type": OCREngineType.ONNXRUNTIME, # 统一设置推理引擎
+        "engine_type": OCREngineType.ONNXRUNTIME, # 统一设置推理引擎 总运行时间: 5.039876222610474秒
+        # "engine_type": OCREngineType.OPENVINO,  # 统一设置推理引擎 总运行时间: 4.724567413330078秒
+        # "engine_type": OCREngineType.TORCH,  # 统一设置推理引擎 总运行时间: 4.724567413330078秒
     }
-    ocr_model = RapidOcrModel()
+    ocr_model = RapidOcrModel(ocr_config=ocr_config)
     bgr_image = cv2.imread('reader_order_01.png')
     start_time = time.time()
     det_res = ocr_model.ocr(bgr_image, rec=False)[0]

@@ -395,6 +395,8 @@ class MagicModel:
             elif category_id == CategoryId.OcrText:
                 span['content'] = layout_det['text']
                 span['type'] = ContentType.TEXT
+                if layout_det.get('docvortex_native_text'):
+                    span['docvortex_native_text'] = True
             
             all_spans.append(span)
         

@@ -169,11 +169,13 @@ class MineruPipelineModel:
         )
         # init table model
         if self.apply_table:
-            self.table_model = atom_model_manager.get_atom_model(
-                atom_model_name=AtomicModel.Table,
-                lang=self.lang,
-                ocr_config=self.ocr_config,
-                table_config=self.table_config,
-            )
+            self.table_model = None
+            if self.table_config.get('rule_table_engine') != 'docvortex' or self.table_config.get('custom_model') is not None:
+                self.table_model = atom_model_manager.get_atom_model(
+                    atom_model_name=AtomicModel.Table,
+                    lang=self.lang,
+                    ocr_config=self.ocr_config,
+                    table_config=self.table_config,
+                )
 
         logger.info('DocAnalysis init done!')

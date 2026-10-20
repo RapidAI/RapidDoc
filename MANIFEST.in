@@ -1,0 +1,3 @@
+recursive-include native/onnx_ops *.cc *.cu *.h *.txt *.py *.md LICENSE
+recursive-include rapid_doc/backend/onnx_ops/licenses *.txt
+recursive-include rapid_doc/backend/onnx_ops/lib *.so *.dll

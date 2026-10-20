@@ -1086,10 +1086,31 @@ class DocxConverter:
     @staticmethod
     def _xml_table_signature(xml_table) -> dict:
         """提取 XML 表格的轻量签名，用于与 Mammoth HTML 表格对齐。"""
+        w_ns = DocxConverter._BLIP_NAMESPACES["w"]
+        vmerge_value_key = f"{{{w_ns}}}val"
+
+        def is_vmerge_continuation_text(node) -> bool:
+            """判断文本是否位于纵向合并的续接单元格中。"""
+            element = node.getparent()
+            while element is not None:
+                if DocxConverter._local_name(element) == "tc":
+                    vmerge = element.find(
+                        "w:tcPr/w:vMerge",
+                        namespaces=DocxConverter._BLIP_NAMESPACES,
+                    )
+                    return (
+                        vmerge is not None
+                        and vmerge.get(vmerge_value_key) != "restart"
+                    )
+                element = element.getparent()
+            return False
+
+        # Word 允许纵向合并的续接单元格保留文本。Mammoth 会按逻辑表格
+        # 忽略这些文本；若把它们计入 XML 签名，便会导致同一张表无法对齐。
         text = "".join(
             node.text or ""
             for node in xml_table.xpath('.//*[local-name()="t"]')
-            if node.text
+            if node.text and not is_vmerge_continuation_text(node)
         )
         return {
             "row_count": len(xml_table.xpath('./*[local-name()="tr"]')),

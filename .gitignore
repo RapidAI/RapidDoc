@@ -48,8 +48,11 @@ debug_utils/
 
 # sphinx docs
 _build/
-
-
+native/onnx_ops/build/
+docs/evidence
+tests/others
+docs/others
+tools/
 output*/
 
 **/rapid_*_self/**/models/*

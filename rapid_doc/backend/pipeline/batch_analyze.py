@@ -171,9 +171,17 @@ class BatchAnalyze:
     ) -> List[List[Dict]]:
         """执行版面检测"""
         images_layout_res = self.model.layout_model.batch_predict(
-            np_images, self.layout_base_batch_size
+            np_images, self.layout_base_batch_size, page_dicts=pdf_dict_list,
+            include_formula=self.formula_enable, include_seal=self.seal_enable,
         )
-        images_layout_res = [filter_overlap_boxes(item, self.use_custom_ocr) for item in images_layout_res]
+        images_layout_res = [
+            item if '_docvortex_layout' in page_dict else filter_overlap_boxes(item, self.use_custom_ocr)
+            for item, page_dict in zip(images_layout_res, pdf_dict_list)
+        ]
+        if not self.table_enable:
+            for page in images_layout_res:
+                for item in page:
+                    item.pop('html', None)
         # 如果是 txt 模式，移除原始图片中的版面元素
         if self.use_det_mode == 'txt':
             images_layout_res = remove_layout_in_ori_images(images_layout_res, pdf_dict_list, scale_list)
@@ -232,6 +240,8 @@ class BatchAnalyze:
 
             # 表格区域
             for table_res in table_res_list:
+                if table_res.get('html'):
+                    continue
                 def get_crop_table_img(scale):
                     bbox = [table_res["poly"][0], table_res["poly"][1], table_res["poly"][4], table_res["poly"][5]]
                     bbox = normalize_to_int_bbox(

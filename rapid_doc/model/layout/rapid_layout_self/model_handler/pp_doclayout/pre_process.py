@@ -18,6 +18,7 @@ class PPPreProcess:
             self.mean = np.array([0.485, 0.456, 0.406])
             self.std = np.array([0.229, 0.224, 0.225])
         self.scale = 1 / 255.0
+        self.identity_normalization = model_type in (ModelType.PP_DOCLAYOUTV2, ModelType.PP_DOCLAYOUTV3)
 
     def __call__(self, img: Optional[np.ndarray] = None) -> np.ndarray:
         if img is None:
@@ -27,6 +28,8 @@ class PPPreProcess:
         img = self.normalize(img) #Normalize
         img = self.permute(img) #ToCHWImage
         img = np.expand_dims(img, axis=0) #ToBatch
+        if self.identity_normalization:
+            return np.ascontiguousarray(img, dtype=np.float32)
         return img.astype(np.float32)
 
     def resize(self, img: np.ndarray) -> np.ndarray:
@@ -36,6 +39,8 @@ class PPPreProcess:
         return img
 
     def normalize(self, img: np.ndarray) -> np.ndarray:
+        if self.identity_normalization:
+            return img.astype("float32") * self.scale
         return (img.astype("float32") * self.scale - self.mean) / self.std
 
     def permute(self, img: np.ndarray) -> np.ndarray:

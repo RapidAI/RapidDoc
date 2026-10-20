@@ -13,6 +13,7 @@ from ...utils.pdf_classify import classify
 from ...utils.pdf_image_tools import load_images_from_pdf, get_ori_image
 from ...utils.model_utils import get_vram, clean_memory
 from ...utils.pdf_text_tool import get_page
+from ...model.docvortex_adapter import analyze_docvortex_layout, get_docvortex_mode
 from ...utils import PyPDFium2Parser
 from ...utils.pdfium_guard import close_pdfium_child, close_pdfium_document
 
@@ -141,6 +142,8 @@ def doc_analyze(
     all_image_lists = []
     all_pdf_docs = []
     ocr_enabled_list = []
+    use_docvortex_layout = get_docvortex_mode(layout_config) != "off"
+    use_docvortex_table = (table_config or {}).get("rule_table_engine") == "docvortex"
     for pdf_idx, pdf_bytes in enumerate(pdf_bytes_list):
         # 确定OCR设置
         _ocr_enable = False
@@ -149,9 +152,19 @@ def doc_analyze(
                 _ocr_enable = True
         elif parse_method == 'ocr':
             _ocr_enable = True
+        logger.info(f"_ocr_enable result: {_ocr_enable}  pdf_id: {pdf_idx}")
 
         ocr_enabled_list.append(_ocr_enable)
         _lang = lang_list[pdf_idx]
+
+        native_layout_pages = None
+        if use_docvortex_layout and not _ocr_enable:
+            try:
+                native_layout_pages = analyze_docvortex_layout(pdf_bytes)
+            except ImportError:
+                raise
+            except Exception as exc:
+                logger.warning(f"DocVortex layout failed; falling back to model: {exc}")
 
         # 收集每个数据集中的页面
         # load_images_start = time.time()
@@ -177,7 +190,12 @@ def doc_analyze(
                         pdf_page = pdf_doc_list[page_index]
                     # 获取pdf的文字和图片的字典对象
                     page_dict = get_page(pdf_page)
-                    if not _ocr_enable and page_dict['blocks']:
+                    if native_layout_pages is not None and page_index < len(native_layout_pages) and page_dict['blocks']:
+                        page_dict['_docvortex_layout'] = native_layout_pages[page_index]
+                    if use_docvortex_table and not _ocr_enable and page_dict['blocks']:
+                        page_dict['_source_pdf_bytes'] = pdf_bytes
+                        page_dict['_source_page_index'] = page_index
+                    if not _ocr_enable and page_dict['blocks'] and not use_docvortex_table:
                         from rapid_doc.utils.pdf_text_tool import get_page_vector_lines
                         page_dict['vector_lines'] = get_page_vector_lines(pdf_page)
                     if page_dict['blocks']:
@@ -230,6 +248,13 @@ def doc_analyze(
         )
         batch_results = batch_image_analyze(batch_image, formula_enable, table_enable, layout_config, ocr_config, formula_config, table_config, checkbox_config)
         results.extend(batch_results)
+
+    for document_pages in all_pdf_docs:
+        for page_dict in document_pages:
+            page_dict.pop('_docvortex_layout', None)
+            page_dict.pop('_docvortex_table_page', None)
+            page_dict.pop('_source_pdf_bytes', None)
+            page_dict.pop('_source_page_index', None)
 
     # 构建返回结果
     infer_results = []

@@ -1,6 +1,7 @@
 import time
 from copy import deepcopy
 from typing import Optional, Union, List
+from pathlib import Path
 
 import cv2
 import numpy as np
@@ -94,6 +95,19 @@ class PaddleCls:
         self.mean = np.array([0.485, 0.456, 0.406], dtype=np.float32)
         self.std = np.array([0.229, 0.224, 0.225], dtype=np.float32)
         self.cls = {0: "wired", 1: "wireless"}
+        self.output_type = cfg.get("engine_cfg", {}).get("cls_output_type", "auto")
+        if self.output_type == "auto":
+            path = Path(cfg.get("model_dir_or_path") or "")
+            # Preserve legacy logits handling for unknown/custom exporters.
+            self.output_type = "probabilities" if path.stem == "paddle_cls" else "logits"
+            if path.suffix.lower() == ".onnx" and path.is_file():
+                try:
+                    from ..inference_engine.onnxruntime.optimization import classifier_output_type
+                    self.output_type = classifier_output_type(path)
+                except (ImportError, OSError):
+                    pass
+        if self.output_type not in ("probabilities", "logits"):
+            raise ValueError("cls_output_type must be auto, probabilities or logits")
 
     def batch_preprocess(self, imgs):
         res_imgs = []
@@ -127,8 +141,11 @@ class PaddleCls:
 
     def predict_with_scores(self, img):
         pred_output = self.session(img)[0]
-        predict = np.exp(pred_output - np.max(pred_output, axis=1, keepdims=True))
-        predict /= np.sum(predict, axis=1, keepdims=True)
+        if self.output_type == "logits":
+            predict = np.exp(pred_output - np.max(pred_output, axis=1, keepdims=True))
+            predict /= np.sum(predict, axis=1, keepdims=True)
+        else:
+            predict = pred_output
         pred_idxs = np.argmax(predict, axis=1).tolist()
         scores = np.max(predict, axis=1).astype(float).tolist()
         return [self.cls[int(idx)] for idx in pred_idxs], scores
@@ -146,12 +163,11 @@ class QanythingCls:
         self.cls = {0: "wired", 1: "wireless"}
 
     def preprocess(self, img):
-        img = cv2.cvtColor(img.copy(), cv2.COLOR_BGR2RGB)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        img = np.stack((img,) * 3, axis=-1)  # gray → 3 channel
-        img = Image.fromarray(np.uint8(img))
+        # Equivalent to the legacy BGR->RGB->BGR2GRAY conversion.
+        img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+        img = Image.fromarray(img)
         img = img.resize((self.inp_w, self.inp_h))  # 注意：PIL resize 是 (W,H)
-        img = np.array(img, dtype=np.float32) / 255.0
+        img = np.repeat(np.asarray(img)[..., None], 3, axis=-1).astype(np.float32) / 255.0
         img -= self.mean
         img /= self.std
         img = img.transpose(2, 0, 1)  # HWC → CHW
@@ -160,7 +176,7 @@ class QanythingCls:
     def batch_preprocess(self, imgs):
         """支持 TableCls 批量"""
         res_imgs = [self.preprocess(img) for img in imgs]
-        x = np.stack(res_imgs, axis=0).astype(np.float32)  # → (N, 3, H, W)
+        x = np.stack(res_imgs, axis=0)  # → (N, 3, H, W)
         return x
 
     def __call__(self, img_batch):

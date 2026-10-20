@@ -28,9 +28,9 @@ class RapidTableModel(object):
             device_id = int(device.split(':')[1]) if ':' in device else 0  # npu 编号
             engine_cfg = {'use_cann': True, "cann_ep_cfg.device_id": device_id}
         engine_cfg = engine_cfg or {}
-        # 如果传入了 engine_cfg，则覆盖参数
+        # Override individual options while preserving the selected device.
         if table_config.get('engine_cfg'):
-            engine_cfg = table_config.get('engine_cfg')
+            engine_cfg.update(table_config['engine_cfg'])
         self.use_compare_table = table_config.get('use_compare_table') if table_config else False
         self.cls_conf_threshold = table_config.get('cls_conf_threshold', 0.9) if table_config else 0.9
         self.enable_blank_cell_rec = table_config.get('enable_blank_cell_rec', False) if table_config else False

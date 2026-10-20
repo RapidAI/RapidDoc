@@ -17,6 +17,8 @@ class RapidLayout:
     def __init__(self, cfg: Optional[RapidLayoutInput] = None):
         if cfg is None:
             cfg = RapidLayoutInput()
+        if cfg.model_type == ModelType.DOCVORTEX_RULE:
+            raise ValueError("docvortex_rule requires PDF page data; use RapidDoc's layout_config")
 
         if not cfg.conf_thresh:
             if cfg.model_type == ModelType.PP_DOCLAYOUT_PLUS_L:
@@ -64,7 +66,7 @@ def parse_args(arg_list: Optional[List[str]] = None):
         "--model_type",
         type=str,
         default=ModelType.PP_DOCLAYOUT_L.value,
-        choices=[v.value for v in ModelType],
+        choices=[v.value for v in ModelType if v != ModelType.DOCVORTEX_RULE],
         help="Support model type",
     )
     parser.add_argument(

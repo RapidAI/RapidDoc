@@ -1,12 +1,22 @@
 import cv2
+from loguru import logger
 
 from rapid_doc.model.layout.rapid_layout_self import ModelType, RapidLayout, RapidLayoutInput
+from rapid_doc.model.docvortex_adapter import (
+    convert_docvortex_layout, docvortex_layout_fallback_reason,
+    get_docvortex_mode, merge_docvortex_supplements,
+)
 from rapid_doc.utils.config_reader import get_device
 from rapid_doc.utils.enum_class import CategoryId
 from rapid_doc.utils.boxbase import calculate_iou
 
 class RapidLayoutModel(object):
     def __init__(self, layout_config=None):
+        layout_config = layout_config or {}
+        self.docvortex_mode = get_docvortex_mode(layout_config)
+        self.docvortex_native_only = layout_config.get("model_type") in {
+            ModelType.DOCVORTEX_RULE, "docvortex_rule",
+        }
         cfg = RapidLayoutInput(model_type=ModelType.PP_DOCLAYOUTV3)
 
         device = get_device()
@@ -23,7 +33,10 @@ class RapidLayoutModel(object):
         # 如果传入了 layout_config，则用传入配置覆盖默认配置
         if layout_config is not None:
             if layout_config.get("model_type"):
-                cfg.model_type = layout_config.get("model_type")
+                selected_type = layout_config.get("model_type")
+                if selected_type == ModelType.DOCVORTEX_RULE or selected_type == "docvortex_rule":
+                    selected_type = ModelType.PP_DOCLAYOUTV3
+                cfg.model_type = ModelType(selected_type) if isinstance(selected_type, str) else selected_type
             if layout_config.get("layout_shape_mode"):
                 cfg.layout_shape_mode = layout_config.get("layout_shape_mode")
             if not layout_config.get("conf_thresh"):
@@ -36,15 +49,21 @@ class RapidLayoutModel(object):
             # 遍历字典，把传入配置设置到 default_cfg 对象中
             for key, value in layout_config.items():
                 if hasattr(cfg, key):
-                    setattr(cfg, key, value)
-                    setattr(cfg, key, value)
-        layout_config = layout_config or {}
-        self.markdown_ignore_labels = layout_config.get("markdown_ignore_labels",
-                                                        ["number", "footnote", "header", "header_image", "footer", "footer_image", "aside_text",])
+                    if key == "model_type" and (value == ModelType.DOCVORTEX_RULE or value == "docvortex_rule"):
+                        value = ModelType.PP_DOCLAYOUTV3
+                    setattr(cfg, key, ModelType(value) if key == "model_type" and isinstance(value, str) else value)
+        default_ignore_labels = ["number", "footnote", "header", "header_image", "footer", "footer_image", "aside_text"]
+        if self.docvortex_mode != "off":
+            # Native footnotes include table notes that are part of the document content.
+            default_ignore_labels.remove("footnote")
+        self.markdown_ignore_labels = layout_config.get("markdown_ignore_labels", default_ignore_labels)
         self.pp_doclayout_cls_dict, self.pp_doclayout_plus_cls_dict, self.pp_doclayoutv2_cls_dict \
             = get_cls_dicts(self.markdown_ignore_labels)
-        self.model = RapidLayout(cfg=cfg)
         self.model_type = cfg.model_type
+        self.model = None if self.docvortex_mode != "off" else RapidLayout(cfg=cfg)
+        self._fallback_model = None
+        self._supplement_model = None
+        self._fallback_config = {**layout_config, "model_type": cfg.model_type, "docvortex_mode": "off"}
         self.doclayout_yolo_list = ['title', 'plain text', 'abandon', 'figure', 'figure_caption',
                                     'table', 'table_caption', 'table_footnote', 'isolate_formula', 'formula_caption',
                                     '10', '11', '12', 'inline_formula', 'isolated_formula', 'ocr_text']
@@ -52,7 +71,73 @@ class RapidLayoutModel(object):
     def predict(self, image):
         return self.batch_predict(images=[image], batch_size=1)[0]
 
-    def batch_predict(self, images: list, batch_size: int) -> list:
+    def batch_predict(self, images: list, batch_size: int, page_dicts: list | None = None,
+                      include_formula: bool = True, include_seal: bool = True) -> list:
+        if self.docvortex_mode != "off":
+            if page_dicts is None or len(page_dicts) != len(images):
+                raise ValueError("docvortex_rule requires one PDF page dictionary per image")
+            results = [None] * len(images)
+            fallback_indices = []
+            fallback_reasons = []
+            native_unavailable_indices = []
+            for index, image in enumerate(images):
+                page_dict = page_dicts[index] or {}
+                blocks = page_dict.get("_docvortex_layout")
+                if not blocks:
+                    if self.docvortex_native_only:
+                        results[index] = []
+                        native_unavailable_indices.append(index + 1)
+                        continue
+                    fallback_indices.append(index)
+                    fallback_reasons.append(f"page {index + 1}: empty layout")
+                    continue
+                layout = convert_docvortex_layout(
+                    blocks, image.shape[1], image.shape[0], set(self.markdown_ignore_labels)
+                )
+                reason = None if self.docvortex_native_only else docvortex_layout_fallback_reason(
+                    blocks, layout, image.shape[1], image.shape[0],
+                    native_char_count=len(page_dict.get("chars") or []),
+                )
+                if reason:
+                    fallback_indices.append(index)
+                    fallback_reasons.append(f"page {index + 1}: {reason}")
+                    continue
+                results[index] = layout
+            if native_unavailable_indices:
+                logger.warning(
+                    f"DocVortex native layout unavailable on pages {native_unavailable_indices}; "
+                    "native-only mode leaves these pages without layout blocks"
+                )
+            if self.docvortex_mode == "rule_plus_s" and (include_formula or include_seal):
+                supplement_indices = [index for index, result in enumerate(results) if result is not None]
+                if supplement_indices:
+                    if self._supplement_model is None:
+                        self._supplement_model = RapidLayoutModel({
+                            "model_type": ModelType.PP_DOCLAYOUT_S,
+                            "markdown_ignore_labels": self.markdown_ignore_labels,
+                            "docvortex_mode": "off",
+                        })
+                    supplements = self._supplement_model.batch_predict(
+                        [images[index] for index in supplement_indices], batch_size
+                    )
+                    for index, extra in zip(supplement_indices, supplements):
+                        results[index] = merge_docvortex_supplements(
+                            results[index], extra,
+                            include_formula=include_formula, include_seal=include_seal,
+                        )
+            if fallback_indices:
+                logger.warning(
+                    f"DocVortex layout fallback on {len(fallback_indices)} pages: "
+                    f"{'; '.join(fallback_reasons)}; using configured layout model"
+                )
+                if self._fallback_model is None:
+                    self._fallback_model = RapidLayoutModel(self._fallback_config)
+                fallback = self._fallback_model.batch_predict(
+                    [images[index] for index in fallback_indices], batch_size
+                )
+                for index, page_result in zip(fallback_indices, fallback):
+                    results[index] = page_result
+            return results
         images_layout_res = []
         all_results = self.model(img_contents=images, batch_size=batch_size, tqdm_enable=True)
         for img_idx, results in enumerate(all_results):

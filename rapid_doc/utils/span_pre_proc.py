@@ -327,6 +327,8 @@ def txt_spans_extract(pdf_page_or_dict, spans, input_img, scale, all_bboxes, all
     span_height_list = []
     for span in spans:
         if span['type'] in [ContentType.TEXT]:
+            if span.get('docvortex_native_text'):
+                continue
             span_height = span['bbox'][3] - span['bbox'][1]
             span['height'] = span_height
             span['width'] = span['bbox'][2] - span['bbox'][0]
@@ -342,6 +344,8 @@ def txt_spans_extract(pdf_page_or_dict, spans, input_img, scale, all_bboxes, all
     vertical_spans = []
     for span in spans:
         if span['type'] in [ContentType.TEXT]:
+            if span.get('docvortex_native_text'):
+                continue
             for block in all_bboxes + all_discarded_blocks:
                 if block[7] in [BlockType.IMAGE_BODY, BlockType.TABLE_BODY, BlockType.INTERLINE_EQUATION]:
                     continue

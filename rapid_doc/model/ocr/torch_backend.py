@@ -124,11 +124,20 @@ class TorchInferSession(InferSession):
         self._move_model_to_device()
 
     def _resolve_device_config(self, cfg):
-        if cfg.engine_cfg.use_cuda:
-            return torch.device(f"cuda:{cfg.engine_cfg.gpu_id}"), True, False
+        engine_cfg = cfg.engine_cfg
+        if engine_cfg.get("use_cuda", False):
+            cuda_cfg = engine_cfg.get("cuda_ep_cfg")
+            device_id = cuda_cfg.get("device_id") if cuda_cfg else None
+            if device_id is None:
+                device_id = engine_cfg.get("gpu_id", 0)
+            return torch.device(f"cuda:{device_id}"), True, False
 
-        if cfg.engine_cfg.get('use_npu'):
-            return torch.device(f"npu:{cfg.engine_cfg.npu_id}"), False, True
+        if engine_cfg.get("use_npu", False):
+            npu_cfg = engine_cfg.get("npu_ep_cfg")
+            device_id = npu_cfg.get("device_id") if npu_cfg else None
+            if device_id is None:
+                device_id = engine_cfg.get("npu_id", 0)
+            return torch.device(f"npu:{device_id}"), False, True
 
         return torch.device("cpu"), False, False
 
