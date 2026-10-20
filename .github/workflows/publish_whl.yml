@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - v*
+  workflow_dispatch:
 
 jobs:
 
@@ -11,10 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Pull latest code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python 3.10
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
           architecture: 'x64'
@@ -27,29 +28,70 @@ jobs:
           pip install .[test]
           pytest tests/unittest/test_e2e.py
 
-  build-and-publish:
-    runs-on: ubuntu-latest
+  build-wheels:
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, windows-latest]
+    runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Python 3.10
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
       - name: Install build tools
         run: |
           python -m pip install --upgrade pip
-          pip install build wheel
+          pip install build wheel twine
 
       - name: Build wheel
         run: |
-          python -m build --wheel
+          python -m build --wheel --outdir raw-dist
+
+      - name: Repair Linux wheel
+        if: runner.os == 'Linux'
+        run: |
+          python -m pip install auditwheel patchelf
+          auditwheel show raw-dist/*.whl
+          # CUDA/cuDNN are supplied by the GPU environment and preloaded by
+          # onnx_ops/native.py. Do not bundle or rename NVIDIA runtime libraries.
+          # auditwheel validates the bundled plugin's GLIBC/GLIBCXX requirements.
+          auditwheel repair raw-dist/*.whl --plat manylinux_2_34_x86_64 --exclude libcudart.so.12 --exclude libcudnn.so.9 --wheel-dir dist
+
+      - name: Collect Windows wheel
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path dist
+          Copy-Item raw-dist/*.whl dist/
+
+      - name: Check distribution metadata
+        run: python -m twine check --strict dist/*
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.os }}
+          path: dist/*.whl
+          if-no-files-found: error
+
+  build-and-publish:
+    needs: [unit-testing, build-wheels]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: wheels-*
+          merge-multiple: true
+          path: dist/
 
       - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@v1.5.0
+        uses: pypa/gh-action-pypi-publish@release/v1
         with:
           user: __token__
           password: ${{ secrets.RAPID_DOC }}
-          packages_dir: dist/
+          packages-dir: dist/
+          verbose: true
+          attestations: false

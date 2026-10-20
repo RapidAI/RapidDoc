@@ -4,6 +4,7 @@ import platform
 from pathlib import Path
 from setuptools import Distribution, setup
 from setuptools.command.build_py import build_py
+from wheel.bdist_wheel import bdist_wheel
 
 ROOT = Path(__file__).parent
 LIB = ROOT / "rapid_doc/backend/onnx_ops/lib"
@@ -24,4 +25,14 @@ class PlatformBuild(build_py):
                 or Path(p).suffix == SUFFIX]
 
 
-setup(distclass=NativeDistribution, cmdclass={"build_py": PlatformBuild})
+class PlatformWheel(bdist_wheel):
+    def get_tag(self):
+        python, abi, plat = super().get_tag()
+        if self.distribution.has_ext_modules():
+            # The native library uses the ONNX Runtime C API, not the CPython ABI.
+            return "py3", "none", plat
+        return python, abi, plat
+
+
+setup(distclass=NativeDistribution,
+      cmdclass={"build_py": PlatformBuild, "bdist_wheel": PlatformWheel})
