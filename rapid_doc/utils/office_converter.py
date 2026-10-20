@@ -16,17 +16,7 @@ class ConvertToPdfError(Exception):
 
 EXPORT_FILTERS = {
     "pdf": "pdf",
-    "docx": "Office Open XML Text",
-    "pptx": "Impress Office Open XML",
-    "xlsx": "Calc Office Open XML",
 }
-
-LEGACY_TO_MODERN_FORMATS = {
-    ".doc": "docx",
-    ".ppt": "pptx",
-    ".xls": "xlsx",
-}
-
 
 def check_fonts_installed():
     """Check if required Chinese fonts are installed."""
@@ -205,38 +195,3 @@ def convert_file(input_path, output_dir, target_format):
 def convert_file_to_pdf(input_path, output_dir):
     """Convert a single document (ppt, doc, xls, etc.) to PDF."""
     return convert_file(input_path, output_dir, "pdf")
-
-
-def convert_doc_to_docx(input_path, output_dir):
-    """Convert a legacy Word document (.doc) to .docx."""
-    return convert_file(input_path, output_dir, "docx")
-
-
-def convert_ppt_to_pptx(input_path, output_dir):
-    """Convert a legacy PowerPoint presentation (.ppt) to .pptx."""
-    return convert_file(input_path, output_dir, "pptx")
-
-
-def convert_xls_to_xlsx(input_path, output_dir):
-    """Convert a legacy Excel workbook (.xls) to .xlsx."""
-    return convert_file(input_path, output_dir, "xlsx")
-
-
-def convert_legacy_office_to_modern(input_path, output_dir=None):
-    if not output_dir:
-        output_dir = tempfile.mkdtemp()
-    """Convert .doc/.ppt/.xls files to .docx/.pptx/.xlsx based on the input suffix."""
-    input_suffix = Path(input_path).suffix.lower()
-    target_format = LEGACY_TO_MODERN_FORMATS.get(input_suffix)
-    if not target_format:
-        supported = ", ".join(sorted(LEGACY_TO_MODERN_FORMATS))
-        raise ConvertToPdfError(
-            f"Unsupported legacy Office format: {input_suffix or '<no suffix>'}. Supported inputs: {supported}"
-        )
-
-    return convert_file(input_path, output_dir, target_format)
-
-
-if __name__ == '__main__':
-    convert_legacy_office_to_modern(r"D:\file\docx\test.doc",
-                        r"D:\file\docx")

@@ -16,7 +16,6 @@ from rapid_doc.utils.enum_class import MakeMode
 from rapid_doc.backend.pipeline.pipeline_analyze import doc_analyze as pipeline_doc_analyze
 from rapid_doc.backend.pipeline.pipeline_middle_json_mkcontent import union_make as pipeline_union_make
 from rapid_doc.backend.pipeline.model_json_to_middle_json import result_to_middle_json as pipeline_result_to_middle_json
-from rapid_doc.model.layout.rapid_layout_self import ModelType as LayoutModelType
 
 def do_parse(
     output_dir,
@@ -32,18 +31,12 @@ def do_parse(
 ):
     layout_config = {
         # "model_type": LayoutModelType.PP_DOCLAYOUTV3,
-        # "engine_cfg": {'use_cuda': True, "cuda_ep_cfg.device_id": 0},
     }
     from rapidocr import EngineType as OCREngineType
     ocr_config = {
-        # "engine_type": OCREngineType.OPENVINO,  # 统一设置推理引擎
     }
-    from rapid_doc.model.formula.rapid_formula_self import ModelType as FormulaModelType, \
-        EngineType as FormulaEngineType
     formula_config = {
         # "model_type": FormulaModelType.PP_FORMULANET_PLUS_M,
-        # "engine_type": FormulaEngineType.TORCH,
-        # "engine_cfg": {'use_cuda': True, "gpu_id": 0},
     }
     table_config = {
 
@@ -118,7 +111,7 @@ def parse_doc(
 
 if __name__ == '__main__':
     files_dir = r"/web/hzkitty/OmniDocBenchFiles/pdfs"
-    output_dir = r"/web/hzkitty/OmniDocBenchFiles/layout_v3-ocrv6_smail_pytorch_tablev3"
+    output_dir = r"/web/hzkitty/OmniDocBenchFiles/layout_v3-ocrv6_smail_onnx_tablev5"
 
     # files_dir = r"D:\Download\OmniDocBench\pdfs"
     # output_dir = r"D:\Download\OmniDocBench\layout_v3-ocrv6_smail_cpu-pdf"
@@ -143,12 +136,11 @@ if __name__ == '__main__':
     # 按批次运行 parse_doc
     for batch_idx, i in enumerate(range(0, len(doc_path_list), batch_size), start=1):
         batch = doc_path_list[i:i + batch_size]
-        if batch_idx == 15:
-            print(
-                f"处理第 {batch_idx}/{total_batches} 批，"
-                f"当前批次 {len(batch)} 个文件，"
-                f"共 {len(doc_path_list)} 个文件"
-            )
-            parse_doc(batch, output_dir)
+        print(
+            f"处理第 {batch_idx}/{total_batches} 批，"
+            f"当前批次 {len(batch)} 个文件，"
+            f"共 {len(doc_path_list)} 个文件"
+        )
+        parse_doc(batch, output_dir)
 
     print(f"总运行时间: {time.time() - start_time} 秒")

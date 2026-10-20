@@ -22,21 +22,20 @@ dependencies = [
     "onnx>=1.17.0,<2",
     "loguru>=0.6.0",
     "numpy>=1.21.6",
+    "packaging>=23.0",
     "tqdm>=4.67.1",
     "requests",
-    "pypdfium2>=4.30.0,<6.0.0",
+    "pypdfium2>=5.10.1,<6.0.0",
     "pypdf>=5.6.0",
     "reportlab",
     "pdftext>=0.6.2,<0.8.0",
     "json-repair>=0.46.2",
     "robust-downloader>=0.0.2",
-    "fasttext-predict>=0.9.2.4,<1; python_version >= '3.10' and python_version < '3.14'",
-    "fasttext-predict-v2>=1.1.0,<2; python_version >= '3.14' and python_version < '3.15'",
     "beautifulsoup4>=4.13.5,<5",
     "ftfy>=6.3.1,<7",
     "shapely>=2.0.7,<3",
     "tokenizers>=0.13.2",
-    "rapidocr>=3.4.0,<=3.9.2",
+    "rapidocr>=3.4.0,<=3.10.0",
     "openai>=1.63",
     "python-docx>=1.2.0,<2",
     'pypptx-with-oxml>=1.0.3,<2',
@@ -44,13 +43,18 @@ dependencies = [
     "pylatexenc>=2.10,<3",
     "lxml>=4.0.0,<7.0.0",
     "openpyxl>=3.1.5,<4",
+    "pydantic>=2.12.5,<3",
+    "pillow>=11,<13",
+    "olefile>=0.47,<1",
+    "metafile-render>=0.3.0,<1",
+    "resvg_py>=0.5.0,<0.6",
 ]
 
 [project.optional-dependencies]
-docvortex = ["docvortex>=0.4.21,<1"]
 test = [
     "rapid-doc[cpu]",
     "pytest",
+    "tomli; python_version < '3.11'",
     "fuzzywuzzy"
 ]
 
@@ -128,13 +132,16 @@ rapid_doc = [
     "resources/*.safetensors",
     "resources/*.txt",
     "resources/*.html",
-    "resources/fasttext-langdetect/*",
     "model/magika/config/*.json",
     "model/magika/models/**/*.json",
     "model/magika/models/**/*.onnx",
     "backend/onnx_ops/licenses/*.txt",
     "backend/onnx_ops/lib/*.so",
     "backend/onnx_ops/lib/*.dll",
+    "_vendor/docvortex_core/UPSTREAM.md",
+    "_vendor/docvortex_core/licenses/*.txt",
+    "_vendor/docvortex_core/resources/fonts/*",
+    "_vendor/docvortex_core/resources/unicode/*.txt",
 ]
 
 [tool.setuptools]

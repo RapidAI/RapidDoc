@@ -27,7 +27,7 @@
 
 - **OCR 识别**
   - 使用 [RapidOCR](https://github.com/RapidAI/RapidOCR) 支持多种推理引擎
-  - CPU 下默认使用 OpenVINO（速度快，内存占用较高），GPU 下默认使用 torch
+  - CPU/CUDA 下默认使用 ONNX Runtime：CPU 安装 `rapid-doc[cpu]`，CUDA GPU 安装 `rapid-doc[gpu]`
   
 - **版面识别**
   - 模型使用 `PP-DocLayout` 系列 ONNX 模型（v2、plus-L、L、M、S）
@@ -43,20 +43,26 @@
     - **PP-FormulaNet_plus-M**：默认使用，支持onnx和torch    
     - **PP-FormulaNet_plus-S**：速度最快，支持onnx，复杂公式精度不够
   - 支持配置只识别行间公式
-  - cuda环境，默认使用torch推理，公式模型onnx gpu推理会报错，暂时无人解决 [PaddleOCR/issues/15125](https://github.com/PaddlePaddle/PaddleOCR/issues/15125), [PaddleX/issues/4238](https://github.com/PaddlePaddle/PaddleX/issues/4238), [Paddle2ONNX/issues/1593](https://github.com/PaddlePaddle/Paddle2ONNX/issues/1593)
+  - CPU/CUDA 下默认使用 ONNX Runtime；GPU 路径已接入内置 CUDA 算子库，详见 [算子库说明](native/onnx_ops/README.md)
+  - 显式选择 Torch 引擎时，需自行安装对应的 Torch 依赖
 
 - **表格识别**
   - 基于 [rapid_table_self](rapid_doc/model/table/rapid_table_self) 增强，在原有基础上增强为多模型串联方案：  
     - **表格分类**（区分有线/无线表格）
     - **[有线表格识别UNET](https://github.com/RapidAI/TableStructureRec)** + SLANET_plus/UNITABLE（作为无线表格识别）
 
-### 可选的 DocVortex 原生 PDF 解析
+### 内置的 DocVortex 原生 PDF 解析
 
-非扫描 PDF 可使用 DocVortex 的规则版面识别和原生表格结构恢复：
+非扫描 PDF 可使用内置 DocVortex 核心的规则版面识别和原生表格结构恢复，六种 Office 格式直接原生解析，无需 LibreOffice 转换。核心采用 Python 后端，已移除 fasttext 依赖。
+
+按运行环境安装一种 Runtime：
 
 ```bash
-pip install "rapid-doc[docvortex]"
+pip install "rapid-doc[cpu]"
+# CUDA 环境选择：pip install "rapid-doc[gpu]"
 ```
+
+源码来源、变更和验收记录见 [迁移记录](docs/migrations/docvortex-baseline.md)。
 
 ```python
 from rapid_doc import RapidDoc
@@ -79,8 +85,8 @@ result = parser("document.pdf")
   - 其余版面模型，使用 PP-StructureV3 阅读顺序恢复算法，基于xycut算法和版面的结果
 
 - **推理方式**
-  - 所有模型通过 ONNXRuntime 推理，OCR可配置其他推理引擎
-  - 除了 OCR 和 PP-DocLayout-M/S 模型，OpenVINO推理会报错，暂时难以解决。[PaddleOCR/issues/16277](https://github.com/PaddlePaddle/PaddleOCR/issues/16277)
+  - 默认 Pipeline 模型（OCR、版面、公式、表格）使用 ONNX Runtime，CPU/CUDA 按安装的 Runtime 和设备配置运行
+  - OCR、公式等模块可显式配置其支持的其他引擎；原生 Office 和 DocVortex 规则解析不使用模型推理
 ---
 
 ## 基准测试结果
@@ -286,12 +292,12 @@ Pipeline 模型使用 PP-DocLayoutV3、PP-OCRv6-small、PP-FormulaNet_plus-M、U
             <td><strong>RapidDoc</strong></td>
             <td><strong>Pipeline Tools</strong></td>
             <td><strong>-</strong></td>
-            <td><strong>90.157</strong></td>
+            <td><strong>90.479</strong></td>
             <td><strong>0.047</strong></td>
-            <td><strong>93.777</strong></td>
-            <td><strong>81.394</strong></td>
-            <td><strong>88.402</strong></td>
-            <td><strong>0.136</strong></td>
+            <td><strong>94.342</strong></td>
+            <td><strong>81.797</strong></td>
+            <td><strong>88.433</strong></td>
+            <td><strong>0.135</strong></td>
         </tr>
         <tr>
             <td>HunyuanOCR</td>
@@ -465,10 +471,13 @@ Pipeline 模型使用 PP-DocLayoutV3、PP-OCRv6-small、PP-FormulaNet_plus-M、U
 
 #### 使用pip安装
 ```bash
-pip install rapid-doc[cpu] -i https://mirrors.aliyun.com/pypi/simple
-或
-pip install rapid-doc[gpu] -i https://mirrors.aliyun.com/pypi/simple
+# CPU 环境
+pip install "rapid-doc[cpu]" -i https://mirrors.aliyun.com/pypi/simple
+# 或 CUDA GPU 环境
+pip install "rapid-doc[gpu]" -i https://mirrors.aliyun.com/pypi/simple
 ```
+
+CPU extra 安装 `onnxruntime`，GPU extra 安装 `onnxruntime-gpu`，用于默认模型的推理，包括 OCR 和公式模型。按运行环境选择一种；GPU extra 不会额外安装 CPU 版 Runtime，也不默认安装 Torch。两个 Runtime 发行包使用同一个 `onnxruntime` 导入名，不要同时安装。
 
 #### 通过源码安装
 ```bash
@@ -477,15 +486,17 @@ git clone https://github.com/RapidAI/RapidDoc.git
 cd RapidDoc
 
 # 安装依赖
-pip install -e .[cpu] -i https://mirrors.aliyun.com/pypi/simple
-或
-pip install -e .[gpu] -i https://mirrors.aliyun.com/pypi/simple
+pip install -e ".[cpu]" -i https://mirrors.aliyun.com/pypi/simple
+# 或 CUDA GPU 环境
+pip install -e ".[gpu]" -i https://mirrors.aliyun.com/pypi/simple
 ```
 #### 使用gpu推理
-```python
-# rapid-doc[gpu] 默认安装 onnxruntime-gpu 最新版
-# 需要确定onnxruntime-gpu与GPU对应，参考 https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html#requirements
 
+`rapid-doc[gpu]` 按项目依赖约束安装 `onnxruntime-gpu`（当前为 `<=1.23.0`）。CUDA/cuDNN 需满足 [CUDA Execution Provider 要求](https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html#requirements)。默认 OCR 和公式模型使用 ONNX Runtime，无需切换到 Torch。
+
+OCR 默认启用 `onnx_ops`，公式 ONNX 路径也已接入内置算子库，用于 CUDA 算子支持与优化。原生库及其 CUDA/cuDNN 要求、构建方法和平台验证范围见 [算子库说明](native/onnx_ops/README.md)。这些原生库与 `onnxruntime-gpu` 是不同组件，安装 Runtime 不代表原生库及其系统依赖都已就绪。
+
+```python
 # 在 Python 中指定 GPU（必须在导入 rapid_doc 之前设置）
 import os
 # 使用默认 GPU（cuda:0）
@@ -580,7 +591,7 @@ for output in outputs:
 - [x] 文本型pdf，使用pypdfium2提取原始图片（默认截图会导致清晰度降低和图片边界可能丢失部分）
 - [x] 表格内公式提取，表格内图片提取
 - [x] 优化阅读顺序，支持多栏、竖排等复杂版面恢复
-- [x] 公式支持torch推理，可用GPU加速
+- [x] OCR 和公式默认使用 ONNX Runtime，支持 CUDA GPU 推理；公式仍可显式选择 Torch
 - [x] 版面、表格模型支持openvino
 - [x] markdown转docx、html
 - [x] 支持 PP-DocLayoutV2 版面识别+阅读顺序

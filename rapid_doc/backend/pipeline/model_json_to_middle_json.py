@@ -4,6 +4,7 @@
 """
 import os
 from tqdm import tqdm
+from rapid_doc.backend.utils.html_image_utils import replace_inline_base64_img_src
 
 from rapid_doc.backend.utils.utils import cross_page_table_merge
 from rapid_doc.model.custom import CustomBaseModel
@@ -60,6 +61,14 @@ def page_model_info_to_page_info(
     page_pil_img = image_dict["img_pil"]
     page_img_md5 = bytes_md5(page_pil_img.tobytes())
     page_w, page_h = map(int, page_dict['size'])
+
+    # 原生表格的单元格图片与普通 PDF 图片使用同一输出目录。
+    for item in page_model_info['layout_dets']:
+        markup = item.get('html', '')
+        if 'data:image/' in markup:
+            image_dir = os.path.basename(str(getattr(image_writer, '_parent_dir', 'images')))
+            item['html'] = replace_inline_base64_img_src(
+                markup, image_writer, page_index, image_path_prefix=f'{image_dir}/' if image_dir else '')
     
     magic_model = MagicModel(page_model_info, scale)
     

@@ -4,7 +4,7 @@ import re
 
 from loguru import logger
 
-from rapid_doc.backend.utils.office_image import is_vector_image_part, serialize_office_image
+from rapid_doc._vendor.docvortex_core.analyzers.native.office.image import is_vector_image_part, serialize_office_image
 from rapid_doc.utils.enum_class import BlockType, ContentType
 from rapid_doc.utils.hash_utils import str_sha256
 
@@ -101,7 +101,8 @@ def save_base64_image(b64_data_uri: str, image_writer, page_index: int):
     return img_path
 
 
-def replace_inline_base64_img_src(markup: str, image_writer, page_index: int) -> str:
+def replace_inline_base64_img_src(markup: str, image_writer, page_index: int,
+                                 image_path_prefix: str = "") -> str:
     """Replace inline base64 image sources in HTML-like markup with local paths."""
     if not markup or not image_writer or "base64," not in markup:
         return markup
@@ -109,7 +110,7 @@ def replace_inline_base64_img_src(markup: str, image_writer, page_index: int) ->
     def _replace_src(match, _writer=image_writer, _idx=page_index):
         img_path = save_base64_image(match.group(1), _writer, _idx)
         if img_path:
-            return f'src="{img_path}"'
+            return f'src="{image_path_prefix}{img_path}"'
         return match.group(0)
 
     return re.sub(

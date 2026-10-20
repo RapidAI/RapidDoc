@@ -94,6 +94,11 @@ class RapidLayoutModel(object):
                 layout = convert_docvortex_layout(
                     blocks, image.shape[1], image.shape[0], set(self.markdown_ignore_labels)
                 )
+                if page_dict.get('_docvortex_ocr'):
+                    for item in layout:
+                        # Preserve OCR for unreliable font mappings, including table text.
+                        item.pop('html', None)
+                        item.pop('native_text', None)
                 reason = None if self.docvortex_native_only else docvortex_layout_fallback_reason(
                     blocks, layout, image.shape[1], image.shape[0],
                     native_char_count=len(page_dict.get("chars") or []),

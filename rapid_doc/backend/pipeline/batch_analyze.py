@@ -438,6 +438,9 @@ class BatchAnalyze:
                     seal_crop_bgr = cv2.cvtColor(seal_img, cv2.COLOR_RGB2BGR)
                     seal_ocr_items.append((seal_crop_bgr, layout_re))
 
+        if not seal_ocr_items:
+            return
+
         seal_ocr_model = None
         for seal_crop_bgr, layout_re in tqdm(seal_ocr_items, desc="Seal Predict"):
             if (isinstance(self.model.ocr_model, CustomBaseModel)

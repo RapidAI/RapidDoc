@@ -27,7 +27,8 @@ from rapidocr.utils.utils import has_chinese_char, quads_to_rect_bbox
 
 from rapid_doc.utils.model_utils import import_package
 from importlib.metadata import version
-rapidocr_version = version("rapidocr")
+from packaging.version import Version
+rapidocr_version = Version(version("rapidocr"))
 _patches_applied = False
 # print(f"rapidocr_version=={rapidocr_version}")
 
@@ -46,7 +47,7 @@ def patch_torch_ocr():
     torch_ = import_package("torch")
     if not torch_:
         return  # 未安装 PyTorch，跳过
-    if rapidocr_version >= "3.4.3":
+    if rapidocr_version >= Version("3.4.3"):
         from rapidocr.inference_engine.pytorch.networks.backbones.rec_lcnetv3 import LearnableRepLayer, ConvBNLayer
     else:
         from rapidocr.networks.backbones.rec_lcnetv3 import LearnableRepLayer, ConvBNLayer
@@ -94,7 +95,7 @@ def patch_torch_ocr():
     LearnableRepLayer._fuse_bn_tensor = _fuse_bn_tensor2
 
     # 替换 rapidocr 的 TorchInferSession
-    if rapidocr_version >= "3.4.3":
+    if rapidocr_version >= Version("3.4.3"):
         from rapidocr.inference_engine.pytorch import main as rapidocr_torch
         import rapidocr.inference_engine.pytorch as rapidocr_torch_pkg
     else:

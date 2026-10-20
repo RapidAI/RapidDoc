@@ -16,9 +16,9 @@ RapidDoc also supports custom OCR, formula, and table models by implementing the
 
 ## Features
 
-- OCR recognition powered by [RapidOCR](https://github.com/RapidAI/RapidOCR), with multiple inference engines.
+- OCR recognition powered by [RapidOCR](https://github.com/RapidAI/RapidOCR), using ONNX Runtime by default on CPU/CUDA, with other engines available through explicit configuration.
 - Layout analysis with PP-DocLayout models, including PP-DocLayoutV3 as the default.
-- Formula recognition with PP-FormulaNet_plus models.
+- Formula recognition with PP-FormulaNet_plus models, using ONNX Runtime by default on CPU/CUDA. Explicit Torch configuration requires installing the corresponding Torch dependencies.
 - Table recognition with table classification, wired-table recognition, and SLANET_plus/UNITABLE for wireless tables.
 - Reading-order recovery using layout model output or PP-StructureV3-style XY-cut logic.
 - Native Office parsing for Word, PowerPoint, and Excel files.
@@ -30,27 +30,29 @@ RapidDoc also supports custom OCR, formula, and table models by implementing the
 Install the CPU version:
 
 ```bash
-pip install rapid-doc[cpu]
+pip install "rapid-doc[cpu]"
 ```
 
 Install the GPU version:
 
 ```bash
-pip install rapid-doc[gpu]
+pip install "rapid-doc[gpu]"
 ```
+
+The default pipeline models (OCR, layout, formula, and table) use ONNX Runtime. The CPU extra installs `onnxruntime`; the GPU extra installs `onnxruntime-gpu` without adding the CPU runtime distribution or Torch by default. Choose one runtime distribution: both expose the same `onnxruntime` import name and should not be installed together. Native Office and DocVortex rule parsing do not use neural inference.
 
 Install from source:
 
 ```bash
 git clone https://github.com/RapidAI/RapidDoc.git
 cd RapidDoc
-pip install -e .[cpu]
+pip install -e ".[cpu]"
 ```
 
 For GPU development:
 
 ```bash
-pip install -e .[gpu]
+pip install -e ".[gpu]"
 ```
 
 ## GPU Inference
@@ -64,7 +66,9 @@ os.environ["MINERU_DEVICE_MODE"] = "cuda"    # cuda:0
 # os.environ["MINERU_DEVICE_MODE"] = "cuda:1"
 ```
 
-The GPU package installs `onnxruntime-gpu`. Make sure your CUDA/cuDNN environment matches the ONNXRuntime CUDA execution provider requirements.
+The GPU extra installs `onnxruntime-gpu` within the project dependency constraint (currently `<=1.23.0`). Match CUDA/cuDNN to the [CUDA Execution Provider requirements](https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html#requirements). Default OCR and formula inference use ONNX Runtime and do not require switching to Torch.
+
+OCR enables `onnx_ops` by default, and the formula ONNX path also integrates the bundled CUDA operator library. See the [operator library documentation](native/onnx_ops/README.md) for native-library CUDA/cuDNN requirements, build instructions, and platform validation coverage. The operator library is separate from `onnxruntime-gpu`; installing the runtime alone does not establish that the native library and its system dependencies are ready.
 
 ## Quick Start
 
@@ -130,3 +134,7 @@ RapidDoc is evaluated on OmniDocBench v1.6 using a pipeline with PP-DocLayoutV3,
 ## License
 
 This project is released under the [Apache 2.0 license](LICENSE).
+
+## Built-in native parsing
+
+PDF rule layout and tables use the bundled DocVortex core. DOC/DOCX, XLS/XLSX and PPT/PPTX use native parsers without LibreOffice conversion. The core uses Python kernels and no fasttext language model. Install `rapid-doc[cpu]` or `rapid-doc[gpu]` for the inference runtime; the GPU extra does not install the CPU runtime distribution. See [migration notes](docs/migrations/docvortex-baseline.md).

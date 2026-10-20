@@ -5,20 +5,7 @@ from rapid_doc.utils.config_reader import get_latex_delimiter_config
 from rapid_doc.backend.pipeline.para_split import ListLineTag
 from rapid_doc.utils.enum_class import BlockType, ContentType, MakeMode
 from rapid_doc.utils.guess_suffix_or_lang import guess_language_by_text
-from rapid_doc.utils.language import detect_lang
-
-
-def __is_hyphen_at_line_end(line):
-    """Check if a line ends with one or more letters followed by a hyphen.
-
-    Args:
-    line (str): The line of text to check.
-
-    Returns:
-    bool: True if the line ends with one or more letters followed by a hyphen, False otherwise.
-    """
-    # Use regex to check if the line ends with one or more letters followed by a hyphen
-    return bool(re.search(r'[A-Za-z]+-\s*$', line))
+from rapid_doc.utils.text_boundary import resolve_text_line_boundary, remove_invalid_surrogates
 
 
 def make_blocks_to_markdown(paras_of_layout,
@@ -143,63 +130,73 @@ display_right_delimiter = delimiters['display']['right']
 inline_left_delimiter = delimiters['inline']['left']
 inline_right_delimiter = delimiters['inline']['right']
 
+def _inline_separator(previous, current):
+    left, right = str(previous.get('content', '')), str(current.get('content', ''))
+    if previous['type'] != ContentType.TEXT or current['type'] != ContentType.TEXT:
+        return ' '
+    if left.endswith((' ', '\t')) or right.startswith((' ', '\t')):
+        return ' '
+    first, second = previous.get('bbox'), current.get('bbox')
+    if first and second:
+        height = min(first[3] - first[1], second[3] - second[1])
+        if height > 0:
+            return ' ' if second[0] - first[2] > 0.15 * height else ''
+    # No geometry: use visible boundary characters without rewriting a span.
+    return resolve_text_line_boundary(left, next_content=right)[1]
+
+
 def merge_para_with_text(para_block):
-    is_algorithm_block = _is_algorithm_block(para_block)
-    if is_algorithm_block:
+    if _is_algorithm_block(para_block):
         return _merge_algorithm_block(para_block)
-
-    block_text = ''
+    rendered, raw = '', ''
+    previous_tail = None
     for line in para_block['lines']:
+        line_rendered, line_raw = '', ''
+        previous = None
+        first = None
         for span in line['spans']:
-            if span['type'] in [ContentType.TEXT]:
-                span['content'] = full_to_half(span['content'])
-                block_text += span['content']
-    block_lang = detect_lang(block_text)
-
-    para_text = ''
-    for i, line in enumerate(para_block['lines']):
-
-        if i >= 1 and line.get(ListLineTag.IS_LIST_START_LINE, False):
-            para_text += '  \n'
-
-        for j, span in enumerate(line['spans']):
-
-            span_type = span['type']
-            content = ''
-            if span_type == ContentType.TEXT:
-                content = escape_special_markdown_char(span['content'])
-            elif span_type == ContentType.INLINE_EQUATION:
-                if span.get('content', ''):
-                    content = f"{inline_left_delimiter}{span['content']}{inline_right_delimiter}"
-            elif span_type == ContentType.INTERLINE_EQUATION:
-                if span.get('content', ''):
-                    content = f"\n{display_left_delimiter}\n{span['content']}\n{display_right_delimiter}\n"
-            elif span_type == ContentType.CHECKBOX:
-                if span.get('content', ''):
-                    content = span['content']
-            content = content.strip()
-
-            if content:
-                langs = ['zh', 'ja', 'ko']
-                # logger.info(f'block_lang: {block_lang}, content: {content}')
-                if block_lang in langs: # 中文/日语/韩文语境下，换行不需要空格分隔,但是如果是行内公式结尾，还是要加空格
-                    if j == len(line['spans']) - 1 and span_type not in [ContentType.INLINE_EQUATION]:
-                        para_text += content
-                    else:
-                        para_text += f'{content} '
-                else:
-                    if span_type in [ContentType.TEXT, ContentType.INLINE_EQUATION, ContentType.CHECKBOX]:
-                        # 如果span是line的最后一个且末尾带有-连字符，那么末尾不应该加空格,同时应该把-删除
-                        if j == len(line['spans'])-1 and span_type == ContentType.TEXT and __is_hyphen_at_line_end(content):
-                            para_text += content[:-1]
-                        else:  # 西方文本语境下 content间需要空格分隔
-                            para_text += f'{content} '
-                    elif span_type == ContentType.INTERLINE_EQUATION:
-                        para_text += content
+            kind = span['type']
+            value = remove_invalid_surrogates(str(span.get('content', '')))
+            if kind == ContentType.TEXT:
+                value = full_to_half(value)
+                content = escape_special_markdown_char(value).strip()
+            elif kind == ContentType.INLINE_EQUATION:
+                content = f"{inline_left_delimiter}{value}{inline_right_delimiter}" if value else ''
+            elif kind == ContentType.INTERLINE_EQUATION:
+                content = f"\n{display_left_delimiter}\n{value}\n{display_right_delimiter}\n" if value else ''
+            elif kind == ContentType.CHECKBOX:
+                content = value.strip()
             else:
                 continue
-
-    return para_text
+            if not content:
+                continue
+            normalized = {**span, 'content': value}
+            separator = _inline_separator(previous, normalized) if previous else ''
+            line_rendered += separator + content
+            line_raw += separator + value.strip()
+            first = first or normalized
+            previous = normalized
+        if not line_rendered:
+            continue
+        if rendered:
+            if line.get(ListLineTag.IS_LIST_START_LINE, False):
+                separator = '  \n'
+                raw += '\n'
+            elif previous_tail['type'] == ContentType.TEXT and first['type'] == ContentType.TEXT:
+                adjusted, separator = resolve_text_line_boundary(raw, next_content=line_raw)
+                if len(adjusted) < len(raw) and rendered.endswith('-'):
+                    rendered = rendered[:-1]
+                elif len(adjusted) < len(raw) and rendered[-1:] in {'\u00ad', '\u2010', '\u2011', '\u2043'}:
+                    rendered = rendered[:-1]
+                raw = adjusted
+            else:
+                separator = ' '
+            rendered += separator
+            raw += separator
+        rendered += line_rendered
+        raw += line_raw
+        previous_tail = previous
+    return rendered.strip()
 
 
 def _merge_algorithm_block(para_block):

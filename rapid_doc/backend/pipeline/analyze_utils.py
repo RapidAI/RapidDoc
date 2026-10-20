@@ -15,7 +15,7 @@ from .model_init import AtomModelSingleton
 from .model_list import AtomicModel
 from ...model.table.utils import normalize_table_ocr_text
 from ...model.table.rule_table import build_rule_table, build_track_table
-from ...model.docvortex_adapter import recover_docvortex_table
+from ...model.docvortex_adapter import recover_docvortex_table, use_docvortex_table_rules
 from ...utils.bbox_utils import normalize_to_int_bbox
 from ...utils.boxbase import rotate_table_image
 from ...utils.enum_class import CategoryId
@@ -356,7 +356,6 @@ def _process_single_table(
     # 表格配置
     table_force_ocr = table_config.get("force_ocr", False)
     skip_text_in_image = table_config.get("skip_text_in_image", True)
-    use_img2table = table_config.get("use_img2table", False)
     table_use_word_box = table_config.get("use_word_box", False)
     table_formula_enable = table_config.get("table_formula_enable", True)
     table_image_enable = table_config.get("table_image_enable", True)
@@ -382,8 +381,7 @@ def _process_single_table(
     table_class_score = 1.0
     pdf_not_rotate = page_dict.get("rotate_label") not in ["90", "180", "270"]
     if (
-        use_rule_table and rule_table_engine == "docvortex"
-        and not table_force_ocr and not table_res_dict['ocr_enable']
+        use_docvortex_table_rules(table_config) and not table_res_dict['ocr_enable']
         and pdf_not_rotate and '_source_pdf_bytes' in page_dict
     ):
         poly = table_res_dict['table_res']['poly']
@@ -543,7 +541,7 @@ def _process_single_table(
     html_code = table_model.predict(
         table_res_dict['table_img'], ocr_result,
         fill_image_res, adjusted_mfdetrec_res,
-        skip_text_in_image, use_img2table,
+        skip_text_in_image,
         **predict_kwargs,
     )
 

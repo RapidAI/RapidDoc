@@ -9,6 +9,7 @@ from ...model.formula.rapid_formula_model import RapidFormulaModel
 from ...model.ocr.rapid_ocr import RapidOcrModel
 from ...model.orientation.rapid_orientation_model import RapidOrientationModel
 from ...model.table.rapid_table import RapidTableModel
+from ...model.docvortex_adapter import use_docvortex_table_rules
 from ...utils.hash_utils import make_hashable
 
 def table_model_init(lang=None, ocr_config=None, table_config=None):
@@ -170,7 +171,7 @@ class MineruPipelineModel:
         # init table model
         if self.apply_table:
             self.table_model = None
-            if self.table_config.get('rule_table_engine') != 'docvortex' or self.table_config.get('custom_model') is not None:
+            if not use_docvortex_table_rules(self.table_config) or self.table_config.get('custom_model') is not None:
                 self.table_model = atom_model_manager.get_atom_model(
                     atom_model_name=AtomicModel.Table,
                     lang=self.lang,

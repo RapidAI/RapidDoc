@@ -22,9 +22,8 @@ from rapid_doc.data.data_reader_writer import FileBasedDataWriter
 from rapid_doc.utils.draw_bbox import draw_layout_bbox, draw_span_bbox
 from rapid_doc.utils.enum_class import MakeMode
 from rapid_doc.utils.config_reader import get_processing_window_size
-from rapid_doc.utils.guess_suffix_or_lang import guess_suffix_by_bytes, guess_suffix_by_path
-from rapid_doc.utils.office_converter import convert_legacy_office_to_modern
-from rapid_doc.cli.common import convert_pdf_bytes_to_bytes_by_pypdfium2, prepare_env, read_fn, office_suffixes, old_office_suffixes
+from rapid_doc.utils.guess_suffix_or_lang import guess_suffix_by_bytes
+from rapid_doc.cli.common import convert_pdf_bytes_to_bytes_by_pypdfium2, prepare_env, read_fn, office_suffixes
 from rapid_doc.backend.office.office_analyze import office_analyze
 from rapid_doc.backend.office.office_middle_json_mkcontent import union_make as office_union_make
 from rapid_doc.backend.pipeline.pipeline_analyze import doc_analyze as pipeline_doc_analyze
@@ -194,23 +193,16 @@ def _build_config():
     from rapid_doc.model.custom.paddleocr_vl.paddleocr_vl import PaddleOCRVLTableModel, PaddleOCRVLOCRModel, PaddleOCRVLFormulaModel
     layout_config = {
         # "model_type": LayoutModelType.PP_DOCLAYOUTV3,
-        # "docvortex_mode": "rule_plus_s",  # off / rule / rule_plus_s
-        # "conf_thresh": 0.4,
-        # "batch_num": 1,
-        # "model_dir_or_path": r"C:\ocr\models\ppmodel\layout\PP-DocLayoutV3\pp_doclayoutv3.onnx",
+        # "docvortex_mode": "off",  # off / rule / rule_plus_s
         # "markdown_ignore_labels": ["number", "footnote", "header", "header_image", "footer", "footer_image", "aside_text",],
     }
 
     ocr_config = {
         # "custom_model": PaddleOCRVLOCRModel(),
-        # "Det.model_path": r"C:\ocr\models\ppmodel\ocr\v4\ch_PP-OCRv4_det_infer\openvino\ch_PP-OCRv4_det_infer.onnx",
-        # "Rec.model_path": r"C:\ocr\models\ppmodel\ocr\v4\ch_PP-OCRv4_rec_infer\openvino\ch_PP-OCRv4_rec_infer.onnx",
         # "Rec.rec_batch_num": 1,
-
         # 新增的自定义参数
-        # "engine_type": OCREngineType.TORCH, # 统一设置推理引擎
+        # "engine_type": OCREngineType.ONNXRUNTIME, # 统一设置推理引擎
         # "Det.rec_batch_num": 8, # Det批处理大小
-
         # 文本检测框模式：auto（默认）、txt、ocr
         # "use_det_mode": 'auto' #（1、txt只会从pypdfium2获取文本框，保留pdf中的图片，2、ocr只会从OCR-det获取文本框，3、auto先从pypdfium2获取文本框，提取不到再使用OCR-det提取）
     }
@@ -218,11 +210,8 @@ def _build_config():
     formula_config = {
         # "custom_model": PaddleOCRVLFormulaModel(),
         # "model_type": FormulaModelType.PP_FORMULANET_PLUS_M,
-        # "engine_type": FormulaEngineType.TORCH,
         # "formula_level": 1, # 公式识别等级，默认为0，全识别。1:仅识别行间公式，行内公式不识别
         # "batch_num": 1,
-        # "model_dir_or_path": r"C:\ocr\models\ppmodel\formula\PP-FormulaNet_plus-S\pp_formulanet_plus_s.onnx",
-        # "dict_keys_path": "D:\CodeProjects\doc\RapidAI\model\pp_formulanet_plus_m_inference.yml", #yml字典路径（torch使用）
     }
 
     table_config = {
@@ -232,7 +221,6 @@ def _build_config():
         # "force_ocr": False, # 表格文字，是否强制使用ocr，默认 False 根据 parse_method 来判断是否需要ocr还是从pdf中直接提取文本
         # 注：文字版pdf可以使用pypdfium2提取到表格内图片，扫描版或图片需要使用PP_DOCLAYOUT_PLUS_L/PP_DOCLAYOUTV2版面识别模型，才能识别到表格内的图片
         # "skip_text_in_image": True, # 是否跳过表格里图片中的文字（如表格单元格中嵌入的图片、图标、扫描底图等）
-        # "use_img2table": False, # 是否优先使用img2table库提取表格，需要手动安装（pip install img2table），基于opencv识别准确度不如使用模型，但是速度很快，默认关闭
 
         # "model_type": TableModelType.SLANETPLUS,
         # "model_type": TableModelType.UNET_SLANET_PLUS,  # （默认） 有线表格使用unet，无线表格使用slanet_plus
@@ -446,9 +434,6 @@ def parse_doc(
         file_name_list = []
         pdf_bytes_list = []
         for path in path_list:
-            file_suffix = guess_suffix_by_path(path)
-            if file_suffix in old_office_suffixes:
-                path = convert_legacy_office_to_modern(path)
             file_name = str(Path(path).stem)
             pdf_bytes = read_fn(path)
             file_name_list.append(file_name)

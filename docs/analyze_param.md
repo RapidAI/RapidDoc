@@ -32,11 +32,10 @@ os.environ['USE_DOC_ORIENTATION_CLASSIFY'] = "true"
 ```
 #### 1、使用gpu推理
 ```bash
-# 在安装完 rapid_doc 之后，卸载 cpu 版的 onnxruntime
-pip uninstall onnxruntime
-# 这里一定要确定onnxruntime-gpu与GPU对应
-# 可参见https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html#requirements
-pip install onnxruntime-gpu
+# 新环境直接选择 GPU extra，不会自动安装 CPU 版 Runtime
+pip install "rapid-doc[gpu]"
+# CUDA/cuDNN 对应要求：
+# https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html#requirements
 ```
 ```python
 # 在 Python 中指定 GPU（必须在导入 rapid_doc 之前设置）
@@ -57,6 +56,7 @@ os.environ['PADDLEOCRVL_VL_VL_REC_SERVER_URL'] = "http://localhost:8118/v1"
 |  参数名   |   说明    |         默认值         | 备注 |
 | :-------: |:-------:|:-------------------:|:--:|
 | model_type |   模型    | PP_DOCLAYOUTv3 |  |
+| docvortex_mode | 内置 PDF 规则解析 | off | rule：原生优先，失败回退 model_type；rule_plus_s：额外补公式/印章；无需安装外部 DocVortex |
 | layout_shape_mode |  版面框形状  | PP_DOCLAYOUTv3 | "rect" / "auto" |
 | conf_thresh  |   阈值    |     0.5（_S为0.2）     |  |
 | batch_num |  批处理大小  |          1          |  |
@@ -81,7 +81,7 @@ layout_config = {
 |        参数名        |            说明            |                      默认值                      |                                             备注                                              |
 |:-----------------:|:------------------------:|:---------------------------------------------:|:-------------------------------------------------------------------------------------------:|
 |   custom_model    |          自定义模型           |                                               |                                                                                             |
-|    engine_type    |       det和rec的推理引擎       |           OPENVINO（cpu）、TORCH（gpu）            |      
+|    engine_type    |       det和rec的推理引擎       |           ONNXRUNTIME            |      
 |   use_det_mode    | 文本检测框模式：auto（默认）、txt、ocr |                     auto                      | 1、txt只会从pypdfium2获取文本框，保留pdf中的图片<br/>2、ocr只会从OCR-det获取文本框<br/>3、auto先从pypdfium2获取文本框，提取不到再使用OCR-det提取 |
 | Det.rec_batch_num |         rec批处理大小         |                       1                       |                                                                                             |
 > [ocr_config想更深入了解，请移步rapidocr config.yaml参数解释](https://rapidai.github.io/RapidOCRDocs/install_usage/api/RapidOCR/)
@@ -101,7 +101,7 @@ ocr_config = {
     # "Rec.model_type": OCRModelType.SERVER,
 
     # 新增的自定义参数
-    # "engine_type": OCREngineType.TORCH, # 统一设置推理引擎
+    # "engine_type": OCREngineType.ONNXRUNTIME, # 统一设置推理引擎
     # "Det.rec_batch_num": 1, # Det批处理大小
 
     # "use_det_mode": 'auto' # 文本检测框模式：auto（默认）、txt、ocr
@@ -114,10 +114,10 @@ ocr_config = {
 |:-----------------:|:-------:|:--------------------:|:---------------------------------:|
 |   custom_model    |  自定义模型  |  |                                   |
 |    model_type     |   模型    | PP_FORMULANET_PLUS_M |                                   |
-|    engine_type    |  推理引擎   | ONNXRUNTIME（cpu）、TORCH（gpu） |  torch仅支持PP_FORMULANET_PLUS_M模型   |
+|    engine_type    |  推理引擎   | ONNXRUNTIME |                                   |
 |   formula_level   | 公式识别等级  |          0           | 公式识别等级，默认为0，全识别。1:仅识别行间公式，行内公式不识别 |
 |     batch_num     |  批处理大小  |          1           |                                   |
-| model_dir_or_path |  模型路径   |         None         |                 不设置自动下载                  |
+| model_dir_or_path |  模型路径   |         None         |              不设置自动下载              |
 |  dict_keys_path   | yml字典路径 |         None         |         torch推理使用，不设置自动下载         |
 示例：
 
@@ -139,11 +139,11 @@ formula_config = {
 |                 custom_model                 |           自定义模型           |                                |                                                               |
 |                  force_ocr                   |       表格文字是否强制使用ocr       |             False              |            根据 parse_method 来判断是否需要ocr还是从pdf中直接提取文本            |
 |              skip_text_in_image              |       是否跳过表格里图片中的文字       |              True              |                  如表格单元格中嵌入的图片、图标、扫描底图等，里面的文字                  |
+|              rule_table_engine              | 内置规则表格引擎 | docvortex | docvortex：迁入的原生表格；pdfium：原有 PDFium 规则实现 |
 |                use_rule_table                |     优先基于 PDFium 规则解析      |             True              |          非 OCR PDF 的高置信度有线表格优先使用 PDFium 原生字符与矢量线解析            |
-|           rule_table_score_threshold         | 规则 HTML 低于该分数时回退当前配置的表格模型 |             0.90              | 需要手动安装（pip install img2table），基于opencv识别准确度不如使用模型，但是速度很快，默认关闭 |
-|                use_img2table                 |   是否优先使用img2table库提取表格    |             False              | 需要手动安装（pip install img2table），基于opencv识别准确度不如使用模型，但是速度很快，默认关闭 |
+|           rule_table_score_threshold         | 规则 HTML 低于该分数时回退当前配置的表格模型 |             0.90              | 原生规则表格低于阈值时回退当前配置的表格模型 |
 |                  model_type                  |            模型             |        UNET_SLANET_PLUS        |                 有线表格使用unet，无线表格使用slanet_plus                  |
-|                 engine_type                  |           推理引擎            | OPENVINO（cpu）、ONNXRUNTIME（gpu） |                             None                              |  torch仅支持UNITABLE模型   |
+|                 engine_type                  |           推理引擎            | ONNXRUNTIME |                             None                              |  torch仅支持UNITABLE模型   |
 |                 use_word_box                 |        使用单字坐标匹配单元格        |              False              |                                                               |
 |              use_compare_table               |   启用表格结果比较（同时跑有线/无线并比对）   |             False              |       如果开启，分类判断为有线表格时，也会用无线表格模型识别，然后比较两个模型选择有效单元格识别结果多的       |
 |             table_formula_enable             |          表格内公式识别          |              True              |                                                               |
@@ -168,7 +168,6 @@ table_config = {
     # "force_ocr": False, # 表格文字，是否强制使用ocr，默认 False 根据 parse_method 来判断是否需要ocr还是从pdf中直接提取文本
     # 注：文字版pdf可以使用pypdfium2提取到表格内图片，扫描版或图片需要使用PP_DOCLAYOUT_PLUS_L/PP_DOCLAYOUTv2/PP_DOCLAYOUTv3版面识别模型，才能识别到表格内的图片
     # "skip_text_in_image": True, # 是否跳过表格里图片中的文字（如表格单元格中嵌入的图片、图标、扫描底图等）
-    # "use_img2table": False, # 是否优先使用img2table库提取表格，需要手动安装（pip install img2table），基于opencv识别准确度不如使用模型，但是速度很快，默认关闭
 
     # "model_type": TableModelType.SLANETPLUS,
     # "model_type": TableModelType.UNET_SLANET_PLUS,  # （默认） 有线表格使用unet，无线表格使用slanet_plus
@@ -218,3 +217,8 @@ image_config = {
 }
 middle_json = pipeline_result_to_middle_json(model_list, images_list, pdf_dict, image_writer, _lang, _ocr_enable, p_formula_enable, ocr_config=ocr_config, image_config=image_config)
 ```
+### Office 原生解析
+
+doc/docx、xls/xlsx（含 xlsm）、ppt/pptx 统一使用内置解析器，支持路径、bytes、二进制流、URL 和批处理。已有扩展名用作分派依据；无扩展名时优先识别 OOXML/OLE 结构。不会自动调用 LibreOffice 转为新版 Office。旧 converter、标签字符串 spans、fasttext 接口和 docvortex extra 已删除。
+
+DOC 以 section 分页、XLS 以可见 sheet 分页、PPT 以 slide 分页；不恢复 Word 的打印分页，也不重新计算 Excel 公式。加密文件明确报错，损坏/缺失内容/资源超限由解析器抛出错误。迁移来源及测试见 [迁移记录](migrations/docvortex-baseline.md)。

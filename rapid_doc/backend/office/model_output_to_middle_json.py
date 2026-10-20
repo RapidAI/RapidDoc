@@ -134,7 +134,9 @@ def result_to_middle_json(model_output_blocks_list, image_writer):
         for block in page_info.get("para_blocks", []):
             if block.get("type") != BlockType.TITLE:
                 continue
-            level = block.get("level", 1)
+            level = block.pop("_numbering_depth", 1)
+            if level == 0:
+                continue
             if block.get("is_numbered_style", False):
                 existing_section_number = block.get("section_number")
                 if isinstance(existing_section_number, str) and existing_section_number.strip():

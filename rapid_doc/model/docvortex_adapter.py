@@ -1,13 +1,25 @@
-"""Optional DocVortex adapters for native-text PDF layout and tables."""
+"""Adapters for the built-in native PDF layout and table parsing core."""
 
 from __future__ import annotations
 
+import math
 import re
+from collections import Counter
 
 from rapid_doc.utils.enum_class import CategoryId
 
 
 DOCVORTEX_MODES = {"off", "rule", "rule_plus_s"}
+
+
+def use_docvortex_table_rules(table_config: dict | None) -> bool:
+    """Resolve the native table route consistently before preparing or parsing pages."""
+    config = table_config or {}
+    return (
+        config.get("use_rule_table", True)
+        and config.get("rule_table_engine", "docvortex") == "docvortex"
+        and not config.get("force_ocr", False)
+    )
 
 
 def get_docvortex_mode(layout_config: dict | None) -> str:
@@ -180,20 +192,10 @@ _LABELS = {
 }
 
 
-def _require_docvortex():
-    try:
-        from docvortex.document.pdf import PDFDocument
-    except ImportError as exc:
-        raise ImportError(
-            "DocVortex support requires `pip install rapid-doc[docvortex]`"
-        ) from exc
-    return PDFDocument
-
-
 def analyze_docvortex_layout(pdf_bytes: bytes) -> list[list[dict]]:
     """Run the document-level native pipeline once, preserving cross-page context."""
-    PDFDocument = _require_docvortex()
-    from docvortex.analyzers.native import PdfModel
+    from rapid_doc._vendor.docvortex_core.document.pdf import PDFDocument
+    from rapid_doc._vendor.docvortex_core.analyzers.native import PdfModel
 
     with PDFDocument(pdf_bytes) as document:
         return PdfModel().predict(document)
@@ -280,6 +282,9 @@ def convert_docvortex_layout(blocks: list[dict], width: int, height: int,
             "score": 1.0,
         }
         content = block.get("content")
+        if item["category_id"] in {CategoryId.Text, CategoryId.Title}:
+            # Native ownership has already separated foreground text from images.
+            item["native_text_region"] = True
         if ((label in {"caption", "table_caption", "footnote", "page_footnote"}
              or (rotated and category_id in (CategoryId.Text, CategoryId.Title)))
                 and item["category_id"] != CategoryId.Abandon):
@@ -291,15 +296,42 @@ def convert_docvortex_layout(blocks: list[dict], width: int, height: int,
     return output
 
 
+def _table_text_angle(table_page, table_bbox) -> int:
+    """Infer visual direction from visible characters owned by this region."""
+    angles = Counter()
+    x0, y0, x1, y1 = table_bbox
+    for char in table_page.geometry.chars:
+        bbox = char.get("bbox")
+        if not bbox or not str(char.get("char") or "").strip():
+            continue
+        cx, cy = (bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2
+        if not (x0 <= cx <= x1 and y0 <= cy <= y1):
+            continue
+        try:
+            # Writing direction uses visual coordinates, including PDF /Rotate,
+            # and avoids mistaking italic glyph shear for baseline rotation.
+            degrees = math.degrees(float(char.get("writing_angle", char.get("rotation", 0)) or 0))
+        except (TypeError, ValueError):
+            continue
+        if not math.isfinite(degrees):
+            continue
+        nearest = round(degrees / 90) * 90
+        if abs(degrees - nearest) <= 5:
+            angles[nearest % 360] += 1
+    return angles.most_common(1)[0][0] if angles else 0
+
+
 def recover_docvortex_table(page_dict: dict, table_bbox: tuple[float, float, float, float],
-                            angle: int = 0):
+                            angle: int | None = None):
     """Reuse detached page primitives for all table regions on one page."""
-    PDFDocument = _require_docvortex()
-    from docvortex.analyzers.pdf import prepare_table_page, recover_table_region
+    from rapid_doc._vendor.docvortex_core.document.pdf import PDFDocument
+    from rapid_doc._vendor.docvortex_core.analyzers.pdf import prepare_table_page, recover_table_region
 
     table_page = page_dict.get("_docvortex_table_page")
     if table_page is None:
         with PDFDocument(page_dict["_source_pdf_bytes"]) as document:
             table_page = prepare_table_page(document[page_dict["_source_page_index"]])
         page_dict["_docvortex_table_page"] = table_page
+    if angle is None:
+        angle = _table_text_angle(table_page, table_bbox)
     return recover_table_region(table_page, table_bbox, angle=angle)

@@ -1,6 +1,7 @@
 """Optional CUDA custom-op sessions; ordinary CPU OCR keeps its original path."""
 
 import warnings
+from packaging.version import Version
 
 
 def configure_cuda_onnx(params, device, rapidocr_version):
@@ -13,8 +14,7 @@ def configure_cuda_onnx(params, device, rapidocr_version):
         return
     params.setdefault("EngineConfig.onnxruntime.use_cuda", True)
     gpu_id = int(device.split(":")[1]) if ":" in device else 0
-    parts = tuple(int(p) for p in rapidocr_version.split(".")[:3])
-    field = "gpu_id" if parts < (3, 4, 3) else "cuda_ep_cfg.device_id"
+    field = "gpu_id" if Version(str(rapidocr_version)) < Version("3.4.3") else "cuda_ep_cfg.device_id"
     params.setdefault(f"EngineConfig.onnxruntime.{field}", gpu_id)
 
 

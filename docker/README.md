@@ -6,6 +6,8 @@
 
 如果需要自己构建镜像
 
+Dockerfile 已移除本机 LibreOffice，六种 Office 格式（DOC/DOCX、XLS/XLSX、PPT/PPTX）由原生解析器处理；其他格式转 PDF 仍需外部 Gotenberg 服务。发布原生解析版本后，手动更新 Dockerfile 中的 `rapid-doc` 版本号，再构建镜像。
+
 ### 执行构建命令
 
 ```bash

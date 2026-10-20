@@ -22,11 +22,10 @@ from rapid_doc.utils.pdf_page_id import get_end_page_id
 
 pdf_suffixes = ["pdf"]
 image_suffixes = ["png", "jpeg", "jp2", "webp", "gif", "bmp", "jpg", "tiff"]
-docx_suffixes = ["docx"]
-pptx_suffixes = ["pptx"]
-xlsx_suffixes = ["xlsx", "xlsm"]
+docx_suffixes = ["doc", "docx"]
+pptx_suffixes = ["ppt", "pptx"]
+xlsx_suffixes = ["xls", "xlsx", "xlsm"]
 office_suffixes = docx_suffixes + pptx_suffixes + xlsx_suffixes
-old_office_suffixes = ["doc", "ppt", "xls"]
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 

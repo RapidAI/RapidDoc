@@ -27,7 +27,8 @@ from rapid_doc.utils.model_utils import check_openvino
 from rapid_doc.utils.ocr_utils import check_img, preprocess_image, sorted_boxes, merge_det_boxes, update_det_boxes, get_rotate_crop_image
 from rapidocr.inference_engine.base import InferSession
 from importlib.metadata import version
-rapidocr_version = version("rapidocr")
+from packaging.version import Version
+rapidocr_version = Version(version("rapidocr"))
 models_dir = os.getenv('RAPID_MODELS_DIR', None)
 models_root_path = Path(models_dir) if models_dir else None
 if models_dir:
@@ -69,7 +70,7 @@ class RapidOcrModel(object):
             "Det.use_dilation": use_dilation,
             "Det.unclip_ratio": det_db_unclip_ratio,
         }
-        if models_root_path and rapidocr_version >= "3.8.0":
+        if models_root_path and rapidocr_version >= Version("3.8.0"):
             default_params["Global.model_root_dir"] = models_root_path
 
         # 获取用户传入的 engine_type
@@ -98,7 +99,7 @@ class RapidOcrModel(object):
             gpu_id = int(device.split(':')[1]) if ':' in device else 0 # GPU 编号
             if default_params.get('Det.engine_type') == EngineType.TORCH:
                 default_params['EngineConfig.torch.use_cuda'] = True
-                if rapidocr_version <= "3.4.2":
+                if rapidocr_version <= Version("3.4.2"):
                     default_params['EngineConfig.torch.gpu_id'] = gpu_id
                 else:
                     default_params['EngineConfig.torch.cuda_ep_cfg.device_id'] = gpu_id
@@ -110,7 +111,7 @@ class RapidOcrModel(object):
             npu_id = int(device.split(':')[1]) if ':' in device else 0  # npu 编号
             if default_params.get('Det.engine_type') == EngineType.TORCH:
                 default_params['EngineConfig.torch.use_npu'] = True
-                if rapidocr_version <= "3.4.2":
+                if rapidocr_version <= Version("3.4.2"):
                     default_params['EngineConfig.torch.npu_id'] = npu_id
                 else:
                     default_params['EngineConfig.torch.npu_ep_cfg.device_id'] = npu_id
@@ -170,6 +171,12 @@ class RapidOcrModel(object):
             self.enable_merge_det_boxes = False
 
         self.ocr_engine = RapidOCR(params=default_params)
+        # RapidOCR 3.10+ loads adapters lazily. This wrapper calls Det/Rec
+        # directly, so load both before replacing sessions or reading metadata.
+        for task in ("det", "rec"):
+            load_model = getattr(self.ocr_engine, f"_load_{task}_model", None)
+            if callable(load_model) and getattr(self.ocr_engine, f"text_{task}", None) is None:
+                load_model()
         self.onnx_ops_reports = install_onnx_ops(self.ocr_engine, onnx_ops_settings)
         if self.onnx_ops_reports:
             for task, report in self.onnx_ops_reports.items():

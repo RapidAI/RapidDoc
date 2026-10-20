@@ -1,12 +1,16 @@
 import base64
 import json
+import mimetypes
 import os
-import tempfile
 import requests
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any, BinaryIO, Iterable
 from urllib.parse import unquote, urlparse
+
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from rapid_doc.backend.office.office_analyze import office_analyze
 from rapid_doc.backend.office.office_middle_json_mkcontent import union_make as office_union_make
@@ -14,7 +18,7 @@ from rapid_doc.backend.pipeline.model_json_to_middle_json import result_to_middl
 from rapid_doc.backend.pipeline.pipeline_analyze import ModelSingleton
 from rapid_doc.backend.pipeline.pipeline_analyze import doc_analyze as pipeline_doc_analyze
 from rapid_doc.backend.pipeline.pipeline_middle_json_mkcontent import union_make as pipeline_union_make
-from rapid_doc.cli.common import image_suffixes, office_suffixes, old_office_suffixes, prepare_env
+from rapid_doc.cli.common import image_suffixes, office_suffixes, prepare_env
 from rapid_doc.data.data_reader_writer import FileBasedDataWriter
 from rapid_doc.data.data_reader_writer.base import DataWriter
 from rapid_doc.utils.draw_bbox import draw_layout_bbox, draw_span_bbox
@@ -22,7 +26,6 @@ from rapid_doc.utils.empty_office import normalize_empty_office_bytes
 from rapid_doc.utils.enum_class import MakeMode
 from rapid_doc.utils.config_reader import get_processing_window_size
 from rapid_doc.utils.guess_suffix_or_lang import guess_suffix_by_bytes
-from rapid_doc.utils.office_converter import convert_legacy_office_to_modern
 from rapid_doc.utils.pdf_image_tools import images_bytes_to_pdf_bytes
 
 
@@ -140,7 +143,7 @@ class RapidDoc:
 
     def __call__(
         self,
-        inputs: str | bytes | Path | list[str | bytes | Path],
+        inputs: str | bytes | Path | BinaryIO | list[str | bytes | Path | BinaryIO],
         output_dir: str | Path | None = None,
         image_writer: DataWriter | None = None,
         md_writer: DataWriter | None = None,
@@ -205,6 +208,7 @@ class RapidDoc:
             outputs[index] = self._parse_office(
                 name=doc["name"],
                 file_bytes=doc["raw_bytes"],
+                file_type=doc["suffix"],
                 output_dir=final_output_dir,
                 image_writer=final_image_writer,
                 md_writer=final_md_writer,
@@ -441,6 +445,7 @@ class RapidDoc:
         image_output_mode: str,
         f_dump_middle_json: bool,
         f_dump_content_list: bool,
+        file_type: str,
     ) -> RapidDocOutput:
         if output_dir:
             local_image_dir, local_md_dir = prepare_env(output_dir, name, f"office")
@@ -453,6 +458,7 @@ class RapidDoc:
         middle_json, model_json = office_analyze(
             file_bytes,
             image_writer=combined_image_writer,
+            file_type=file_type,
         )
         markdown = office_union_make(
             middle_json["pdf_info"],
@@ -537,7 +543,7 @@ class RapidDoc:
 
     def _normalize_inputs(
         self,
-        inputs: list[str | bytes | Path],
+        inputs: list[str | bytes | Path | BinaryIO],
     ) -> list[dict[str, Any]]:
         normalized_docs: list[dict[str, Any]] = []
         for index, item in enumerate(inputs):
@@ -559,21 +565,33 @@ class RapidDoc:
                 raise FileNotFoundError(f"Input file not found: {path}")
 
             file_suffix = path.suffix.lower().lstrip(".")
-            actual_path = path
-            if file_suffix in old_office_suffixes:
-                actual_path = Path(convert_legacy_office_to_modern(path))
-                file_suffix = actual_path.suffix.lower().lstrip(".")
-
-            raw_bytes = actual_path.read_bytes()
+            raw_bytes = path.read_bytes()
             return self._build_normalized_doc(
                 raw_bytes=raw_bytes,
-                name=actual_path.stem,
+                name=path.stem,
                 suffix=file_suffix,
                 index=index,
             )
 
         if isinstance(item, bytearray):
             item = bytes(item)
+
+        if hasattr(item, "read"):
+            try:
+                item.seek(0)
+            except (AttributeError, OSError, ValueError):
+                pass
+            raw_bytes = item.read()
+            if not isinstance(raw_bytes, bytes):
+                raise TypeError("Document streams must return bytes")
+            stream_name = getattr(item, "name", "")
+            stream_path = Path(stream_name) if isinstance(stream_name, (str, Path)) else None
+            return self._build_normalized_doc(
+                raw_bytes=raw_bytes,
+                name=stream_path.stem if stream_path and stream_path.stem else f"document_{index + 1}",
+                suffix=stream_path.suffix if stream_path else "",
+                index=index,
+            )
 
         if isinstance(item, bytes):
             return self._build_normalized_doc(
@@ -614,13 +632,6 @@ class RapidDoc:
         if not file_suffix:
             file_suffix = guess_suffix_by_bytes(raw_bytes)
 
-        if file_suffix in old_office_suffixes:
-            raw_bytes, doc_name, file_suffix = self._convert_legacy_office_bytes(
-                raw_bytes=raw_bytes,
-                suffix=file_suffix,
-                name=doc_name,
-            )
-
         if file_suffix in image_suffixes:
             pdf_bytes = images_bytes_to_pdf_bytes(raw_bytes)
         elif file_suffix in ["pdf", *office_suffixes]:
@@ -634,23 +645,6 @@ class RapidDoc:
             "raw_bytes": raw_bytes,
             "pdf_bytes": pdf_bytes,
         }
-
-    def _convert_legacy_office_bytes(
-        self,
-        raw_bytes: bytes,
-        suffix: str,
-        name: str,
-    ) -> tuple[bytes, str, str]:
-        with tempfile.TemporaryDirectory(prefix="rapid_doc_legacy_") as temp_dir:
-            input_path = Path(temp_dir) / f"{Path(name).stem}.{suffix}"
-            input_path.write_bytes(raw_bytes)
-
-            converted_path = Path(convert_legacy_office_to_modern(input_path, temp_dir))
-            return (
-                converted_path.read_bytes(),
-                converted_path.stem,
-                converted_path.suffix.lower().lstrip("."),
-            )
 
     def _infer_remote_name(self, url: str, index: int) -> str:
         parsed = urlparse(url)
@@ -703,9 +697,9 @@ class RapidDoc:
 
     def _to_data_uri(self, logical_ref: str, image_bytes: bytes) -> str:
         suffix = Path(logical_ref).suffix.lower().lstrip(".") or "png"
-        mime_suffix = "jpeg" if suffix == "jpg" else suffix
+        mime_type = mimetypes.guess_type(f"image.{suffix}")[0] or f"image/{suffix}"
         encoded = base64.b64encode(image_bytes).decode("utf-8")
-        return f"data:image/{mime_suffix};base64,{encoded}"
+        return f"data:{mime_type};base64,{encoded}"
 
     def _empty_output(self) -> RapidDocOutput:
         return RapidDocOutput()
@@ -717,7 +711,7 @@ class RapidDoc:
             )
 
     def _is_batch_input(self, inputs: Any) -> bool:
-        if isinstance(inputs, (bytes, bytearray, str, Path)):
+        if isinstance(inputs, (bytes, bytearray, str, Path)) or hasattr(inputs, "read"):
             return False
         return isinstance(inputs, Iterable)
 

@@ -141,11 +141,16 @@ def classify(pdf_bytes):
                 return "ocr"
 
             text_samples = _collect_pdfium_text_samples(pdf, page_indices)
-            avg_cleaned_chars_per_page = _get_avg_cleaned_chars_per_page_from_samples(
-                text_samples
-            )
-            if avg_cleaned_chars_per_page < CHARS_THRESHOLD:
-                return "ocr"
+            for sample in text_samples:
+                if len(sample["cleaned_text"]) >= CHARS_THRESHOLD:
+                    continue
+                reason = _sparse_page_ocr_reason(pdf, sample)
+                if reason is not None:
+                    logger.debug(
+                        "Classify PDF as OCR due to sparse sampled-page evidence: "
+                        f"page={sample['page_index'] + 1}, reason={reason}"
+                    )
+                    return "ocr"
 
             unicode_map_error_signal = _get_unicode_map_error_signal_from_samples(
                 text_samples
@@ -180,12 +185,15 @@ def classify(pdf_bytes):
             )
             if cid_font_usage_signal["triggered"]:
                 logger.debug(
-                    "Classify PDF as OCR due to high CID font usage without ToUnicode: "
+                    "Classify PDF as OCR due to observed CID font decoding defects "
+                    "without ToUnicode: "
                     f"page={cid_font_usage_signal['page_index'] + 1}, "
                     f"fonts={cid_font_usage_signal['font_names']}, "
                     f"chars={cid_font_usage_signal['cid_font_char_count']}, "
                     f"total={cid_font_usage_signal['total_chars']}, "
-                    f"ratio={cid_font_usage_signal['cid_font_usage_ratio']:.4f}"
+                    f"ratio={cid_font_usage_signal['cid_font_usage_ratio']:.4f}, "
+                    f"map_error_ratio={cid_font_usage_signal['unicode_map_error_ratio']:.4f}, "
+                    f"abnormal_ratio={cid_font_usage_signal['abnormal_ratio']:.4f}"
                 )
                 return "ocr"
 
@@ -328,6 +336,44 @@ def classify(pdf_bytes):
     return "txt"
 
 
+def _sparse_page_ocr_reason(pdf_doc, sample):
+    """Low text count requires decoding or visual evidence before choosing OCR."""
+    quality = _get_text_quality_signal_from_samples([sample])
+    if quality["abnormal_ratio"] >= TEXT_QUALITY_BAD_THRESHOLD:
+        return "unreliable sparse text"
+    if (sample["char_count"] > 0
+            and sample["unicode_map_error_count"] / sample["char_count"] >= UNICODE_MAP_ERROR_RATIO_THRESHOLD):
+        return "sparse text Unicode mapping errors"
+
+    from rapid_doc.utils.pdf_image_text_probe import _area, _intersect, _union_area
+
+    page = None
+    try:
+        page = pdf_doc[sample["page_index"]]
+        frame = page.get_bbox()
+        images = []
+        has_content = False
+        # Textless pages also inspect vector objects: outlined text still needs
+        # OCR, whereas genuinely empty pages should not condemn a text document.
+        filters = [pdfium_c.FPDF_PAGEOBJ_IMAGE] if sample["cleaned_text"] else None
+        for obj in page.get_objects(filter=filters, max_depth=3):
+            try:
+                box = _intersect(_get_pdfium_page_object_bounds(obj), frame)
+                if _area(box):
+                    has_content = True
+                    if pdfium_c.FPDFPageObj_GetType(obj.raw) == pdfium_c.FPDF_PAGEOBJ_IMAGE:
+                        images.append(box)
+            finally:
+                close_pdfium_child(obj)
+        if _area(frame) and _union_area(images) / _area(frame) >= HIGH_IMAGE_COVERAGE_THRESHOLD:
+            return "large page image with insufficient native text"
+        if not sample["cleaned_text"] and has_content:
+            return "nonempty page without extractable text"
+    finally:
+        close_pdfium_child(page)
+    return None
+
+
 def get_sample_page_indices(page_count: int, max_pages: int = MAX_SAMPLE_PAGES):
     if page_count <= 0 or max_pages <= 0:
         return []
@@ -398,6 +444,8 @@ def _collect_pdfium_text_sample_from_page(page_index, page):
         non_generated_char_count = 0
         font_non_generated_char_counts = {}
         font_non_generated_cjk_char_counts = {}
+        font_non_generated_unicode_map_error_counts = {}
+        font_non_generated_abnormal_char_counts = {}
 
         for char_index in range(char_count):
             unicode_code = pdfium_c.FPDFText_GetUnicode(text_page, char_index)
@@ -413,7 +461,10 @@ def _collect_pdfium_text_sample_from_page(page_index, page):
             elif _PRIVATE_USE_AREA_START <= unicode_code <= _PRIVATE_USE_AREA_END:
                 private_use_char_count += 1
 
-            if pdfium_c.FPDFText_HasUnicodeMapError(text_page, char_index):
+            has_unicode_map_error = bool(
+                pdfium_c.FPDFText_HasUnicodeMapError(text_page, char_index)
+            )
+            if has_unicode_map_error:
                 unicode_map_error_count += 1
 
             font_name = _normalize_pdf_font_name(
@@ -425,6 +476,18 @@ def _collect_pdfium_text_sample_from_page(page_index, page):
                     font_non_generated_char_counts[font_name] = (
                         font_non_generated_char_counts.get(font_name, 0) + 1
                     )
+                    if has_unicode_map_error:
+                        font_non_generated_unicode_map_error_counts[font_name] = (
+                            font_non_generated_unicode_map_error_counts.get(font_name, 0) + 1
+                        )
+                    if (
+                        unicode_code in (0, 0xFFFD)
+                        or _is_disallowed_control_unicode(unicode_code)
+                        or _PRIVATE_USE_AREA_START <= unicode_code <= _PRIVATE_USE_AREA_END
+                    ):
+                        font_non_generated_abnormal_char_counts[font_name] = (
+                            font_non_generated_abnormal_char_counts.get(font_name, 0) + 1
+                        )
                     if _is_cjk_unicode_code(unicode_code):
                         font_non_generated_cjk_char_counts[font_name] = (
                             font_non_generated_cjk_char_counts.get(font_name, 0) + 1
@@ -446,6 +509,10 @@ def _collect_pdfium_text_sample_from_page(page_index, page):
             "font_non_generated_cjk_char_counts": (
                 font_non_generated_cjk_char_counts
             ),
+            "font_non_generated_unicode_map_error_counts": (
+                font_non_generated_unicode_map_error_counts
+            ),
+            "font_non_generated_abnormal_char_counts": font_non_generated_abnormal_char_counts,
         }
     finally:
         close_pdfium_child(text_page)
@@ -664,7 +731,7 @@ def _get_pdfium_char_font_name(text_page, char_index: int) -> str:
 
 
 def _get_cid_font_usage_signal_from_samples(text_samples, cid_font_signal):
-    """基于 PDFium 字符级字体名统计可疑 CID 字体在抽样页中的真实使用比例。"""
+    """缺映射仅作为风险：同一 CID 字体须有足量使用及实际解码缺陷才转 OCR。"""
     best_signal = {
         "triggered": False,
         "page_index": None,
@@ -672,6 +739,8 @@ def _get_cid_font_usage_signal_from_samples(text_samples, cid_font_signal):
         "cid_font_char_count": 0,
         "total_chars": 0,
         "cid_font_usage_ratio": 0.0,
+        "unicode_map_error_ratio": 0.0,
+        "abnormal_ratio": 0.0,
     }
     if not cid_font_signal or not cid_font_signal.get("triggered"):
         return best_signal
@@ -687,40 +756,51 @@ def _get_cid_font_usage_signal_from_samples(text_samples, cid_font_signal):
         if not cid_font_names:
             continue
 
-        total_chars = text_sample["char_count"]
+        total_chars = text_sample.get("non_generated_char_count", 0)
         if total_chars <= 0:
             continue
 
-        font_name_counts = text_sample.get("font_name_counts") or {}
-        matched_font_names = cid_font_names.intersection(font_name_counts)
-        cid_font_char_count = sum(
-            font_name_counts[font_name] for font_name in matched_font_names
-        )
+        font_name_counts = text_sample.get("font_non_generated_char_counts") or {}
+        map_errors = text_sample.get("font_non_generated_unicode_map_error_counts") or {}
+        abnormal_chars = text_sample.get("font_non_generated_abnormal_char_counts") or {}
+        # Evaluate fonts separately: readable fonts cannot dilute a defective one,
+        # and defects in unrelated fonts cannot condemn a readable CID font.
+        for font_name in sorted(cid_font_names.intersection(font_name_counts)):
+            cid_font_char_count = font_name_counts[font_name]
+            if cid_font_char_count <= 0:
+                continue
+            cid_font_usage_ratio = cid_font_char_count / total_chars
+            map_error_ratio = map_errors.get(font_name, 0) / cid_font_char_count
+            abnormal_ratio = abnormal_chars.get(font_name, 0) / cid_font_char_count
+            signal = {
+                "triggered": False,
+                "page_index": page_index,
+                "font_names": [font_name],
+                "cid_font_char_count": cid_font_char_count,
+                "total_chars": total_chars,
+                "cid_font_usage_ratio": cid_font_usage_ratio,
+                "unicode_map_error_ratio": map_error_ratio,
+                "abnormal_ratio": abnormal_ratio,
+            }
+            if (
+                cid_font_char_count >= CID_FONT_USAGE_COUNT_THRESHOLD
+                and cid_font_usage_ratio >= CID_FONT_USAGE_RATIO_THRESHOLD
+                and (
+                    map_error_ratio >= UNICODE_MAP_ERROR_RATIO_THRESHOLD
+                    or abnormal_ratio >= TEXT_QUALITY_BAD_THRESHOLD
+                )
+            ):
+                signal["triggered"] = True
+                return signal
 
-        cid_font_usage_ratio = cid_font_char_count / total_chars
-        signal = {
-            "triggered": False,
-            "page_index": page_index,
-            "font_names": sorted(matched_font_names),
-            "cid_font_char_count": cid_font_char_count,
-            "total_chars": total_chars,
-            "cid_font_usage_ratio": cid_font_usage_ratio,
-        }
-        if (
-            cid_font_char_count >= CID_FONT_USAGE_COUNT_THRESHOLD
-            and cid_font_usage_ratio >= CID_FONT_USAGE_RATIO_THRESHOLD
-        ):
-            signal["triggered"] = True
-            return signal
-
-        if (
-            signal["cid_font_usage_ratio"],
-            signal["cid_font_char_count"],
-        ) > (
-            best_signal["cid_font_usage_ratio"],
-            best_signal["cid_font_char_count"],
-        ):
-            best_signal = signal
+            if (
+                signal["cid_font_usage_ratio"],
+                signal["cid_font_char_count"],
+            ) > (
+                best_signal["cid_font_usage_ratio"],
+                best_signal["cid_font_char_count"],
+            ):
+                best_signal = signal
 
     return best_signal
 

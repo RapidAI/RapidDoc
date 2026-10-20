@@ -742,6 +742,14 @@ def _span_has_content_for_v2(span: dict, visible_styles: set) -> bool:
 def merge_para_with_text_v2(para_block):
     """将 Office 段落转换为 content_list_v2 spans，避免原地修改 middle_json。"""
     _visible_styles = {'underline', 'strikethrough'}
+    def convert_span(span):
+        result = dict(span)
+        if result['type'] == ContentType.INLINE_EQUATION:
+            result['type'] = ContentTypeV2.SPAN_EQUATION_INLINE
+        if span.get('children'):
+            result['children'] = [convert_span(child) for child in span['children']]
+        return result
+
     para_content = []
     if para_block.get('type') == BlockType.TITLE:
         section_number = para_block.get('section_number', '')
@@ -754,10 +762,7 @@ def merge_para_with_text_v2(para_block):
     for line in para_block['lines']:
         for span in line['spans']:
             if _span_has_content_for_v2(span, _visible_styles):
-                rendered_span = dict(span)
-                if rendered_span['type'] == ContentType.INLINE_EQUATION:
-                    rendered_span['type'] = ContentTypeV2.SPAN_EQUATION_INLINE
-                para_content.append(rendered_span)
+                para_content.append(convert_span(span))
     return para_content
 
 

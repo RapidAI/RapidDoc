@@ -20,9 +20,8 @@ from starlette.background import BackgroundTask
 from loguru import logger
 
 from file_converter import ensure_pdf, OFFICE_EXTENSIONS
-from rapid_doc.cli.common import aio_do_parse, old_office_suffixes, pdf_suffixes, image_suffixes, office_suffixes
+from rapid_doc.cli.common import aio_do_parse, pdf_suffixes, image_suffixes, office_suffixes
 from rapid_doc.utils.empty_office import normalize_empty_office_bytes
-from rapid_doc.utils.office_converter import convert_legacy_office_to_modern
 from rapid_doc.utils.pdf_image_tools import images_bytes_to_pdf_bytes
 from rapid_doc.model.custom.paddleocr_vl.paddleocr_vl import PaddleOCRVLTableModel, PaddleOCRVLOCRModel, PaddleOCRVLFormulaModel
 from rapid_doc.version import __version__
@@ -232,11 +231,8 @@ async def file_parse(
                 with open(temp_file_path, "wb") as tmp_f:
                     tmp_f.write(await file.read())
 
-                if file_suffix in old_office_suffixes:
-                    convert_file_path = convert_legacy_office_to_modern(temp_file_path)
-                else:
-                    # 转为 pdf
-                    convert_file_path, temp_pdf_to_delete = ensure_pdf(temp_file_path, temp_dir)
+                # 其他文档格式仍使用独立的转 PDF 工具。
+                convert_file_path, temp_pdf_to_delete = ensure_pdf(temp_file_path, temp_dir)
                 if not convert_file_path:
                     return JSONResponse(
                         content={"error": f"Failed to convert Office/document: {file.filename}"},

@@ -6,6 +6,10 @@ from urllib.parse import urlparse
 
 from rapid_doc.utils.enum_class import ContentType, BlockType
 from rapid_doc.utils.magic_model_utils import tie_up_category_by_index
+from rapid_doc._vendor.docvortex_core.content.spans import inline_span_plain_text
+from rapid_doc._vendor.docvortex_core.foundation._hyperlink import (
+    OFFICE_EXTERNAL_HYPERLINK_SCHEMES, sanitize_hyperlink_target,
+)
 
 
 class MagicModel:
@@ -22,8 +26,10 @@ class MagicModel:
         for index, block_info in enumerate(page_blocks):
 
             block_type = block_info["type"]
+            if block_type in {"doc_title", "paragraph_title"}:
+                block_type = BlockType.TITLE
             block_content = block_info.get("content", "")
-            if not block_content and block_type != BlockType.CHART:
+            if not block_content and block_type not in {BlockType.CHART, BlockType.IMAGE}:
                 continue
 
             if block_type in [
@@ -42,7 +48,7 @@ class MagicModel:
                 block_type = BlockType.IMAGE_BODY
                 span = {
                     "type": ContentType.IMAGE,
-                    "image_base64": block_content,
+                    "image_base64": block_info["image_base64"],
                 }
             elif block_type in ["table"]:
                 block_type = BlockType.TABLE_BODY
@@ -110,6 +116,10 @@ class MagicModel:
             if block_type == BlockType.TITLE:
                 block["is_numbered_style"] = block_info.get("is_numbered_style", False)
                 block["level"] = block_info.get("level", 1)
+                block["_numbering_depth"] = (
+                    0 if block_info["type"] == "doc_title"
+                    else max(1, block["level"] - 1)
+                )
                 section_number = block_info.get("section_number")
                 if isinstance(section_number, str) and section_number.strip():
                     block["section_number"] = section_number.strip()
@@ -187,208 +197,38 @@ class MagicModel:
         return self.discarded_blocks
 
 
-def _parse_style_list(style_str: str | None) -> list:
-    """解析逗号分隔的 Office inline style 字符串。"""
-    if not style_str:
-        return []
-    return [style.strip() for style in style_str.split(',') if style.strip()]
-
-
-def _parse_hyperlink_text_children(hyperlink_content: str, text_tag_re) -> tuple:
-    """解析一个 hyperlink 内部的多个 text 子片段，并保留每段样式。"""
-    url_start = hyperlink_content.find('<url>')
-    url_end = hyperlink_content.find('</url>')
-    if url_start == -1 or url_end == -1 or url_end < url_start:
-        return [], ''
-
-    children = []
-    pos = 0
-    while pos < url_start:
-        text_match = text_tag_re.search(hyperlink_content, pos)
-        if text_match is None or text_match.start() >= url_start:
-            break
-
-        text_end = hyperlink_content.find('</text>', text_match.end())
-        if text_end == -1 or text_end > url_start:
-            return [], ''
-
-        child = {
-            "type": ContentType.TEXT,
-            "content": hyperlink_content[text_match.end():text_end],
-        }
-        style = _parse_style_list(text_match.group(1))
-        if style:
-            child["style"] = style
-        children.append(child)
-        pos = text_end + 7
-
-    return children, hyperlink_content[url_start + 5:url_end]
-
-
-def parse_text_block_spans(content: str) -> list:
-    """
-    解析文本类block的content，提取其中的文本、行内公式、超链接和字体样式。
-
-    支持的标签格式：
-    - <eq>...</eq>: 行内公式
-    - <hyperlink><text [style="..."]>...</text><url>...</url></hyperlink>: 超链接（支持样式）
-    - <text style="...">...</text>: 带字体样式的普通文本
-
-    字体样式值（逗号分隔）：bold, italic, underline, emphasis, strikethrough, superscript, subscript
-
-    Args:
-        content: 文本块的content字符串，可能包含特殊标签
-
-    Returns:
-        包含多个span的列表，每个span是一个字典，包含type和content等字段。
-        带样式的文本span额外包含 style 字段（list类型）。
-    """
-    if not content:
-        return []
-
-    # 匹配 <text> 或 <text style="..."> 开始标签
-    _text_tag_re = re.compile(r'<text(?:\s+style="([^"]*)")?>')
-
-    spans = []
-    last_end = 0
-    pos = 0
-
-    while pos < len(content):
-        # 查找行内公式标签 <eq>...</eq>
-        eq_start = content.find('<eq>', pos)
-        # 查找超链接标签 <hyperlink>
-        hyperlink_start = content.find('<hyperlink>', pos)
-        # 查找带样式的文本标签 <text ...>（顶层，不在 hyperlink 内部）
-        text_tag_match = _text_tag_re.search(content, pos)
-        text_tag_start = text_tag_match.start() if text_tag_match else -1
-
-        # 收集所有有效的标签位置
-        candidates = []
-        if eq_start != -1:
-            candidates.append((eq_start, 'eq'))
-        if hyperlink_start != -1:
-            candidates.append((hyperlink_start, 'hyperlink'))
-        if text_tag_start != -1:
-            candidates.append((text_tag_start, 'text'))
-
-        # 没有找到任何标签，处理剩余文本
-        if not candidates:
-            remaining_text = content[last_end:]
-            if remaining_text:
-                spans.append({
-                    "type": ContentType.TEXT,
-                    "content": remaining_text
-                })
-            break
-
-        # 取位置最小的标签
-        next_tag_pos, next_tag_type = min(candidates, key=lambda x: x[0])
-
-        # 处理标签前的文本
-        if next_tag_pos > last_end:
-            text_before = content[last_end:next_tag_pos]
-            if text_before:
-                spans.append({
-                    "type": ContentType.TEXT,
-                    "content": text_before
-                })
-
-        # 处理行内公式
-        if next_tag_type == 'eq':
-            eq_end = content.find('</eq>', next_tag_pos)
-            if eq_end != -1:
-                formula_content = content[next_tag_pos + 4:eq_end]
-                spans.append({
-                    "type": ContentType.INLINE_EQUATION,
-                    "content": formula_content
-                })
-                pos = eq_end + 5  # 跳过</eq>
-                last_end = pos
-            else:
-                # 未找到闭合标签，将<eq>作为普通文本处理
-                spans.append({
-                    "type": ContentType.TEXT,
-                    "content": content[last_end:]
-                })
-                break
-
-        # 处理带样式的文本标签
-        elif next_tag_type == 'text':
-            text_end = content.find('</text>', next_tag_pos)
-            if text_end != -1:
-                # text_tag_match 对应当前 next_tag_pos 的匹配
-                # 重新匹配确保位置对齐
-                tag_open_end = content.find('>', next_tag_pos) + 1
-                text_content = content[tag_open_end:text_end]
-                style_str = text_tag_match.group(1) if text_tag_match and text_tag_match.start() == next_tag_pos else None
-                span = {
-                    "type": ContentType.TEXT,
-                    "content": text_content
-                }
-                if style_str:
-                    span["style"] = [s.strip() for s in style_str.split(',') if s.strip()]
-                spans.append(span)
-                pos = text_end + 7  # 跳过 </text>
-                last_end = pos
-            else:
-                # 未找到闭合标签，作为普通文本处理
-                spans.append({
-                    "type": ContentType.TEXT,
-                    "content": content[last_end:]
-                })
-                break
-
-        # 处理超链接
-        elif next_tag_type == 'hyperlink':
-            hyperlink_end = content.find('</hyperlink>', next_tag_pos)
-            if hyperlink_end != -1:
-                # 提取超链接内容
-                hyperlink_content = content[next_tag_pos + 11:hyperlink_end]
-
-                # 解析内部的一个或多个 <text [style="..."]> 和一个 <url> 标签
-                children, link_url = _parse_hyperlink_text_children(
-                    hyperlink_content,
-                    _text_tag_re,
-                )
-
-                if children and link_url:
-                    if len(children) == 1:
-                        child = children[0]
-                        span = {
-                            "type": ContentType.HYPERLINK,
-                            "content": child["content"],
-                            "url": link_url,
-                        }
-                        if child.get("style"):
-                            span["style"] = child["style"]
-                    else:
-                        span = {
-                            "type": ContentType.HYPERLINK,
-                            "content": ''.join(
-                                child["content"] for child in children
-                            ),
-                            "url": link_url,
-                            "children": children,
-                        }
-                    spans.append(span)
-                    pos = hyperlink_end + 12  # 跳过</hyperlink>
-                    last_end = pos
-                else:
-                    # 超链接格式不正确，作为普通文本处理
-                    spans.append({
-                        "type": ContentType.TEXT,
-                        "content": content[last_end:]
-                    })
-                    break
-            else:
-                # 未找到闭合标签，将<hyperlink>作为普通文本处理
-                spans.append({
-                    "type": ContentType.TEXT,
-                    "content": content[last_end:]
-                })
-                break
-
-    return spans
+def parse_text_block_spans(content: list[dict]) -> list[dict]:
+    """Map native structured spans to RapidDoc's inline output contract."""
+    if not isinstance(content, list):
+        raise TypeError("Office text content must be a list of structured spans")
+    output = []
+    for source in content:
+        kind = source["type"]
+        if kind == "hyperlink":
+            children = parse_text_block_spans(source.get("content", []))
+            url = sanitize_hyperlink_target(
+                source.get("url"), allowed_schemes=OFFICE_EXTERNAL_HYPERLINK_SCHEMES,
+                allow_fragment=True, allow_relative=True,
+            )
+            if not url:
+                output.extend(children)
+                continue
+            output.append({
+                "type": ContentType.HYPERLINK, "url": url,
+                "content": ''.join(child.get("content", "") for child in children),
+                "children": children,
+            })
+        elif kind in {"text", "equation_inline", "code_inline"}:
+            span = {
+                "type": ContentType.INLINE_EQUATION if kind == "equation_inline" else kind,
+                "content": source.get("content", ""),
+            }
+            if source.get("styles"):
+                span["style"] = list(source["styles"])
+            output.append(span)
+        else:
+            raise ValueError(f"Unsupported Office inline span type: {kind}")
+    return output
 
 
 def parse_list_block(list_block: dict):
@@ -418,8 +258,8 @@ def parse_list_block(list_block: dict):
                 "type": BlockType.TEXT,
                 "lines": [{"spans": spans}]
             }
-            if item.get("prefix"):
-                text_block["prefix"] = item["prefix"]
+            if item.get("list_label"):
+                text_block["prefix"] = item["list_label"]
             blocks.append(text_block)
 
         elif item_type == "list":
@@ -778,7 +618,7 @@ def classify_caption_blocks(page_blocks: list) -> list:
                 next_block_type = next_block.get("type")
 
                 if next_block_type == "text":
-                    content = next_block.get("content", "").strip().lower()
+                    content = inline_span_plain_text(next_block.get("content", [])).strip().lower()
 
                     # 根据当前块类型检查是否匹配caption前缀
                     if block_type == "table":

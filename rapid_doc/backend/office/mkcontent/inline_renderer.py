@@ -832,14 +832,32 @@ def _render_hyperlink_children_label(children: list[dict], inline_syntax: str) -
     child_parts = []
     child_text_spans = []
     for child in children or []:
-        if child.get('type') != ContentType.TEXT:
-            continue
-        child_text_spans.append({
-            'content': child.get('content', ''),
-            'style': child.get('style', []),
-        })
+        if child.get('type') == ContentType.TEXT:
+            child_text_spans.append({
+                'content': child.get('content', ''),
+                'style': child.get('style', []),
+            })
+        else:
+            _append_style_grouped_text_parts(child_parts, child_text_spans, inline_syntax)
+            child_text_spans.clear()
+            content = child.get('content', '')
+            if child.get('type') == ContentType.INLINE_EQUATION:
+                content = f'{inline_left_delimiter}{content}{inline_right_delimiter}'
+            elif child.get('type') == 'code_inline':
+                content = _render_inline_code(content, inline_syntax)
+            child_parts.append(_make_rendered_part(child['type'], content))
     _append_style_grouped_text_parts(child_parts, child_text_spans, inline_syntax)
     return _join_rendered_parts(child_parts).strip()
+
+
+def _render_inline_code(content: str, inline_syntax: str) -> str:
+    if inline_syntax == OFFICE_INLINE_SYNTAX_HTML:
+        return f'<code>{escape(content)}</code>'
+    delimiter = '`'
+    while delimiter in content:
+        delimiter += '`'
+    padding = ' ' if content.startswith('`') or content.endswith('`') else ''
+    return f'{delimiter}{padding}{content}{padding}{delimiter}'
 
 
 def _append_hyperlink_part(
@@ -942,6 +960,9 @@ def merge_para_with_text(para_block, escape_text_block_prefix=True):
                             content,
                         )
                     )
+            elif span_type == 'code_inline':
+                flush_text_span_buffer()
+                parts.append(_make_rendered_part(span_type, _render_inline_code(span['content'], inline_syntax)))
             elif span_type == ContentType.HYPERLINK:
                 flush_text_span_buffer()
                 _append_hyperlink_part(

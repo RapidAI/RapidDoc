@@ -719,6 +719,48 @@ def adjust_table_rows_colspan(
                 last_cell["colspan"] = str(current_last_span + cols_diff)
 
 
+def _align_rendered_column_grid(source_state, reference_state, source_row_idx, reference_row_idx):
+    """Map matching rendered boundary cells to one logical grid, including rowspans."""
+    def boundaries(rows, row_idx):
+        occupied, total = _scan_row_visual_sources(rows, row_idx)
+        if not total or len(occupied) != total:
+            return None
+        return [0] + [col for col in range(1, total)
+                      if occupied[col] != occupied[col-1]] + [total]
+
+    source = boundaries(source_state.rows, source_row_idx)
+    reference = boundaries(reference_state.rows, reference_row_idx)
+    if (source is None or reference is None or len(source) != len(reference)
+            or source[-1] != source_state.total_cols
+            or reference[-1] != reference_state.total_cols):
+        return False
+    mapping = dict(zip(source, reference))
+    occupied = {}
+    updates = []
+    # Compute every original placement before changing spans: later rows may
+    # inherit the very cells whose widths are being expanded.
+    for row_idx, row in enumerate(source_state.rows):
+        row_occupied = occupied.setdefault(row_idx, set())
+        col = 0
+        for cell in row.find_all(["td", "th"]):
+            while col in row_occupied:
+                col += 1
+            end = col + int(cell.get("colspan", 1))
+            if col not in mapping or end not in mapping:
+                return False
+            updates.append((cell, mapping[end] - mapping[col]))
+            for target in range(row_idx, row_idx + int(cell.get("rowspan", 1))):
+                occupied.setdefault(target, set()).update(range(col, end))
+            col = end
+    for cell, colspan in updates:
+        if colspan > 1:
+            cell["colspan"] = str(colspan)
+        else:
+            cell.attrs.pop("colspan", None)
+    _refresh_table_state_metrics(source_state)
+    return True
+
+
 def _cell_has_semantic_content(cell) -> bool:
     """判断单元格是否仍包含用户可见的语义内容。"""
     if cell is None:
@@ -939,7 +981,8 @@ def perform_table_merge(
         table_cols1 = previous_state.total_cols
         table_cols2 = current_state.total_cols
 
-        if table_cols1 > table_cols2:
+        if table_cols1 > table_cols2 and not _align_rendered_column_grid(
+                current_state, previous_state, header_count, len(rows1)-1):
             reference_structure = [
                 int(cell.get("colspan", 1)) for cell in last_row1.find_all(["td", "th"])
             ]
@@ -954,7 +997,8 @@ def perform_table_merge(
                 table_cols1,
                 first_data_row2,
             )
-        elif table_cols2 > table_cols1:
+        elif table_cols2 > table_cols1 and not _align_rendered_column_grid(
+                previous_state, current_state, len(rows1)-1, header_count):
             reference_structure = [
                 int(cell.get("colspan", 1)) for cell in first_data_row2.find_all(["td", "th"])
             ]

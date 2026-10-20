@@ -5,7 +5,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 ## Install libgl for opencv support & Noto fonts for Chinese characters && python
 RUN sed -i 's|http://archive.ubuntu.com/ubuntu/|https://mirrors.tuna.tsinghua.edu.cn/ubuntu/|g; s|http://security.ubuntu.com/ubuntu/|https://mirrors.tuna.tsinghua.edu.cn/ubuntu/|g; s|http://ports.ubuntu.com/ubuntu-ports/|https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/|g' /etc/apt/sources.list && \
     apt-get -o Acquire::Retries=5 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 update && \
-    apt-get -o Acquire::Retries=5 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 install -y --no-install-recommends software-properties-common curl wget gnupg ca-certificates && \
+    apt-get -o Acquire::Retries=5 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 install -y --no-install-recommends software-properties-common curl gnupg ca-certificates && \
     add-apt-repository ppa:deadsnakes/ppa -y && \
     apt-get -o Acquire::Retries=5 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 update && \
     apt-get -o Acquire::Retries=5 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 install -y --no-install-recommends \
@@ -15,10 +15,7 @@ RUN sed -i 's|http://archive.ubuntu.com/ubuntu/|https://mirrors.tuna.tsinghua.ed
         libglib2.0-0 \
         libsm6 \
         libxext6 \
-        libxrender-dev \
-        libreoffice-writer \
-        libreoffice-calc \
-        libreoffice-impress \
+        libxrender1 \
         fonts-noto-core \
         fonts-noto-cjk \
         fontconfig \

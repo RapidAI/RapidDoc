@@ -13,7 +13,7 @@ from ...utils.pdf_classify import classify
 from ...utils.pdf_image_tools import load_images_from_pdf, get_ori_image
 from ...utils.model_utils import get_vram, clean_memory
 from ...utils.pdf_text_tool import get_page
-from ...model.docvortex_adapter import analyze_docvortex_layout, get_docvortex_mode
+from ...model.docvortex_adapter import analyze_docvortex_layout, get_docvortex_mode, use_docvortex_table_rules
 from ...utils import PyPDFium2Parser
 from ...utils.pdfium_guard import close_pdfium_child, close_pdfium_document
 
@@ -143,7 +143,7 @@ def doc_analyze(
     all_pdf_docs = []
     ocr_enabled_list = []
     use_docvortex_layout = get_docvortex_mode(layout_config) != "off"
-    use_docvortex_table = (table_config or {}).get("rule_table_engine") == "docvortex"
+    use_docvortex_table = use_docvortex_table_rules(table_config)
     for pdf_idx, pdf_bytes in enumerate(pdf_bytes_list):
         # 确定OCR设置
         _ocr_enable = False
@@ -158,7 +158,8 @@ def doc_analyze(
         _lang = lang_list[pdf_idx]
 
         native_layout_pages = None
-        if use_docvortex_layout and not _ocr_enable:
+        # OCR decides how to read characters, not how to obtain layout regions.
+        if use_docvortex_layout:
             try:
                 native_layout_pages = analyze_docvortex_layout(pdf_bytes)
             except ImportError:
@@ -190,8 +191,14 @@ def doc_analyze(
                         pdf_page = pdf_doc_list[page_index]
                     # 获取pdf的文字和图片的字典对象
                     page_dict = get_page(pdf_page)
-                    if native_layout_pages is not None and page_index < len(native_layout_pages) and page_dict['blocks']:
-                        page_dict['_docvortex_layout'] = native_layout_pages[page_index]
+                    if native_layout_pages is not None and page_index < len(native_layout_pages):
+                        native_blocks = native_layout_pages[page_index]
+                        if _ocr_enable and not page_dict['blocks']:
+                            # Scanned pages have no native text geometry. Supply an OCR region,
+                            # rather than classifying the entire scan as an unread image.
+                            native_blocks = [{"type": "text", "bbox": [0, 0, 1, 1], "content": ""}]
+                        page_dict['_docvortex_layout'] = native_blocks
+                        page_dict['_docvortex_ocr'] = _ocr_enable
                     if use_docvortex_table and not _ocr_enable and page_dict['blocks']:
                         page_dict['_source_pdf_bytes'] = pdf_bytes
                         page_dict['_source_page_index'] = page_index
@@ -252,6 +259,7 @@ def doc_analyze(
     for document_pages in all_pdf_docs:
         for page_dict in document_pages:
             page_dict.pop('_docvortex_layout', None)
+            page_dict.pop('_docvortex_ocr', None)
             page_dict.pop('_docvortex_table_page', None)
             page_dict.pop('_source_pdf_bytes', None)
             page_dict.pop('_source_page_index', None)

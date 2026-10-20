@@ -17,10 +17,8 @@ load_dotenv()
 from gradio_pdf import PDF
 from loguru import logger
 
-from rapid_doc.cli.common import prepare_env, read_fn, aio_do_parse, pdf_suffixes, image_suffixes, office_suffixes, \
-    old_office_suffixes
+from rapid_doc.cli.common import prepare_env, read_fn, aio_do_parse, pdf_suffixes, image_suffixes, office_suffixes
 from rapid_doc.utils.hash_utils import str_sha256
-from rapid_doc.utils.office_converter import convert_legacy_office_to_modern
 from rapid_doc.version import __version__
 from rapid_doc.model.table.rapid_table_self import ModelType as TableModelType, EngineType as TableEngineType
 
@@ -312,8 +310,6 @@ async def to_markdown(file_path, end_pages=10, is_ocr=False, formula_enable=True
         return None, None, None, *build_preview_updates(None)
 
     file_suffix = Path(file_path).suffix[1:].lower()
-    if file_suffix in old_office_suffixes:
-        file_path = convert_legacy_office_to_modern(file_path)
     # office 文件不需要转换为 PDF，直接使用原始文件路径
     file_suffix = Path(file_path).suffix.lower().lstrip('.')
     is_office = file_suffix in office_suffixes
@@ -549,7 +545,7 @@ def main(ctx,
         raise ValueError(f"Invalid latex delimiters type: {latex_delimiters_type}.")
 
     # suffixes = [f".{suffix}" for suffix in pdf_suffixes + image_suffixes]
-    suffixes = [f".{suffix}" for suffix in pdf_suffixes + image_suffixes + office_suffixes + old_office_suffixes]
+    suffixes = [f".{suffix}" for suffix in pdf_suffixes + image_suffixes + office_suffixes]
     blocks_kwargs, launch_head_kwargs = blocks_head_kwargs()
     with gr.Blocks(**blocks_kwargs) as demo:
         gr.HTML(header)

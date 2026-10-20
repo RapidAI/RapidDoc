@@ -9,6 +9,8 @@ sync1.sh
 data_preprocess_pj1
 data-preparation1
 __pycache__
+build/
+*.egg-info/
 *.log
 *.pyc
 .vscode
@@ -28,16 +30,11 @@ bak/
 app/tests/*
 temp/
 tmp/
-tmp
-.vscode
-.vscode/
 ocr_demo
 .coveragerc
 /app/common/__init__.py
 /magic_pdf/config/__init__.py
 source.dev.env
-
-tmp
 
 projects/web/node_modules
 projects/web/dist
@@ -50,6 +47,7 @@ debug_utils/
 _build/
 native/onnx_ops/build/
 docs/evidence
+docs/migrations/
 tests/others
 docs/others
 tools/

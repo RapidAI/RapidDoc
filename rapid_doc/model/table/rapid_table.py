@@ -116,7 +116,7 @@ class RapidTableModel(object):
         result, scores, _ = self.table_cls([cv2.cvtColor(np.asarray(image), cv2.COLOR_RGB2BGR)], return_scores=True)
         return (result[0] if result else None, scores[0] if scores else 1.0)
 
-    def batch_predict(self, images: list, ocr_result=None, fill_image_res=None, mfd_res=None, skip_text_in_image=True, use_img2table=False, skip_table_orientation=None, table_class=None, table_class_score=1.0) -> list[str]:
+    def batch_predict(self, images: list, ocr_result=None, fill_image_res=None, mfd_res=None, skip_text_in_image=True, skip_table_orientation=None, table_class=None, table_class_score=1.0) -> list[str]:
         results = []
         for image in images:
             res = self.predict(
@@ -125,7 +125,6 @@ class RapidTableModel(object):
                 fill_image_res=fill_image_res,
                 mfd_res=mfd_res,
                 skip_text_in_image=skip_text_in_image,
-                use_img2table=use_img2table,
                 skip_table_orientation=skip_table_orientation,
                 table_class=table_class,
                 table_class_score=table_class_score,
@@ -133,7 +132,7 @@ class RapidTableModel(object):
             results.append(res)
         return results
 
-    def predict(self, image, ocr_result=None, fill_image_res=None, mfd_res=None, skip_text_in_image=True, use_img2table=False, skip_table_orientation=None, table_class=None, table_class_score=1.0):
+    def predict(self, image, ocr_result=None, fill_image_res=None, mfd_res=None, skip_text_in_image=True, skip_table_orientation=None, table_class=None, table_class_score=1.0):
         bgr_image = cv2.cvtColor(np.asarray(image), cv2.COLOR_RGB2BGR)
 
         if skip_table_orientation is None:
@@ -231,39 +230,6 @@ class RapidTableModel(object):
         """开始识别表格"""
         cls = table_class
         cls_score = table_class_score
-        """使用 img2table 识别"""
-        if use_img2table:
-            try:
-                from rapid_doc.model.table.img2table_self.image import Image
-                from rapid_doc.model.table.img2table_self.RapidOcrTable import RapidOcrTable
-
-                if not cls:
-                    cls, elasp = self.table_cls(image)
-                    cls = cls[0]
-                if cls == "wired":
-                    borderless_tables = False
-                else:
-                    borderless_tables = True
-                opencv_ocr = RapidOcrTable(ocr_result)
-                doc = Image(src=bgr_image)
-                extracted_tables = doc.extract_tables(
-                    ocr=opencv_ocr,
-                    implicit_rows=False,
-                    implicit_columns=False,
-                    borderless_tables=borderless_tables,
-                    min_confidence=50
-                )
-                if extracted_tables:
-                    # print(f"img2table detected {len(extracted_tables)} tables")
-                    html_code = "<html><body>" + extracted_tables[0].html + "</body></html>"
-                    return html_code
-            except ImportError:
-                raise ValueError(
-                    "Could not import img2table python package. "
-                    "Please install it with `pip install img2table`."
-                )
-            except Exception as e:
-                logger.exception(e)
 
         """使用 rapid_table_self 识别"""
         try:

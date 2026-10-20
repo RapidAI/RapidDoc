@@ -1,6 +1,6 @@
 import copy
 from rapid_doc.utils.enum_class import ContentType, BlockType, SplitFlag
-from rapid_doc.utils.language import detect_lang
+from rapid_doc.utils.text_boundary import uses_unspaced_script
 
 
 LINE_STOP_FLAG = ('.', '!', '?', '。', '！', '？', ')', '）', '"', '”', ':', '：', ';', '；')
@@ -123,8 +123,7 @@ def __is_list_or_index_block(block):
             lines_text_list.append(line_text)
             block_text = ''.join(lines_text_list)
 
-        block_lang = detect_lang(block_text)
-        # logger.info(f"block_lang: {block_lang}")
+        unspaced_script = uses_unspaced_script(block_text)
 
         for line in block['lines']:
             line_mid_x = (line['bbox'][0] + line['bbox'][2]) / 2
@@ -148,7 +147,7 @@ def __is_list_or_index_block(block):
                 right_close_num += 1
             else:
                 # 类中文没有超长单词的情况，可以用统一的阈值
-                if block_lang in ['zh', 'ja', 'ko']:
+                if unspaced_script:
                     closed_area = 0.26 * block_weight
                 else:
                     # 右侧不顶格情况下是否有一段距离，拍脑袋用0.3block宽度做阈值

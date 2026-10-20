@@ -9,14 +9,10 @@ RUN sed -i 's|http://deb.debian.org/debian|https://mirrors.tuna.tsinghua.edu.cn/
         libglib2.0-0 \
         libsm6 \
         libxext6 \
-        libxrender-dev \
-        libreoffice-writer \
-        libreoffice-calc \
-        libreoffice-impress \
+        libxrender1 \
         fonts-noto-core \
         fonts-noto-cjk \
         fontconfig \
-        wget \
         curl \
         ca-certificates \
         libgl1 && \

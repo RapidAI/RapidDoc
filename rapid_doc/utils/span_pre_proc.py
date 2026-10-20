@@ -118,6 +118,11 @@ def remove_overlaps_min_spans(spans):
                 if span1 in dropped_spans or span2 in dropped_spans:
                     continue
                 else:
+                    if ({span1['type'], span2['type']} == {ContentType.IMAGE, ContentType.TEXT}
+                            and any(s['type'] == ContentType.TEXT and s.get('native_text_region') for s in (span1, span2))):
+                        # A separately owned native foreground is not a duplicate
+                        # of the background image behind it.
+                        continue
                     overlap_box = get_minbox_if_overlap_by_ratio(
                         span1['bbox'], span2['bbox'], 0.65
                     )

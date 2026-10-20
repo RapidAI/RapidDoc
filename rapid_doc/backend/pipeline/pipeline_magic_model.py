@@ -8,7 +8,8 @@ import math
 from typing import List, Tuple, Dict
 
 from rapid_doc.utils.boxbase import (
-    bbox_relative_pos, calculate_iou, bbox_distance, get_minbox_if_overlap_by_ratio
+    bbox_relative_pos, calculate_iou, bbox_distance, get_minbox_if_overlap_by_ratio,
+    calculate_overlap_area_in_bbox1_area_ratio,
 )
 from rapid_doc.utils.enum_class import CategoryId, ContentType
 from rapid_doc.utils.magic_model_utils import tie_up_category_by_distance_v3, reduct_overlap
@@ -337,6 +338,8 @@ class MagicModel:
         """
         all_spans = []
         layout_dets = self.__page_model_info['layout_dets']
+        native_text_regions = {item['original_order']: item['bbox'] for item in layout_dets
+                               if item.get('native_text_region') and item.get('original_order') is not None}
         
         allow_category_ids = [
             CategoryId.ImageBody,
@@ -395,6 +398,17 @@ class MagicModel:
             elif category_id == CategoryId.OcrText:
                 span['content'] = layout_det['text']
                 span['type'] = ContentType.TEXT
+                native_bbox = native_text_regions.get(layout_det.get('original_order'))
+                if native_bbox is not None:
+                    span['native_text_region'] = True
+                    # OCR detection can expand into crop padding, surrounding a
+                    # tight native region. Constrain that oversized result to
+                    # its known owner before area-based filtering/assignment.
+                    if (calculate_overlap_area_in_bbox1_area_ratio(span['bbox'], native_bbox) <= 0.5
+                            and calculate_overlap_area_in_bbox1_area_ratio(native_bbox, span['bbox']) > 0.5):
+                        x0, y0, x1, y1 = span['bbox']
+                        span['bbox'] = [max(x0, native_bbox[0]), max(y0, native_bbox[1]),
+                                        min(x1, native_bbox[2]), min(y1, native_bbox[3])]
                 if layout_det.get('docvortex_native_text'):
                     span['docvortex_native_text'] = True
             

@@ -4,25 +4,29 @@ from io import BytesIO
 
 from loguru import logger
 from rapid_doc.backend.office.model_output_to_middle_json import result_to_middle_json
-from rapid_doc.utils.guess_suffix_or_lang import guess_suffix_by_bytes
+from rapid_doc.utils.guess_suffix_or_lang import guess_suffix_by_bytes, reject_encrypted_ooxml
 
 def office_analyze(
         file_bytes,
-        image_writer=None
+        image_writer=None,
+        file_type=None,
 ):
     infer_start = time.time()
-    file_type = guess_suffix_by_bytes(file_bytes)
+    reject_encrypted_ooxml(file_bytes)
+    file_type = str(file_type).lower().lstrip(".") if file_type else guess_suffix_by_bytes(file_bytes)
     file_stream = BytesIO(file_bytes)
 
-    if file_type == "docx":
-        from rapid_doc.model.docx.main import convert_binary
-    elif file_type == "pptx":
-        from rapid_doc.model.pptx.main import convert_binary
-    elif file_type == "xlsx":
-        from rapid_doc.model.xlsx.main import convert_binary
-    else:
+    from rapid_doc._vendor.docvortex_core.analyzers.native import (
+        DocModel, DocxModel, XlsModel, XlsxModel, PptModel, PptxModel,
+    )
+    models = {
+        "doc": DocModel, "docx": DocxModel,
+        "xls": XlsModel, "xlsx": XlsxModel, "xlsm": XlsxModel,
+        "ppt": PptModel, "pptx": PptxModel,
+    }
+    if file_type not in models:
         raise ValueError(f"Unsupported or unknown office file type: {file_type}")
-    results = convert_binary(file_stream)
+    results = models[file_type]().predict(file_stream)
 
     infer_time = round(time.time() - infer_start, 2)
     safe_time = max(infer_time, 0.01)

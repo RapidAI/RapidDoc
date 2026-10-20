@@ -1,201 +1,73 @@
-# Copyright (c) Opendatalab. All rights reserved.
-from io import BytesIO
+"""Structural file detection and lazy code-language classification."""
+from functools import lru_cache
 from pathlib import Path
-from zipfile import BadZipFile, ZipFile
-from xml.etree import ElementTree
+from io import BytesIO
 
-from loguru import logger
-from rapid_doc.model.magika.magika import Magika
-
+from rapid_doc._vendor.docvortex_core.document.detection import (
+    _guess_ooxml_suffix_by_bytes, _guess_ooxml_suffix_by_path,
+    _guess_ole2_suffix_by_bytes, _guess_ole2_suffix_by_path,
+)
 
 DEFAULT_LANG = "txt"
-PDF_SIG_BYTES = b'%PDF'
-OOXML_ROOT_RELS = "_rels/.rels"
-OOXML_CONTENT_TYPES = "[Content_Types].xml"
-OOXML_PACKAGE_REL_NS = (
-    "http://schemas.openxmlformats.org/package/2006/relationships"
-)
-OOXML_CONTENT_TYPES_NS = (
-    "http://schemas.openxmlformats.org/package/2006/content-types"
-)
-OOXML_OFFICE_DOCUMENT_REL = (
-    "http://schemas.openxmlformats.org/officeDocument/2006/relationships/"
-    "officeDocument"
-)
-OOXML_MAIN_CONTENT_TYPES = {
-    (
-        "application/vnd.openxmlformats-officedocument.wordprocessingml."
-        "document.main+xml"
-    ): "docx",
-    (
-        "application/vnd.openxmlformats-officedocument.presentationml."
-        "presentation.main+xml"
-    ): "pptx",
-    (
-        "application/vnd.openxmlformats-officedocument.spreadsheetml."
-        "sheet.main+xml"
-    ): "xlsx",
-}
-magika = Magika()
+PDF_SIG_BYTES = b"%PDF"
+
+
+def reject_encrypted_ooxml(file_bytes: bytes) -> None:
+    """Encrypted modern Office uses OLE storage rather than a ZIP package."""
+    if not file_bytes.startswith(b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1"):
+        return
+    import olefile
+    try:
+        with olefile.OleFileIO(BytesIO(file_bytes)) as ole:
+            encrypted = ole.exists("EncryptedPackage") or ole.exists("EncryptionInfo")
+    except OSError:
+        return  # The selected parser reports malformed containers.
+    if encrypted:
+        from rapid_doc._vendor.docvortex_core.analyzers.native.office.errors import LegacyOfficeEncryptedError
+        raise LegacyOfficeEncryptedError("Encrypted OOXML packages are not supported")
+
+
+@lru_cache(maxsize=1)
+def _get_magika():
+    from rapid_doc.model.magika.magika import Magika
+    return Magika()
+
 
 def _normalize_text_for_language_guess(code: str) -> str:
-    if not code:
-        return ""
-
-    normalized = []
-    index = 0
-    while index < len(code):
-        current_char = code[index]
-        current_ord = ord(current_char)
-
-        if 0xD800 <= current_ord <= 0xDBFF:
-            if index + 1 < len(code):
-                next_char = code[index + 1]
-                next_ord = ord(next_char)
-                if 0xDC00 <= next_ord <= 0xDFFF:
-                    pair = current_char + next_char
-                    normalized.append(pair.encode("utf-16", "surrogatepass").decode("utf-16"))
-                    index += 2
-                    continue
-            index += 1
-            continue
-
-        if 0xDC00 <= current_ord <= 0xDFFF:
-            index += 1
-            continue
-
-        normalized.append(current_char)
-        index += 1
-
-    return "".join(normalized)
+    # Restore explicit surrogate pairs and drop lone halves.
+    return code.encode("utf-16", errors="surrogatepass").decode("utf-16", errors="ignore")
 
 
-def guess_language_by_text(code):
-    normalized_code = _normalize_text_for_language_guess(code)
-    if not normalized_code:
+def guess_language_by_text(code: str) -> str:
+    normalized = _normalize_text_for_language_guess(code)
+    if not normalized:
         return DEFAULT_LANG
-
     try:
-        codebytes = normalized_code.encode("utf-8", errors="replace")
-        lang = magika.identify_bytes(codebytes).prediction.output.label
+        label = _get_magika().identify_bytes(normalized.encode("utf-8")).prediction.output.label
     except Exception:
         return DEFAULT_LANG
-
-    return lang if lang != "unknown" else DEFAULT_LANG
-
-
-def _strip_package_part_name(part_name: str | None) -> str:
-    """规范化 OPC part 路径，方便匹配 Content_Types 中的 PartName。"""
-    if not part_name:
-        return ""
-    return part_name.replace("\\", "/").lstrip("/")
+    return label if label != "unknown" else DEFAULT_LANG
 
 
-def _ooxml_relationship_targets(root: ElementTree.Element) -> list[str]:
-    """从根关系文件中提取 Office 主文档关系目标。"""
-    targets = []
-    for relationship in root:
-        if relationship.tag not in {
-            f"{{{OOXML_PACKAGE_REL_NS}}}Relationship",
-            "Relationship",
-        }:
-            continue
-        if relationship.get("TargetMode") == "External":
-            continue
-        if relationship.get("Type") != OOXML_OFFICE_DOCUMENT_REL:
-            continue
-        target = _strip_package_part_name(relationship.get("Target"))
-        if target:
-            targets.append(target)
-    return targets
-
-
-def _ooxml_content_type_overrides(root: ElementTree.Element) -> dict[str, str]:
-    """读取 Content_Types 中每个显式 part 的 ContentType 映射。"""
-    overrides = {}
-    for override in root:
-        if override.tag not in {
-            f"{{{OOXML_CONTENT_TYPES_NS}}}Override",
-            "Override",
-        }:
-            continue
-        part_name = _strip_package_part_name(override.get("PartName"))
-        content_type = override.get("ContentType")
-        if part_name and content_type:
-            overrides[part_name] = content_type
-    return overrides
-
-
-def _guess_ooxml_suffix_from_zip(package: ZipFile) -> str | None:
-    """根据 OOXML 包内标准主文档关系和主内容类型判断 Office 子类型。"""
-    rels_root = ElementTree.fromstring(package.read(OOXML_ROOT_RELS))
-    content_types_root = ElementTree.fromstring(package.read(OOXML_CONTENT_TYPES))
-
-    overrides = _ooxml_content_type_overrides(content_types_root)
-    for target in _ooxml_relationship_targets(rels_root):
-        suffix = OOXML_MAIN_CONTENT_TYPES.get(overrides.get(target, ""))
-        if suffix:
-            return suffix
-    return None
-
-
-def _guess_ooxml_suffix_by_bytes(file_bytes: bytes) -> str | None:
-    """优先用 OOXML 包结构识别 docx/pptx/xlsx，避免 Magika 被内嵌对象误导。"""
-    try:
-        with ZipFile(BytesIO(file_bytes)) as package:
-            return _guess_ooxml_suffix_from_zip(package)
-    except (
-        BadZipFile,
-        KeyError,
-        ElementTree.ParseError,
-        RuntimeError,
-        OSError,
-        ValueError,
-    ):
-        return None
-
-
-def _guess_ooxml_suffix_by_path(file_path: Path) -> str | None:
-    """从文件路径读取 OOXML 包结构；失败时交给 Magika 原有逻辑兜底。"""
-    try:
-        with ZipFile(file_path) as package:
-            return _guess_ooxml_suffix_from_zip(package)
-    except (
-        BadZipFile,
-        KeyError,
-        ElementTree.ParseError,
-        RuntimeError,
-        OSError,
-        ValueError,
-    ):
-        return None
-
-
-def guess_suffix_by_bytes(file_bytes, file_path=None) -> str:
-    ooxml_suffix = _guess_ooxml_suffix_by_bytes(file_bytes)
-    if ooxml_suffix:
-        return ooxml_suffix
-
-    suffix = magika.identify_bytes(file_bytes).prediction.output.label
-    if file_path and suffix in ["ai", "html"] and Path(file_path).suffix.lower() in [".pdf"] and file_bytes[:4] == PDF_SIG_BYTES:
-        suffix = "pdf"
-    return suffix
+def guess_suffix_by_bytes(file_bytes: bytes, file_path=None) -> str:
+    if file_bytes.startswith(PDF_SIG_BYTES):
+        return "pdf"
+    reject_encrypted_ooxml(file_bytes)
+    office = _guess_ooxml_suffix_by_bytes(file_bytes) or _guess_ole2_suffix_by_bytes(file_bytes)
+    if office:
+        return office
+    return _get_magika().identify_bytes(file_bytes).prediction.output.label
 
 
 def guess_suffix_by_path(file_path) -> str:
-    if not isinstance(file_path, Path):
-        file_path = Path(file_path)
-
-    ooxml_suffix = _guess_ooxml_suffix_by_path(file_path)
-    if ooxml_suffix:
-        return ooxml_suffix
-
-    suffix = magika.identify_path(file_path).prediction.output.label
-    if suffix in ["ai", "html"] and file_path.suffix.lower() in [".pdf"]:
-        try:
-            with open(file_path, 'rb') as f:
-                if f.read(4) == PDF_SIG_BYTES:
-                    suffix = "pdf"
-        except Exception as e:
-            logger.warning(f"Failed to read file {file_path} for PDF signature check: {e}")
-    return suffix
+    path = Path(file_path)
+    with path.open("rb") as stream:
+        if stream.read(4) == PDF_SIG_BYTES:
+            return "pdf"
+    office = _guess_ooxml_suffix_by_path(path) or _guess_ole2_suffix_by_path(path)
+    if office:
+        return office
+    with path.open("rb") as stream:
+        if stream.read(8) == b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1":
+            reject_encrypted_ooxml(path.read_bytes())
+    return _get_magika().identify_path(path).prediction.output.label
