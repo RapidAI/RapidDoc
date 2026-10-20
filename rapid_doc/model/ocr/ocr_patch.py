@@ -34,7 +34,9 @@ _patches_applied = False
 
 def patch_text_detector():
     """修复 TextDetector 的 get_preprocess 方法"""
-    def new_get_preprocess(self, max_wh: int) -> DetPreProcess:
+    def new_get_preprocess(self, max_wh: int | None = None) -> DetPreProcess:
+        # 3.10+ calls without max_wh; retain the legacy argument for callers
+        # using older RapidOCR or RapidDoc's batched detection path.
         limit_side_len = self.limit_side_len
         return DetPreProcess(limit_side_len, self.limit_type, self.mean, self.std)
 

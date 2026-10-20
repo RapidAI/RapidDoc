@@ -14,10 +14,10 @@ Dockerfile 已移除本机 LibreOffice，六种 Office 格式（DOC/DOCX、XLS/X
 cd docker
 
 # 1. CPU 模式
-docker build -f Dockerfile -t hzkitty/rapid-doc:0.9.10 .
+docker build -f Dockerfile -t hzkitty/rapid-doc:0.9.11 .
 
 # 2. GPU 模式
-docker build -f DockerfileGPU -t hzkitty/rapid-doc:0.9.10-gpu .
+docker build -f DockerfileGPU -t hzkitty/rapid-doc:0.9.11-gpu .
 ```
 
 

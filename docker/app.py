@@ -13,7 +13,7 @@ from typing import Optional, List
 
 import uvicorn
 from dotenv import load_dotenv
-from fastapi import FastAPI, UploadFile, File, Form
+from fastapi import FastAPI, UploadFile, File, Form, Request
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse, FileResponse
 from starlette.background import BackgroundTask
@@ -146,6 +146,7 @@ def has_vl_env():
     summary="Parse files using RapidDoc - Compatible with official API",
 )
 async def file_parse(
+    request: Request,
     files: List[UploadFile] = File(...),
     output_dir: str = Form("./output"),
     clear_output_file: bool = Form(True),
@@ -189,6 +190,16 @@ async def file_parse(
         end_page_id: End page ID for parsing
     """
     try:
+        # Newer FastAPI treats omitted bool Form fields as unchecked checkboxes
+        # (False), including fields declared with Form(True). This API uses
+        # omission to mean the documented default; explicit false still wins.
+        form_data = await request.form()
+        clear_output_file = clear_output_file if 'clear_output_file' in form_data else True
+        formula_enable = formula_enable if 'formula_enable' in form_data else True
+        table_enable = table_enable if 'table_enable' in form_data else True
+        return_md = return_md if 'return_md' in form_data else True
+        return_images = return_images if 'return_images' in form_data else True
+
         # 创建唯一的输出目录
         unique_dir = os.path.join(output_dir, str(uuid.uuid4()))
         os.makedirs(unique_dir, exist_ok=True)

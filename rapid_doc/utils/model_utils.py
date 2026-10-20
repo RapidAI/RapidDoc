@@ -58,35 +58,6 @@ def get_cpu_vendor():
             return vendor
     return None
 
-
-def check_openvino(target_device="CPU", require_intel_cpu=True):
-    """
-    检查当前环境是否适合作为默认 OpenVINO 推理后端。
-
-    默认只在 Intel CPU 上启用 CPU OpenVINO，避免 AMD/Apple/未知 CPU
-    因为运行时可导入而被自动切到 OpenVINO。
-    """
-    target_device = (target_device or "").upper()
-    if target_device == "CPU" and require_intel_cpu:
-        cpu_vendor = get_cpu_vendor()
-        if cpu_vendor != "intel":
-            logger.info(f"Skip OpenVINO auto selection: CPU vendor is {cpu_vendor or 'unknown'}")
-            return False
-
-    try:
-        try:
-            from openvino import Core
-        except ImportError:
-            from openvino.runtime import Core  # 兼容旧版本
-        core = Core()
-        devices = [str(device).upper() for device in core.available_devices]
-        if target_device:
-            return target_device in devices
-        return bool(devices)
-    except Exception as e:
-        logger.warning(f"OpenVINO 可用性检查出错: {e}")
-        return False
-
 def crop_img(input_res, input_img: np.ndarray, crop_paste_x=0, crop_paste_y=0, layout_shape_mode="auto"):
 
     crop_xmin, crop_ymin = int(input_res['poly'][0]), int(input_res['poly'][1])

@@ -75,6 +75,17 @@ def default_download(mineru_models_dir, models_pkg, configs_pkg):
             )
             DownloadFile.run(download_params)
 
+def _iter_ocr_model_configs(value):
+    """Yield model records, skipping alias strings and routing metadata."""
+    if not isinstance(value, (dict, DictConfig)):
+        return
+    if "model_dir" in value:
+        yield value
+        return
+    for child in value.values():
+        yield from _iter_ocr_model_configs(child)
+
+
 def ocr_download(mineru_models_dir, models_pkg, configs_pkg):
     if mineru_models_dir:
         model_dir = Path(mineru_models_dir)
@@ -104,29 +115,26 @@ def ocr_download(mineru_models_dir, models_pkg, configs_pkg):
                     )
                     DownloadFile.run(download_params)
             else:
-                for version, ocr_info in engin_info.items(): # ocr_info为PP-OCRv4层级
-                    for det, det_info in ocr_info.items(): # info为det层级
-                        for model_name, model_info in det_info.items():
-                            # 如果有字典文件，下载字典
-                            dict_download_url = model_info.get("dict_url")
-                            if dict_download_url:
-                                dict_path = (model_dir / Path(dict_download_url).name)
-                            if dict_download_url and not Path(dict_path).exists():
-                                DownloadFile.run(
-                                    DownloadFileInput(
-                                        file_url=dict_download_url,
-                                        sha256=None,
-                                        save_path=dict_path,
-                                    )
+                for model_info in _iter_ocr_model_configs(engin_info):
+                    dict_download_url = model_info.get("dict_url")
+                    if dict_download_url:
+                        dict_path = model_dir / Path(dict_download_url).name
+                        if not dict_path.exists():
+                            DownloadFile.run(
+                                DownloadFileInput(
+                                    file_url=dict_download_url,
+                                    sha256=None,
+                                    save_path=dict_path,
                                 )
-                            # 下载模型
-                            model_path = model_dir / Path(model_info["model_dir"]).name
-                            download_params = DownloadFileInput(
-                                file_url=model_info["model_dir"],
-                                sha256=model_info["SHA256"],
-                                save_path=model_path,
                             )
-                            DownloadFile.run(download_params)
+                    model_path = model_dir / Path(model_info["model_dir"]).name
+                    DownloadFile.run(
+                        DownloadFileInput(
+                            file_url=model_info["model_dir"],
+                            sha256=model_info["SHA256"],
+                            save_path=model_path,
+                        )
+                    )
 
 def download_pipeline_models():
     """下载Pipeline模型"""

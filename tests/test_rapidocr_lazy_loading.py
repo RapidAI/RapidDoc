@@ -23,7 +23,6 @@ def test_adapters_are_loaded_before_session_installation(monkeypatch, lazy, ops)
         engine._load_rec_model = Mock(side_effect=lambda: setattr(engine, 'text_rec', recognizer))
     monkeypatch.setattr(rapid_ocr, 'RapidOCR', lambda **kwargs: engine)
     monkeypatch.setattr(rapid_ocr, 'get_device', lambda: 'cpu')
-    monkeypatch.setattr(rapid_ocr, 'check_openvino', lambda: False)
     install = rapid_ocr.install_onnx_ops
     def checked_install(value, settings):
         assert value.text_det is detector and value.text_rec is recognizer
@@ -44,7 +43,6 @@ def test_model_loading_failure_is_not_silently_skipped(monkeypatch):
                              _load_det_model=Mock(side_effect=RuntimeError('invalid model')))
     monkeypatch.setattr(rapid_ocr, 'RapidOCR', lambda **kwargs: engine)
     monkeypatch.setattr(rapid_ocr, 'get_device', lambda: 'cpu')
-    monkeypatch.setattr(rapid_ocr, 'check_openvino', lambda: False)
     install = Mock()
     monkeypatch.setattr(rapid_ocr, 'install_onnx_ops', install)
     with pytest.raises(RuntimeError, match='invalid model'):
