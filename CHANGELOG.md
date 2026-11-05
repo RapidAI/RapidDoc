@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.9.12
+
+原 Python `rapid-doc` 发布版本。
+
+- 同步 DocVortex 0.6.13～0.6.15 的 PDF 表格字体框、跨页表格边界和相关文字处理修复。
+- 保留原 Python API、模型配置和 Office 解析入口。
+- 完成发布前的 PDF、Office 和表格回归检查。
+
 ## 0.1.0
 
 首个 Rust 引擎及 Python、Java、Go、Node.js 绑定发布候选版本。
