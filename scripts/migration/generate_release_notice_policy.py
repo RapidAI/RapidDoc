@@ -53,7 +53,7 @@ def main():
         files,keep=selected_files(p)
         if not files:raise ValueError('Missing source license: '+component)
         choices[component]=dict(spdx=p['license'],selected_files=sorted(keep),repository=p.get('repository'))
-        for name in keep:
+        for name in sorted(keep):
             path=f"cargo-runtime/{p['name']}-{p['version']}/{name}"
             generated[path]=files[name]
             rules[path]=dict(component=component,selected=True)

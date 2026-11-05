@@ -762,11 +762,11 @@
       "component": "log 0.4.34",
       "selected": true
     },
-    "cargo-runtime/memchr-2.8.3/LICENSE-MIT": {
+    "cargo-runtime/memchr-2.8.3/COPYING": {
       "component": "memchr 2.8.3",
       "selected": true
     },
-    "cargo-runtime/memchr-2.8.3/COPYING": {
+    "cargo-runtime/memchr-2.8.3/LICENSE-MIT": {
       "component": "memchr 2.8.3",
       "selected": true
     },
@@ -786,11 +786,11 @@
       "component": "percent-encoding 2.3.2",
       "selected": true
     },
-    "cargo-runtime/ring-0.17.14/LICENSE-BoringSSL": {
+    "cargo-runtime/ring-0.17.14/LICENSE": {
       "component": "ring 0.17.14",
       "selected": true
     },
-    "cargo-runtime/ring-0.17.14/LICENSE": {
+    "cargo-runtime/ring-0.17.14/LICENSE-BoringSSL": {
       "component": "ring 0.17.14",
       "selected": true
     },
@@ -858,11 +858,11 @@
       "component": "webpki-roots 1.0.11",
       "selected": true
     },
-    "cargo-runtime/windows-link-0.2.1/license-mit": {
+    "cargo-runtime/windows-link-0.2.1/license-apache-2.0": {
       "component": "windows-link 0.2.1",
       "selected": true
     },
-    "cargo-runtime/windows-link-0.2.1/license-apache-2.0": {
+    "cargo-runtime/windows-link-0.2.1/license-mit": {
       "component": "windows-link 0.2.1",
       "selected": true
     },
