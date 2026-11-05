@@ -12,6 +12,7 @@ sys.path.insert(0, str(ROOT/'scripts/migration'))
 spec = importlib.util.spec_from_file_location('notice_sync', ROOT/'scripts/migration/sync_migration_notices.py')
 sync = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(sync)
+from license_bundle import read_notice
 
 
 def test_source_and_distribution_preserve_every_original_notice():
@@ -20,7 +21,7 @@ def test_source_and_distribution_preserve_every_original_notice():
     versions = [e for e in index['entries'] if e['name'] == 'PDFTEXT-NOTICE.txt']
     assert len(versions) == 2  # differing originals must not overwrite each other
     assert len({v['sha256'] for v in versions}) == 2
-    assert (ROOT/'bindings/python/python/rapid_doc_rust/licenses/PDFTEXT.txt').is_file()
+    assert read_notice(ROOT/'bindings/python/python/rapid_doc_rust/licenses/PDFTEXT.txt')
     assert (ROOT/'rust/rapiddoc-inference/vendor/x86-simd-sort/LICENSE.md').is_file()
 
 
