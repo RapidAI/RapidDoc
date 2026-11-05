@@ -77,6 +77,18 @@ def pack_shared(entries, legal_templates=None):
 
 
 def unpack_shared(text,index):
+    raw = bytes(text)
+    try:
+        return _unpack_shared(raw, index)
+    except ValueError:
+        # Git may check generated bundles out with CRLF on Windows, while
+        # their stored offsets and hashes use canonical LF bytes.
+        if b'\r\n' not in raw:
+            raise
+        return _unpack_shared(raw.replace(b'\r\n', b'\n'), index)
+
+
+def _unpack_shared(text,index):
     metadata=json.loads(index);terms={}
     def slice_checked(record):
         start,end=record['start'],record['end']
