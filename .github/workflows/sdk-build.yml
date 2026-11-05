@@ -109,9 +109,16 @@ jobs:
         run: |
           if (-not (Get-Command nasm -ErrorAction SilentlyContinue)) { choco install nasm --no-progress -y }
           "C:\Program Files\NASM" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
-          if (Test-Path 'C:\msys64\mingw64\bin\gcc.exe') {
-            'C:\msys64\mingw64\bin' | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
-          } else { throw 'Install an x64 GCC toolchain for Go cgo on this runner' }
+          $gccDirectories = @(
+            'C:\msys64\mingw64\bin',
+            'C:\mingw64\bin'
+          )
+          $gccDirectory = $gccDirectories | Where-Object { Test-Path (Join-Path $_ 'gcc.exe') } | Select-Object -First 1
+          if ($gccDirectory) {
+            $gccDirectory | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
+          } else {
+            throw 'Install an x64 GCC toolchain for Go cgo on this runner'
+          }
       - name: Build-time Python tools and pinned runtime distributors
         run: python -m pip install "maturin>=1.8,<2" "twine>=6,<7" "fonttools>=4.60,<5" "pypdfium2==5.10.1" "shapely==2.1.2"
       - name: Linux wheel repair tools
