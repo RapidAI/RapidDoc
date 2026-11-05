@@ -123,7 +123,7 @@ jobs:
         run: python -m pip install "maturin>=1.8,<2" "twine>=6,<7" "fonttools>=4.60,<5" "pypdfium2==5.10.1" "shapely==2.1.2"
       - name: Linux wheel repair tools
         if: runner.os == 'Linux'
-        run: python -m pip install "auditwheel>=6,<7" "patchelf>=0.17"
+        run: python -m pip install "auditwheel>=6.8.2,<7" "patchelf>=0.17"
       - name: Node platform loader and progress checks
         run: node --test bindings/node/test/platform.test.js bindings/node/test/progress.test.js
       - name: Build packages and run seven-format installation checks

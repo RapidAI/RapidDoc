@@ -139,7 +139,7 @@ def main():
                 "auditwheel",
                 "repair",
                 "--plat",
-                "manylinux_2_34_x86_64",
+                "auto",
                 "--exclude",
                 "libcudart.so.12",
                 "--exclude",
