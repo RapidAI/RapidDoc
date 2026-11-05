@@ -190,9 +190,10 @@ def test_git_preserves_byte_indexed_notice_archives(autocrlf):
     import subprocess
 
     paths = subprocess.check_output(
-        ['git', 'ls-files', '*THIRD_PARTY_NOTICES.txt', '*MIGRATION-NOTICES.txt'],
-        cwd=ROOT, text=True,
-    ).splitlines()
+        ['git', 'ls-files', '-z', '*THIRD_PARTY_NOTICES.txt', '*MIGRATION-NOTICES.txt',
+         'bindings/node/licenses/*.txt', '*.pdf'],
+        cwd=ROOT,
+    ).decode('utf8').rstrip('\0').split('\0')
     assert paths
     for name in paths:
         raw = (ROOT / name).read_bytes()

@@ -3,3 +3,5 @@
 **/MIGRATION-NOTICES.txt -text
 # These source notices are pinned by their upstream SHA-256.
 bindings/node/licenses/*.txt -text
+# Even ASCII-only PDFs contain byte offsets and stream lengths.
+*.pdf binary
