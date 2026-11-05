@@ -1,3 +1,5 @@
 # Byte-indexed notice archives must retain their exact contents through Git.
 **/THIRD_PARTY_NOTICES.txt -text
 **/MIGRATION-NOTICES.txt -text
+# These source notices are pinned by their upstream SHA-256.
+bindings/node/licenses/*.txt -text
