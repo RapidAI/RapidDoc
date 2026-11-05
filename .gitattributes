@@ -1,0 +1,3 @@
+# Byte-indexed notice archives must retain their exact contents through Git.
+**/THIRD_PARTY_NOTICES.txt -text
+**/MIGRATION-NOTICES.txt -text

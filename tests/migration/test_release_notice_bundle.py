@@ -183,3 +183,20 @@ def test_shared_term_corruption_is_rejected():
                            {'test':b'Common terms apply.'})
     with pytest.raises(ValueError,match='terms changed'):
         unpack_shared(text.replace(b'Common terms apply.',b'Changed terms apply.'),index)
+
+
+@pytest.mark.parametrize('autocrlf', ['true', 'false'])
+def test_git_preserves_byte_indexed_notice_archives(autocrlf):
+    import subprocess
+
+    paths = subprocess.check_output(
+        ['git', 'ls-files', '*THIRD_PARTY_NOTICES.txt', '*MIGRATION-NOTICES.txt'],
+        cwd=ROOT, text=True,
+    ).splitlines()
+    assert paths
+    for name in paths:
+        raw = (ROOT / name).read_bytes()
+        command = ['git', '-c', 'core.autocrlf=' + autocrlf, 'hash-object', '--stdin']
+        original = subprocess.check_output(command + ['--no-filters'], input=raw, cwd=ROOT)
+        staged = subprocess.check_output(command + ['--path=' + name], input=raw, cwd=ROOT)
+        assert staged == original, name
