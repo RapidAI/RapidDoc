@@ -4,7 +4,7 @@
   "manifest_hashes": {
     "bindings/python/Cargo.toml": "4aed14d7fcfb6e16aebb9bdb53cda5cda21ad11d5b1dd3623aa2eba0ec112a73",
     "Cargo.toml": "b825bddd825e515e8ebd0c1a9e78a6076139dfb2b9de500097458d6e9d3f3de0",
-    "licenses/migration-notices.json": "3833befc14c0921baf3cf967a2e1de76e04e09e9d1d756e2105477931df167c5",
+    "licenses/migration-notices.json": "b689a6706abbd2abf2d24792b6fffa92543c13d06dce2ad1da247b0746178fb4",
     "licenses/MIGRATION-NOTICES.txt": "a9be0ae796b185d3f80065b767ff0382dcfcfe3c08e203e9012b21e581a76c7f",
     "rust/rapiddoc/Cargo.toml": "ffa16667cc0554bdd6e98289cf2567cea01bf67db6793252b7c2434cd47182e3",
     "rust/rapiddoc-core/Cargo.toml": "835a8409f68621199118a788751779e35f1c4072d2e4a67a89fcfec7699231ed",
@@ -762,11 +762,11 @@
       "component": "log 0.4.34",
       "selected": true
     },
-    "cargo-runtime/memchr-2.8.3/COPYING": {
+    "cargo-runtime/memchr-2.8.3/LICENSE-MIT": {
       "component": "memchr 2.8.3",
       "selected": true
     },
-    "cargo-runtime/memchr-2.8.3/LICENSE-MIT": {
+    "cargo-runtime/memchr-2.8.3/COPYING": {
       "component": "memchr 2.8.3",
       "selected": true
     },
@@ -786,15 +786,15 @@
       "component": "percent-encoding 2.3.2",
       "selected": true
     },
-    "cargo-runtime/ring-0.17.14/LICENSE-other-bits": {
-      "component": "ring 0.17.14",
-      "selected": true
-    },
     "cargo-runtime/ring-0.17.14/LICENSE-BoringSSL": {
       "component": "ring 0.17.14",
       "selected": true
     },
     "cargo-runtime/ring-0.17.14/LICENSE": {
+      "component": "ring 0.17.14",
+      "selected": true
+    },
+    "cargo-runtime/ring-0.17.14/LICENSE-other-bits": {
       "component": "ring 0.17.14",
       "selected": true
     },
@@ -806,11 +806,11 @@
       "component": "rustls-webpki 0.103.16",
       "selected": true
     },
-    "cargo-runtime/rustls-0.23.46/LICENSE-MIT": {
+    "cargo-runtime/rustls-0.23.46/LICENSE-ISC": {
       "component": "rustls 0.23.46",
       "selected": true
     },
-    "cargo-runtime/rustls-0.23.46/LICENSE-ISC": {
+    "cargo-runtime/rustls-0.23.46/LICENSE-MIT": {
       "component": "rustls 0.23.46",
       "selected": true
     },
@@ -830,11 +830,11 @@
       "component": "subtle 2.6.1",
       "selected": true
     },
-    "cargo-runtime/typenum-1.20.1/LICENSE-MIT": {
+    "cargo-runtime/typenum-1.20.1/LICENSE": {
       "component": "typenum 1.20.1",
       "selected": true
     },
-    "cargo-runtime/typenum-1.20.1/LICENSE": {
+    "cargo-runtime/typenum-1.20.1/LICENSE-MIT": {
       "component": "typenum 1.20.1",
       "selected": true
     },
@@ -858,11 +858,11 @@
       "component": "webpki-roots 1.0.11",
       "selected": true
     },
-    "cargo-runtime/windows-link-0.2.1/license-apache-2.0": {
+    "cargo-runtime/windows-link-0.2.1/license-mit": {
       "component": "windows-link 0.2.1",
       "selected": true
     },
-    "cargo-runtime/windows-link-0.2.1/license-mit": {
+    "cargo-runtime/windows-link-0.2.1/license-apache-2.0": {
       "component": "windows-link 0.2.1",
       "selected": true
     },
@@ -2681,17 +2681,17 @@
     }
   },
   "retained_migration": [
-    "migration/CHARACTER-DEDUP-NOTICE.txt/a80d509c4de6.txt",
-    "migration/DOCVORTEX-PDFIUM-PATHS-NOTICE.txt/f069e3ab9e3e.txt",
-    "migration/DROID-FONT-NOTICE.txt/38751245389e.txt",
-    "migration/FORMULA-DECODE-NOTICE.txt/81347e278c72.txt",
-    "migration/NATIVE-FIXED-CJK-FONT-NOTICE.txt/f053de0cc588.txt",
-    "migration/NUMPY-SORT-NOTICE.txt/1b6bc8c7f1bd.txt",
-    "migration/PDFTEXT-NOTICE.txt/6ff3f3a8ece0.txt",
-    "migration/PDFTEXT-NOTICE.txt/732ea6cbf73c.txt",
-    "migration/PYPDFIUM2-NOTICE.txt/91af52396186.txt",
-    "migration/PYTHON-MATH-NOTICE.txt/d4f1eab876c5.txt",
-    "migration/PYTHON-SET-NOTICE.txt/5609e4401c53.txt"
+    "migration/CHARACTER-DEDUP-NOTICE.txt/1fdae2b7ff85.txt",
+    "migration/DOCVORTEX-PDFIUM-PATHS-NOTICE.txt/a53b7a11dd6e.txt",
+    "migration/DROID-FONT-NOTICE.txt/29ebbfee42a1.txt",
+    "migration/FORMULA-DECODE-NOTICE.txt/6f88438211eb.txt",
+    "migration/NATIVE-FIXED-CJK-FONT-NOTICE.txt/307ce365fd33.txt",
+    "migration/NUMPY-SORT-NOTICE.txt/e2b6e3e6829d.txt",
+    "migration/PDFTEXT-NOTICE.txt/6cb8e63bedd3.txt",
+    "migration/PDFTEXT-NOTICE.txt/6a0c8500b8fe.txt",
+    "migration/PYPDFIUM2-NOTICE.txt/7edb87373e77.txt",
+    "migration/PYTHON-MATH-NOTICE.txt/edc9011ebae2.txt",
+    "migration/PYTHON-SET-NOTICE.txt/aaeb3db82da7.txt"
   ],
   "scope": "Windows MSVC and Linux glibc runtime (CPU and CUDA); normal edges excluding proc-macro/build/dev",
   "source_audit_records": "Development provenance and migration records remain in source; Cargo license alternatives are read from locked registry sources"
