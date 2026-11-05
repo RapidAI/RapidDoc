@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,6 +23,7 @@ class InputOverloadsTest {
                 .layoutModel("docvortex_rule")
                 .formulaEnabled(false)
                 .tableEnabled(false)
+                .tableConfig(Collections.singletonMap("use_word_box", false))
                 .allowDownload(false)
                 .progressLogging(false)
                 .build();
