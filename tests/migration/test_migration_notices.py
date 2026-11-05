@@ -25,6 +25,7 @@ def test_source_and_distribution_preserve_every_original_notice():
 def test_corrupt_or_missing_notice_content_is_rejected():
     raw = (ROOT/'licenses/MIGRATION-NOTICES.txt').read_bytes()
     index = json.loads((ROOT/'licenses/migration-notices.json').read_text(encoding='utf8'))
+    assert sync.validate(raw.replace(b'\n', b'\r\n'), index) == 120
     broken = bytearray(raw)
     broken[index['entries'][0]['start']] ^= 1
     with pytest.raises(ValueError, match='content changed'):

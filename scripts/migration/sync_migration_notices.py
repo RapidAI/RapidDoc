@@ -10,6 +10,9 @@ FILENAMES = ('MIGRATION-NOTICES.txt', 'migration-notices.json')
 
 
 def validate(bundle, index):
+    # Git may check this reviewed text archive out with CRLF on Windows,
+    # while the recorded offsets and hashes are canonical LF bytes.
+    bundle = bytes(bundle).replace(b'\r\n', b'\n')
     if index['schema'] != 1:
         raise ValueError('Unsupported migration notice index')
     previous = 0
@@ -33,7 +36,7 @@ def validate(bundle, index):
 
 def sync(check=False):
     source = ROOT / 'licenses'
-    bundle = (source / FILENAMES[0]).read_bytes()
+    bundle = (source / FILENAMES[0]).read_bytes().replace(b'\r\n', b'\n')
     index = json.loads((source / FILENAMES[1]).read_text(encoding='utf8'))
     count = validate(bundle, index)
     # Keep attribution in both wheels and independently packaged Rust crates.
@@ -53,6 +56,8 @@ def sync(check=False):
             if name=='migration-notices.json' and destination==ROOT/'bindings/python/python/rapid_doc_rust/licenses':
                 continue  # Development byte-offset index is retained in the source tree.
             raw = (source / name).read_bytes()
+            if name == FILENAMES[0]:
+                raw = raw.replace(b'\r\n', b'\n')
             target = destination / name
             if check:
                 if read_notice(target) != raw:
