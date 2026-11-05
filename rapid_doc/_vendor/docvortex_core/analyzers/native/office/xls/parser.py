@@ -11,9 +11,10 @@ from loguru import logger
 from ..._shared.hyperlink import OFFICE_EXTERNAL_HYPERLINK_SCHEMES, sanitize_hyperlink_target
 from ..errors import LegacyOfficeEncryptedError, LegacyOfficeMalformedError
 from ..legacy.binary import get_f64, get_u16, get_u32
-from ..legacy.officeart import OfficeArtShape, OfficeImagePayload, decode_bstore, extract_excel_shapes
+from ..legacy.officeart import OfficeArtShape, OfficeImageBudget, OfficeImagePayload, decode_bstore, extract_excel_shapes
 from ..image import serialize_office_image
 from ..equation.image import OfficeImageEquationDecoder
+from ..limits import MAX_ASSET_TOTAL_BYTES
 
 from .chart import chart_source_axes, chart_source_selection
 from .models import (
@@ -254,7 +255,12 @@ def _read_extern_sheets(
     return result
 
 
-def _read_globals(data: bytes, budget: RecordBudget) -> _Globals:
+def _read_globals(
+    data: bytes,
+    budget: RecordBudget,
+    *,
+    image_decoder: OfficeImageEquationDecoder | None = None,
+) -> _Globals:
     """解析 Workbook Globals Substream 及共享图片资源。"""
 
     first = record_at(data, 0, budget=budget)
@@ -335,7 +341,12 @@ def _read_globals(data: bytes, budget: RecordBudget) -> _Globals:
     for payload in extern_payloads:
         globals_.extern_sheets.extend(_read_extern_sheets(payload, internal_supbooks))
     if drawing_chunks:
-        globals_.images = decode_bstore(b"".join(drawing_chunks), charge=budget.charge)
+        image_decoder = image_decoder if image_decoder is not None else OfficeImageEquationDecoder()
+        image_budget = OfficeImageBudget(
+            max_bytes=MAX_ASSET_TOTAL_BYTES,
+            check_image=image_decoder.check_limit,
+        )
+        globals_.images = decode_bstore(b"".join(drawing_chunks), charge=budget.charge, image_budget=image_budget)
     return globals_
 
 
@@ -614,7 +625,7 @@ def _shape_anchor(shape: OfficeArtShape | None) -> tuple[int, int] | None:
     return shape.anchor[0], shape.anchor[1]
 
 
-def _serialize_payload(payload: OfficeImagePayload) -> str | None:
+def _serialize_payload(payload: OfficeImagePayload, image_decoder: OfficeImageEquationDecoder) -> str | None:
     """使用共享 Office 图片策略序列化 BLIP。"""
 
     return serialize_office_image(
@@ -622,6 +633,8 @@ def _serialize_payload(payload: OfficeImagePayload) -> str | None:
         part_name=f"picture.{payload.extension}",
         content_type=payload.content_type,
         render_size_emu=payload.render_size_emu,
+        equation_decoder=image_decoder,
+        limit_reason=payload.limit_reason,
     )
 
 
@@ -671,10 +684,14 @@ def _bind_objects(
             and shape.pib is not None
             and (payload := globals_.images.get(int(shape.pib))) is not None
         ):
-            image_latex = image_equation_decoder.decode(
-                payload.data,
-                part_name=f"picture.{payload.extension}",
-                content_type=payload.content_type,
+            image_latex = (
+                image_equation_decoder.probe(
+                    payload.data,
+                    part_name=f"picture.{payload.extension}",
+                    content_type=payload.content_type,
+                ).latex
+                if payload.limit_reason is None
+                else None
             )
             if image_latex:
                 sheet.equations.append(XlsEquation(row=row, col=col, latex=image_latex))
@@ -688,7 +705,7 @@ def _bind_objects(
         if object_.object_type in {OBJ_PICTURE, OBJ_CHART} or shape.pib is not None:
             payload = globals_.images.get(int(shape.pib or 0))
             if payload is not None:
-                image_base64 = _serialize_payload(payload)
+                image_base64 = _serialize_payload(payload, image_equation_decoder)
                 if image_base64 and object_.object_type != OBJ_CHART:
                     sheet.images.append(XlsImage(row=row, col=col, image_base64=image_base64))
 
@@ -710,7 +727,7 @@ def _bind_objects(
         preview: str | None = None
         if object_.shape.pib is not None:
             payload = globals_.images.get(object_.shape.pib)
-            preview = _serialize_payload(payload) if payload is not None else None
+            preview = _serialize_payload(payload, image_equation_decoder) if payload is not None else None
         if axes is None:
             if preview:
                 sheet.charts.append(
@@ -1067,7 +1084,7 @@ def parse_xls_workbook(
     budget = RecordBudget()
     normalized_equations = {storage.casefold(): latex for storage, latex in (native_equations or {}).items()}
     image_equation_decoder = OfficeImageEquationDecoder()
-    globals_ = _read_globals(data, budget)
+    globals_ = _read_globals(data, budget, image_decoder=image_equation_decoder)
     candidates = _worksheet_bof_offsets(data)
     used_offsets: set[int] = set()
     sheets: list[XlsSheet] = []

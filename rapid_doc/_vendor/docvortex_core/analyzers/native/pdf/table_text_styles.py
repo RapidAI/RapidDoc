@@ -20,7 +20,7 @@ from ._table_recovery.contracts import (
     NativeTableText,
 )
 from ._table_recovery.geometry import page_bbox_to_table_local
-from ._table_recovery.text import build_cell_text_parts
+from ._table_recovery.text import build_cell_text_parts, cell_text_rows, cell_writing_angle
 from .geometry import _bbox_union_many, _coerce_bbox
 from .inline.scripts import (
     _classify_script_runs,
@@ -81,9 +81,17 @@ def _cell_visual_lines(
 ) -> list[_LineItem]:
     """把一个 cell 的 glyph 按 visual row 转换成正文公式分段使用的行。"""
 
+    relative_angle = cell_writing_angle(glyphs)
+    if relative_angle is None:
+        return []
     grouped: dict[int, list[NativeTableGlyph]] = defaultdict(list)
-    for glyph in glyphs:
-        grouped[glyph.visual_row].append(glyph)
+    if relative_angle:
+        rows, _height = cell_text_rows(glyphs, 1.0)
+        grouped.update(enumerate(rows))
+        angle = (angle + relative_angle) % 360
+    else:
+        for glyph in glyphs:
+            grouped[glyph.visual_row].append(glyph)
 
     lines: list[_LineItem] = []
     for visual_row, row_glyphs in sorted(grouped.items()):

@@ -1,0 +1,31 @@
+[package]
+repository = "https://github.com/RapidAI/RapidDoc"
+description = "Command line document parser for RapidDoc."
+include = [
+    "src/**",
+    "build.rs",
+    "build/**",
+    "native/**",
+    "vendor/**",
+    "assets/**",
+    "resources/**",
+    "models.json",
+    "licenses/**",
+    "Cargo.toml",
+    "LICENSE",
+    "README.md",
+]
+name = "rapiddoc-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+rapiddoc = { version = "=0.1.0", path = "../rapiddoc" }
+rapiddoc-core = { version = "=0.1.0", path = "../rapiddoc-core" }
+serde_json.workspace = true
+mimalloc = { version = "=0.1.52", optional = true, default-features = false }
+
+[features]
+default = ["mimalloc-allocator"]
+mimalloc-allocator = ["dep:mimalloc"]

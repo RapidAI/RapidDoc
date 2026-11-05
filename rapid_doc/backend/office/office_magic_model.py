@@ -44,6 +44,9 @@ class MagicModel:
             ]:
                 span = parse_text_block_spans(block_content)
 
+            elif block_type == "code":
+                # Code is literal text: preserve indentation, tabs and newlines.
+                span = {"type": "text", "content": str(block_content)}
             elif block_type in ["image"]:
                 block_type = BlockType.IMAGE_BODY
                 span = {
@@ -143,7 +146,7 @@ class MagicModel:
                 self.chart_blocks.append(block)
             elif block["type"] == BlockType.INTERLINE_EQUATION:
                 self.interline_equation_blocks.append(block)
-            elif block["type"] == BlockType.TEXT:
+            elif block["type"] in (BlockType.TEXT, BlockType.CODE):
                 self.text_blocks.append(block)
             elif block["type"] == BlockType.TITLE:
                 self.title_blocks.append(block)

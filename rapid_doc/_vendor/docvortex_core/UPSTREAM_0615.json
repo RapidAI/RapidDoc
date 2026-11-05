@@ -1,0 +1,29 @@
+{
+  "repository": "https://github.com/myhloli/DocVortex",
+  "target_tag": "v0.6.15",
+  "target_commit": "6549982",
+  "selective_changes": [
+    {
+      "upstream_commit": "e7dc6bd",
+      "scope": "PDF table inflated glyph geometry",
+      "python": [
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/pdf/_table_recovery/ink_geometry.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/pdf/_table_recovery/text.py"
+      ],
+      "rust": "Existing tight-bbox table path retained. PDFium font metadata normalization is in rapiddoc-pdf/src/font_weight.rs."
+    },
+    {
+      "upstream_commit": "7899a33",
+      "scope": "Cross-page table cell text boundaries",
+      "python": ["rapid_doc/utils/table_merge.py"],
+      "rust": "Rust table output uses the shared native cell boundary path and remains covered by table rendering tests."
+    },
+    {
+      "upstream_commit": "0e3a439",
+      "scope": "Embedded font weight evidence",
+      "python": "Vendored Python font recovery remains in the existing native PDF path.",
+      "rust": "Out-of-range PDFium weights are converted to unknown before layout classification."
+    }
+  ],
+  "excluded": ["upstream release metadata", "unrelated CI and wheel changes"]
+}

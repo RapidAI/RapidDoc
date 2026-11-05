@@ -1,0 +1,10 @@
+{
+  "source": "fontTools.agl.LEGACY_AGL2UV",
+  "fonttools": "4.65.0",
+  "unicode_version": "16.0.0",
+  "source_license": "../../../../licenses/fonttools-glyph-data",
+  "files": {
+    "glyphs.json": "bc84e859983d70c3dbc8a8d6be43cd55b9e8e71f4d5254f734e537a9c77d7e0f",
+    "category_c.json": "fdf16ab3b6ae8e5bfe46c19e5f890807dc79080dfe797f33f4ff9cf6bfadf212"
+  }
+}

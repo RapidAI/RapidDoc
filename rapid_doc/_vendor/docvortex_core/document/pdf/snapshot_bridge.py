@@ -120,7 +120,7 @@ def _record_snapshot_result(snapshot, count):
     return snapshot
 
 
-def read_text_snapshot(textpage, frame, rotation, extended, visibility=None):
+def read_text_snapshot(textpage, frame, rotation, extended, visibility=None, unicode_fallback=None):
     """在原锁和 Python textpage 生命周期内读取、规范化与去重。"""
     global _REASON
     native = get_native()
@@ -149,6 +149,9 @@ def read_text_snapshot(textpage, frame, rotation, extended, visibility=None):
             _REASON = "negative character count"
             return None
         try:
+            options = {}
+            if unicode_fallback is not None:
+                return None  # use the Python materializer with verified NUL recovery
             snapshot = native.read_pdfium_text_snapshot(
                 character_addresses,
                 color_addresses,
@@ -158,6 +161,7 @@ def read_text_snapshot(textpage, frame, rotation, extended, visibility=None):
                 frame,
                 rotation,
                 packed_visibility,
+                **options,
             )
         except native.PdfiumReadError as exc:
             raise pdfium.PdfiumError(str(exc)) from exc

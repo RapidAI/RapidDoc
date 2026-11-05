@@ -1299,6 +1299,25 @@ def _physical_row_dense_baseline_pairs(
     return tuple(ambiguous_pairs)
 
 
+def _uncovered_dense_outer_rows(text: NativeTableText, x_tracks: list[float], y_tracks: list[float]) -> list[int]:
+    """检测物理网格首尾之外仍有完整多列记录，避免少量字框交叠伪装文字完整。"""
+    tolerance = max(0.5, 0.08 * text.median_glyph_height)
+    uncovered = []
+    for row in text.rows:
+        center_y = (row.bbox[1] + row.bbox[3]) / 2
+        if y_tracks[0] - tolerance <= center_y <= y_tracks[-1] + tolerance:
+            continue
+        occupied = {
+            col
+            for token in row.tokens
+            for col, (left, right) in enumerate(zip(x_tracks, x_tracks[1:]))
+            if left <= (token.bbox[0] + token.bbox[2]) / 2 <= right
+        }
+        if len(occupied) >= 2:
+            uncovered.append(row.row_index)
+    return uncovered
+
+
 def _looks_like_single_column_tracks(
     x_tracks: list[float],
     local_width: float,
@@ -1625,6 +1644,11 @@ def _build_vector_tracks(
         diagnostics["physical_row_dense_baseline_pairs"] = list(dense_baseline_pairs)
     if dense_baseline_pairs:
         return _reject_vector_candidate(diagnostics, "physical_row_undercount")
+    uncovered_rows = _uncovered_dense_outer_rows(text, x_tracks, y_tracks) if is_line_grid else []
+    if uncovered_rows:
+        if diagnostics is not None:
+            diagnostics["uncovered_dense_outer_rows"] = uncovered_rows
+        return _reject_vector_candidate(diagnostics, "physical_outer_row_undercount")
 
     return _VectorTracks(
         snap_tolerance=snap_tolerance,

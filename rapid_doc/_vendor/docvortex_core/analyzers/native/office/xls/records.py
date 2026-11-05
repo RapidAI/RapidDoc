@@ -74,9 +74,12 @@ def iter_records(
 ) -> Iterator[BiffRecord]:
     """顺序遍历 BIFF 记录，并在截断尾部保留已经完成的记录。"""
 
+    data_view = memoryview(data)
     cursor = start
     while cursor < len(data):
-        if data[cursor:] and not any(data[cursor:]):
+        # 只查看剩余字节，避免每条记录都复制完整尾部；空视图仍走既有坏偏移诊断。
+        remaining = data_view[cursor:]
+        if remaining and not any(remaining):
             return
         record = record_at(data, cursor, budget=budget)
         if record is None:

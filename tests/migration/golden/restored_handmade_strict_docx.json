@@ -1,0 +1,66 @@
+{
+  "assets": {},
+  "content_list_json": [
+    {
+      "page_idx": 0,
+      "text": "Strict heading",
+      "text_level": 2,
+      "type": "text"
+    },
+    {
+      "page_idx": 0,
+      "text": "Strict body with **toggled bold**",
+      "type": "text"
+    }
+  ],
+  "markdown": "## Strict heading\n\nStrict body with **toggled bold**",
+  "middle_json": {
+    "_backend": "office",
+    "_version_name": "0.9.11",
+    "pdf_info": [
+      {
+        "discarded_blocks": [],
+        "page_idx": 0,
+        "para_blocks": [
+          {
+            "index": 0,
+            "is_numbered_style": false,
+            "level": 2,
+            "lines": [
+              {
+                "spans": [
+                  {
+                    "content": "Strict heading",
+                    "type": "text"
+                  }
+                ]
+              }
+            ],
+            "type": "title"
+          },
+          {
+            "index": 1,
+            "lines": [
+              {
+                "spans": [
+                  {
+                    "content": "Strict body with ",
+                    "type": "text"
+                  },
+                  {
+                    "content": "toggled bold",
+                    "style": [
+                      "bold"
+                    ],
+                    "type": "text"
+                  }
+                ]
+              }
+            ],
+            "type": "text"
+          }
+        ]
+      }
+    ]
+  }
+}

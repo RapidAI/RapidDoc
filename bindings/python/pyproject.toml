@@ -1,0 +1,25 @@
+[build-system]
+requires = ["maturin>=1.8,<2"]
+build-backend = "maturin"
+
+[project]
+name = "rapid-doc-rust"
+version = "0.1.0"
+requires-python = ">=3.10"
+description = "RapidDoc native Rust PDF, DOC, DOCX, XLS, XLSX, PPT and PPTX engine with a Python-compatible preview API"
+dependencies = ["loguru>=0.6.0", "python-dotenv>=1", "Pillow>=11,<13"]
+
+[project.optional-dependencies]
+# Shared Rust engine uses ORT C API 23: runtimes older than 1.23 cannot be used.
+# These are compatibility lower bounds, not a claim that every later release is validated.
+cpu = ["onnxruntime>=1.23.0"]
+gpu = ["onnxruntime-gpu>=1.23.0"]
+
+[project.scripts]
+rapid-doc-rust = "rapid_doc_rust.__main__:main"
+
+[tool.maturin]
+python-source = "python"
+module-name = "rapid_doc_rust._native"
+features = ["pyo3/extension-module"]
+exclude = ["python/rapid_doc_rust/**/__pycache__/*", "python/rapid_doc_rust/**/*.pyc"]

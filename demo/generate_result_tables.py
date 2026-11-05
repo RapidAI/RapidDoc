@@ -8,7 +8,7 @@ ocr_types_dict = {
     'end2end': 'predictions'
 }
 
-result_folder = r'D:\Download\OmniDocBench\result_layout_v3-ocrv6_smail_onnx_tablev5'
+result_folder = r'D:\Download\OmniDocBench\result_rust_v3_unet_slanet_tatr_fallback_orientation_off_full_20261103'
 
 match_name = 'quick_match'
 
@@ -39,6 +39,6 @@ for ocr_type in ocr_types_dict.values():
 
 df = pd.DataFrame(dict_list, index=ocr_types_dict.keys()).round(3)
 df['overall'] = ((1 - df['text_block_Edit_dist']) * 100 + df['display_formula_CDM'] + df['table_TEDS']) / 3
-df.to_csv('./overall_layout_v3-ocrv6_smail_onnx_tablev5.csv')
+df.to_csv('./overall_rust_v3_unet_slanet_tatr_fallback_orientation_off_full_20261103.csv')
 
 # df

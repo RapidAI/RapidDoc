@@ -1,0 +1,207 @@
+{
+  "opencv": "5.0.0",
+  "cases": [
+    {
+      "source": [
+        4,
+        4
+      ],
+      "target": [
+        32,
+        32
+      ],
+      "sha256": "2a296a914c005e8b072ecb89fedb2133319120052f2b1c762cbc828222abc970"
+    },
+    {
+      "source": [
+        4,
+        4
+      ],
+      "target": [
+        64,
+        96
+      ],
+      "sha256": "ef8aaae0865d926fc0a8b70c90878d2d4215713904b2e4d52b16dbcfa19dfcb1"
+    },
+    {
+      "source": [
+        4,
+        4
+      ],
+      "target": [
+        800,
+        800
+      ],
+      "sha256": "353263eb7b156fc477023e119cc58213f7ddee2c2abb5b30c068614ff727f2b3",
+      "preexisting_native_sha256": "f8802e3c45c48acee1d7c04f1277d4ae9a5c5ddcebaccca6a82c29f3e4fff6d4"
+    },
+    {
+      "source": [
+        17,
+        19
+      ],
+      "target": [
+        32,
+        32
+      ],
+      "sha256": "bf58a93ca1304b7b6e368de955e8a98985354a21076fb2002e9402bb80fcd637"
+    },
+    {
+      "source": [
+        17,
+        19
+      ],
+      "target": [
+        64,
+        96
+      ],
+      "sha256": "264a92e17d8aad53d191e8e9206f86026817d9432d84ef63da545846c4bc6333"
+    },
+    {
+      "source": [
+        17,
+        19
+      ],
+      "target": [
+        800,
+        800
+      ],
+      "sha256": "9e75c4e97a7562296821b3cdea181776996e51024aca66dcd5efa1c6a9a1a317",
+      "preexisting_native_sha256": "1116866967f726cac2d9367539d6787245206c2f527494a057a72578b17859f1"
+    },
+    {
+      "source": [
+        63,
+        77
+      ],
+      "target": [
+        32,
+        32
+      ],
+      "sha256": "bbbe6b66e3c2cb3ae2b29762d649b9213f2390eaff15aae8a999665397468ade"
+    },
+    {
+      "source": [
+        63,
+        77
+      ],
+      "target": [
+        64,
+        96
+      ],
+      "sha256": "cf7861b83a6642d6f5d741a869a4cc56238a60719603f1d12141d8eddcc3e39e"
+    },
+    {
+      "source": [
+        63,
+        77
+      ],
+      "target": [
+        800,
+        800
+      ],
+      "sha256": "3f792e4e3b66cb8363b90b0a8cfcde102974f580e996f5ca5033c214455fcaad",
+      "preexisting_native_sha256": "75bc4bdac8671af64c3f25fb7499e80e7f4eb368c00e994e790199ef12b2fe2a"
+    },
+    {
+      "source": [
+        300,
+        230
+      ],
+      "target": [
+        32,
+        32
+      ],
+      "sha256": "27bdff0750aa2cbd09b1de20e4e57310d6a67a56e44def638492f155f25ffd90"
+    },
+    {
+      "source": [
+        300,
+        230
+      ],
+      "target": [
+        64,
+        96
+      ],
+      "sha256": "d0b627251af66ac1edb864450d3577259f4d1e2982bf441872482dfc9dfd43a1"
+    },
+    {
+      "source": [
+        300,
+        230
+      ],
+      "target": [
+        800,
+        800
+      ],
+      "sha256": "cbd34a6f9492b93fbf5303f8d76e5fca1dd86c23b9c8055419cbba29bc086a09"
+    },
+    {
+      "source": [
+        400,
+        600
+      ],
+      "target": [
+        32,
+        32
+      ],
+      "sha256": "225f1ea7297ccc04c435a8c6bd4d0e08caee607d60b71c97dc6321ad73d6fe8f"
+    },
+    {
+      "source": [
+        400,
+        600
+      ],
+      "target": [
+        64,
+        96
+      ],
+      "sha256": "da199800564da6cd5cd7315c7e8f782cf138be460a2ba6b0a9c689a5e84bb04f"
+    },
+    {
+      "source": [
+        400,
+        600
+      ],
+      "target": [
+        800,
+        800
+      ],
+      "sha256": "6568d8c0af72b0e13c8327d6265946a35bbdba1403e535adf6b8497276d9700b"
+    },
+    {
+      "source": [
+        1600,
+        2200
+      ],
+      "target": [
+        32,
+        32
+      ],
+      "sha256": "86d82cffb5be241bcf2d5b0a9077b964a8f1411949da475f157692d59f1dae3d"
+    },
+    {
+      "source": [
+        1600,
+        2200
+      ],
+      "target": [
+        64,
+        96
+      ],
+      "sha256": "c9cfd5830f826771d7d2349c9262cd1c3f0946a98551b9529400e9347f42b879"
+    },
+    {
+      "source": [
+        1600,
+        2200
+      ],
+      "target": [
+        800,
+        800
+      ],
+      "sha256": "f933994ab3bd23d9e770296b1f1e2942f736f3d72a7df26703eef4f46664fffd"
+    }
+  ],
+  "limitation": "Three tiny-source 800x800 upscales already differ before the row-cache change; retain both independent OpenCV and prior-native hashes. No tolerance is applied."
+}

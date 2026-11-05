@@ -1,0 +1,69 @@
+{
+  "repository": "https://github.com/myhloli/DocVortex",
+  "target_commit": "2de5f42b1884495313d9df63868e6a2f3d85fea0",
+  "formats": [
+    "pdf",
+    "doc",
+    "docx",
+    "xls",
+    "xlsx",
+    "ppt",
+    "pptx"
+  ],
+  "files": [
+    {
+      "path": "analyzers/native/office/docx/docx_converter.py",
+      "upstream": "src/docvortex/analyzers/native/office/docx/docx_converter.py",
+      "upstream_sha256": "e6c667c0de7bd6d0f648d3fa6a8d5156d942f90fc3fd871d71e2e2b5ddcb5b26",
+      "installed_sha256": "76aa20533730743ece7663b4a63cf42ee99935b9a99994c3da74029f1b54d268"
+    },
+    {
+      "path": "analyzers/native/office/docx/tables.py",
+      "upstream": "src/docvortex/analyzers/native/office/docx/tables.py",
+      "upstream_sha256": "5532f050c30140b353f852785a84f435f3d60c27338b65a3caf9ba5894ce96aa",
+      "installed_sha256": "bd752f68fb783295bf85069dcbf8a7e6b89f86afa19764bfc1f24a37ea2373e8"
+    },
+    {
+      "path": "analyzers/native/office/xls/records.py",
+      "upstream": "src/docvortex/analyzers/native/office/xls/records.py",
+      "upstream_sha256": "cf1ed15f84618294f82ff34ab242e7323ddf96125a80309acfef3852d933d650",
+      "installed_sha256": "cdda253783f65239ed80ef1bd416c046ca1b08b418644121c0d84768e0e835ea"
+    },
+    {
+      "path": "analyzers/native/office/xlsx/xlsx_converter.py",
+      "upstream": "src/docvortex/analyzers/native/office/xlsx/xlsx_converter.py",
+      "upstream_sha256": "45902905ca67fb9a8064567a00069fd1c8462233191d5dab7cd5d2f7d9428a6e",
+      "installed_sha256": "a1da5abb54732dab360da02ff6bf01d31b4f59d8174234866e06622a62044d12"
+    },
+    {
+      "path": "analyzers/native/office/errors.py",
+      "upstream": "src/docvortex/analyzers/native/office/errors.py",
+      "upstream_sha256": "0ad295e038e1f41c1e9e3a97f661896415259bedb1edae05e05c3d3e9e90a77a",
+      "installed_sha256": "4bf02fcd2ec2b5e4824fc14e11333dbe7612d462ba3740b09b7728886286ac21"
+    },
+    {
+      "path": "analyzers/native/office/doc/images.py",
+      "upstream": "src/docvortex/analyzers/native/office/doc/images.py",
+      "upstream_sha256": "0c86b7b9259110acadae38981da0b3284847a54b9958822110a7c3cb87fe21b3",
+      "installed_sha256": "638ed7152014ba62212e377ba7e7ecadc935b8c29c6d459c9ce5995e1d6573c8"
+    },
+    {
+      "path": "analyzers/native/office/legacy/officeart.py",
+      "upstream": "src/docvortex/analyzers/native/office/legacy/officeart.py",
+      "upstream_sha256": "5b9d393fa65dcb9796c23d060548efbf962a5da7d2c6de6679fafa4c278a3735",
+      "installed_sha256": "1d3bd1e308b57925e4f2ddadd9497a987afe08be1ee232050c10cb960a209cbd"
+    },
+    {
+      "path": "analyzers/native/office/ppt/parser.py",
+      "upstream": "src/docvortex/analyzers/native/office/ppt/parser.py",
+      "upstream_sha256": "4c11603d7e58e292b417780bdf7206cf97dccdb6d8623487cbfa817ce0a6c4ce",
+      "installed_sha256": "68b4ce6e347a8fa5f3b933e6f4869301fe9c2fcee39be2c1ff14ef2baa1742a5"
+    }
+  ],
+  "retained_python_reference": [
+    "analyzers/native/office/spreadsheet/projector.py",
+    "analyzers/native/office/spreadsheet/region_discovery.py"
+  ],
+  "note": "Selective Python Office update. Native spreadsheet batch optimization is reserved for direct Rust integration; PDF and shared fallback kernels remain pinned.",
+  "issue36_policy": "Upstream 0.6.8 implementation, retaining local regression tests"
+}

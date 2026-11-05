@@ -1,0 +1,16 @@
+[
+  {
+    "package": "napi-3.16.1",
+    "commit": "417375ad5ef1d8cb4c49edf13d2cc6c0204bb5b1",
+    "url": "https://raw.githubusercontent.com/napi-rs/napi-rs/417375ad5ef1d8cb4c49edf13d2cc6c0204bb5b1/LICENSE",
+    "sha256": "3f1ce66533302df3a32edbfdfc0b78f0dd34659e4c1f5817162e5ea3c2297215",
+    "file": "3f1ce66533302df3a32edbfdfc0b78f0dd34659e4c1f5817162e5ea3c2297215.txt"
+  },
+  {
+    "package": "napi-sys-3.4.1",
+    "commit": "d9cb526c15e63ba30e06b4d169068c9854180595",
+    "url": "https://raw.githubusercontent.com/napi-rs/napi-rs/d9cb526c15e63ba30e06b4d169068c9854180595/LICENSE",
+    "sha256": "3f1ce66533302df3a32edbfdfc0b78f0dd34659e4c1f5817162e5ea3c2297215",
+    "file": "3f1ce66533302df3a32edbfdfc0b78f0dd34659e4c1f5817162e5ea3c2297215.txt"
+  }
+]

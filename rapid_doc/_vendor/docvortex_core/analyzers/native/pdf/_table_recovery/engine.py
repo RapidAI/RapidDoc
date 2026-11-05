@@ -7,8 +7,11 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Any
 
+from loguru import logger
+
 from .candidate import serialize_candidate_html
 from .banded_numeric import build_banded_numeric_candidate
+from .banded_rowspan import build_banded_rowspan_candidate
 from .aligned_numeric import build_aligned_numeric_candidate, regroup_numeric_text
 from .contracts import (
     NativeTableCandidate,
@@ -19,10 +22,12 @@ from .contracts import (
     NativeTableText,
 )
 from .geometry import bbox_intersection, normalize_bbox
+from .hierarchical import build_hierarchical_candidate, find_nested_table_evidence, preserves_nested_cells
 from .sparse_hybrid import build_sparse_hybrid_candidates, diagnose_sparse_hybrid_candidate_builds
 from .sparse_multiline import build_sparse_multiline_candidates, diagnose_sparse_multiline_candidate_builds
 from .rule_band import build_rule_band_candidates
 from .text import build_native_table_text
+from .text_quality import TableTextQuality, measure_table_input_quality, measure_table_text_quality
 from .text_grid import build_text_candidates, diagnose_text_candidate_builds
 from .vector import MAX_PRIMITIVES_PER_TABLE, build_vector_candidates, diagnose_vector_candidate_builds
 
@@ -56,6 +61,7 @@ class _CandidateEvaluation:
     selected: NativeTableCandidate | None
     physical_topology_conflict: bool
     first_rejection_gate: str | None
+    text_quality: tuple[TableTextQuality, ...] = ()
 
 
 def _is_verified_line_candidate(candidate: NativeTableCandidate) -> bool:
@@ -332,6 +338,7 @@ def _select_candidate(
 
 def _evaluate_native_pdf_table(
     table_input: NativeTableInput,
+    *, prepared_text: NativeTableText | None = None,
 ) -> _CandidateEvaluation:
     """执行共享生产判定，并保留候选生成到仲裁的完整阶段结果。"""
 
@@ -366,7 +373,10 @@ def _evaluate_native_pdf_table(
             False,
             "primitive_limit",
         )
-    text = build_native_table_text(table_input)
+    input_quality = measure_table_input_quality(table_input)
+    if input_quality.rejected:
+        return _CandidateEvaluation(primitive_count, None, (), (), None, False, "text_quality", (input_quality,))
+    text = prepared_text if prepared_text is not None else build_native_table_text(table_input)
     if text is None:
         return _CandidateEvaluation(
             primitive_count,
@@ -378,6 +388,8 @@ def _evaluate_native_pdf_table(
             "native_text",
         )
     vector_attempt_records: list[dict[str, Any]] = []
+    nested_evidence = find_nested_table_evidence(table_input, text)
+    hierarchical_candidate = build_hierarchical_candidate(table_input, text, nested_evidence)
     vector_candidates = build_vector_candidates(
         table_input,
         text,
@@ -388,6 +400,8 @@ def _evaluate_native_pdf_table(
     vector_candidates = _retain_column_consistent_candidates(vector_candidates, minimum_columns)
     aligned_text = regroup_numeric_text(text)
     aligned_candidate = build_aligned_numeric_candidate(table_input, aligned_text)
+    if aligned_candidate is not None and not preserves_nested_cells(aligned_candidate, nested_evidence):
+        aligned_candidate = None
     if aligned_candidate is not None and aligned_candidate.cols < minimum_columns:
         aligned_candidate = None
     aligned_replaces_vector = aligned_candidate is not None and any(
@@ -411,7 +425,13 @@ def _evaluate_native_pdf_table(
             is not None
         ):
             physical_topology_conflict = False
-    vector_selection = None if physical_topology_conflict else _select_candidate(vector_candidates)
+    vector_selection = (
+        None
+        if physical_topology_conflict
+        else _select_candidate(
+            [candidate for candidate in vector_candidates if preserves_nested_cells(candidate, nested_evidence)]
+        )
+    )
     sparse_hybrid_allowed = len(text.rows) >= 2 and vector_selection is None and not physical_topology_conflict
     if sparse_hybrid_allowed:
         if not vector_attempts:
@@ -445,6 +465,7 @@ def _evaluate_native_pdf_table(
             text_candidates = []
     existing_generated_candidates = [
         *vector_candidates,
+        *([hierarchical_candidate] if hierarchical_candidate is not None else []),
         *rule_band_candidates,
         *sparse_hybrid_candidates,
         *text_candidates,
@@ -452,6 +473,7 @@ def _evaluate_native_pdf_table(
     existing_candidates = _retain_column_consistent_candidates(
         _remove_undercounted_vector_candidates(existing_generated_candidates), minimum_columns
     )
+    existing_candidates = [candidate for candidate in existing_candidates if preserves_nested_cells(candidate, nested_evidence)]
     existing_verified = any(_passes_verified_threshold(candidate) for candidate in existing_candidates)
     sparse_multiline_allowed = len(text.rows) >= 2 and not physical_topology_conflict and not existing_verified
     if sparse_multiline_allowed:
@@ -476,6 +498,7 @@ def _evaluate_native_pdf_table(
     candidates = _retain_column_consistent_candidates(
         _remove_undercounted_vector_candidates(generated_candidates), minimum_columns
     )
+    candidates = [candidate for candidate in candidates if preserves_nested_cells(candidate, nested_evidence)]
     selected = None if physical_topology_conflict else _select_candidate(candidates)
     header_undercount = (
         selected is not None
@@ -520,13 +543,27 @@ def _evaluate_native_pdf_table(
         text = aligned_text
         generated_candidates.append(aligned_candidate)
         candidates.append(aligned_candidate)
+    rowspan_candidate = build_banded_rowspan_candidate(table_input, text, aligned_text) if sparse_hybrid_allowed else None
+    if (
+        rowspan_candidate is not None
+        and rowspan_candidate.cols >= minimum_columns
+        and preserves_nested_cells(rowspan_candidate, nested_evidence)
+    ):
+        generated_candidates.append(rowspan_candidate)
+        candidates.append(rowspan_candidate)
+        if selected is None or (selected.cols == rowspan_candidate.cols and selected.rows < rowspan_candidate.rows):
+            # 重复横线带内的独立数值行证明旧视觉行桥接；仅首列有跨行证据。
+            selected = rowspan_candidate
+            text = aligned_text
     if selected is not None:
         first_rejection_gate = None
     elif not generated_candidates:
         first_rejection_gate = "candidate_generation"
     elif not candidates:
         first_rejection_gate = (
-            "physical_column_undercount"
+            "nested_cell_undercount"
+            if nested_evidence
+            else "physical_column_undercount"
             if minimum_columns and any(candidate.cols < minimum_columns for candidate in generated_candidates)
             else "undercount_guard"
         )
@@ -534,6 +571,13 @@ def _evaluate_native_pdf_table(
         first_rejection_gate = "verified_threshold"
     else:
         first_rejection_gate = "topology_conflict"
+    text_quality = (input_quality,)
+    if selected is not None:
+        output_quality = measure_table_text_quality((cell.content for cell in selected.cells), stage="output")
+        text_quality += (output_quality,)
+        if output_quality.rejected:
+            selected = None
+            first_rejection_gate = "text_quality"
     return _CandidateEvaluation(
         primitive_count,
         text,
@@ -542,6 +586,7 @@ def _evaluate_native_pdf_table(
         selected,
         physical_topology_conflict,
         first_rejection_gate,
+        text_quality,
     )
 
 
@@ -669,6 +714,7 @@ def diagnose_native_pdf_table(table_input: NativeTableInput) -> dict[str, Any]:
         "glyph_count": len(evaluation.text.glyphs) if evaluation.text else 0,
         "visual_text_rows": len(evaluation.text.rows) if evaluation.text else 0,
         "first_rejection_gate": first_rejection_gate,
+        "text_quality": [quality.diagnostic() for quality in evaluation.text_quality],
         "line_rect_topology_conflict": (
             evaluation.physical_topology_conflict or _has_line_rect_topology_conflict(evaluation.candidates)
         ),
@@ -685,12 +731,21 @@ def diagnose_native_pdf_table(table_input: NativeTableInput) -> dict[str, Any]:
 
 def recover_native_pdf_table(
     table_input: NativeTableInput,
+    *, prepared_text: NativeTableText | None = None,
 ) -> NativeTableResult | None:
     """对一个已知表格区域运行全部候选并返回高置信 HTML 结果。"""
 
-    evaluation = _evaluate_native_pdf_table(table_input)
+    evaluation = (_evaluate_native_pdf_table(table_input) if prepared_text is None else
+                  _evaluate_native_pdf_table(table_input, prepared_text=prepared_text))
     selected = evaluation.selected
     if selected is None or evaluation.text is None:
+        for quality in evaluation.text_quality:
+            if quality.rejected:
+                logger.bind(table_text_quality=quality.diagnostic()).debug(
+                    "Native table rejected: reason=text_quality, "
+                    f"stage={quality.stage}, text_chars={quality.text_chars}, "
+                    f"abnormal_chars={quality.abnormal_chars}, abnormal_ratio={quality.abnormal_ratio:.4f}"
+                )
         return None
     diagnostics = tuple(
         [

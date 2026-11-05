@@ -1,0 +1,118 @@
+{
+  "crate": "lopdf 0.42.0",
+  "files": {
+    "src/object.rs": {
+      "patched_sha256": "f63393e5a9eef38a4280c511ed1ca1799a9486a6f654abae12bfcdb78846a6b0",
+      "upstream_sha256": "b888bc136141a29acc10923c47702e31fbc28506e12322b722382dab2a23bee0"
+    },
+    "src/parser/mod.rs": {
+      "patched_sha256": "1c6931d1478cfec45eebf40fa383f8aec7b8adaf3d99d16c5d3d15ec0153c333",
+      "upstream_sha256": "470ca81f16406328fa94818bb3d8f98dcb837e7c1f3728b8553995d4e204c310"
+    },
+    "src/xobject.rs": {
+      "patched_sha256": "d09177d40af6a8b29c0d1fde99abc8d3ca26b9bf9acab425247d0dd637cf2571",
+      "upstream_sha256": "cb77c22436f9bba51b9f49af1c10b7244816f55355c303d083cc59c71ce94d47"
+    }
+  },
+  "purpose": "Preserve f64 PDF Real parsing; retain f32 accessor compatibility.",
+  "packaging": {
+    "Cargo.toml": {
+      "upstream_sha256": "f9670506b20a6da73817348f350da136a127c2726b857420d28226677d6982e8",
+      "patched_sha256": "1070f110c04568266027389b0481419446266ffa061f80fd3bd61a851d721016"
+    }
+  },
+  "formatting": {
+    "src/bookmarks.rs": {
+      "upstream_sha256": "492d77a65f1d7844b99a2a41ce223a722ba1b252df89f15074788b5d225e133a",
+      "patched_sha256": "0e19f486306053c169e292b73c8620912332bcc359c780f05eaf7290381b8273"
+    },
+    "src/creator.rs": {
+      "upstream_sha256": "3ccea695e0f18f06cac1d1fbdfac9629ce21c1cb728b97292a7fe062145e455b",
+      "patched_sha256": "d901ca4ee1687cf49a7ef894135713a1d6159da0c34e28def9b00b84670df4b1"
+    },
+    "src/datetime.rs": {
+      "upstream_sha256": "c21144516d400d5fb3d761ee18645e93e22dabba19f875e22458647c7abdd8db",
+      "patched_sha256": "43c8f6c8f62d167984ac1e765f831c981e44521d5ff5eb9efd674d071b470872"
+    },
+    "src/destinations.rs": {
+      "upstream_sha256": "2fe88a6b0f10f178c47777aa86f5cd258c85f5d11eb3d9875b4d9b71cc0adbfc",
+      "patched_sha256": "df3748da1ef3eeb0679a75ce0873743dfb36b5b0b271f2c74d101484e21b8d8a"
+    },
+    "src/document.rs": {
+      "upstream_sha256": "e42f87b9e0a67bf9afd13fe4362ab47eae21ecf54205282b4543e9837a16d64a",
+      "patched_sha256": "252e0320090fb3025326be5d118dfce387c80e8ced529f33db38fc822ba8ff3e"
+    },
+    "src/encryption.rs": {
+      "upstream_sha256": "17cf94f8fecc73e610a41464abf48208b1981ddff07eafad584f82c5db4dd7a2",
+      "patched_sha256": "75a442451d1648442dc570bae7ca111382c26ea087f5ab37f79eb84dfaffc70d"
+    },
+    "src/error.rs": {
+      "upstream_sha256": "8602cdbaf773595561e87015a5fe77e387d28bca41eeb61e77a6b523a456115a",
+      "patched_sha256": "d8a9660949852dc1e26c0a2f71dec0d966996b6efbbe7b9d82c118ce1c4577ab"
+    },
+    "src/incremental_document.rs": {
+      "upstream_sha256": "99addd95e94ae275fd2136035b6b657bba8ad4c812a34499c530ec8bec5fd9eb",
+      "patched_sha256": "5bd01d49767da162dd8df00ae9b548fc9f749488bd20bc36525e7c0bab24eb0d"
+    },
+    "src/object_stream.rs": {
+      "upstream_sha256": "b0660f17d789fdee7ed9d9f1efcca16d273e1271812cec8367ebc3fb7c1168f2",
+      "patched_sha256": "54e5359882a42fb884f7314df9b841fcb2bc311d7c4fffb5e135a5ef074688e8"
+    },
+    "src/outlines.rs": {
+      "upstream_sha256": "4209edce7285b8036119e8e8a4b9f6b3fa328178285bb6011f252a5a80c33bd0",
+      "patched_sha256": "a71906693a1c9293eae427b38922d0502608fa98655d636e5283452521c07638"
+    },
+    "src/processor.rs": {
+      "upstream_sha256": "710cf739f00d1c4c4e08c53037756fe3a61a512d671659579075635d55340fd6",
+      "patched_sha256": "4b889264a41ee8a9abc679a017ae5f140aaf29acfe8d6ffaf38e6a4450cd3cf6"
+    },
+    "src/reader.rs": {
+      "upstream_sha256": "0d296910b9addbd68a8b9b78fb9028c7303ab103534988df1a1eaf651ed3f7cd",
+      "patched_sha256": "0a6cc04151200d77590ffc807dd411834eda4f69eda40ba3cf2c6f1e937d8f4f"
+    },
+    "src/toc.rs": {
+      "upstream_sha256": "0c3b4a89a66958d03c2b5f477872a5679dafeafb1b1eff69902e17c120f451c9",
+      "patched_sha256": "7deea1bbb01f2444bba9c31202d04caa42bf8d41cdf4bce8ab8611080b41c151"
+    },
+    "src/writer.rs": {
+      "upstream_sha256": "0645784f3642b1d1a5fe73895432cf671e1f38fff649e6881846bfb6fe3e7162",
+      "patched_sha256": "2a4932ef10a6106737f94ad371b5fb1c5f694dd285f419f96869e8667d1839e5"
+    },
+    "src/xref.rs": {
+      "upstream_sha256": "c722f5f15cdbdc0bdb4ff9642660ab14d5bde5be27e7aa2042a66ebbbb283402",
+      "patched_sha256": "b268e23d22ea4e0b768bcc64c9a8526035be7affe75c85f13881b8c10b7f3dc4"
+    },
+    "src/common_data_structures/mod.rs": {
+      "upstream_sha256": "83db74da563246d1ed2258828fa463b2fde740be75b8f4aeb4ede8bc28ff43c2",
+      "patched_sha256": "63d80b2f15e9539107b3e816c4a22b7a53d98d98e72d3973038947e56d47071d"
+    },
+    "src/encodings/cmap.rs": {
+      "upstream_sha256": "f587ed9897f4d24ae283edbad6aecaffc4bad954e41840299bea52a55947bb37",
+      "patched_sha256": "e8039b4cecfb708d99a29dbfafa3d5da04d5a147c71df14c95f7bb29513d8146"
+    },
+    "src/encodings/mod.rs": {
+      "upstream_sha256": "dbc88a278b271ea2add3198152c516a76a967eca113d85783877a1fc00d77d38",
+      "patched_sha256": "1c4095493a805897a30ad4fbe695af46557e4a5f3776dc8b41fcf88efae78ad8"
+    },
+    "src/encryption/algorithms.rs": {
+      "upstream_sha256": "a677094cf56abf900c6f08a660db2324e10f82e70cc3f60aeee91e8ca3543485",
+      "patched_sha256": "db0194d50a0dbfc59d2a97cc617c00aa7be088a8e1ad1e646550b0285129e714"
+    },
+    "src/encryption/rc4.rs": {
+      "upstream_sha256": "72470d82ab6cd8e94941d8919669123c2ec12989e7443024b45e1b7cb8c541f0",
+      "patched_sha256": "92279ba0d4ff235cb6a906add648bd2622e631226fd1157858c7bbb20e491555"
+    },
+    "src/filters/png.rs": {
+      "upstream_sha256": "57308fc09a8756b4ecd601113152969f49228ead70afbb0f9a227efd9b067a04",
+      "patched_sha256": "b057c7ce9f1891c30cd9f5a184a656060278834e9e40c45fad3f44a60e6679b9"
+    },
+    "src/parser/cmap_parser.rs": {
+      "upstream_sha256": "4afa0eac6154b7f7fa2e6fc5572d02f802be540f3c0a3b23658143930e6c8a20",
+      "patched_sha256": "bc730c96ed918f8fc46e0d5eb93c179abbc4f6e1d357d71f54caa81d07f615a0"
+    },
+    "src/parser_aux.rs": {
+      "upstream_sha256": "1a29e9c06fe6180f46b1e83cb5cff36c2d2c1c5157f8ad9bf13ff525e1355790",
+      "patched_sha256": "7a2ae4d46afc602bde10ea847dd24b1e345480399af28538bb8e52f89f02a662"
+    }
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "assets": {},
+  "content_list_json": [
+    {
+      "page_idx": 0,
+      "text": "[Jump to the second slide](slide2.xml)",
+      "type": "text"
+    },
+    {
+      "page_idx": 0,
+      "text": "[External link](https://example.com/)",
+      "type": "text"
+    },
+    {
+      "page_idx": 1,
+      "text": "Second slide content",
+      "type": "text"
+    }
+  ],
+  "markdown": "[Jump to the second slide](slide2.xml)\n\n[External link](https://example.com/)\n\nSecond slide content",
+  "middle_json": {
+    "_backend": "office",
+    "_version_name": "0.9.11",
+    "pdf_info": [
+      {
+        "discarded_blocks": [],
+        "page_idx": 0,
+        "para_blocks": [
+          {
+            "index": 0,
+            "lines": [
+              {
+                "spans": [
+                  {
+                    "children": [
+                      {
+                        "content": "Jump to the second slide",
+                        "type": "text"
+                      }
+                    ],
+                    "content": "Jump to the second slide",
+                    "type": "hyperlink",
+                    "url": "slide2.xml"
+                  }
+                ]
+              }
+            ],
+            "type": "text"
+          },
+          {
+            "index": 1,
+            "lines": [
+              {
+                "spans": [
+                  {
+                    "children": [
+                      {
+                        "content": "External link",
+                        "type": "text"
+                      }
+                    ],
+                    "content": "External link",
+                    "type": "hyperlink",
+                    "url": "https://example.com/"
+                  }
+                ]
+              }
+            ],
+            "type": "text"
+          }
+        ]
+      },
+      {
+        "discarded_blocks": [],
+        "page_idx": 1,
+        "para_blocks": [
+          {
+            "index": 0,
+            "lines": [
+              {
+                "spans": [
+                  {
+                    "content": "Second slide content",
+                    "type": "text"
+                  }
+                ]
+              }
+            ],
+            "type": "text"
+          }
+        ]
+      }
+    ]
+  }
+}

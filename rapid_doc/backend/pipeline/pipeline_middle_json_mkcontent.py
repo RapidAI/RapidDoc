@@ -68,9 +68,10 @@ def make_blocks_to_markdown(paras_of_layout,
                         if block['type'] == BlockType.IMAGE_CAPTION:
                             para_text += '  \n' + merge_para_with_text(block)
         elif para_type == BlockType.TABLE:
-            if mode == MakeMode.NLP_MD:
+            text_fallback = any(span.get('text_fallback') for block in para_block['blocks'] for line in block.get('lines', []) for span in line['spans'])
+            if mode == MakeMode.NLP_MD and not text_fallback:
                 continue
-            elif mode == MakeMode.MM_MD:
+            elif mode == MakeMode.MM_MD or text_fallback:
                 for block in para_block['blocks']:  # 1st.拼table_caption
                     if block['type'] == BlockType.TABLE_CAPTION:
                         para_text += merge_para_with_text(block) + '  \n'
@@ -81,7 +82,11 @@ def make_blocks_to_markdown(paras_of_layout,
                                 if span['type'] == ContentType.TABLE:
                                     # if processed by table model
                                     if span.get('html', ''):
-                                        para_text += f"\n{span['html']}\n"
+                                        if span.get('text_fallback'):
+                                            from rapid_doc.model.table.fallback import markdown_prose
+                                            para_text += '\n' + markdown_prose(span['html']) + '\n'
+                                        else:
+                                            para_text += f"\n{span['html']}\n"
                                     elif span.get('image_path', ''):
                                         para_text += f"![]({img_buket_path}/{span['image_path']})"
                 for block in para_block['blocks']:  # 3rd.拼table_footnote
@@ -288,7 +293,13 @@ def make_blocks_to_content_list(para_block, img_buket_path, page_idx, page_size)
                     for span in line['spans']:
                         if span['type'] == ContentType.TABLE:
                             if span.get('html', ''):
-                                para_content[BlockType.TABLE_BODY] = f"{span['html']}"
+                                if span.get('text_fallback'):
+                                    from html import unescape
+                                    from rapid_doc.model.table.fallback import prose
+                                    para_content['type'] = ContentType.TEXT
+                                    para_content['text'] = unescape(prose(span['html']))
+                                else:
+                                    para_content[BlockType.TABLE_BODY] = f"{span['html']}"
 
                             if span.get('image_path', ''):
                                 para_content['img_path'] = f"{img_buket_path}/{span['image_path']}"

@@ -14,7 +14,30 @@ Most default models come from the [PaddleOCR](https://github.com/PaddlePaddle/Pa
 
 RapidDoc also supports custom OCR, formula, and table models by implementing the `CustomBaseModel.batch_predict` method. Integration for the [PaddleOCR-VL](https://www.paddleocr.ai/main/version3.x/pipeline_usage/PaddleOCR-VL.html) series is included.
 
+## Choose an Engine and Language SDK
+
+RapidDoc provides the original Python implementation and a shared Rust engine. The original Python package remains `rapid-doc`. The new Python, Java, Go and Node.js bindings call the same Rust parsing core without installing the original Python package. Rust, Java, Go and Node.js applications do not require Python at runtime.
+
+| Interface | Package / import name | Usage |
+| --- | --- | --- |
+| Original Python | `rapid-doc` / `rapid_doc` | [Installation](#installation) |
+| Python binding to Rust | `rapid-doc-rust` / `rapid_doc_rust` | [Python SDK](bindings/python/README.md) |
+| Rust | `rapiddoc` | [Rust SDK](rust/rapiddoc/README.md) |
+| Java | `io.github.rapidai:rapid-doc` | [Java SDK](bindings/java/README.md) |
+| Go | `github.com/RapidAI/RapidDoc/bindings/go` | [Go SDK](bindings/go/README.md) |
+| Node.js / TypeScript | `rapid-doc` on npm | [Node.js SDK](bindings/node/README.md) |
+
+**Release status: the Rust SDK and its language bindings are development previews at version `0.1.0`, not yet published to public package registries.** These are the intended package names. Follow the individual SDK guides for source builds or local artifacts; future registry installation examples are not available releases yet. See the [publishing guide](docs/publishing.md) for build and validation workflows.
+
+The Rust engine supports PDF, DOC, DOCX, XLS, XLSX, PPT and PPTX, with native Office parsing and ONNX Runtime for PDF model inference. Delivery of PDFium, ORT, GEOS and CUDA operators depends on the language and platform package; deploying a single shared library is insufficient. Missing models can be downloaded automatically or supplied through an existing model directory; see [model configuration](docs/rust-models.md).
+
+Feature parity is not complete. The Rust PDF pipeline supports V2/V3 layout, S/M/L formula models, UNET/SLANet and Table Transformer. Full Plus-L PDF reading order, enhanced reading order and character-box splitting with `use_word_box=True` remain deferred. Python's Torch, alternative OCR engines and `CustomBaseModel` extensions are not automatically available in the Rust bindings. Consult the SDK guides for supported options and defaults.
+
+The existing [Docker / FastAPI deployment](docker/README.md) uses the original Python implementation; a Rust image has not replaced it. Compare output, time and memory with identical models, parameters and documents. A language change alone does not guarantee a fixed performance multiplier.
+
 ## Features
+
+This section describes the original Python implementation. See the SDK guides above for Rust model and parameter support.
 
 - OCR recognition powered by [RapidOCR](https://github.com/RapidAI/RapidOCR), using ONNX Runtime by default on CPU/CUDA, with other engines available through explicit configuration.
 - Layout analysis with PP-DocLayout models, including PP-DocLayoutV3 as the default.
@@ -26,6 +49,8 @@ RapidDoc also supports custom OCR, formula, and table models by implementing the
 - Docker and FastAPI deployment examples.
 
 ## Installation
+
+These commands install the original Python implementation, `rapid-doc`, not the Rust engine. For the Rust-backed Python package, see the [Python SDK guide](bindings/python/README.md).
 
 Install the CPU version:
 

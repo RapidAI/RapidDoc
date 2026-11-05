@@ -1,0 +1,82 @@
+{
+  "assets": {},
+  "content_list_json": [
+    {
+      "page_idx": 0,
+      "text": "Quadratic formula",
+      "text_level": 2,
+      "type": "text"
+    },
+    {
+      "page_idx": 0,
+      "text": "Solve with $x=\\frac{-b\\pm \\sqrt{b^{2}-4ac}}{2a}$",
+      "type": "text"
+    },
+    {
+      "page_idx": 0,
+      "text": "$\\sum_{i=1}^n x_i=\\sin(\\left(\\theta \\right))$",
+      "type": "text"
+    }
+  ],
+  "markdown": "## Quadratic formula\n\nSolve with $x=\\frac{-b\\pm \\sqrt{b^{2}-4ac}}{2a}$\n\n$\\sum_{i=1}^n x_i=\\sin(\\left(\\theta \\right))$",
+  "middle_json": {
+    "_backend": "office",
+    "_version_name": "0.9.11",
+    "pdf_info": [
+      {
+        "discarded_blocks": [],
+        "page_idx": 0,
+        "para_blocks": [
+          {
+            "index": 0,
+            "is_numbered_style": false,
+            "level": 2,
+            "lines": [
+              {
+                "spans": [
+                  {
+                    "content": "Quadratic formula",
+                    "type": "text"
+                  }
+                ]
+              }
+            ],
+            "type": "title"
+          },
+          {
+            "index": 1,
+            "lines": [
+              {
+                "spans": [
+                  {
+                    "content": "Solve with ",
+                    "type": "text"
+                  },
+                  {
+                    "content": "x=\\frac{-b\\pm \\sqrt{b^{2}-4ac}}{2a}",
+                    "type": "inline_equation"
+                  }
+                ]
+              }
+            ],
+            "type": "text"
+          },
+          {
+            "index": 2,
+            "lines": [
+              {
+                "spans": [
+                  {
+                    "content": "\\sum_{i=1}^n x_i=\\sin(\\left(\\theta \\right))",
+                    "type": "inline_equation"
+                  }
+                ]
+              }
+            ],
+            "type": "text"
+          }
+        ]
+      }
+    ]
+  }
+}

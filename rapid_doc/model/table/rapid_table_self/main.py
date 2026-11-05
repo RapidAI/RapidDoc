@@ -34,6 +34,9 @@ class RapidTable:
         if cfg is None:
             cfg = RapidTableInput()
 
+        if cfg.model_type == ModelType.TABLE_TRANSFORMER.value:
+            cfg.model_type = ModelType.TABLE_TRANSFORMER
+
         if not cfg.model_dir_or_path and cfg.model_type is not None:
             if cfg.model_type == ModelType.SLANET1M:
                 rapid_doc_dir = Path(os.path.abspath(__file__)).parent.parent.parent.parent
@@ -62,6 +65,10 @@ class RapidTable:
         return rapidocr_.RapidOCR(params=params)
 
     def _init_table_structer(self):
+        if self.cfg.model_type == ModelType.TABLE_TRANSFORMER:
+            from .table_structure.table_transformer import TableTransformerRecognition
+
+            return TableTransformerRecognition(asdict(self.cfg))
         if self.cfg.model_type == ModelType.UNITABLE:
             from .table_structure.unitable import UniTableStructure
 
@@ -105,7 +112,21 @@ class RapidTable:
 
             imgs = self._load_imgs(img_contents[start_i:end_i])
 
-            if self.cfg.model_type == ModelType.UNET:
+            if self.cfg.model_type == ModelType.TABLE_TRANSFORMER:
+                if ocr_results is None and not self.cfg.use_ocr:
+                    crop_ocr = [None] * len(imgs)
+                else:
+                    dt_boxes, rec_res = self.get_ocr_results(imgs, start_i, end_i, ocr_results)
+                    if len(dt_boxes) != len(imgs) or len(rec_res) != len(imgs):
+                        raise ValueError("Table Transformer image/OCR batch length mismatch")
+                    crop_ocr = [
+                        None if boxes is None or len(boxes) == 0 else
+                        (np.asarray(boxes).reshape(-1, 2, 2),
+                         [item[0] for item in recs], [item[1] for item in recs])
+                        for boxes, recs in zip(dt_boxes, rec_res)
+                    ]
+                pred_htmls, cell_bboxes, logic_points = self.table_structure(imgs, crop_ocr)
+            elif self.cfg.model_type == ModelType.UNET:
                 pred_htmls, cell_bboxes, logic_points = self.table_structure(imgs, ocr_results[start_i:end_i])
             else:
                 pred_structures, cell_bboxes = self.table_structure(imgs)
@@ -150,6 +171,12 @@ class RapidTable:
 
             for img, ocr_result in zip(imgs, ocr_results_batch):
                 img_h, img_w = img.shape[:2]
+                if self.cfg.model_type == ModelType.TABLE_TRANSFORMER and (
+                    ocr_result is None or len(ocr_result[0]) == 0
+                ):
+                    batch_dt_boxes.append(None)
+                    batch_rec_res.append(None)
+                    continue
                 dt_boxes, rec_res = format_ocr_results(ocr_result, img_h, img_w)
                 batch_dt_boxes.append(dt_boxes)
                 batch_rec_res.append(rec_res)

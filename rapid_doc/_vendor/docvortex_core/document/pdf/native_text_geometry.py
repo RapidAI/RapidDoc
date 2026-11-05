@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable
+from functools import partial
 from typing import cast
 
 import pypdfium2 as pdfium
@@ -133,6 +135,7 @@ def _extract_page_text_geometry(
     compact: bool = False,
     compact_only: bool = False,
     paint_page_reader=None,
+    unicode_resolver: Callable[[pdfium.PdfTextPage, list[int]], dict[int, int]] | None = None,
 ) -> PDFPageTextGeometry | None:
     """在调用方持有的页面和锁内读取字符，使批量提取与独立接口共用实现。"""
     textpage = None
@@ -147,16 +150,21 @@ def _extract_page_text_geometry(
             _text_object_visibility(page, tuple(raw_page_bbox), page_rotation, paint_page_reader) if visible_only else None
         )
         textpage = page.get_textpage()
+        unicode_fallback = partial(unicode_resolver, textpage) if unicode_resolver is not None else None
         if compact:
             from .snapshot_bridge import read_text_snapshot
 
             # 消融未显示稳定收益，恢复由 Python 包装持有 textpage 的原快照入口。
-            snapshot = read_text_snapshot(textpage, raw_page_bbox, page_rotation, include_extended_geometry, visibility)
+            snapshot = read_text_snapshot(
+                textpage, raw_page_bbox, page_rotation, include_extended_geometry, visibility, unicode_fallback=unicode_fallback
+            )
             if snapshot is not None:
                 return snapshot
             if compact_only:
                 return None
         options = {"visibility_by_object": visibility} if visible_only else {}
+        if unicode_fallback is not None:
+            options["unicode_fallback"] = unicode_fallback
         chars = get_chars(textpage, raw_page_bbox, page_rotation, include_geometry=include_extended_geometry, **options)
         raw_codes = {char["char_idx"]: char["raw_code"] for char in chars}
         chars = _restore_pdfium_surrogate_pairs(chars, textpage, raw_codes=raw_codes)

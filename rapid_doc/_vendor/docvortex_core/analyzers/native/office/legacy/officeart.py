@@ -3,14 +3,15 @@
 from __future__ import annotations
 
 from collections.abc import Callable, Iterator
-from dataclasses import dataclass
+from dataclasses import dataclass, field, replace
+import hashlib
 import struct
 import zlib
 
 from loguru import logger
 
 from ..image import ensure_bmp_header
-from ..errors import LegacyOfficeImageResourceLimitError, LegacyOfficeResourceLimitError
+from ..errors import LegacyOfficeImageLimitError, LegacyOfficeResourceLimitError
 from ..limits import MAX_ASSET_TOTAL_BYTES, MAX_ENTRY_BYTES, MAX_PICTURE_RECORDS, MAX_RECORD_DEPTH
 
 OFFICEART_CONTAINER_VERSION = 0xF
@@ -48,6 +49,58 @@ class OfficeImagePayload:
     extension: str
     content_type: str
     render_size_emu: tuple[int, int] | None = None
+    limit_reason: str | None = None
+    source_digest: bytes | None = None
+
+
+@dataclass(slots=True)
+class OfficeImageBudget:
+    """按文档共享图片预算，拒绝的图片只保存摘要与占位原因。"""
+
+    max_bytes: int = MAX_ASSET_TOTAL_BYTES
+    check_image: Callable[[bytes, str, str], str | None] | None = None
+    total: int = 0
+    _accepted: dict[bytes, bytes] = field(default_factory=dict)
+    _rejected: dict[bytes, str] = field(default_factory=dict)
+
+    def reject(self, payload: OfficeImagePayload, reason: str, *, source: str) -> OfficeImagePayload:
+        """清除被拒绝的图片载荷，按摘要去重安全告警并保留定位信息。"""
+        digest = payload.source_digest or hashlib.sha256(payload.data).digest()
+        if digest not in self._rejected:
+            self._rejected[digest] = reason
+            logger.warning(
+                "OFFICE_IMAGE_LIMIT: source={!r}, payload_sha256={}: {}. Using placeholder.",
+                source,
+                digest.hex()[:16],
+                reason,
+            )
+        return replace(payload, data=b"", limit_reason=self._rejected[digest], source_digest=digest)
+
+    def admit(self, payload: OfficeImagePayload, *, source: str) -> OfficeImagePayload:
+        """只接收预算内且通过图片探测的载荷，重复图片复用同一份字节。"""
+        if payload.limit_reason is not None:
+            return replace(payload, data=b"")
+        digest = payload.source_digest or hashlib.sha256(payload.data).digest()
+        payload = replace(payload, source_digest=digest)
+        if digest in self._rejected:
+            return replace(payload, data=b"", limit_reason=self._rejected[digest])
+        if digest in self._accepted:
+            return replace(payload, data=self._accepted[digest])
+        if self.total + len(payload.data) > self.max_bytes:
+            return self.reject(
+                payload,
+                f"embedded assets exceed max_asset_total_bytes={self.max_bytes}",
+                source=source,
+            )
+        # 图片探测由格式层注入，通用二进制层不依赖公式解析实现。
+        limit_reason = self.check_image(payload.data, source, payload.content_type) if self.check_image else None
+        if limit_reason is not None:
+            # 上层检查器已记录同一摘要的超限告警，此处仅保留拒绝状态。
+            self._rejected[digest] = limit_reason
+            return replace(payload, data=b"", limit_reason=limit_reason)
+        self.total += len(payload.data)
+        self._accepted[digest] = payload.data
+        return payload
 
 
 @dataclass(frozen=True, slots=True)
@@ -213,14 +266,17 @@ def decode_blip(record: OfficeArtRecord) -> OfficeImagePayload | None:
         if data is None:
             return None
         if len(data) > MAX_ENTRY_BYTES:
-            raise LegacyOfficeImageResourceLimitError(f"bitmap BLIP exceeds max_entry_bytes={MAX_ENTRY_BYTES}")
+            raise LegacyOfficeImageLimitError("bitmap BLIP exceeds max_entry_bytes")
         if record.record_type == 0xF01D:
             return OfficeImagePayload(data=data, extension="jpg", content_type="image/jpeg")
         if record.record_type == 0xF01E:
             return OfficeImagePayload(data=data, extension="png", content_type="image/png")
         if record.record_type == 0xF029:
             return OfficeImagePayload(data=data, extension="tiff", content_type="image/tiff")
-        return OfficeImagePayload(data=ensure_bmp_header(data), extension="bmp", content_type="image/bmp")
+        data = ensure_bmp_header(data)
+        if len(data) > MAX_ENTRY_BYTES:
+            raise LegacyOfficeImageLimitError("bitmap BLIP exceeds max_entry_bytes")
+        return OfficeImagePayload(data=data, extension="bmp", content_type="image/bmp")
 
     if record.record_type not in {0xF01A, 0xF01B}:
         return None
@@ -234,9 +290,9 @@ def decode_blip(record: OfficeArtRecord) -> OfficeImagePayload | None:
     compressed_size = int(struct.unpack_from("<I", body, header_offset + 28)[0])
     compression = body[header_offset + 32]
     payload_start = header_offset + 34
-    if declared_size > MAX_ENTRY_BYTES:
-        raise LegacyOfficeImageResourceLimitError(f"metafile BLIP exceeds max_entry_bytes={MAX_ENTRY_BYTES}")
     payload = body[payload_start : payload_start + compressed_size]
+    if declared_size > MAX_ENTRY_BYTES:
+        raise LegacyOfficeImageLimitError("metafile BLIP exceeds max_entry_bytes")
     if compression == 0:
         data = b""
         reached_eof = False
@@ -246,10 +302,9 @@ def decode_blip(record: OfficeArtRecord) -> OfficeImagePayload | None:
                 candidate = inflater.decompress(payload, MAX_ENTRY_BYTES + 1)
             except zlib.error:
                 continue
-            # 有界 decompress 已输出全部可解码内容；不能再用无输出上限的
-            # flush 扩张缓冲，也不能在达到上限时调用 flush(0)。
+            # 先检查有界输出，避免 flush(0) 或 flush 继续分配超限数据。
             if len(candidate) > MAX_ENTRY_BYTES:
-                raise LegacyOfficeImageResourceLimitError(f"metafile BLIP decompression exceeds max_entry_bytes={MAX_ENTRY_BYTES}")
+                raise LegacyOfficeImageLimitError("metafile BLIP decompression exceeded its limit")
             if inflater.eof:
                 data = candidate
                 reached_eof = True
@@ -258,8 +313,8 @@ def decode_blip(record: OfficeArtRecord) -> OfficeImagePayload | None:
             return None
     else:
         data = payload
-    if len(data) > MAX_ENTRY_BYTES:
-        raise LegacyOfficeImageResourceLimitError(f"metafile BLIP payload exceeds max_entry_bytes={MAX_ENTRY_BYTES}")
+        if len(data) > MAX_ENTRY_BYTES:
+            raise LegacyOfficeImageLimitError("metafile BLIP exceeds max_entry_bytes")
     if record.record_type == 0xF01A:
         return OfficeImagePayload(
             data=data,
@@ -339,12 +394,13 @@ def decode_bstore(
     *,
     charge: Callable[[], None] | None = None,
     delay_stream: bytes | None = None,
+    image_budget: OfficeImageBudget | None = None,
 ) -> dict[int, OfficeImagePayload]:
     """按一基 BSE 序号解码 drawing group 中的图片资源。"""
 
     bse_records = [record for record in iter_descendants(data, charge=charge) if record.record_type == OFFICEART_BSE]
     result: dict[int, OfficeImagePayload] = {}
-    asset_total = 0
+    image_budget = image_budget if image_budget is not None else OfficeImageBudget(max_bytes=MAX_ASSET_TOTAL_BYTES)
     for index, bse in enumerate(bse_records[:MAX_PICTURE_RECORDS], start=1):
         try:
             decoded = _decode_bse_body(
@@ -352,15 +408,16 @@ def decode_bstore(
                 charge=charge,
                 delay_stream=delay_stream,
             )
-        except LegacyOfficeImageResourceLimitError as exc:
-            logger.warning("LEGACY_OFFICE_IMAGE_SKIPPED: BSE {}: {}", index, exc)
+        except LegacyOfficeImageLimitError as exc:
+            result[index] = image_budget.reject(
+                OfficeImagePayload(bse.payload, "bin", "application/octet-stream"),
+                str(exc),
+                source=f"BSE {index} at offset {bse.offset}",
+            )
             continue
         if decoded is None:
             continue
-        asset_total += len(decoded.data)
-        if asset_total > MAX_ASSET_TOTAL_BYTES:
-            raise LegacyOfficeResourceLimitError(f"embedded assets exceed max_asset_total_bytes={MAX_ASSET_TOTAL_BYTES}")
-        result[index] = decoded
+        result[index] = image_budget.admit(decoded, source=f"BSE {index} at offset {bse.offset}.{decoded.extension}")
     if len(bse_records) > MAX_PICTURE_RECORDS:
         logger.warning(
             "LEGACY_OFFICE_PICTURE_LIMIT: ignored BSE records after {}",

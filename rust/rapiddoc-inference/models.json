@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "defaults": {
+    "det": "pp_ocrv6_det_small",
+    "rec": "pp_ocrv6_rec_small",
+    "orientation": "rapid_orientation",
+    "layout": "pp_doclayoutv3",
+    "formula": "pp_formulanet_plus_m",
+    "table": "slanet_plus",
+    "wired": "unet",
+    "classifier": "paddle_cls",
+    "secondary_classifier": "q_cls",
+    "seal_det": "pp_ocrv4_mobile_seal_det"
+  },
+  "models": {
+    "pp_ocrv6_det_small": {
+      "filename": "PP-OCRv6_det_small.onnx",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/master/ocr/det/PP-OCRv6_det_small.onnx",
+      "sha256": "d73e0058b7a8086bbd57f3d10b8bcd4ff95363f67e06e2762b5e814fe9c9410e"
+    },
+    "pp_ocrv6_rec_small": {
+      "filename": "PP-OCRv6_rec_small.onnx",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/master/ocr/rec/PP-OCRv6_rec_small.onnx",
+      "sha256": "e84474bdbbdd5a7c43448f0aa75871b1ba9df4927732953decb9aaecbc18b8ab"
+    },
+    "rapid_orientation": {
+      "filename": "rapid_orientation.onnx",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/master/orientation/rapid_orientation.onnx",
+      "sha256": "2f62c9bfb830a0b417241269fde7ef2d0ad5446c0ed2b8af33b1f6543545e8e2"
+    },
+    "slanet_plus": {
+      "filename": "slanet-plus.onnx",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidTable/resolve/v2.0.0/slanet-plus.onnx",
+      "sha256": "d57a942af6a2f57d6a4a0372573c696a2379bf5857c45e2ac69993f3b334514b"
+    },
+    "pp_doclayoutv3": {
+      "filename": "pp_doclayoutv3.onnx",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/master/layout/PP-DocLayoutV3/pp_doclayoutv3.onnx",
+      "sha256": "b9a2759e51ee2cc9d98f10cea21caf5862043b882b5f57c683eaf6fa247196a3"
+    },
+    "pp_formulanet_plus_m": {
+      "filename": "pp_formulanet_plus_m.onnx",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/v1.0.1/formula/PP-FormulaNet_plus-M/pp_formulanet_plus_m.onnx",
+      "sha256": "52afa60ff51ad66cd7840a74188a058fe99081e617d3bd780117a2d67d94f50d"
+    },
+    "unet": {
+      "filename": "unet.onnx",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidTable/resolve/master/unet.onnx",
+      "sha256": "0ea48d3a17e35ef5c2e498a5e799566073234d39b1079ca21d9f4fafe73c6d20"
+    },
+    "paddle_cls": {
+      "filename": "paddle_cls.onnx",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidTable/resolve/master/table_cls/paddle_cls.onnx",
+      "sha256": "21c801f0c403cf960f9f1ccaecf506585b3b98421208033755b9e67cd2371492"
+    },
+    "q_cls": {
+      "filename": "q_cls.onnx",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidTable/resolve/master/table_cls/q_cls.onnx",
+      "sha256": "ef940037471c49f5d35ba2b1d9df9a19eabddf03f1689026d2a5bcab5efe577b"
+    },
+    "pp_ocrv4_mobile_seal_det": {
+      "filename": "pp-ocrv4_mobile_seal_det.onnx",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/master/ocr/det/pp-ocrv4_mobile_seal_det.onnx",
+      "sha256": "e6109a1022b5ebf0822fc00646ef2398a7ef387390ca5c978de79352b1314204"
+    },
+    "pp_doclayoutv2": {
+      "filename": "pp_doclayoutv2.onnx",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/master/layout/PP-DocLayoutV2/pp_doclayoutv2.onnx",
+      "sha256": "9fedca3a2ebfdce73fc36f7842a4cabe0a4fe8c0ee33a446ca358ed500907b29"
+    },
+    "pp_formulanet_plus_s": {
+      "filename": "pp_formulanet_plus_s.onnx",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/v1.0.1/formula/PP-FormulaNet_plus-S/pp_formulanet_plus_s.onnx",
+      "sha256": "a97f156a3d5fc957f29321083cba1517ffde29e99fbd6d2d36958f1fe128fbbf"
+    },
+    "pp_formulanet_plus_l": {
+      "filename": "pp_formulanet_plus_l.onnx",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/v1.0.1/formula/PP-FormulaNet_plus-L/pp_formulanet_plus_l.onnx",
+      "sha256": "f6686782c2bb5f84000ff9da4788ac672e736fa2d0652f483a140fa8401b3d32"
+    },
+    "table_transformer_v1_1_all": {
+      "filename": "table_transformer_v1_1_all.onnx",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/master/table/table_transformer_v1_1_all.onnx",
+      "sha256": "2c361306169b92b8fdf1ae677b0bbcc5111503729b598c388e5ef20237dc9085"
+    },
+    "pp_doclayout_plus_l": {
+      "filename": "pp_doclayout_plus_l.onnx",
+      "url": "https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/v1.0.0/layout/PP-DocLayout_plus-L/pp_doclayout_plus_l.onnx",
+      "sha256": "3e0a48f1eead902e83e04695430597e92207ef50e19b06bdf65f46096ba6bbd3"
+    }
+  }
+}

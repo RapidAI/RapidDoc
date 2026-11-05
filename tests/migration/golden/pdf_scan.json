@@ -1,0 +1,20 @@
+{
+  "capture": "pdf-facts",
+  "pages": [
+    {
+      "chars": [],
+      "drawing_lines": [],
+      "image_bboxes": [
+        [
+          0.0,
+          0.0,
+          400.0,
+          400.0
+        ]
+      ],
+      "links": [],
+      "page_index": 0,
+      "paths": []
+    }
+  ]
+}

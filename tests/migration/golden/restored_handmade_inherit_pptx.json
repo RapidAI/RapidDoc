@@ -1,0 +1,138 @@
+{
+  "assets": {},
+  "content_list_json": [
+    {
+      "page_idx": 0,
+      "text": "Inherited Title Slide",
+      "text_level": 1,
+      "type": "text"
+    },
+    {
+      "list_items": [
+        "- **Roman three bold via master**",
+        "- **Roman four** with bold turned off",
+        "    - *Dash bullet italic via master level two*"
+      ],
+      "page_idx": 0,
+      "type": "list"
+    },
+    {
+      "page_idx": 0,
+      "text": "**Plain closing line**",
+      "type": "text"
+    }
+  ],
+  "markdown": "# Inherited Title Slide\n\n- **Roman three bold via master**\n- **Roman four** with bold turned off\n    - *Dash bullet italic via master level two*\n\n**Plain closing line**",
+  "middle_json": {
+    "_backend": "office",
+    "_version_name": "0.9.11",
+    "pdf_info": [
+      {
+        "discarded_blocks": [],
+        "page_idx": 0,
+        "para_blocks": [
+          {
+            "index": 0,
+            "is_numbered_style": false,
+            "level": 1,
+            "lines": [
+              {
+                "spans": [
+                  {
+                    "content": "Inherited Title Slide",
+                    "type": "text"
+                  }
+                ]
+              }
+            ],
+            "type": "title"
+          },
+          {
+            "attribute": "unordered",
+            "blocks": [
+              {
+                "lines": [
+                  {
+                    "spans": [
+                      {
+                        "content": "Roman three bold via master",
+                        "style": [
+                          "bold"
+                        ],
+                        "type": "text"
+                      }
+                    ]
+                  }
+                ],
+                "type": "text"
+              },
+              {
+                "lines": [
+                  {
+                    "spans": [
+                      {
+                        "content": "Roman four ",
+                        "style": [
+                          "bold"
+                        ],
+                        "type": "text"
+                      },
+                      {
+                        "content": "with bold turned off",
+                        "type": "text"
+                      }
+                    ]
+                  }
+                ],
+                "type": "text"
+              },
+              {
+                "attribute": "unordered",
+                "blocks": [
+                  {
+                    "lines": [
+                      {
+                        "spans": [
+                          {
+                            "content": "Dash bullet italic via master level two",
+                            "style": [
+                              "italic"
+                            ],
+                            "type": "text"
+                          }
+                        ]
+                      }
+                    ],
+                    "type": "text"
+                  }
+                ],
+                "ilevel": 1,
+                "type": "list"
+              }
+            ],
+            "ilevel": 0,
+            "index": 1,
+            "type": "list"
+          },
+          {
+            "index": 2,
+            "lines": [
+              {
+                "spans": [
+                  {
+                    "content": "Plain closing line",
+                    "style": [
+                      "bold"
+                    ],
+                    "type": "text"
+                  }
+                ]
+              }
+            ],
+            "type": "text"
+          }
+        ]
+      }
+    ]
+  }
+}

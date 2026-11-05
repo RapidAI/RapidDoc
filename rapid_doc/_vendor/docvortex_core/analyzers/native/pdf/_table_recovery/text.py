@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import statistics
+import math
 import re
 import unicodedata
 from dataclasses import dataclass, replace
@@ -14,7 +15,8 @@ from .....foundation._text import resolve_text_line_boundary
 from .....schema import BBox
 from ..spatial_text import _normalize_table_text
 from .contracts import NativeTableGlyph, NativeTableInput, NativeTableText, NativeTableTextRow, NativeTableToken
-from .geometry import bbox_center, bbox_intersection, bbox_union, normalize_angle, normalize_bbox, page_bbox_to_table_local
+from .ink_geometry import calibrate_inflated_table_glyphs
+from .geometry import bbox_center, bbox_intersection, bbox_union, normalize_angle, normalize_bbox, page_bbox_to_table_local, rotate_local_bbox
 
 
 @dataclass(frozen=True, slots=True)
@@ -27,6 +29,64 @@ class _PendingGlyph:
     bbox: BBox
     explicit_space_before: bool = False
     explicit_break_before: bool = False
+    writing_angle: int | None = 0
+    advance_bbox: BBox | None = None
+    origin: tuple[float, float] | None = None
+
+
+def _rotate_origin(origin: tuple[float, float], angle: int) -> tuple[float, float]:
+    """旋转局部基线原点，平移量不参与单元格内的相对几何判定。"""
+    x, y = origin
+    return {0: (x, y), 90: (y, -x), 180: (-x, -y), 270: (-y, x)}[angle]
+
+
+def _local_origin(value: object, table_bbox: BBox, angle: int) -> tuple[float, float] | None:
+    """读取有限基线原点并转换到与物理字形相同的整表坐标。"""
+    if not isinstance(value, (tuple, list)) or len(value) != 2:
+        return None
+    try:
+        x, y = float(value[0]), float(value[1])
+    except (TypeError, ValueError, OverflowError):
+        return None
+    if not (math.isfinite(x) and math.isfinite(y)):
+        return None
+    x, y = _rotate_origin((x - table_bbox[0], y - table_bbox[1]), angle)
+    width, height = table_bbox[2] - table_bbox[0], table_bbox[3] - table_bbox[1]
+    dx, dy = {0: (0, 0), 90: (0, width), 180: (width, height), 270: (height, 0)}[angle]
+    return x + dx, y + dy
+
+
+def _relative_writing_angle(value: object, table_angle: int) -> int | None:
+    """把已校正的页面书写弧度转换到整表坐标；缺失方向沿用整表语义。"""
+    if value is None:
+        return 0
+    try:
+        degrees = math.degrees(float(value))
+    except (TypeError, ValueError, OverflowError):
+        return None
+    if not math.isfinite(degrees):
+        return None
+    relative = (degrees % 360 - table_angle) % 360
+    cardinal = round(relative / 90) * 90 % 360
+    return cardinal if abs((relative - cardinal + 180) % 360 - 180) <= 0.1 else None
+
+
+def _baseline_writing_angle(glyph: _PendingGlyph) -> int | None:
+    """独立字符缺少 advance 时，以字体排版框相对基线的上下侧证据纠正半周反向。"""
+    angle = glyph.writing_angle
+    if not angle or glyph.origin is None:
+        return angle
+    # 轻量字符接口没有 loose 框时，字母数字的墨迹相对基线仍可证明半周反向；标点必须有字体排版框。
+    reference = glyph.advance_bbox or (glyph.bbox if any(char.isalnum() for char in glyph.text) else None)
+    if reference is None:
+        return angle
+    box = rotate_local_bbox(reference, 0, 0, angle)
+    origin = _rotate_origin(glyph.origin, angle)
+    above, below = origin[1] - box[1], box[3] - origin[1]
+    # 正向字体框通常将上伸部放在基线上方；只有完整排版框强烈反向才纠偏，不能使用短横线的墨迹框猜方向。
+    if above >= -0.1 * (box[3] - box[1]) and below > 0 and below >= 2 * above and below - above >= 0.4 * (box[3] - box[1]):
+        return (angle + 180) % 360
+    return angle
 
 
 _PENDING_REFERENCES = (
@@ -127,7 +187,22 @@ def _select_pending_glyphs_adapter(table_input: NativeTableInput) -> list[_Pendi
         text = _normalize_table_text(raw_text)
         if not text or text.isspace() or local is None or (local[3] - local[1] < 0.5 and not _contains_cjk(text)):
             continue
-        output.append(_PendingGlyph(len(output), source_index, text, local, pending_space, pending_break))
+        direction = _relative_writing_angle(char.get("writing_angle"), normalize_angle(table_input.angle))
+        loose = normalize_bbox(char.get("loose_bbox")) if direction else None
+        advance = page_bbox_to_table_local(loose, table_bbox, normalize_angle(table_input.angle)) if loose else None
+        output.append(
+            _PendingGlyph(
+                len(output),
+                source_index,
+                text,
+                local,
+                pending_space,
+                pending_break,
+                direction,
+                advance,
+                _local_origin(char.get("origin"), table_bbox, normalize_angle(table_input.angle)),
+            )
+        )
         pending_space = pending_break = False
     return output
 
@@ -187,6 +262,10 @@ def _select_pending_glyphs_python(table_input: NativeTableInput) -> list[_Pendin
                 bbox=local_bbox,
                 explicit_space_before=pending_space,
                 explicit_break_before=pending_break,
+                writing_angle=_relative_writing_angle(char.get("writing_angle"), angle),
+                advance_bbox=page_bbox_to_table_local(normalize_bbox(char.get("loose_bbox")), table_bbox, angle)
+                if _relative_writing_angle(char.get("writing_angle"), angle) and normalize_bbox(char.get("loose_bbox")) else None,
+                origin=_local_origin(char.get("origin"), table_bbox, angle),
             )
         )
         pending_space = False
@@ -382,6 +461,7 @@ def _glyph_line_parts(
     median_height: float,
     *,
     presorted: bool = False,
+    use_advance: bool = False,
 ) -> list[tuple[str, int | None]]:
     """重建单行文本片段，并保留每个可见片段的原字符索引。"""
 
@@ -391,16 +471,21 @@ def _glyph_line_parts(
     parts: list[tuple[str, int | None]] = [(ordered[0].text, ordered[0].source_index)]
     previous = ordered[0]
     for glyph in ordered[1:]:
-        gap = glyph.bbox[0] - previous.bbox[2]
+        current_box = (glyph.advance_bbox if use_advance else None) or glyph.bbox
+        previous_box = (previous.advance_bbox if use_advance else None) or previous.bbox
+        gap = current_box[0] - previous_box[2]
         spacing_height = median_height
-        previous_spacing = getattr(previous, "spacing_bbox", None)
-        current_spacing = getattr(glyph, "spacing_bbox", None)
-        if previous_spacing is not None and current_spacing is not None:
-            # Ink bounds shrink for narrow glyphs (1, i, decimal points).
-            # PDF advance bounds measure the actual extra layout separation.
-            gap = current_spacing[0] - previous_spacing[2]
-            spacing_height = min(previous_spacing[3] - previous_spacing[1],
-                                 current_spacing[3] - current_spacing[1])
+        if not use_advance:
+            gap = glyph.bbox[0] - previous.bbox[2]
+            spacing_height = median_height
+            previous_spacing = getattr(previous, "spacing_bbox", None)
+            current_spacing = getattr(glyph, "spacing_bbox", None)
+            if previous_spacing is not None and current_spacing is not None:
+                # Ink bounds shrink for narrow glyphs (1, i, decimal points).
+                # PDF advance bounds measure the actual extra layout separation.
+                gap = current_spacing[0] - previous_spacing[2]
+                spacing_height = min(previous_spacing[3] - previous_spacing[1],
+                                     current_spacing[3] - current_spacing[1])
         previous_tail = previous.text[-1:] or ""
         current_head = glyph.text[:1] or ""
         needs_space = glyph.explicit_space_before or (
@@ -489,6 +574,17 @@ def build_native_table_text(table_input: NativeTableInput) -> NativeTableText | 
             row_inputs.append(item)
     pending_rows = [[pending[item.glyph_id] for item in row]
                     for row in _assign_visual_rows(row_inputs, median_height)]
+    calibrated = calibrate_inflated_table_glyphs(
+        table_input,
+        pending,
+        pending_rows,
+        median_height=median_height,
+    )
+    if calibrated is not None:
+        pending = calibrated
+        median_height = max(0.1, float(statistics.median(glyph.bbox[3] - glyph.bbox[1] for glyph in pending)))
+        pending_rows = [[pending[item.glyph_id] for item in row]
+                        for row in _assign_visual_rows(pending, median_height)]
 
     glyphs: list[NativeTableGlyph] = []
     rows: list[NativeTableTextRow] = []
@@ -503,6 +599,9 @@ def build_native_table_text(table_input: NativeTableInput) -> NativeTableText | 
                 explicit_space_before=item.explicit_space_before,
                 explicit_break_before=item.explicit_break_before,
                 spacing_bbox=spacing_boxes.get(item.source_index),
+                writing_angle=_baseline_writing_angle(item),
+                advance_bbox=item.advance_bbox,
+                origin=item.origin,
             )
             for item in pending_row
         ]
@@ -602,6 +701,79 @@ def _python_cell_visual_groups(glyphs, median_height):
     return refined
 
 
+def cell_writing_angle(glyphs: list[NativeTableGlyph]) -> int | None:
+    """用同向邻字的基线和墨迹侧向消歧孤立字形，真实混合方向保持拒绝。"""
+    directions = {glyph.writing_angle for glyph in glyphs}
+    if not directions:
+        return 0
+    if len(directions) == 1:
+        return next(iter(directions))
+    accepted = [angle for angle in directions if angle is not None and _cell_baseline_supports_angle(glyphs, angle)]
+    return accepted[0] if len(accepted) == 1 else None
+
+
+def _cell_baseline_supports_angle(glyphs: list[NativeTableGlyph], angle: int) -> bool:
+    """同一书写行至少两个锚字才能纠正孤立字符的角度，墨迹须位于基线同侧。"""
+    anchors = [
+        (rotate_local_bbox(glyph.bbox, 0, 0, angle), _rotate_origin(glyph.origin, angle))
+        for glyph in glyphs
+        if glyph.writing_angle == angle and glyph.origin is not None
+    ]
+    if len(anchors) < 2:
+        return False
+    scale = float(statistics.median(box[3] - box[1] for box, _origin in anchors))
+    for glyph in glyphs:
+        if glyph.writing_angle == angle:
+            continue
+        if glyph.origin is None or glyph.writing_angle is not None and (glyph.writing_angle - angle) % 360 != 180:
+            return False
+        box = rotate_local_bbox(glyph.bbox, 0, 0, angle)
+        origin = _rotate_origin(glyph.origin, angle)
+        neighbors = [
+            (peer, baseline)
+            for peer, baseline in anchors
+            if abs(origin[1] - baseline[1]) <= 0.15 * scale and max(peer[0] - box[2], box[0] - peer[2], 0) <= 2 * scale
+        ]
+        if (
+            len(neighbors) < 2
+            or max(point[0] for _, point in neighbors) - min(point[0] for _, point in neighbors) < 0.5 * scale
+        ):
+            return False
+        center = (box[1] + box[3]) / 2 - origin[1]
+        side = statistics.median((peer[1] + peer[3]) / 2 - baseline[1] for peer, baseline in neighbors)
+        # 单字旋转 180 度时墨迹会落到基线另一侧；不能仅凭邻字占多数就强行改写。
+        if center * side <= 0 or abs(center - side) > 0.6 * scale:
+            return False
+    return True
+
+
+def cell_text_rows(
+    glyphs: list[NativeTableGlyph],
+    median_height: float,
+) -> tuple[list[list[NativeTableGlyph]], float]:
+    """仅为单元格阅读创建正向字形副本，保留落格坐标及源字符身份。"""
+    angle = cell_writing_angle(glyphs)
+    if angle is None:
+        raise ValueError("ambiguous cell writing direction")
+    if not angle:
+        rows = _native_cell_visual_groups(glyphs, median_height)
+        return (rows if rows is not None else _python_cell_visual_groups(glyphs, median_height)), median_height
+    from ....._compute_backend import get_native
+
+    upright = [
+        replace(
+            glyph,
+            bbox=rotate_local_bbox(glyph.bbox, 0, 0, angle),
+            advance_bbox=rotate_local_bbox(glyph.advance_bbox, 0, 0, angle) if glyph.advance_bbox else None,
+        )
+        for glyph in glyphs
+    ]
+    height = float(statistics.median(glyph.bbox[3] - glyph.bbox[1] for glyph in upright))
+    grouped = _assign_visual_rows(upright, height)
+    rows = [[replace(glyph, visual_row=row_index) for glyph in row] for row_index, row in enumerate(grouped)]
+    return rows, height
+
+
 def build_cell_text_parts(
     glyphs: list[NativeTableGlyph],
     median_height: float,
@@ -610,14 +782,13 @@ def build_cell_text_parts(
 
     if not glyphs:
         return []
-    refined = _native_cell_visual_groups(glyphs, median_height)
-    if refined is None:
-        refined = _python_cell_visual_groups(glyphs, median_height)
+    refined, median_height = cell_text_rows(glyphs, median_height)
+    use_advance = bool(cell_writing_angle(glyphs))
     grouped = dict(enumerate(refined))
     parts: list[tuple[str, int | None]] = []
     previous_line = ""
     for row_index in sorted(grouped):
-        row_parts = _glyph_line_parts(grouped[row_index], median_height)
+        row_parts = _glyph_line_parts(grouped[row_index], median_height, use_advance=use_advance)
         row_text = "".join(text for text, _source_index in row_parts)
         if not row_text:
             continue

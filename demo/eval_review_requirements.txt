@@ -1,0 +1,5 @@
+# Optional review report generation; does not change parser dependencies.
+markdown-it-py>=3,<5
+mdit-py-plugins==0.5.0
+pypdfium2
+Pillow

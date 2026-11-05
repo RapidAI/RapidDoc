@@ -1,0 +1,2698 @@
+{
+  "schema": 1,
+  "cargo_lock_sha256": "beb39c56e40c1abcc03462b248a08b4ac7682a52fbd130de3af09667bb4e4336",
+  "manifest_hashes": {
+    "bindings/python/Cargo.toml": "4aed14d7fcfb6e16aebb9bdb53cda5cda21ad11d5b1dd3623aa2eba0ec112a73",
+    "Cargo.toml": "b825bddd825e515e8ebd0c1a9e78a6076139dfb2b9de500097458d6e9d3f3de0",
+    "licenses/migration-notices.json": "fd4799e9114c815d7e117e4e2146f60d0afa3cb8e9ddc542f2da12a4b749b125",
+    "licenses/MIGRATION-NOTICES.txt": "a9be0ae796b185d3f80065b767ff0382dcfcfe3c08e203e9012b21e581a76c7f",
+    "rust/rapiddoc/Cargo.toml": "5f596d9a67dd03cc60ae3f5fb81debea3558edbd4a824c55155f04a9508ed97b",
+    "rust/rapiddoc-core/Cargo.toml": "835a8409f68621199118a788751779e35f1c4072d2e4a67a89fcfec7699231ed",
+    "rust/rapiddoc-inference/Cargo.toml": "b3b8600f8968d9af3c0ddf835dcd4c5f5b5da587c47396b2ae7bef00add07e9c",
+    "rust/rapiddoc-native/Cargo.toml": "9ffa371049bf26efce83c9e10257659723ce8670907b073617bdfd05cc7843ee",
+    "rust/rapiddoc-office/Cargo.toml": "5e4f6557c2478c6002024ada9e5f45bd7caad276ee299c859b36e7c4461f7cdc",
+    "rust/rapiddoc-pdf/Cargo.toml": "de72d6c59aa059110f4c033a4e7789b46e0b187eaece4a2d750602d0e73231a8",
+    "rust/rapiddoc-render/Cargo.toml": "01b44ac68def50e5048a432e46896eb78edde983ae610856ebc8d6bb66b46344",
+    "rust/vendor/docvortex-core/Cargo.toml": "fe22e1475e9a9566ec68f0826aa47f9313916fe6b3a5f996fd95398015400a7f",
+    "rust/vendor/docvortex-pdfium-paths/Cargo.toml": "9046af1811e2bbf00ed24d8070112b67ade3f44cf8048ca594770250535e9154",
+    "rust/vendor/lopdf-f64/Cargo.toml": "0c17db0a68f1f6f3bde25e3ac8b1d6182529e4dfec37e84f7c818842e86a646f"
+  },
+  "profiles": {
+    "windows": [
+      "ab_glyph 0.2.32",
+      "ab_glyph_rasterizer 0.1.10",
+      "adler2 2.0.1",
+      "aes 0.8.4",
+      "ahash 0.8.12",
+      "aho-corasick 1.1.5",
+      "approx 0.5.1",
+      "arrayref 0.3.9",
+      "arrayvec 0.7.8",
+      "base64 0.13.1",
+      "base64 0.23.1",
+      "bit-set 0.8.0",
+      "bit-vec 0.8.0",
+      "bitflags 2.13.2",
+      "block-buffer 0.10.4",
+      "block-padding 0.3.3",
+      "bumpalo 3.20.3",
+      "bytemuck 1.25.2",
+      "byteorder 1.5.0",
+      "byteorder-lite 0.1.0",
+      "bytes 1.12.1",
+      "castaway 0.2.4",
+      "cbc 0.1.2",
+      "cfb 0.15.0",
+      "cfg-if 1.0.5",
+      "chacha20 0.10.2",
+      "chrono 0.4.45",
+      "cipher 0.4.4",
+      "clipper-sys 0.8.0",
+      "color_quant 1.1.0",
+      "compact_str 0.9.1",
+      "core_detect 1.0.0",
+      "cpufeatures 0.2.17",
+      "cpufeatures 0.3.1",
+      "crc32fast 1.5.3",
+      "crossbeam-deque 0.8.8",
+      "crossbeam-epoch 0.9.21",
+      "crossbeam-utils 0.8.23",
+      "crypto-common 0.1.7",
+      "dary_heap 0.3.9",
+      "data-url 0.3.2",
+      "derive_builder 0.20.2",
+      "digest 0.10.7",
+      "ecb 0.1.2",
+      "either 1.19.0",
+      "encoding_rs 0.8.42",
+      "equivalent 1.0.3",
+      "esaxx-rs 0.1.10",
+      "fancy-regex 0.14.0",
+      "fax 0.2.7",
+      "fdeflate 0.3.7",
+      "flate2 1.1.10",
+      "float-cmp 0.9.0",
+      "fnv 1.0.7",
+      "font-types 0.12.7",
+      "fontdb 0.24.0",
+      "freetype-sys 0.20.1",
+      "gcd 2.3.0",
+      "generic-array 0.14.7",
+      "getrandom 0.2.17",
+      "getrandom 0.3.4",
+      "getrandom 0.4.3",
+      "gif 0.14.2",
+      "half 2.7.1",
+      "harfrust 0.12.0",
+      "hashbrown 0.17.1",
+      "http 1.5.0",
+      "httparse 1.10.1",
+      "image 0.25.10",
+      "image-webp 0.2.4",
+      "imageproc 0.25.0",
+      "imagesize 0.15.0",
+      "indexmap 2.14.2",
+      "inout 0.1.4",
+      "itertools 0.12.1",
+      "itertools 0.14.0",
+      "itertools 0.15.0",
+      "itoa 1.0.18",
+      "kurbo 0.13.1",
+      "libc 0.2.191",
+      "libloading 0.9.0",
+      "libm 0.2.16",
+      "libmimalloc-sys 0.1.49",
+      "lock_api 0.4.14",
+      "log 0.4.34",
+      "macro_rules_attribute 0.2.3",
+      "matrixmultiply 0.3.11",
+      "maybe-owned 0.3.4",
+      "md-5 0.10.6",
+      "memchr 2.8.3",
+      "mimalloc 0.1.52",
+      "minimal-lexical 0.2.1",
+      "miniz_oxide 0.8.9",
+      "miniz_oxide 0.9.1",
+      "monostate 0.1.18",
+      "moxcms 0.8.1",
+      "nalgebra 0.32.6",
+      "nom 7.1.3",
+      "nom 8.0.0",
+      "num 0.4.3",
+      "num-bigint 0.4.8",
+      "num-complex 0.4.6",
+      "num-integer 0.1.47",
+      "num-iter 0.1.46",
+      "num-rational 0.4.2",
+      "num-traits 0.2.19",
+      "once_cell 1.21.4",
+      "ort 2.0.0-rc.15",
+      "ort-sys 2.0.0-rc.15",
+      "owned_ttf_parser 0.25.1",
+      "parking_lot 0.12.5",
+      "parking_lot_core 0.9.12",
+      "pdfium-render 0.9.4",
+      "percent-encoding 2.3.2",
+      "pico-args 0.5.0",
+      "piston-float 1.0.1",
+      "png 0.18.1",
+      "polycool 0.4.0",
+      "ppv-lite86 0.2.21",
+      "pxfm 0.1.30",
+      "pyo3 0.28.2",
+      "pyo3-ffi 0.28.2",
+      "quick-error 2.0.1",
+      "quick-xml 0.42.0",
+      "rand 0.10.3",
+      "rand 0.8.8",
+      "rand 0.9.5",
+      "rand_chacha 0.3.1",
+      "rand_chacha 0.9.0",
+      "rand_core 0.10.1",
+      "rand_core 0.6.4",
+      "rand_core 0.9.5",
+      "rand_distr 0.4.3",
+      "rangemap 1.8.0",
+      "rapiddoc 0.1.0",
+      "rapiddoc-core 0.1.0",
+      "rapiddoc-docvortex-core 0.1.0",
+      "rapiddoc-docvortex-pdfium-paths 0.1.0",
+      "rapiddoc-inference 0.1.0",
+      "rapiddoc-lopdf 0.42.0",
+      "rapiddoc-native 0.1.0",
+      "rapiddoc-office 0.1.0",
+      "rapiddoc-pdf 0.1.0",
+      "rapiddoc-python 0.1.0",
+      "rapiddoc-render 0.1.0",
+      "rawpointer 0.2.1",
+      "rayon 1.12.0",
+      "rayon-cond 0.4.0",
+      "rayon-core 1.13.0",
+      "read-fonts 0.41.0",
+      "regex 1.13.1",
+      "regex-automata 0.4.18",
+      "regex-syntax 0.8.11",
+      "resvg 0.48.0",
+      "rgb 0.8.53",
+      "ring 0.17.14",
+      "roxmltree 0.21.2",
+      "rustls 0.23.46",
+      "rustls-pki-types 1.15.1",
+      "rustls-webpki 0.103.16",
+      "ryu 1.0.23",
+      "safe_arch 0.7.4",
+      "scopeguard 1.2.0",
+      "serde 1.0.229",
+      "serde_core 1.0.229",
+      "serde_json 1.0.154",
+      "sha2 0.10.9",
+      "simba 0.8.1",
+      "simd-adler32 0.3.10",
+      "simdutf8 0.1.5",
+      "simplecss 0.2.2",
+      "siphasher 1.0.4",
+      "skrifa 0.44.0",
+      "slotmap 1.1.1",
+      "smallvec 1.16.3",
+      "spm_precompiled 0.1.4",
+      "static_assertions 1.1.0",
+      "strict-num 0.1.1",
+      "stringprep 0.1.5",
+      "subtle 2.6.1",
+      "svgtypes 0.16.1",
+      "thiserror 1.0.69",
+      "thiserror 2.0.21",
+      "tiff 0.11.3",
+      "tiny-skia 0.12.0",
+      "tiny-skia-path 0.12.0",
+      "tinyvec 1.13.3",
+      "tokenizers 0.22.2",
+      "ttf-parser 0.25.1",
+      "turbojpeg 1.5.1",
+      "turbojpeg-sys 1.2.0",
+      "typed-path 0.13.0",
+      "typenum 1.20.1",
+      "unicode-bidi 0.3.18",
+      "unicode-normalization 0.1.24",
+      "unicode-normalization-alignments 0.1.12",
+      "unicode-properties 0.1.4",
+      "unicode-script 0.5.8",
+      "unicode-segmentation 1.13.3",
+      "unicode-vo 0.1.0",
+      "unicode_categories 0.1.1",
+      "untrusted 0.9.0",
+      "ureq 3.5.1",
+      "ureq-proto 0.7.1",
+      "usvg 0.48.1",
+      "utf16string 0.2.0",
+      "utf8-zero 0.8.1",
+      "uuid 1.29.0",
+      "vecmath 1.0.0",
+      "web-time 1.1.0",
+      "webpki-roots 1.0.11",
+      "weezl 0.1.12",
+      "wide 0.7.33",
+      "windows-link 0.2.1",
+      "windows-sys 0.61.2",
+      "xmlwriter 0.1.0",
+      "zerocopy 0.8.63",
+      "zeroize 1.9.1",
+      "zip 9.1.3",
+      "zlib-rs 0.6.8",
+      "zmij 1.0.23",
+      "zopfli 0.8.4",
+      "zune-core 0.5.3",
+      "zune-jpeg 0.5.15"
+    ],
+    "linux": [
+      "ab_glyph 0.2.32",
+      "ab_glyph_rasterizer 0.1.10",
+      "adler2 2.0.1",
+      "aes 0.8.4",
+      "ahash 0.8.12",
+      "aho-corasick 1.1.5",
+      "approx 0.5.1",
+      "arrayref 0.3.9",
+      "arrayvec 0.7.8",
+      "base64 0.13.1",
+      "base64 0.23.1",
+      "bit-set 0.8.0",
+      "bit-vec 0.8.0",
+      "bitflags 2.13.2",
+      "block-buffer 0.10.4",
+      "block-padding 0.3.3",
+      "bumpalo 3.20.3",
+      "bytemuck 1.25.2",
+      "byteorder 1.5.0",
+      "byteorder-lite 0.1.0",
+      "bytes 1.12.1",
+      "castaway 0.2.4",
+      "cbc 0.1.2",
+      "cfb 0.15.0",
+      "cfg-if 1.0.5",
+      "chacha20 0.10.2",
+      "chrono 0.4.45",
+      "cipher 0.4.4",
+      "clipper-sys 0.8.0",
+      "color_quant 1.1.0",
+      "compact_str 0.9.1",
+      "core_detect 1.0.0",
+      "cpufeatures 0.2.17",
+      "cpufeatures 0.3.1",
+      "crc32fast 1.5.3",
+      "crossbeam-deque 0.8.8",
+      "crossbeam-epoch 0.9.21",
+      "crossbeam-utils 0.8.23",
+      "crypto-common 0.1.7",
+      "dary_heap 0.3.9",
+      "data-url 0.3.2",
+      "derive_builder 0.20.2",
+      "digest 0.10.7",
+      "ecb 0.1.2",
+      "either 1.19.0",
+      "encoding_rs 0.8.42",
+      "equivalent 1.0.3",
+      "esaxx-rs 0.1.10",
+      "fancy-regex 0.14.0",
+      "fax 0.2.7",
+      "fdeflate 0.3.7",
+      "flate2 1.1.10",
+      "float-cmp 0.9.0",
+      "fnv 1.0.7",
+      "font-types 0.12.7",
+      "fontdb 0.24.0",
+      "freetype-sys 0.20.1",
+      "gcd 2.3.0",
+      "generic-array 0.14.7",
+      "getrandom 0.2.17",
+      "getrandom 0.3.4",
+      "getrandom 0.4.3",
+      "gif 0.14.2",
+      "half 2.7.1",
+      "harfrust 0.12.0",
+      "hashbrown 0.17.1",
+      "http 1.5.0",
+      "httparse 1.10.1",
+      "iana-time-zone 0.1.65",
+      "image 0.25.10",
+      "image-webp 0.2.4",
+      "imageproc 0.25.0",
+      "imagesize 0.15.0",
+      "indexmap 2.14.2",
+      "inout 0.1.4",
+      "itertools 0.12.1",
+      "itertools 0.14.0",
+      "itertools 0.15.0",
+      "itoa 1.0.18",
+      "kurbo 0.13.1",
+      "libc 0.2.191",
+      "libloading 0.9.0",
+      "libm 0.2.16",
+      "libmimalloc-sys 0.1.49",
+      "lock_api 0.4.14",
+      "log 0.4.34",
+      "macro_rules_attribute 0.2.3",
+      "matrixmultiply 0.3.11",
+      "maybe-owned 0.3.4",
+      "md-5 0.10.6",
+      "memchr 2.8.3",
+      "mimalloc 0.1.52",
+      "minimal-lexical 0.2.1",
+      "miniz_oxide 0.8.9",
+      "miniz_oxide 0.9.1",
+      "monostate 0.1.18",
+      "moxcms 0.8.1",
+      "nalgebra 0.32.6",
+      "nom 7.1.3",
+      "nom 8.0.0",
+      "num 0.4.3",
+      "num-bigint 0.4.8",
+      "num-complex 0.4.6",
+      "num-integer 0.1.47",
+      "num-iter 0.1.46",
+      "num-rational 0.4.2",
+      "num-traits 0.2.19",
+      "once_cell 1.21.4",
+      "ort 2.0.0-rc.15",
+      "ort-sys 2.0.0-rc.15",
+      "owned_ttf_parser 0.25.1",
+      "parking_lot 0.12.5",
+      "parking_lot_core 0.9.12",
+      "pdfium-render 0.9.4",
+      "percent-encoding 2.3.2",
+      "pico-args 0.5.0",
+      "piston-float 1.0.1",
+      "png 0.18.1",
+      "polycool 0.4.0",
+      "ppv-lite86 0.2.21",
+      "pxfm 0.1.30",
+      "pyo3 0.28.2",
+      "pyo3-ffi 0.28.2",
+      "quick-error 2.0.1",
+      "quick-xml 0.42.0",
+      "rand 0.10.3",
+      "rand 0.8.8",
+      "rand 0.9.5",
+      "rand_chacha 0.3.1",
+      "rand_chacha 0.9.0",
+      "rand_core 0.10.1",
+      "rand_core 0.6.4",
+      "rand_core 0.9.5",
+      "rand_distr 0.4.3",
+      "rangemap 1.8.0",
+      "rapiddoc 0.1.0",
+      "rapiddoc-core 0.1.0",
+      "rapiddoc-docvortex-core 0.1.0",
+      "rapiddoc-docvortex-pdfium-paths 0.1.0",
+      "rapiddoc-inference 0.1.0",
+      "rapiddoc-lopdf 0.42.0",
+      "rapiddoc-native 0.1.0",
+      "rapiddoc-office 0.1.0",
+      "rapiddoc-pdf 0.1.0",
+      "rapiddoc-python 0.1.0",
+      "rapiddoc-render 0.1.0",
+      "rawpointer 0.2.1",
+      "rayon 1.12.0",
+      "rayon-cond 0.4.0",
+      "rayon-core 1.13.0",
+      "read-fonts 0.41.0",
+      "regex 1.13.1",
+      "regex-automata 0.4.18",
+      "regex-syntax 0.8.11",
+      "resvg 0.48.0",
+      "rgb 0.8.53",
+      "ring 0.17.14",
+      "roxmltree 0.21.2",
+      "rustls 0.23.46",
+      "rustls-pki-types 1.15.1",
+      "rustls-webpki 0.103.16",
+      "ryu 1.0.23",
+      "safe_arch 0.7.4",
+      "scopeguard 1.2.0",
+      "serde 1.0.229",
+      "serde_core 1.0.229",
+      "serde_json 1.0.154",
+      "sha2 0.10.9",
+      "simba 0.8.1",
+      "simd-adler32 0.3.10",
+      "simdutf8 0.1.5",
+      "simplecss 0.2.2",
+      "siphasher 1.0.4",
+      "skrifa 0.44.0",
+      "slotmap 1.1.1",
+      "smallvec 1.16.3",
+      "spm_precompiled 0.1.4",
+      "static_assertions 1.1.0",
+      "strict-num 0.1.1",
+      "stringprep 0.1.5",
+      "subtle 2.6.1",
+      "svgtypes 0.16.1",
+      "thiserror 1.0.69",
+      "thiserror 2.0.21",
+      "tiff 0.11.3",
+      "tiny-skia 0.12.0",
+      "tiny-skia-path 0.12.0",
+      "tinyvec 1.13.3",
+      "tokenizers 0.22.2",
+      "ttf-parser 0.25.1",
+      "turbojpeg 1.5.1",
+      "turbojpeg-sys 1.2.0",
+      "typed-path 0.13.0",
+      "typenum 1.20.1",
+      "unicode-bidi 0.3.18",
+      "unicode-normalization 0.1.24",
+      "unicode-normalization-alignments 0.1.12",
+      "unicode-properties 0.1.4",
+      "unicode-script 0.5.8",
+      "unicode-segmentation 1.13.3",
+      "unicode-vo 0.1.0",
+      "unicode_categories 0.1.1",
+      "untrusted 0.9.0",
+      "ureq 3.5.1",
+      "ureq-proto 0.7.1",
+      "usvg 0.48.1",
+      "utf16string 0.2.0",
+      "utf8-zero 0.8.1",
+      "uuid 1.29.0",
+      "vecmath 1.0.0",
+      "web-time 1.1.0",
+      "webpki-roots 1.0.11",
+      "weezl 0.1.12",
+      "wide 0.7.33",
+      "xmlwriter 0.1.0",
+      "zerocopy 0.8.63",
+      "zeroize 1.9.1",
+      "zip 9.1.3",
+      "zlib-rs 0.6.8",
+      "zmij 1.0.23",
+      "zopfli 0.8.4",
+      "zune-core 0.5.3",
+      "zune-jpeg 0.5.15"
+    ],
+    "all": [
+      "ab_glyph 0.2.32",
+      "ab_glyph_rasterizer 0.1.10",
+      "adler2 2.0.1",
+      "aes 0.8.4",
+      "ahash 0.8.12",
+      "aho-corasick 1.1.5",
+      "approx 0.5.1",
+      "arrayref 0.3.9",
+      "arrayvec 0.7.8",
+      "base64 0.13.1",
+      "base64 0.23.1",
+      "bit-set 0.8.0",
+      "bit-vec 0.8.0",
+      "bitflags 2.13.2",
+      "block-buffer 0.10.4",
+      "block-padding 0.3.3",
+      "bumpalo 3.20.3",
+      "bytemuck 1.25.2",
+      "byteorder 1.5.0",
+      "byteorder-lite 0.1.0",
+      "bytes 1.12.1",
+      "castaway 0.2.4",
+      "cbc 0.1.2",
+      "cfb 0.15.0",
+      "cfg-if 1.0.5",
+      "chacha20 0.10.2",
+      "chrono 0.4.45",
+      "cipher 0.4.4",
+      "clipper-sys 0.8.0",
+      "color_quant 1.1.0",
+      "compact_str 0.9.1",
+      "core_detect 1.0.0",
+      "cpufeatures 0.2.17",
+      "cpufeatures 0.3.1",
+      "crc32fast 1.5.3",
+      "crossbeam-deque 0.8.8",
+      "crossbeam-epoch 0.9.21",
+      "crossbeam-utils 0.8.23",
+      "crypto-common 0.1.7",
+      "dary_heap 0.3.9",
+      "data-url 0.3.2",
+      "derive_builder 0.20.2",
+      "digest 0.10.7",
+      "ecb 0.1.2",
+      "either 1.19.0",
+      "encoding_rs 0.8.42",
+      "equivalent 1.0.3",
+      "esaxx-rs 0.1.10",
+      "fancy-regex 0.14.0",
+      "fax 0.2.7",
+      "fdeflate 0.3.7",
+      "flate2 1.1.10",
+      "float-cmp 0.9.0",
+      "fnv 1.0.7",
+      "font-types 0.12.7",
+      "fontdb 0.24.0",
+      "freetype-sys 0.20.1",
+      "gcd 2.3.0",
+      "generic-array 0.14.7",
+      "getrandom 0.2.17",
+      "getrandom 0.3.4",
+      "getrandom 0.4.3",
+      "gif 0.14.2",
+      "half 2.7.1",
+      "harfrust 0.12.0",
+      "hashbrown 0.17.1",
+      "http 1.5.0",
+      "httparse 1.10.1",
+      "iana-time-zone 0.1.65",
+      "image 0.25.10",
+      "image-webp 0.2.4",
+      "imageproc 0.25.0",
+      "imagesize 0.15.0",
+      "indexmap 2.14.2",
+      "inout 0.1.4",
+      "itertools 0.12.1",
+      "itertools 0.14.0",
+      "itertools 0.15.0",
+      "itoa 1.0.18",
+      "kurbo 0.13.1",
+      "libc 0.2.191",
+      "libloading 0.9.0",
+      "libm 0.2.16",
+      "libmimalloc-sys 0.1.49",
+      "lock_api 0.4.14",
+      "log 0.4.34",
+      "macro_rules_attribute 0.2.3",
+      "matrixmultiply 0.3.11",
+      "maybe-owned 0.3.4",
+      "md-5 0.10.6",
+      "memchr 2.8.3",
+      "mimalloc 0.1.52",
+      "minimal-lexical 0.2.1",
+      "miniz_oxide 0.8.9",
+      "miniz_oxide 0.9.1",
+      "monostate 0.1.18",
+      "moxcms 0.8.1",
+      "nalgebra 0.32.6",
+      "nom 7.1.3",
+      "nom 8.0.0",
+      "num 0.4.3",
+      "num-bigint 0.4.8",
+      "num-complex 0.4.6",
+      "num-integer 0.1.47",
+      "num-iter 0.1.46",
+      "num-rational 0.4.2",
+      "num-traits 0.2.19",
+      "once_cell 1.21.4",
+      "ort 2.0.0-rc.15",
+      "ort-sys 2.0.0-rc.15",
+      "owned_ttf_parser 0.25.1",
+      "parking_lot 0.12.5",
+      "parking_lot_core 0.9.12",
+      "pdfium-render 0.9.4",
+      "percent-encoding 2.3.2",
+      "pico-args 0.5.0",
+      "piston-float 1.0.1",
+      "png 0.18.1",
+      "polycool 0.4.0",
+      "ppv-lite86 0.2.21",
+      "pxfm 0.1.30",
+      "pyo3 0.28.2",
+      "pyo3-ffi 0.28.2",
+      "quick-error 2.0.1",
+      "quick-xml 0.42.0",
+      "rand 0.10.3",
+      "rand 0.8.8",
+      "rand 0.9.5",
+      "rand_chacha 0.3.1",
+      "rand_chacha 0.9.0",
+      "rand_core 0.10.1",
+      "rand_core 0.6.4",
+      "rand_core 0.9.5",
+      "rand_distr 0.4.3",
+      "rangemap 1.8.0",
+      "rapiddoc 0.1.0",
+      "rapiddoc-core 0.1.0",
+      "rapiddoc-docvortex-core 0.1.0",
+      "rapiddoc-docvortex-pdfium-paths 0.1.0",
+      "rapiddoc-inference 0.1.0",
+      "rapiddoc-lopdf 0.42.0",
+      "rapiddoc-native 0.1.0",
+      "rapiddoc-office 0.1.0",
+      "rapiddoc-pdf 0.1.0",
+      "rapiddoc-python 0.1.0",
+      "rapiddoc-render 0.1.0",
+      "rawpointer 0.2.1",
+      "rayon 1.12.0",
+      "rayon-cond 0.4.0",
+      "rayon-core 1.13.0",
+      "read-fonts 0.41.0",
+      "regex 1.13.1",
+      "regex-automata 0.4.18",
+      "regex-syntax 0.8.11",
+      "resvg 0.48.0",
+      "rgb 0.8.53",
+      "ring 0.17.14",
+      "roxmltree 0.21.2",
+      "rustls 0.23.46",
+      "rustls-pki-types 1.15.1",
+      "rustls-webpki 0.103.16",
+      "ryu 1.0.23",
+      "safe_arch 0.7.4",
+      "scopeguard 1.2.0",
+      "serde 1.0.229",
+      "serde_core 1.0.229",
+      "serde_json 1.0.154",
+      "sha2 0.10.9",
+      "simba 0.8.1",
+      "simd-adler32 0.3.10",
+      "simdutf8 0.1.5",
+      "simplecss 0.2.2",
+      "siphasher 1.0.4",
+      "skrifa 0.44.0",
+      "slotmap 1.1.1",
+      "smallvec 1.16.3",
+      "spm_precompiled 0.1.4",
+      "static_assertions 1.1.0",
+      "strict-num 0.1.1",
+      "stringprep 0.1.5",
+      "subtle 2.6.1",
+      "svgtypes 0.16.1",
+      "thiserror 1.0.69",
+      "thiserror 2.0.21",
+      "tiff 0.11.3",
+      "tiny-skia 0.12.0",
+      "tiny-skia-path 0.12.0",
+      "tinyvec 1.13.3",
+      "tokenizers 0.22.2",
+      "ttf-parser 0.25.1",
+      "turbojpeg 1.5.1",
+      "turbojpeg-sys 1.2.0",
+      "typed-path 0.13.0",
+      "typenum 1.20.1",
+      "unicode-bidi 0.3.18",
+      "unicode-normalization 0.1.24",
+      "unicode-normalization-alignments 0.1.12",
+      "unicode-properties 0.1.4",
+      "unicode-script 0.5.8",
+      "unicode-segmentation 1.13.3",
+      "unicode-vo 0.1.0",
+      "unicode_categories 0.1.1",
+      "untrusted 0.9.0",
+      "ureq 3.5.1",
+      "ureq-proto 0.7.1",
+      "usvg 0.48.1",
+      "utf16string 0.2.0",
+      "utf8-zero 0.8.1",
+      "uuid 1.29.0",
+      "vecmath 1.0.0",
+      "web-time 1.1.0",
+      "webpki-roots 1.0.11",
+      "weezl 0.1.12",
+      "wide 0.7.33",
+      "windows-link 0.2.1",
+      "windows-sys 0.61.2",
+      "xmlwriter 0.1.0",
+      "zerocopy 0.8.63",
+      "zeroize 1.9.1",
+      "zip 9.1.3",
+      "zlib-rs 0.6.8",
+      "zmij 1.0.23",
+      "zopfli 0.8.4",
+      "zune-core 0.5.3",
+      "zune-jpeg 0.5.15"
+    ]
+  },
+  "files": {
+    "cargo-runtime/base64-0.23.1/LICENSE-MIT": {
+      "component": "base64 0.23.1",
+      "selected": true
+    },
+    "cargo-runtime/bitflags-2.13.2/LICENSE-MIT": {
+      "component": "bitflags 2.13.2",
+      "selected": true
+    },
+    "cargo-runtime/block-buffer-0.10.4/LICENSE-MIT": {
+      "component": "block-buffer 0.10.4",
+      "selected": true
+    },
+    "cargo-runtime/bytes-1.12.1/LICENSE": {
+      "component": "bytes 1.12.1",
+      "selected": true
+    },
+    "cargo-runtime/cfg-if-1.0.5/LICENSE-MIT": {
+      "component": "cfg-if 1.0.5",
+      "selected": true
+    },
+    "cargo-runtime/cpufeatures-0.2.17/LICENSE-MIT": {
+      "component": "cpufeatures 0.2.17",
+      "selected": true
+    },
+    "cargo-runtime/crypto-common-0.1.7/LICENSE-MIT": {
+      "component": "crypto-common 0.1.7",
+      "selected": true
+    },
+    "cargo-runtime/digest-0.10.7/LICENSE-MIT": {
+      "component": "digest 0.10.7",
+      "selected": true
+    },
+    "cargo-runtime/generic-array-0.14.7/LICENSE": {
+      "component": "generic-array 0.14.7",
+      "selected": true
+    },
+    "cargo-runtime/getrandom-0.2.17/LICENSE-MIT": {
+      "component": "getrandom 0.2.17",
+      "selected": true
+    },
+    "cargo-runtime/http-1.5.0/LICENSE-MIT": {
+      "component": "http 1.5.0",
+      "selected": true
+    },
+    "cargo-runtime/httparse-1.10.1/LICENSE-MIT": {
+      "component": "httparse 1.10.1",
+      "selected": true
+    },
+    "cargo-runtime/itoa-1.0.18/LICENSE-MIT": {
+      "component": "itoa 1.0.18",
+      "selected": true
+    },
+    "cargo-runtime/libc-0.2.191/LICENSE-MIT": {
+      "component": "libc 0.2.191",
+      "selected": true
+    },
+    "cargo-runtime/lock_api-0.4.14/LICENSE-MIT": {
+      "component": "lock_api 0.4.14",
+      "selected": true
+    },
+    "cargo-runtime/log-0.4.34/LICENSE-MIT": {
+      "component": "log 0.4.34",
+      "selected": true
+    },
+    "cargo-runtime/memchr-2.8.3/COPYING": {
+      "component": "memchr 2.8.3",
+      "selected": true
+    },
+    "cargo-runtime/memchr-2.8.3/LICENSE-MIT": {
+      "component": "memchr 2.8.3",
+      "selected": true
+    },
+    "cargo-runtime/once_cell-1.21.4/LICENSE-MIT": {
+      "component": "once_cell 1.21.4",
+      "selected": true
+    },
+    "cargo-runtime/parking_lot-0.12.5/LICENSE-MIT": {
+      "component": "parking_lot 0.12.5",
+      "selected": true
+    },
+    "cargo-runtime/parking_lot_core-0.9.12/LICENSE-MIT": {
+      "component": "parking_lot_core 0.9.12",
+      "selected": true
+    },
+    "cargo-runtime/percent-encoding-2.3.2/LICENSE-MIT": {
+      "component": "percent-encoding 2.3.2",
+      "selected": true
+    },
+    "cargo-runtime/ring-0.17.14/LICENSE-BoringSSL": {
+      "component": "ring 0.17.14",
+      "selected": true
+    },
+    "cargo-runtime/ring-0.17.14/LICENSE": {
+      "component": "ring 0.17.14",
+      "selected": true
+    },
+    "cargo-runtime/ring-0.17.14/LICENSE-other-bits": {
+      "component": "ring 0.17.14",
+      "selected": true
+    },
+    "cargo-runtime/rustls-pki-types-1.15.1/LICENSE-MIT": {
+      "component": "rustls-pki-types 1.15.1",
+      "selected": true
+    },
+    "cargo-runtime/rustls-webpki-0.103.16/LICENSE": {
+      "component": "rustls-webpki 0.103.16",
+      "selected": true
+    },
+    "cargo-runtime/rustls-0.23.46/LICENSE-ISC": {
+      "component": "rustls 0.23.46",
+      "selected": true
+    },
+    "cargo-runtime/rustls-0.23.46/LICENSE-MIT": {
+      "component": "rustls 0.23.46",
+      "selected": true
+    },
+    "cargo-runtime/scopeguard-1.2.0/LICENSE-MIT": {
+      "component": "scopeguard 1.2.0",
+      "selected": true
+    },
+    "cargo-runtime/sha2-0.10.9/LICENSE-MIT": {
+      "component": "sha2 0.10.9",
+      "selected": true
+    },
+    "cargo-runtime/smallvec-1.16.3/LICENSE-MIT": {
+      "component": "smallvec 1.16.3",
+      "selected": true
+    },
+    "cargo-runtime/subtle-2.6.1/LICENSE": {
+      "component": "subtle 2.6.1",
+      "selected": true
+    },
+    "cargo-runtime/typenum-1.20.1/LICENSE-MIT": {
+      "component": "typenum 1.20.1",
+      "selected": true
+    },
+    "cargo-runtime/typenum-1.20.1/LICENSE": {
+      "component": "typenum 1.20.1",
+      "selected": true
+    },
+    "cargo-runtime/untrusted-0.9.0/LICENSE.txt": {
+      "component": "untrusted 0.9.0",
+      "selected": true
+    },
+    "cargo-runtime/ureq-proto-0.7.1/LICENSE-MIT.txt": {
+      "component": "ureq-proto 0.7.1",
+      "selected": true
+    },
+    "cargo-runtime/ureq-3.5.1/LICENSE-MIT": {
+      "component": "ureq 3.5.1",
+      "selected": true
+    },
+    "cargo-runtime/utf8-zero-0.8.1/LICENSE-MIT": {
+      "component": "utf8-zero 0.8.1",
+      "selected": true
+    },
+    "cargo-runtime/webpki-roots-1.0.11/LICENSE": {
+      "component": "webpki-roots 1.0.11",
+      "selected": true
+    },
+    "cargo-runtime/windows-link-0.2.1/license-mit": {
+      "component": "windows-link 0.2.1",
+      "selected": true
+    },
+    "cargo-runtime/windows-link-0.2.1/license-apache-2.0": {
+      "component": "windows-link 0.2.1",
+      "selected": true
+    },
+    "cargo-runtime/zeroize-1.9.1/LICENSE-MIT": {
+      "component": "zeroize 1.9.1",
+      "selected": true
+    },
+    "office/image-dependencies/adler2-2.0.1/LICENSE-0BSD": {
+      "component": "adler2 2.0.1",
+      "selected": false
+    },
+    "office/image-dependencies/adler2-2.0.1/LICENSE-APACHE": {
+      "component": "adler2 2.0.1",
+      "selected": false
+    },
+    "office/image-dependencies/adler2-2.0.1/LICENSE-MIT": {
+      "component": "adler2 2.0.1",
+      "selected": true
+    },
+    "office/image-dependencies/arrayref-0.3.9/LICENSE": {
+      "component": "arrayref 0.3.9",
+      "selected": true
+    },
+    "office/image-dependencies/arrayvec-0.7.8/LICENSE-APACHE": {
+      "component": "arrayvec 0.7.8",
+      "selected": false
+    },
+    "office/image-dependencies/arrayvec-0.7.8/LICENSE-MIT": {
+      "component": "arrayvec 0.7.8",
+      "selected": true
+    },
+    "office/image-dependencies/autocfg-1.5.1/LICENSE-APACHE": {
+      "component": "autocfg 1.5.1",
+      "selected": false
+    },
+    "office/image-dependencies/autocfg-1.5.1/LICENSE-MIT": {
+      "component": "autocfg 1.5.1",
+      "selected": true
+    },
+    "office/image-dependencies/base64-0.23.1/LICENSE-APACHE": {
+      "component": "base64 0.23.1",
+      "selected": false
+    },
+    "office/image-dependencies/base64-0.23.1/LICENSE-MIT": {
+      "component": "base64 0.23.1",
+      "selected": true
+    },
+    "office/image-dependencies/bitflags-2.13.2/LICENSE-APACHE": {
+      "component": "bitflags 2.13.2",
+      "selected": false
+    },
+    "office/image-dependencies/bitflags-2.13.2/LICENSE-MIT": {
+      "component": "bitflags 2.13.2",
+      "selected": true
+    },
+    "office/image-dependencies/bytemuck-1.25.2/LICENSE-APACHE": {
+      "component": "bytemuck 1.25.2",
+      "selected": false
+    },
+    "office/image-dependencies/bytemuck-1.25.2/LICENSE-MIT": {
+      "component": "bytemuck 1.25.2",
+      "selected": true
+    },
+    "office/image-dependencies/bytemuck-1.25.2/LICENSE-ZLIB": {
+      "component": "bytemuck 1.25.2",
+      "selected": false
+    },
+    "office/image-dependencies/bytemuck_derive-1.12.1/LICENSE-APACHE": {
+      "component": "bytemuck_derive 1.12.1",
+      "selected": false
+    },
+    "office/image-dependencies/bytemuck_derive-1.12.1/LICENSE-MIT": {
+      "component": "bytemuck_derive 1.12.1",
+      "selected": true
+    },
+    "office/image-dependencies/bytemuck_derive-1.12.1/LICENSE-ZLIB": {
+      "component": "bytemuck_derive 1.12.1",
+      "selected": false
+    },
+    "office/image-dependencies/byteorder-lite-0.1.0/LICENSE-MIT": {
+      "component": "byteorder-lite 0.1.0",
+      "selected": true
+    },
+    "office/image-dependencies/cfg-if-1.0.5/LICENSE-APACHE": {
+      "component": "cfg-if 1.0.5",
+      "selected": false
+    },
+    "office/image-dependencies/cfg-if-1.0.5/LICENSE-MIT": {
+      "component": "cfg-if 1.0.5",
+      "selected": true
+    },
+    "office/image-dependencies/color_quant-1.1.0/LICENSE": {
+      "component": "color_quant 1.1.0",
+      "selected": true
+    },
+    "office/image-dependencies/crc32fast-1.5.3/LICENSE-APACHE": {
+      "component": "crc32fast 1.5.3",
+      "selected": false
+    },
+    "office/image-dependencies/crc32fast-1.5.3/LICENSE-MIT": {
+      "component": "crc32fast 1.5.3",
+      "selected": true
+    },
+    "office/image-dependencies/crunchy-0.2.4/LICENSE": {
+      "component": "crunchy 0.2.4",
+      "selected": true
+    },
+    "office/image-dependencies/data-url-0.3.2/LICENSE-APACHE": {
+      "component": "data-url 0.3.2",
+      "selected": false
+    },
+    "office/image-dependencies/data-url-0.3.2/LICENSE-MIT": {
+      "component": "data-url 0.3.2",
+      "selected": true
+    },
+    "office/image-dependencies/euclid-0.22.14/LICENSE-APACHE": {
+      "component": "euclid 0.22.14",
+      "selected": false
+    },
+    "office/image-dependencies/euclid-0.22.14/LICENSE-MIT": {
+      "component": "euclid 0.22.14",
+      "selected": true
+    },
+    "office/image-dependencies/euclid-0.22.14/COPYRIGHT": {
+      "component": "euclid 0.22.14",
+      "selected": true
+    },
+    "office/image-dependencies/fax-0.2.7/LICENSE": {
+      "component": "fax 0.2.7",
+      "selected": true
+    },
+    "office/image-dependencies/fdeflate-0.3.7/LICENSE-APACHE": {
+      "component": "fdeflate 0.3.7",
+      "selected": false
+    },
+    "office/image-dependencies/fdeflate-0.3.7/LICENSE-MIT": {
+      "component": "fdeflate 0.3.7",
+      "selected": true
+    },
+    "office/image-dependencies/flate2-1.1.10/LICENSE-APACHE": {
+      "component": "flate2 1.1.10",
+      "selected": false
+    },
+    "office/image-dependencies/flate2-1.1.10/LICENSE-MIT": {
+      "component": "flate2 1.1.10",
+      "selected": true
+    },
+    "office/image-dependencies/float-cmp-0.9.0/LICENSE": {
+      "component": "float-cmp 0.9.0",
+      "selected": true
+    },
+    "office/image-dependencies/font-types-0.12.7/LICENSE-APACHE": {
+      "component": "font-types 0.12.7",
+      "selected": false
+    },
+    "office/image-dependencies/font-types-0.12.7/LICENSE-MIT": {
+      "component": "font-types 0.12.7",
+      "selected": true
+    },
+    "office/image-dependencies/fontdb-0.24.0/LICENSE": {
+      "component": "fontdb 0.24.0",
+      "selected": true
+    },
+    "office/image-dependencies/gif-0.14.2/LICENSE-APACHE": {
+      "component": "gif 0.14.2",
+      "selected": false
+    },
+    "office/image-dependencies/gif-0.14.2/LICENSE-MIT": {
+      "component": "gif 0.14.2",
+      "selected": true
+    },
+    "office/image-dependencies/half-2.7.1/LICENSE-APACHE": {
+      "component": "half 2.7.1",
+      "selected": false
+    },
+    "office/image-dependencies/half-2.7.1/LICENSE-MIT": {
+      "component": "half 2.7.1",
+      "selected": true
+    },
+    "office/image-dependencies/harfrust-0.12.0/LICENSE": {
+      "component": "harfrust 0.12.0",
+      "selected": true
+    },
+    "office/image-dependencies/image-0.25.10/LICENSE-APACHE": {
+      "component": "image 0.25.10",
+      "selected": false
+    },
+    "office/image-dependencies/image-0.25.10/LICENSE-MIT": {
+      "component": "image 0.25.10",
+      "selected": true
+    },
+    "office/image-dependencies/image-webp-0.2.4/LICENSE-APACHE": {
+      "component": "image-webp 0.2.4",
+      "selected": false
+    },
+    "office/image-dependencies/image-webp-0.2.4/LICENSE-MIT": {
+      "component": "image-webp 0.2.4",
+      "selected": true
+    },
+    "office/image-dependencies/imagesize-0.15.0/LICENSE": {
+      "component": "imagesize 0.15.0",
+      "selected": true
+    },
+    "office/image-dependencies/kurbo-0.13.1/LICENSE-APACHE": {
+      "component": "kurbo 0.13.1",
+      "selected": false
+    },
+    "office/image-dependencies/kurbo-0.13.1/LICENSE-MIT": {
+      "component": "kurbo 0.13.1",
+      "selected": true
+    },
+    "office/image-dependencies/libm-0.2.16/LICENSE.txt": {
+      "component": "libm 0.2.16",
+      "selected": true
+    },
+    "office/image-dependencies/log-0.4.34/LICENSE-APACHE": {
+      "component": "log 0.4.34",
+      "selected": false
+    },
+    "office/image-dependencies/log-0.4.34/LICENSE-MIT": {
+      "component": "log 0.4.34",
+      "selected": true
+    },
+    "office/image-dependencies/memchr-2.8.3/LICENSE-MIT": {
+      "component": "memchr 2.8.3",
+      "selected": true
+    },
+    "office/image-dependencies/memchr-2.8.3/COPYING": {
+      "component": "memchr 2.8.3",
+      "selected": true
+    },
+    "office/image-dependencies/miniz_oxide-0.9.1/LICENSE": {
+      "component": "miniz_oxide 0.9.1",
+      "selected": true
+    },
+    "office/image-dependencies/miniz_oxide-0.9.1/LICENSE-APACHE.md": {
+      "component": "miniz_oxide 0.9.1",
+      "selected": false
+    },
+    "office/image-dependencies/miniz_oxide-0.9.1/LICENSE-MIT.md": {
+      "component": "miniz_oxide 0.9.1",
+      "selected": true
+    },
+    "office/image-dependencies/miniz_oxide-0.9.1/LICENSE-ZLIB.md": {
+      "component": "miniz_oxide 0.9.1",
+      "selected": false
+    },
+    "office/image-dependencies/miniz_oxide-0.8.9/LICENSE": {
+      "component": "miniz_oxide 0.8.9",
+      "selected": true
+    },
+    "office/image-dependencies/miniz_oxide-0.8.9/LICENSE-APACHE.md": {
+      "component": "miniz_oxide 0.8.9",
+      "selected": false
+    },
+    "office/image-dependencies/miniz_oxide-0.8.9/LICENSE-MIT.md": {
+      "component": "miniz_oxide 0.8.9",
+      "selected": true
+    },
+    "office/image-dependencies/miniz_oxide-0.8.9/LICENSE-ZLIB.md": {
+      "component": "miniz_oxide 0.8.9",
+      "selected": false
+    },
+    "office/image-dependencies/moxcms-0.8.1/LICENSE-APACHE.md": {
+      "component": "moxcms 0.8.1",
+      "selected": true
+    },
+    "office/image-dependencies/moxcms-0.8.1/LICENSE.md": {
+      "component": "moxcms 0.8.1",
+      "selected": true
+    },
+    "office/image-dependencies/num-traits-0.2.19/LICENSE-APACHE": {
+      "component": "num-traits 0.2.19",
+      "selected": false
+    },
+    "office/image-dependencies/num-traits-0.2.19/LICENSE-MIT": {
+      "component": "num-traits 0.2.19",
+      "selected": true
+    },
+    "office/image-dependencies/once_cell-1.21.4/LICENSE-APACHE": {
+      "component": "once_cell 1.21.4",
+      "selected": false
+    },
+    "office/image-dependencies/once_cell-1.21.4/LICENSE-MIT": {
+      "component": "once_cell 1.21.4",
+      "selected": true
+    },
+    "office/image-dependencies/pico-args-0.5.0/LICENSE": {
+      "component": "pico-args 0.5.0",
+      "selected": true
+    },
+    "office/image-dependencies/png-0.18.1/LICENSE-APACHE": {
+      "component": "png 0.18.1",
+      "selected": false
+    },
+    "office/image-dependencies/png-0.18.1/LICENSE-MIT": {
+      "component": "png 0.18.1",
+      "selected": true
+    },
+    "office/image-dependencies/polycool-0.4.0/LICENSE-APACHE": {
+      "component": "polycool 0.4.0",
+      "selected": false
+    },
+    "office/image-dependencies/polycool-0.4.0/LICENSE-MIT": {
+      "component": "polycool 0.4.0",
+      "selected": true
+    },
+    "office/image-dependencies/proc-macro2-1.0.107/LICENSE-APACHE": {
+      "component": "proc-macro2 1.0.107",
+      "selected": false
+    },
+    "office/image-dependencies/proc-macro2-1.0.107/LICENSE-MIT": {
+      "component": "proc-macro2 1.0.107",
+      "selected": true
+    },
+    "office/image-dependencies/pxfm-0.1.30/LICENSE-APACHE.md": {
+      "component": "pxfm 0.1.30",
+      "selected": true
+    },
+    "office/image-dependencies/pxfm-0.1.30/LICENSE.md": {
+      "component": "pxfm 0.1.30",
+      "selected": true
+    },
+    "office/image-dependencies/quick-error-2.0.1/LICENSE-APACHE": {
+      "component": "quick-error 2.0.1",
+      "selected": true
+    },
+    "office/image-dependencies/quick-error-2.0.1/LICENSE-MIT": {
+      "component": "quick-error 2.0.1",
+      "selected": true
+    },
+    "office/image-dependencies/quote-1.0.47/LICENSE-APACHE": {
+      "component": "quote 1.0.47",
+      "selected": false
+    },
+    "office/image-dependencies/quote-1.0.47/LICENSE-MIT": {
+      "component": "quote 1.0.47",
+      "selected": true
+    },
+    "office/image-dependencies/read-fonts-0.41.0/LICENSE-APACHE": {
+      "component": "read-fonts 0.41.0",
+      "selected": false
+    },
+    "office/image-dependencies/read-fonts-0.41.0/LICENSE-MIT": {
+      "component": "read-fonts 0.41.0",
+      "selected": true
+    },
+    "office/image-dependencies/resvg-0.48.0/LICENSE-APACHE": {
+      "component": "resvg 0.48.0",
+      "selected": false
+    },
+    "office/image-dependencies/resvg-0.48.0/LICENSE-MIT": {
+      "component": "resvg 0.48.0",
+      "selected": true
+    },
+    "office/image-dependencies/rgb-0.8.53/LICENSE": {
+      "component": "rgb 0.8.53",
+      "selected": true
+    },
+    "office/image-dependencies/roxmltree-0.21.2/LICENSE-APACHE": {
+      "component": "roxmltree 0.21.2",
+      "selected": false
+    },
+    "office/image-dependencies/roxmltree-0.21.2/LICENSE-MIT": {
+      "component": "roxmltree 0.21.2",
+      "selected": true
+    },
+    "office/image-dependencies/simd-adler32-0.3.10/LICENSE.md": {
+      "component": "simd-adler32 0.3.10",
+      "selected": true
+    },
+    "office/image-dependencies/simplecss-0.2.2/LICENSE-APACHE": {
+      "component": "simplecss 0.2.2",
+      "selected": false
+    },
+    "office/image-dependencies/simplecss-0.2.2/LICENSE-MIT": {
+      "component": "simplecss 0.2.2",
+      "selected": true
+    },
+    "office/image-dependencies/siphasher-1.0.4/LICENSE-APACHE": {
+      "component": "siphasher 1.0.4",
+      "selected": false
+    },
+    "office/image-dependencies/siphasher-1.0.4/LICENSE-MIT": {
+      "component": "siphasher 1.0.4",
+      "selected": true
+    },
+    "office/image-dependencies/siphasher-1.0.4/COPYING": {
+      "component": "siphasher 1.0.4",
+      "selected": true
+    },
+    "office/image-dependencies/skrifa-0.44.0/LICENSE-APACHE": {
+      "component": "skrifa 0.44.0",
+      "selected": false
+    },
+    "office/image-dependencies/skrifa-0.44.0/LICENSE-MIT": {
+      "component": "skrifa 0.44.0",
+      "selected": true
+    },
+    "office/image-dependencies/slotmap-1.1.1/LICENSE": {
+      "component": "slotmap 1.1.1",
+      "selected": true
+    },
+    "office/image-dependencies/smallvec-1.16.3/LICENSE-APACHE": {
+      "component": "smallvec 1.16.3",
+      "selected": false
+    },
+    "office/image-dependencies/smallvec-1.16.3/LICENSE-MIT": {
+      "component": "smallvec 1.16.3",
+      "selected": true
+    },
+    "office/image-dependencies/strict-num-0.1.1/LICENSE": {
+      "component": "strict-num 0.1.1",
+      "selected": true
+    },
+    "office/image-dependencies/svgtypes-0.16.1/LICENSE-APACHE": {
+      "component": "svgtypes 0.16.1",
+      "selected": false
+    },
+    "office/image-dependencies/svgtypes-0.16.1/LICENSE-MIT": {
+      "component": "svgtypes 0.16.1",
+      "selected": true
+    },
+    "office/image-dependencies/syn-3.0.9/LICENSE-APACHE": {
+      "component": "syn 3.0.9",
+      "selected": false
+    },
+    "office/image-dependencies/syn-3.0.9/LICENSE-MIT": {
+      "component": "syn 3.0.9",
+      "selected": true
+    },
+    "office/image-dependencies/syn-2.0.119/LICENSE-APACHE": {
+      "component": "syn 2.0.119",
+      "selected": false
+    },
+    "office/image-dependencies/syn-2.0.119/LICENSE-MIT": {
+      "component": "syn 2.0.119",
+      "selected": true
+    },
+    "office/image-dependencies/tiff-0.11.3/LICENSE": {
+      "component": "tiff 0.11.3",
+      "selected": true
+    },
+    "office/image-dependencies/tiny-skia-0.12.0/LICENSE": {
+      "component": "tiny-skia 0.12.0",
+      "selected": true
+    },
+    "office/image-dependencies/tiny-skia-path-0.12.0/LICENSE": {
+      "component": "tiny-skia-path 0.12.0",
+      "selected": true
+    },
+    "office/image-dependencies/tinyvec-1.13.3/LICENSE-APACHE.md": {
+      "component": "tinyvec 1.13.3",
+      "selected": false
+    },
+    "office/image-dependencies/tinyvec-1.13.3/LICENSE-MIT.md": {
+      "component": "tinyvec 1.13.3",
+      "selected": true
+    },
+    "office/image-dependencies/tinyvec-1.13.3/LICENSE-ZLIB.md": {
+      "component": "tinyvec 1.13.3",
+      "selected": false
+    },
+    "office/image-dependencies/unicode-bidi-0.3.18/LICENSE-APACHE": {
+      "component": "unicode-bidi 0.3.18",
+      "selected": false
+    },
+    "office/image-dependencies/unicode-bidi-0.3.18/LICENSE-MIT": {
+      "component": "unicode-bidi 0.3.18",
+      "selected": true
+    },
+    "office/image-dependencies/unicode-bidi-0.3.18/COPYRIGHT": {
+      "component": "unicode-bidi 0.3.18",
+      "selected": true
+    },
+    "office/image-dependencies/unicode-ident-1.0.27/LICENSE-APACHE": {
+      "component": "unicode-ident 1.0.27",
+      "selected": false
+    },
+    "office/image-dependencies/unicode-ident-1.0.27/LICENSE-MIT": {
+      "component": "unicode-ident 1.0.27",
+      "selected": true
+    },
+    "office/image-dependencies/unicode-ident-1.0.27/LICENSE-UNICODE": {
+      "component": "unicode-ident 1.0.27",
+      "selected": true
+    },
+    "office/image-dependencies/unicode-script-0.5.8/LICENSE-APACHE": {
+      "component": "unicode-script 0.5.8",
+      "selected": false
+    },
+    "office/image-dependencies/unicode-script-0.5.8/LICENSE-MIT": {
+      "component": "unicode-script 0.5.8",
+      "selected": true
+    },
+    "office/image-dependencies/unicode-vo-0.1.0/LICENSE-APACHE": {
+      "component": "unicode-vo 0.1.0",
+      "selected": true
+    },
+    "office/image-dependencies/unicode-vo-0.1.0/LICENSE-MIT": {
+      "component": "unicode-vo 0.1.0",
+      "selected": true
+    },
+    "office/image-dependencies/usvg-0.48.1/LICENSE-APACHE": {
+      "component": "usvg 0.48.1",
+      "selected": false
+    },
+    "office/image-dependencies/usvg-0.48.1/LICENSE-MIT": {
+      "component": "usvg 0.48.1",
+      "selected": true
+    },
+    "office/image-dependencies/version_check-0.9.5/LICENSE-APACHE": {
+      "component": "version_check 0.9.5",
+      "selected": true
+    },
+    "office/image-dependencies/version_check-0.9.5/LICENSE-MIT": {
+      "component": "version_check 0.9.5",
+      "selected": true
+    },
+    "office/image-dependencies/weezl-0.1.12/LICENSE-APACHE": {
+      "component": "weezl 0.1.12",
+      "selected": false
+    },
+    "office/image-dependencies/weezl-0.1.12/LICENSE-MIT": {
+      "component": "weezl 0.1.12",
+      "selected": true
+    },
+    "office/image-dependencies/xmlwriter-0.1.0/LICENSE": {
+      "component": "xmlwriter 0.1.0",
+      "selected": true
+    },
+    "office/image-dependencies/zerocopy-0.8.63/LICENSE-APACHE": {
+      "component": "zerocopy 0.8.63",
+      "selected": false
+    },
+    "office/image-dependencies/zerocopy-0.8.63/LICENSE-BSD": {
+      "component": "zerocopy 0.8.63",
+      "selected": true
+    },
+    "office/image-dependencies/zerocopy-0.8.63/LICENSE-MIT": {
+      "component": "zerocopy 0.8.63",
+      "selected": true
+    },
+    "office/image-dependencies/zerocopy-derive-0.8.63/LICENSE-APACHE": {
+      "component": "zerocopy-derive 0.8.63",
+      "selected": false
+    },
+    "office/image-dependencies/zerocopy-derive-0.8.63/LICENSE-BSD": {
+      "component": "zerocopy-derive 0.8.63",
+      "selected": true
+    },
+    "office/image-dependencies/zerocopy-derive-0.8.63/LICENSE-MIT": {
+      "component": "zerocopy-derive 0.8.63",
+      "selected": true
+    },
+    "office/image-dependencies/zlib-rs-0.6.8/LICENSE": {
+      "component": "zlib-rs 0.6.8",
+      "selected": true
+    },
+    "office/image-dependencies/zune-core-0.5.3/LICENSE-APACHE": {
+      "component": "zune-core 0.5.3",
+      "selected": false
+    },
+    "office/image-dependencies/zune-core-0.5.3/LICENSE-MIT": {
+      "component": "zune-core 0.5.3",
+      "selected": true
+    },
+    "office/image-dependencies/zune-core-0.5.3/LICENSE-ZLIB": {
+      "component": "zune-core 0.5.3",
+      "selected": false
+    },
+    "office/image-dependencies/zune-jpeg-0.5.15/LICENSE-APACHE": {
+      "component": "zune-jpeg 0.5.15",
+      "selected": false
+    },
+    "office/image-dependencies/zune-jpeg-0.5.15/LICENSE-MIT": {
+      "component": "zune-jpeg 0.5.15",
+      "selected": true
+    },
+    "office/image-dependencies/zune-jpeg-0.5.15/LICENSE-ZLIB": {
+      "component": "zune-jpeg 0.5.15",
+      "selected": false
+    },
+    "office/chart-dependencies/android_system_properties-0.1.6/LICENSE-APACHE": {
+      "component": "android_system_properties 0.1.6",
+      "selected": false
+    },
+    "office/chart-dependencies/android_system_properties-0.1.6/LICENSE-MIT": {
+      "component": "android_system_properties 0.1.6",
+      "selected": true
+    },
+    "office/chart-dependencies/autocfg-1.5.1/LICENSE-APACHE": {
+      "component": "autocfg 1.5.1",
+      "selected": false
+    },
+    "office/chart-dependencies/autocfg-1.5.1/LICENSE-MIT": {
+      "component": "autocfg 1.5.1",
+      "selected": true
+    },
+    "office/chart-dependencies/bumpalo-3.20.3/LICENSE-APACHE": {
+      "component": "bumpalo 3.20.3",
+      "selected": false
+    },
+    "office/chart-dependencies/bumpalo-3.20.3/LICENSE-MIT": {
+      "component": "bumpalo 3.20.3",
+      "selected": true
+    },
+    "office/chart-dependencies/cc-1.9.0/LICENSE-APACHE": {
+      "component": "cc 1.9.0",
+      "selected": false
+    },
+    "office/chart-dependencies/cc-1.9.0/LICENSE-MIT": {
+      "component": "cc 1.9.0",
+      "selected": true
+    },
+    "office/chart-dependencies/cfg-if-1.0.5/LICENSE-APACHE": {
+      "component": "cfg-if 1.0.5",
+      "selected": false
+    },
+    "office/chart-dependencies/cfg-if-1.0.5/LICENSE-MIT": {
+      "component": "cfg-if 1.0.5",
+      "selected": true
+    },
+    "office/chart-dependencies/chrono-0.4.45/LICENSE.txt": {
+      "component": "chrono 0.4.45",
+      "selected": true
+    },
+    "office/chart-dependencies/core-foundation-sys-0.8.7/LICENSE-APACHE": {
+      "component": "core-foundation-sys 0.8.7",
+      "selected": false
+    },
+    "office/chart-dependencies/core-foundation-sys-0.8.7/LICENSE-MIT": {
+      "component": "core-foundation-sys 0.8.7",
+      "selected": true
+    },
+    "office/chart-dependencies/find-msvc-tools-0.1.15/LICENSE-APACHE": {
+      "component": "find-msvc-tools 0.1.15",
+      "selected": false
+    },
+    "office/chart-dependencies/find-msvc-tools-0.1.15/LICENSE-MIT": {
+      "component": "find-msvc-tools 0.1.15",
+      "selected": true
+    },
+    "office/chart-dependencies/futures-core-0.3.34/LICENSE-APACHE": {
+      "component": "futures-core 0.3.34",
+      "selected": false
+    },
+    "office/chart-dependencies/futures-core-0.3.34/LICENSE-MIT": {
+      "component": "futures-core 0.3.34",
+      "selected": true
+    },
+    "office/chart-dependencies/futures-task-0.3.34/LICENSE-APACHE": {
+      "component": "futures-task 0.3.34",
+      "selected": false
+    },
+    "office/chart-dependencies/futures-task-0.3.34/LICENSE-MIT": {
+      "component": "futures-task 0.3.34",
+      "selected": true
+    },
+    "office/chart-dependencies/futures-util-0.3.34/LICENSE-APACHE": {
+      "component": "futures-util 0.3.34",
+      "selected": false
+    },
+    "office/chart-dependencies/futures-util-0.3.34/LICENSE-MIT": {
+      "component": "futures-util 0.3.34",
+      "selected": true
+    },
+    "office/chart-dependencies/iana-time-zone-0.1.65/LICENSE-APACHE": {
+      "component": "iana-time-zone 0.1.65",
+      "selected": false
+    },
+    "office/chart-dependencies/iana-time-zone-0.1.65/LICENSE-MIT": {
+      "component": "iana-time-zone 0.1.65",
+      "selected": true
+    },
+    "office/chart-dependencies/iana-time-zone-haiku-0.1.2/LICENSE-APACHE": {
+      "component": "iana-time-zone-haiku 0.1.2",
+      "selected": false
+    },
+    "office/chart-dependencies/iana-time-zone-haiku-0.1.2/LICENSE-MIT": {
+      "component": "iana-time-zone-haiku 0.1.2",
+      "selected": true
+    },
+    "office/chart-dependencies/js-sys-0.3.106/LICENSE-APACHE": {
+      "component": "js-sys 0.3.106",
+      "selected": false
+    },
+    "office/chart-dependencies/js-sys-0.3.106/LICENSE-MIT": {
+      "component": "js-sys 0.3.106",
+      "selected": true
+    },
+    "office/chart-dependencies/libc-0.2.191/LICENSE-APACHE": {
+      "component": "libc 0.2.191",
+      "selected": false
+    },
+    "office/chart-dependencies/libc-0.2.191/LICENSE-MIT": {
+      "component": "libc 0.2.191",
+      "selected": true
+    },
+    "office/chart-dependencies/libm-0.2.16/LICENSE.txt": {
+      "component": "libm 0.2.16",
+      "selected": true
+    },
+    "office/chart-dependencies/log-0.4.34/LICENSE-APACHE": {
+      "component": "log 0.4.34",
+      "selected": false
+    },
+    "office/chart-dependencies/log-0.4.34/LICENSE-MIT": {
+      "component": "log 0.4.34",
+      "selected": true
+    },
+    "office/chart-dependencies/num-traits-0.2.19/LICENSE-APACHE": {
+      "component": "num-traits 0.2.19",
+      "selected": false
+    },
+    "office/chart-dependencies/num-traits-0.2.19/LICENSE-MIT": {
+      "component": "num-traits 0.2.19",
+      "selected": true
+    },
+    "office/chart-dependencies/once_cell-1.21.4/LICENSE-APACHE": {
+      "component": "once_cell 1.21.4",
+      "selected": false
+    },
+    "office/chart-dependencies/once_cell-1.21.4/LICENSE-MIT": {
+      "component": "once_cell 1.21.4",
+      "selected": true
+    },
+    "office/chart-dependencies/pin-project-lite-0.2.17/LICENSE-APACHE": {
+      "component": "pin-project-lite 0.2.17",
+      "selected": false
+    },
+    "office/chart-dependencies/pin-project-lite-0.2.17/LICENSE-MIT": {
+      "component": "pin-project-lite 0.2.17",
+      "selected": true
+    },
+    "office/chart-dependencies/proc-macro2-1.0.107/LICENSE-APACHE": {
+      "component": "proc-macro2 1.0.107",
+      "selected": false
+    },
+    "office/chart-dependencies/proc-macro2-1.0.107/LICENSE-MIT": {
+      "component": "proc-macro2 1.0.107",
+      "selected": true
+    },
+    "office/chart-dependencies/quote-1.0.47/LICENSE-APACHE": {
+      "component": "quote 1.0.47",
+      "selected": false
+    },
+    "office/chart-dependencies/quote-1.0.47/LICENSE-MIT": {
+      "component": "quote 1.0.47",
+      "selected": true
+    },
+    "office/chart-dependencies/rustversion-1.0.23/LICENSE-APACHE": {
+      "component": "rustversion 1.0.23",
+      "selected": false
+    },
+    "office/chart-dependencies/rustversion-1.0.23/LICENSE-MIT": {
+      "component": "rustversion 1.0.23",
+      "selected": true
+    },
+    "office/chart-dependencies/shlex-2.0.1/LICENSE-APACHE": {
+      "component": "shlex 2.0.1",
+      "selected": false
+    },
+    "office/chart-dependencies/shlex-2.0.1/LICENSE-MIT": {
+      "component": "shlex 2.0.1",
+      "selected": true
+    },
+    "office/chart-dependencies/slab-0.4.12/LICENSE": {
+      "component": "slab 0.4.12",
+      "selected": true
+    },
+    "office/chart-dependencies/syn-3.0.9/LICENSE-APACHE": {
+      "component": "syn 3.0.9",
+      "selected": false
+    },
+    "office/chart-dependencies/syn-3.0.9/LICENSE-MIT": {
+      "component": "syn 3.0.9",
+      "selected": true
+    },
+    "office/chart-dependencies/syn-2.0.119/LICENSE-APACHE": {
+      "component": "syn 2.0.119",
+      "selected": false
+    },
+    "office/chart-dependencies/syn-2.0.119/LICENSE-MIT": {
+      "component": "syn 2.0.119",
+      "selected": true
+    },
+    "office/chart-dependencies/unicode-ident-1.0.27/LICENSE-APACHE": {
+      "component": "unicode-ident 1.0.27",
+      "selected": false
+    },
+    "office/chart-dependencies/unicode-ident-1.0.27/LICENSE-MIT": {
+      "component": "unicode-ident 1.0.27",
+      "selected": true
+    },
+    "office/chart-dependencies/unicode-ident-1.0.27/LICENSE-UNICODE": {
+      "component": "unicode-ident 1.0.27",
+      "selected": true
+    },
+    "office/chart-dependencies/wasm-bindgen-0.2.129/LICENSE-APACHE": {
+      "component": "wasm-bindgen 0.2.129",
+      "selected": false
+    },
+    "office/chart-dependencies/wasm-bindgen-0.2.129/LICENSE-MIT": {
+      "component": "wasm-bindgen 0.2.129",
+      "selected": true
+    },
+    "office/chart-dependencies/wasm-bindgen-macro-0.2.129/LICENSE-APACHE": {
+      "component": "wasm-bindgen-macro 0.2.129",
+      "selected": false
+    },
+    "office/chart-dependencies/wasm-bindgen-macro-0.2.129/LICENSE-MIT": {
+      "component": "wasm-bindgen-macro 0.2.129",
+      "selected": true
+    },
+    "office/chart-dependencies/wasm-bindgen-macro-support-0.2.129/LICENSE-APACHE": {
+      "component": "wasm-bindgen-macro-support 0.2.129",
+      "selected": false
+    },
+    "office/chart-dependencies/wasm-bindgen-macro-support-0.2.129/LICENSE-MIT": {
+      "component": "wasm-bindgen-macro-support 0.2.129",
+      "selected": true
+    },
+    "office/chart-dependencies/wasm-bindgen-shared-0.2.129/LICENSE-APACHE": {
+      "component": "wasm-bindgen-shared 0.2.129",
+      "selected": false
+    },
+    "office/chart-dependencies/wasm-bindgen-shared-0.2.129/LICENSE-MIT": {
+      "component": "wasm-bindgen-shared 0.2.129",
+      "selected": true
+    },
+    "office/chart-dependencies/windows-core-0.62.2/license-apache-2.0": {
+      "component": "windows-core 0.62.2",
+      "selected": true
+    },
+    "office/chart-dependencies/windows-core-0.62.2/license-mit": {
+      "component": "windows-core 0.62.2",
+      "selected": true
+    },
+    "office/chart-dependencies/windows-implement-0.60.2/license-apache-2.0": {
+      "component": "windows-implement 0.60.2",
+      "selected": true
+    },
+    "office/chart-dependencies/windows-implement-0.60.2/license-mit": {
+      "component": "windows-implement 0.60.2",
+      "selected": true
+    },
+    "office/chart-dependencies/windows-interface-0.59.3/license-apache-2.0": {
+      "component": "windows-interface 0.59.3",
+      "selected": true
+    },
+    "office/chart-dependencies/windows-interface-0.59.3/license-mit": {
+      "component": "windows-interface 0.59.3",
+      "selected": true
+    },
+    "office/chart-dependencies/windows-link-0.2.1/license-apache-2.0": {
+      "component": "windows-link 0.2.1",
+      "selected": true
+    },
+    "office/chart-dependencies/windows-link-0.2.1/license-mit": {
+      "component": "windows-link 0.2.1",
+      "selected": true
+    },
+    "office/chart-dependencies/windows-result-0.4.1/license-apache-2.0": {
+      "component": "windows-result 0.4.1",
+      "selected": true
+    },
+    "office/chart-dependencies/windows-result-0.4.1/license-mit": {
+      "component": "windows-result 0.4.1",
+      "selected": true
+    },
+    "office/chart-dependencies/windows-strings-0.5.1/license-apache-2.0": {
+      "component": "windows-strings 0.5.1",
+      "selected": true
+    },
+    "office/chart-dependencies/windows-strings-0.5.1/license-mit": {
+      "component": "windows-strings 0.5.1",
+      "selected": true
+    },
+    "NUM-RATIONAL-LICENSE-APACHE.txt": {
+      "component": "num-rational 0.4.2",
+      "selected": false
+    },
+    "NUM-TRAITS-LICENSE-APACHE.txt": {
+      "component": "num-traits 0.2.19",
+      "selected": false
+    }
+  },
+  "license_choices": {
+    "base64 0.23.1": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/marshallpierce/rust-base64"
+    },
+    "bitflags 2.13.2": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/bitflags/bitflags"
+    },
+    "block-buffer 0.10.4": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/RustCrypto/utils"
+    },
+    "bytes 1.12.1": {
+      "spdx": "MIT",
+      "selected_files": [
+        "LICENSE"
+      ],
+      "repository": "https://github.com/tokio-rs/bytes"
+    },
+    "cfg-if 1.0.5": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/rust-lang/cfg-if"
+    },
+    "cpufeatures 0.2.17": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/RustCrypto/utils"
+    },
+    "crypto-common 0.1.7": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/RustCrypto/traits"
+    },
+    "digest 0.10.7": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/RustCrypto/traits"
+    },
+    "generic-array 0.14.7": {
+      "spdx": "MIT",
+      "selected_files": [
+        "LICENSE"
+      ],
+      "repository": "https://github.com/fizyk20/generic-array.git"
+    },
+    "getrandom 0.2.17": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/rust-random/getrandom"
+    },
+    "http 1.5.0": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/hyperium/http"
+    },
+    "httparse 1.10.1": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/seanmonstar/httparse"
+    },
+    "itoa 1.0.18": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/dtolnay/itoa"
+    },
+    "libc 0.2.191": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/rust-lang/libc"
+    },
+    "lock_api 0.4.14": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/Amanieu/parking_lot"
+    },
+    "log 0.4.34": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/rust-lang/log"
+    },
+    "memchr 2.8.3": {
+      "spdx": "Unlicense OR MIT",
+      "selected_files": [
+        "COPYING",
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/BurntSushi/memchr"
+    },
+    "once_cell 1.21.4": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/matklad/once_cell"
+    },
+    "parking_lot 0.12.5": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/Amanieu/parking_lot"
+    },
+    "parking_lot_core 0.9.12": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/Amanieu/parking_lot"
+    },
+    "percent-encoding 2.3.2": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/servo/rust-url/"
+    },
+    "ring 0.17.14": {
+      "spdx": "Apache-2.0 AND ISC",
+      "selected_files": [
+        "LICENSE",
+        "LICENSE-BoringSSL",
+        "LICENSE-other-bits"
+      ],
+      "repository": "https://github.com/briansmith/ring"
+    },
+    "rustls-pki-types 1.15.1": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/rustls/pki-types"
+    },
+    "rustls-webpki 0.103.16": {
+      "spdx": "ISC",
+      "selected_files": [
+        "LICENSE"
+      ],
+      "repository": "https://github.com/rustls/webpki"
+    },
+    "rustls 0.23.46": {
+      "spdx": "Apache-2.0 OR ISC OR MIT",
+      "selected_files": [
+        "LICENSE-ISC",
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/rustls/rustls"
+    },
+    "scopeguard 1.2.0": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/bluss/scopeguard"
+    },
+    "sha2 0.10.9": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/RustCrypto/hashes"
+    },
+    "smallvec 1.16.3": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/servo/rust-smallvec"
+    },
+    "subtle 2.6.1": {
+      "spdx": "BSD-3-Clause",
+      "selected_files": [
+        "LICENSE"
+      ],
+      "repository": "https://github.com/dalek-cryptography/subtle"
+    },
+    "typenum 1.20.1": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE",
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/paholg/typenum"
+    },
+    "untrusted 0.9.0": {
+      "spdx": "ISC",
+      "selected_files": [
+        "LICENSE.txt"
+      ],
+      "repository": "https://github.com/briansmith/untrusted"
+    },
+    "ureq-proto 0.7.1": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT.txt"
+      ],
+      "repository": "https://github.com/algesten/ureq-proto"
+    },
+    "ureq 3.5.1": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/algesten/ureq"
+    },
+    "utf8-zero 0.8.1": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/algesten/utf8-zero"
+    },
+    "webpki-roots 1.0.11": {
+      "spdx": "CDLA-Permissive-2.0",
+      "selected_files": [
+        "LICENSE"
+      ],
+      "repository": "https://github.com/rustls/webpki-roots"
+    },
+    "windows-link 0.2.1": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "license-apache-2.0",
+        "license-mit"
+      ],
+      "repository": "https://github.com/microsoft/windows-rs"
+    },
+    "zeroize 1.9.1": {
+      "spdx": "Apache-2.0 OR MIT",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/RustCrypto/utils"
+    },
+    "adler2 2.0.1": {
+      "spdx": "0BSD OR MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/oyvindln/adler2"
+    },
+    "arrayref 0.3.9": {
+      "spdx": "BSD-2-Clause",
+      "selected_files": [
+        "LICENSE"
+      ],
+      "repository": "https://github.com/droundy/arrayref"
+    },
+    "arrayvec 0.7.8": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/bluss/arrayvec"
+    },
+    "autocfg 1.5.1": {
+      "spdx": "Apache-2.0 OR MIT",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/cuviper/autocfg"
+    },
+    "bytemuck 1.25.2": {
+      "spdx": "Zlib OR Apache-2.0 OR MIT",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/Lokathor/bytemuck"
+    },
+    "bytemuck_derive 1.12.1": {
+      "spdx": "Zlib OR Apache-2.0 OR MIT",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/Lokathor/bytemuck"
+    },
+    "byteorder-lite 0.1.0": {
+      "spdx": "Unlicense OR MIT",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/image-rs/byteorder-lite"
+    },
+    "color_quant 1.1.0": {
+      "spdx": "MIT",
+      "selected_files": [
+        "LICENSE"
+      ],
+      "repository": "https://github.com/image-rs/color_quant.git"
+    },
+    "crc32fast 1.5.3": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/srijs/rust-crc32fast"
+    },
+    "crunchy 0.2.4": {
+      "spdx": "MIT",
+      "selected_files": [
+        "LICENSE"
+      ],
+      "repository": "https://github.com/eira-fransham/crunchy"
+    },
+    "data-url 0.3.2": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/servo/rust-url"
+    },
+    "euclid 0.22.14": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "COPYRIGHT",
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/servo/euclid"
+    },
+    "fax 0.2.7": {
+      "spdx": "MIT",
+      "selected_files": [
+        "LICENSE"
+      ],
+      "repository": "https://github.com/pdf-rs/fax"
+    },
+    "fdeflate 0.3.7": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/image-rs/fdeflate"
+    },
+    "flate2 1.1.10": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/rust-lang/flate2-rs"
+    },
+    "float-cmp 0.9.0": {
+      "spdx": "MIT",
+      "selected_files": [
+        "LICENSE"
+      ],
+      "repository": "https://github.com/mikedilger/float-cmp"
+    },
+    "font-types 0.12.7": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/googlefonts/fontations"
+    },
+    "fontdb 0.24.0": {
+      "spdx": "MIT",
+      "selected_files": [
+        "LICENSE"
+      ],
+      "repository": "https://github.com/RazrFalcon/fontdb"
+    },
+    "gif 0.14.2": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/image-rs/image-gif"
+    },
+    "half 2.7.1": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/VoidStarKat/half-rs"
+    },
+    "harfrust 0.12.0": {
+      "spdx": "MIT",
+      "selected_files": [
+        "LICENSE"
+      ],
+      "repository": "https://github.com/harfbuzz/harfrust"
+    },
+    "image 0.25.10": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/image-rs/image"
+    },
+    "image-webp 0.2.4": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/image-rs/image-webp"
+    },
+    "imagesize 0.15.0": {
+      "spdx": "MIT",
+      "selected_files": [
+        "LICENSE"
+      ],
+      "repository": "https://github.com/Roughsketch/imagesize"
+    },
+    "kurbo 0.13.1": {
+      "spdx": "Apache-2.0 OR MIT",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/linebender/kurbo"
+    },
+    "libm 0.2.16": {
+      "spdx": "MIT",
+      "selected_files": [
+        "LICENSE.txt"
+      ],
+      "repository": "https://github.com/rust-lang/compiler-builtins"
+    },
+    "miniz_oxide 0.9.1": {
+      "spdx": "MIT OR Zlib OR Apache-2.0",
+      "selected_files": [
+        "LICENSE",
+        "LICENSE-MIT.md"
+      ],
+      "repository": "https://github.com/Frommi/miniz_oxide/tree/master/miniz_oxide"
+    },
+    "miniz_oxide 0.8.9": {
+      "spdx": "MIT OR Zlib OR Apache-2.0",
+      "selected_files": [
+        "LICENSE",
+        "LICENSE-MIT.md"
+      ],
+      "repository": "https://github.com/Frommi/miniz_oxide/tree/master/miniz_oxide"
+    },
+    "moxcms 0.8.1": {
+      "spdx": "BSD-3-Clause OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-APACHE.md",
+        "LICENSE.md"
+      ],
+      "repository": "https://github.com/awxkee/moxcms.git"
+    },
+    "num-traits 0.2.19": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/rust-num/num-traits"
+    },
+    "pico-args 0.5.0": {
+      "spdx": "MIT",
+      "selected_files": [
+        "LICENSE"
+      ],
+      "repository": "https://github.com/RazrFalcon/pico-args"
+    },
+    "png 0.18.1": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/image-rs/image-png"
+    },
+    "polycool 0.4.0": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/linebender/kurbo"
+    },
+    "proc-macro2 1.0.107": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/dtolnay/proc-macro2"
+    },
+    "pxfm 0.1.30": {
+      "spdx": "BSD-3-Clause OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-APACHE.md",
+        "LICENSE.md"
+      ],
+      "repository": "https://github.com/awxkee/pxfm"
+    },
+    "quick-error 2.0.1": {
+      "spdx": "MIT/Apache-2.0",
+      "selected_files": [
+        "LICENSE-APACHE",
+        "LICENSE-MIT"
+      ],
+      "repository": "http://github.com/tailhook/quick-error"
+    },
+    "quote 1.0.47": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/dtolnay/quote"
+    },
+    "read-fonts 0.41.0": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/googlefonts/fontations"
+    },
+    "resvg 0.48.0": {
+      "spdx": "Apache-2.0 OR MIT",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/linebender/resvg"
+    },
+    "rgb 0.8.53": {
+      "spdx": "MIT",
+      "selected_files": [
+        "LICENSE"
+      ],
+      "repository": "https://github.com/kornelski/rust-rgb"
+    },
+    "roxmltree 0.21.2": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/RazrFalcon/roxmltree"
+    },
+    "simd-adler32 0.3.10": {
+      "spdx": "MIT",
+      "selected_files": [
+        "LICENSE.md"
+      ],
+      "repository": "https://github.com/mcountryman/simd-adler32"
+    },
+    "simplecss 0.2.2": {
+      "spdx": "Apache-2.0 OR MIT",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/linebender/simplecss"
+    },
+    "siphasher 1.0.4": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "COPYING",
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/jedisct1/rust-siphash"
+    },
+    "skrifa 0.44.0": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/googlefonts/fontations"
+    },
+    "slotmap 1.1.1": {
+      "spdx": "Zlib",
+      "selected_files": [
+        "LICENSE"
+      ],
+      "repository": "https://github.com/orlp/slotmap"
+    },
+    "strict-num 0.1.1": {
+      "spdx": "MIT",
+      "selected_files": [
+        "LICENSE"
+      ],
+      "repository": "https://github.com/RazrFalcon/strict-num"
+    },
+    "svgtypes 0.16.1": {
+      "spdx": "Apache-2.0 OR MIT",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/linebender/svgtypes"
+    },
+    "syn 3.0.9": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/dtolnay/syn"
+    },
+    "syn 2.0.119": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/dtolnay/syn"
+    },
+    "tiff 0.11.3": {
+      "spdx": "MIT",
+      "selected_files": [
+        "LICENSE"
+      ],
+      "repository": "https://github.com/image-rs/image-tiff"
+    },
+    "tiny-skia 0.12.0": {
+      "spdx": "BSD-3-Clause",
+      "selected_files": [
+        "LICENSE"
+      ],
+      "repository": "https://github.com/linebender/tiny-skia"
+    },
+    "tiny-skia-path 0.12.0": {
+      "spdx": "BSD-3-Clause",
+      "selected_files": [
+        "LICENSE"
+      ],
+      "repository": "https://github.com/linebender/tiny-skia/tree/master/path"
+    },
+    "tinyvec 1.13.3": {
+      "spdx": "Zlib OR Apache-2.0 OR MIT",
+      "selected_files": [
+        "LICENSE-MIT.md"
+      ],
+      "repository": "https://github.com/Lokathor/tinyvec"
+    },
+    "unicode-bidi 0.3.18": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "COPYRIGHT",
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/servo/unicode-bidi"
+    },
+    "unicode-ident 1.0.27": {
+      "spdx": "(MIT OR Apache-2.0) AND Unicode-3.0",
+      "selected_files": [
+        "LICENSE-MIT",
+        "LICENSE-UNICODE"
+      ],
+      "repository": "https://github.com/dtolnay/unicode-ident"
+    },
+    "unicode-script 0.5.8": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/unicode-rs/unicode-script"
+    },
+    "unicode-vo 0.1.0": {
+      "spdx": "MIT/Apache-2.0",
+      "selected_files": [
+        "LICENSE-APACHE",
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/RazrFalcon/unicode-vo"
+    },
+    "usvg 0.48.1": {
+      "spdx": "Apache-2.0 OR MIT",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/linebender/resvg"
+    },
+    "version_check 0.9.5": {
+      "spdx": "MIT/Apache-2.0",
+      "selected_files": [
+        "LICENSE-APACHE",
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/SergioBenitez/version_check"
+    },
+    "weezl 0.1.12": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/image-rs/weezl"
+    },
+    "xmlwriter 0.1.0": {
+      "spdx": "MIT",
+      "selected_files": [
+        "LICENSE"
+      ],
+      "repository": "https://github.com/RazrFalcon/xmlwriter"
+    },
+    "zerocopy 0.8.63": {
+      "spdx": "BSD-2-Clause OR Apache-2.0 OR MIT",
+      "selected_files": [
+        "LICENSE-BSD",
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/google/zerocopy"
+    },
+    "zerocopy-derive 0.8.63": {
+      "spdx": "BSD-2-Clause OR Apache-2.0 OR MIT",
+      "selected_files": [
+        "LICENSE-BSD",
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/google/zerocopy"
+    },
+    "zlib-rs 0.6.8": {
+      "spdx": "Zlib",
+      "selected_files": [
+        "LICENSE"
+      ],
+      "repository": "https://github.com/trifectatechfoundation/zlib-rs"
+    },
+    "zune-core 0.5.3": {
+      "spdx": "MIT OR Apache-2.0 OR Zlib",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/etemesi254/zune-image"
+    },
+    "zune-jpeg 0.5.15": {
+      "spdx": "MIT OR Apache-2.0 OR Zlib",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/etemesi254/zune-image/tree/dev/crates/zune-jpeg"
+    },
+    "android_system_properties 0.1.6": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/nical/android_system_properties"
+    },
+    "bumpalo 3.20.3": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/fitzgen/bumpalo"
+    },
+    "cc 1.9.0": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/rust-lang/cc-rs"
+    },
+    "chrono 0.4.45": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE.txt"
+      ],
+      "repository": "https://github.com/chronotope/chrono"
+    },
+    "core-foundation-sys 0.8.7": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/servo/core-foundation-rs"
+    },
+    "find-msvc-tools 0.1.15": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/rust-lang/cc-rs"
+    },
+    "futures-core 0.3.34": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/rust-lang/futures-rs"
+    },
+    "futures-task 0.3.34": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/rust-lang/futures-rs"
+    },
+    "futures-util 0.3.34": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/rust-lang/futures-rs"
+    },
+    "iana-time-zone 0.1.65": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/strawlab/iana-time-zone"
+    },
+    "iana-time-zone-haiku 0.1.2": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/strawlab/iana-time-zone"
+    },
+    "js-sys 0.3.106": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/wasm-bindgen/wasm-bindgen/tree/master/crates/js-sys"
+    },
+    "pin-project-lite 0.2.17": {
+      "spdx": "Apache-2.0 OR MIT",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/taiki-e/pin-project-lite"
+    },
+    "rustversion 1.0.23": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/dtolnay/rustversion"
+    },
+    "shlex 2.0.1": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/comex/rust-shlex"
+    },
+    "slab 0.4.12": {
+      "spdx": "MIT",
+      "selected_files": [
+        "LICENSE"
+      ],
+      "repository": "https://github.com/tokio-rs/slab"
+    },
+    "wasm-bindgen 0.2.129": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/wasm-bindgen/wasm-bindgen"
+    },
+    "wasm-bindgen-macro 0.2.129": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/wasm-bindgen/wasm-bindgen/tree/master/crates/macro"
+    },
+    "wasm-bindgen-macro-support 0.2.129": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/wasm-bindgen/wasm-bindgen/tree/main/crates/macro-support"
+    },
+    "wasm-bindgen-shared 0.2.129": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "LICENSE-MIT"
+      ],
+      "repository": "https://github.com/wasm-bindgen/wasm-bindgen/tree/master/crates/shared"
+    },
+    "windows-core 0.62.2": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "license-apache-2.0",
+        "license-mit"
+      ],
+      "repository": "https://github.com/microsoft/windows-rs"
+    },
+    "windows-implement 0.60.2": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "license-apache-2.0",
+        "license-mit"
+      ],
+      "repository": "https://github.com/microsoft/windows-rs"
+    },
+    "windows-interface 0.59.3": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "license-apache-2.0",
+        "license-mit"
+      ],
+      "repository": "https://github.com/microsoft/windows-rs"
+    },
+    "windows-result 0.4.1": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "license-apache-2.0",
+        "license-mit"
+      ],
+      "repository": "https://github.com/microsoft/windows-rs"
+    },
+    "windows-strings 0.5.1": {
+      "spdx": "MIT OR Apache-2.0",
+      "selected_files": [
+        "license-apache-2.0",
+        "license-mit"
+      ],
+      "repository": "https://github.com/microsoft/windows-rs"
+    }
+  },
+  "retained_migration": [
+    "migration/CHARACTER-DEDUP-NOTICE.txt/0cc847e02277.txt",
+    "migration/DOCVORTEX-PDFIUM-PATHS-NOTICE.txt/90404e30740a.txt",
+    "migration/DROID-FONT-NOTICE.txt/51d8f4d0ad49.txt",
+    "migration/FORMULA-DECODE-NOTICE.txt/81347e278c72.txt",
+    "migration/NATIVE-FIXED-CJK-FONT-NOTICE.txt/f053de0cc588.txt",
+    "migration/NUMPY-SORT-NOTICE.txt/630fd5cdc6e2.txt",
+    "migration/PDFTEXT-NOTICE.txt/6ff3f3a8ece0.txt",
+    "migration/PDFTEXT-NOTICE.txt/cd2679480aa7.txt",
+    "migration/PYPDFIUM2-NOTICE.txt/91af52396186.txt",
+    "migration/PYTHON-MATH-NOTICE.txt/b2f40c5b69f1.txt",
+    "migration/PYTHON-SET-NOTICE.txt/b54847cbb974.txt"
+  ],
+  "scope": "Windows MSVC and Linux glibc runtime (CPU and CUDA); normal edges excluding proc-macro/build/dev",
+  "source_audit_records": "Development provenance and migration records remain in source; Cargo license alternatives are read from locked registry sources"
+}

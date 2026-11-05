@@ -1,0 +1,9 @@
+Formula decoder uses Hugging Face tokenizers 0.22.2 (Apache-2.0), pinned to the legacy Python tokenizer version.
+Source: https://github.com/huggingface/tokenizers/tree/v0.22.2/tokenizers
+Full license: TOKENIZERS.txt.
+
+formula_html_entities.txt contains sorted html.entities.html5 keys from Python 3.14.5.
+Generator: scripts/migration/generate_formula_entities.py.
+Source: https://github.com/python/cpython/blob/v3.14.5/Lib/html/entities.py
+Python PSF license: PYTHON-UNICODE.txt (also used for the existing Python Unicode tables).
+These names only gate unsupported ftfy inputs; they do not implement HTML or ftfy decoding.

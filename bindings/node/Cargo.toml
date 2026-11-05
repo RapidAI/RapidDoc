@@ -1,0 +1,30 @@
+[package]
+name = "rapiddoc-node"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+name = "rapid_doc_node"
+crate-type = ["cdylib"]
+
+[features]
+default = ["cuda"]
+cuda = ["rapiddoc/cuda"]
+
+[dependencies]
+napi = { version = "=3.16.1", default-features = false, features = ["napi8"] }
+napi-derive = "=3.7.0"
+rapiddoc = { path = "../../rust/rapiddoc" }
+rapiddoc-core = { path = "../../rust/rapiddoc-core" }
+serde_json.workspace = true
+
+[build-dependencies]
+napi-build = "=2.6.0"
+
+
+# Pin the N-API runtime and code generator as one tested release family.
+napi-derive-backend = "=7.0.0"
+
+
+

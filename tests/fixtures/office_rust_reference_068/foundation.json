@@ -1,0 +1,686 @@
+{
+  "relationship_targets": [
+    {
+      "rels": "_rels/.rels",
+      "target": null,
+      "expected": null
+    },
+    {
+      "rels": "_rels/.rels",
+      "target": "",
+      "expected": null
+    },
+    {
+      "rels": "_rels/.rels",
+      "target": "a.xml",
+      "expected": "a.xml"
+    },
+    {
+      "rels": "_rels/.rels",
+      "target": "../a.xml",
+      "expected": null
+    },
+    {
+      "rels": "_rels/.rels",
+      "target": "../../a.xml",
+      "expected": null
+    },
+    {
+      "rels": "_rels/.rels",
+      "target": "..",
+      "expected": ".."
+    },
+    {
+      "rels": "_rels/.rels",
+      "target": "../..",
+      "expected": null
+    },
+    {
+      "rels": "_rels/.rels",
+      "target": "/a/../b.xml",
+      "expected": "b.xml"
+    },
+    {
+      "rels": "_rels/.rels",
+      "target": "a\\b.xml",
+      "expected": "a/b.xml"
+    },
+    {
+      "rels": "_rels/.rels",
+      "target": "a//b.xml",
+      "expected": "a/b.xml"
+    },
+    {
+      "rels": "_rels/.rels",
+      "target": "./a.xml",
+      "expected": "a.xml"
+    },
+    {
+      "rels": "_rels/.rels",
+      "target": " /a.xml ",
+      "expected": " /a.xml "
+    },
+    {
+      "rels": "_rels/.rels",
+      "target": "https://example.test/a",
+      "expected": "https:/example.test/a"
+    },
+    {
+      "rels": "word/_rels/document.xml.rels",
+      "target": null,
+      "expected": null
+    },
+    {
+      "rels": "word/_rels/document.xml.rels",
+      "target": "",
+      "expected": null
+    },
+    {
+      "rels": "word/_rels/document.xml.rels",
+      "target": "a.xml",
+      "expected": "word/a.xml"
+    },
+    {
+      "rels": "word/_rels/document.xml.rels",
+      "target": "../a.xml",
+      "expected": "a.xml"
+    },
+    {
+      "rels": "word/_rels/document.xml.rels",
+      "target": "../../a.xml",
+      "expected": null
+    },
+    {
+      "rels": "word/_rels/document.xml.rels",
+      "target": "..",
+      "expected": null
+    },
+    {
+      "rels": "word/_rels/document.xml.rels",
+      "target": "../..",
+      "expected": ".."
+    },
+    {
+      "rels": "word/_rels/document.xml.rels",
+      "target": "/a/../b.xml",
+      "expected": "b.xml"
+    },
+    {
+      "rels": "word/_rels/document.xml.rels",
+      "target": "a\\b.xml",
+      "expected": "word/a/b.xml"
+    },
+    {
+      "rels": "word/_rels/document.xml.rels",
+      "target": "a//b.xml",
+      "expected": "word/a/b.xml"
+    },
+    {
+      "rels": "word/_rels/document.xml.rels",
+      "target": "./a.xml",
+      "expected": "word/a.xml"
+    },
+    {
+      "rels": "word/_rels/document.xml.rels",
+      "target": " /a.xml ",
+      "expected": "word/ /a.xml "
+    },
+    {
+      "rels": "word/_rels/document.xml.rels",
+      "target": "https://example.test/a",
+      "expected": "word/https:/example.test/a"
+    },
+    {
+      "rels": "custom/a/_rels/root.xml.rels",
+      "target": null,
+      "expected": null
+    },
+    {
+      "rels": "custom/a/_rels/root.xml.rels",
+      "target": "",
+      "expected": null
+    },
+    {
+      "rels": "custom/a/_rels/root.xml.rels",
+      "target": "a.xml",
+      "expected": "custom/a/a.xml"
+    },
+    {
+      "rels": "custom/a/_rels/root.xml.rels",
+      "target": "../a.xml",
+      "expected": "custom/a.xml"
+    },
+    {
+      "rels": "custom/a/_rels/root.xml.rels",
+      "target": "../../a.xml",
+      "expected": "a.xml"
+    },
+    {
+      "rels": "custom/a/_rels/root.xml.rels",
+      "target": "..",
+      "expected": "custom"
+    },
+    {
+      "rels": "custom/a/_rels/root.xml.rels",
+      "target": "../..",
+      "expected": null
+    },
+    {
+      "rels": "custom/a/_rels/root.xml.rels",
+      "target": "/a/../b.xml",
+      "expected": "b.xml"
+    },
+    {
+      "rels": "custom/a/_rels/root.xml.rels",
+      "target": "a\\b.xml",
+      "expected": "custom/a/a/b.xml"
+    },
+    {
+      "rels": "custom/a/_rels/root.xml.rels",
+      "target": "a//b.xml",
+      "expected": "custom/a/a/b.xml"
+    },
+    {
+      "rels": "custom/a/_rels/root.xml.rels",
+      "target": "./a.xml",
+      "expected": "custom/a/a.xml"
+    },
+    {
+      "rels": "custom/a/_rels/root.xml.rels",
+      "target": " /a.xml ",
+      "expected": "custom/a/ /a.xml "
+    },
+    {
+      "rels": "custom/a/_rels/root.xml.rels",
+      "target": "https://example.test/a",
+      "expected": "custom/a/https:/example.test/a"
+    },
+    {
+      "rels": "_rels/root.xml.rels",
+      "target": null,
+      "expected": null
+    },
+    {
+      "rels": "_rels/root.xml.rels",
+      "target": "",
+      "expected": null
+    },
+    {
+      "rels": "_rels/root.xml.rels",
+      "target": "a.xml",
+      "expected": null
+    },
+    {
+      "rels": "_rels/root.xml.rels",
+      "target": "../a.xml",
+      "expected": null
+    },
+    {
+      "rels": "_rels/root.xml.rels",
+      "target": "../../a.xml",
+      "expected": null
+    },
+    {
+      "rels": "_rels/root.xml.rels",
+      "target": "..",
+      "expected": null
+    },
+    {
+      "rels": "_rels/root.xml.rels",
+      "target": "../..",
+      "expected": null
+    },
+    {
+      "rels": "_rels/root.xml.rels",
+      "target": "/a/../b.xml",
+      "expected": "b.xml"
+    },
+    {
+      "rels": "_rels/root.xml.rels",
+      "target": "a\\b.xml",
+      "expected": null
+    },
+    {
+      "rels": "_rels/root.xml.rels",
+      "target": "a//b.xml",
+      "expected": null
+    },
+    {
+      "rels": "_rels/root.xml.rels",
+      "target": "./a.xml",
+      "expected": null
+    },
+    {
+      "rels": "_rels/root.xml.rels",
+      "target": " /a.xml ",
+      "expected": null
+    },
+    {
+      "rels": "_rels/root.xml.rels",
+      "target": "https://example.test/a",
+      "expected": null
+    },
+    {
+      "rels": "invalid",
+      "target": null,
+      "expected": null
+    },
+    {
+      "rels": "invalid",
+      "target": "",
+      "expected": null
+    },
+    {
+      "rels": "invalid",
+      "target": "a.xml",
+      "expected": null
+    },
+    {
+      "rels": "invalid",
+      "target": "../a.xml",
+      "expected": null
+    },
+    {
+      "rels": "invalid",
+      "target": "../../a.xml",
+      "expected": null
+    },
+    {
+      "rels": "invalid",
+      "target": "..",
+      "expected": null
+    },
+    {
+      "rels": "invalid",
+      "target": "../..",
+      "expected": null
+    },
+    {
+      "rels": "invalid",
+      "target": "/a/../b.xml",
+      "expected": "b.xml"
+    },
+    {
+      "rels": "invalid",
+      "target": "a\\b.xml",
+      "expected": null
+    },
+    {
+      "rels": "invalid",
+      "target": "a//b.xml",
+      "expected": null
+    },
+    {
+      "rels": "invalid",
+      "target": "./a.xml",
+      "expected": null
+    },
+    {
+      "rels": "invalid",
+      "target": " /a.xml ",
+      "expected": null
+    },
+    {
+      "rels": "invalid",
+      "target": "https://example.test/a",
+      "expected": null
+    },
+    {
+      "rels": "word\\_rels\\root.xml.rels",
+      "target": null,
+      "expected": null
+    },
+    {
+      "rels": "word\\_rels\\root.xml.rels",
+      "target": "",
+      "expected": null
+    },
+    {
+      "rels": "word\\_rels\\root.xml.rels",
+      "target": "a.xml",
+      "expected": "word/a.xml"
+    },
+    {
+      "rels": "word\\_rels\\root.xml.rels",
+      "target": "../a.xml",
+      "expected": "a.xml"
+    },
+    {
+      "rels": "word\\_rels\\root.xml.rels",
+      "target": "../../a.xml",
+      "expected": null
+    },
+    {
+      "rels": "word\\_rels\\root.xml.rels",
+      "target": "..",
+      "expected": null
+    },
+    {
+      "rels": "word\\_rels\\root.xml.rels",
+      "target": "../..",
+      "expected": ".."
+    },
+    {
+      "rels": "word\\_rels\\root.xml.rels",
+      "target": "/a/../b.xml",
+      "expected": "b.xml"
+    },
+    {
+      "rels": "word\\_rels\\root.xml.rels",
+      "target": "a\\b.xml",
+      "expected": "word/a/b.xml"
+    },
+    {
+      "rels": "word\\_rels\\root.xml.rels",
+      "target": "a//b.xml",
+      "expected": "word/a/b.xml"
+    },
+    {
+      "rels": "word\\_rels\\root.xml.rels",
+      "target": "./a.xml",
+      "expected": "word/a.xml"
+    },
+    {
+      "rels": "word\\_rels\\root.xml.rels",
+      "target": " /a.xml ",
+      "expected": "word/ /a.xml "
+    },
+    {
+      "rels": "word\\_rels\\root.xml.rels",
+      "target": "https://example.test/a",
+      "expected": "word/https:/example.test/a"
+    }
+  ],
+  "embedded_targets": [
+    {
+      "source": "xl/worksheets/sheet1.xml",
+      "target": "../media/a.png",
+      "expected": "xl/media/a.png"
+    },
+    {
+      "source": "xl/worksheets/sheet1.xml",
+      "target": "../../../outside",
+      "expected": null
+    },
+    {
+      "source": "xl/worksheets/sheet1.xml",
+      "target": "..",
+      "expected": "xl"
+    },
+    {
+      "source": "xl/worksheets/sheet1.xml",
+      "target": "a\\b",
+      "expected": null
+    },
+    {
+      "source": "xl/worksheets/sheet1.xml",
+      "target": " /xl/media/a.png ",
+      "expected": "xl/media/a.png"
+    },
+    {
+      "source": "xl/worksheets/sheet1.xml",
+      "target": "\u001ca.xml\u001f",
+      "expected": "xl/worksheets/a.xml"
+    },
+    {
+      "source": "main.xml",
+      "target": "../media/a.png",
+      "expected": null
+    },
+    {
+      "source": "main.xml",
+      "target": "../../../outside",
+      "expected": null
+    },
+    {
+      "source": "main.xml",
+      "target": "..",
+      "expected": null
+    },
+    {
+      "source": "main.xml",
+      "target": "a\\b",
+      "expected": null
+    },
+    {
+      "source": "main.xml",
+      "target": " /xl/media/a.png ",
+      "expected": "xl/media/a.png"
+    },
+    {
+      "source": "main.xml",
+      "target": "\u001ca.xml\u001f",
+      "expected": "a.xml"
+    }
+  ],
+  "relationship_members": [
+    {
+      "part": "",
+      "expected": null
+    },
+    {
+      "part": ".",
+      "expected": null
+    },
+    {
+      "part": "word/document.xml",
+      "expected": "word/_rels/document.xml.rels"
+    },
+    {
+      "part": "main.xml",
+      "expected": "_rels/main.xml.rels"
+    },
+    {
+      "part": "word/",
+      "expected": null
+    },
+    {
+      "part": "custom\\a.xml",
+      "expected": "custom/_rels/a.xml.rels"
+    },
+    {
+      "part": "/a.xml",
+      "expected": "//_rels/a.xml.rels"
+    }
+  ],
+  "source_directories": [
+    {
+      "rels": "_rels/.rels",
+      "expected": ""
+    },
+    {
+      "rels": "_rels/root.xml.rels",
+      "expected": null
+    },
+    {
+      "rels": "custom/a/_rels/root.xml.rels",
+      "expected": "custom/a"
+    },
+    {
+      "rels": "invalid",
+      "expected": null
+    },
+    {
+      "rels": "word/_rels/document.xml.rels",
+      "expected": "word"
+    },
+    {
+      "rels": "word\\_rels\\root.xml.rels",
+      "expected": null
+    }
+  ],
+  "ole": [
+    {
+      "input": "tests/migration/inputs/synthetic.doc",
+      "format": "doc",
+      "sha256": "8220ef40d11940cd0c5a52a5cbdd10ea9d14ec8525d2ac5ed989f0f5a5906576",
+      "streams": [
+        {
+          "name": "1Table",
+          "sha256": "71f9c341636e00c90c0105321491f309ec533fe1023dc2e440e58a8703c789c0"
+        },
+        {
+          "name": "Data",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "WordDocument",
+          "sha256": "e34b104a8150306766f956e962a7e80ba48e5b0d366fbb99314eecd94ba6b0d0"
+        }
+      ]
+    },
+    {
+      "input": "tests/migration/inputs/synthetic.ppt",
+      "format": "ppt",
+      "sha256": "a73a3ec85cba14e7b9adac569bb324dca8b6efc061a5ead677cb17c37999f2fe",
+      "streams": [
+        {
+          "name": "Current User",
+          "sha256": "8f6dab1169796a073613f40d08cd97a0000d5e3b131519a7e93aceeefcccd924"
+        },
+        {
+          "name": "PowerPoint Document",
+          "sha256": "68321cdb7db51ca67b964e14d845b1c92829f8b7f1b3eeefc37c0532b7184024"
+        }
+      ]
+    },
+    {
+      "input": "tests/migration/inputs/synthetic.xls",
+      "format": "xls",
+      "sha256": "4c307b2a72ab8ee3b6608a63f6c95c0a0ba4a543d6ed69158fa85809b066f347",
+      "streams": [
+        {
+          "name": "Workbook",
+          "sha256": "e2692a0cacde2fb578584fce8f8d1b0a4b2a9df6dc26522249d1421872f8b9d3"
+        }
+      ]
+    },
+    {
+      "input": "tests/fixtures/docvortex_migration/docx_01.doc",
+      "format": "doc",
+      "sha256": "6aae60b01f0e020c59d2299f217dbd5904df08182a31384db40953937f322fd1",
+      "streams": [
+        {
+          "name": "\u0001CompObj",
+          "sha256": "c4d5a73c17d4f0903bfbffe6bba276111c8baf89b1b417566a5bb8f1a7ef83be"
+        },
+        {
+          "name": "\u0005DocumentSummaryInformation",
+          "sha256": "d779b489c020d539619dc5a35166e91e194888f12d256698af2412f0344747fc"
+        },
+        {
+          "name": "\u0005SummaryInformation",
+          "sha256": "d8b852ca3143da0134f2943b8de37f258174a159cd9dca50dae2ada468452a55"
+        },
+        {
+          "name": "1Table",
+          "sha256": "057bf3840f5ed98b7756c8888ad7e32582993096b67674d90f500d765b14c7e7"
+        },
+        {
+          "name": "Data",
+          "sha256": "9468618dd3763b5b4a241b6ffe055106fe5a06983232d2361ffa6326e293910e"
+        },
+        {
+          "name": "MsoDataStore/ÍßÕÕUÓ33TLWXBEBÁÊÏÃÙÄÀ==/Item",
+          "sha256": "b9a06f1b3b84034d2125023651cce968563ed095317077cf187e08f768235072"
+        },
+        {
+          "name": "MsoDataStore/ÍßÕÕUÓ33TLWXBEBÁÊÏÃÙÄÀ==/Properties",
+          "sha256": "ec5670f893712b1aa83b7880c048d14c6e58aec4e35269c5bd1e75e6489835b3"
+        },
+        {
+          "name": "ObjectPool/_1849180817/\u0001CompObj",
+          "sha256": "316652376056f0be5d598d39f1cca6ec69d771d66d5dbd9b2b7dfedc5e1e212f"
+        },
+        {
+          "name": "ObjectPool/_1849180817/\u0001Ole",
+          "sha256": "c36c8a4b7dee703b9ce6e288032033b718feef01ca283cfaa4332a8334b2adf3"
+        },
+        {
+          "name": "ObjectPool/_1849180817/\u0003ObjInfo",
+          "sha256": "9a4dab0f443b34a1722455441b4394b261c2f837e0c95f2d30b790d647564c25"
+        },
+        {
+          "name": "ObjectPool/_1849180817/\u0005DocumentSummaryInformation",
+          "sha256": "1f7e346d56533620301f3c743639330a4a114727da0e1e1cd4ae9cf407c1dbf0"
+        },
+        {
+          "name": "ObjectPool/_1849180817/\u0005SummaryInformation",
+          "sha256": "bf2b8fa284123d5eb6509b84db6e5a28cdac743491cd60ce4d7125a5d2ce461e"
+        },
+        {
+          "name": "ObjectPool/_1849180817/Workbook",
+          "sha256": "99b674ae630feb1017beda5f87da45b53ebe21f880ed3ae05790e62e348e9c26"
+        },
+        {
+          "name": "WordDocument",
+          "sha256": "e8784a21d97509e04b5009e750fe0267f0173d17398d32f8e288846033abdbb0"
+        }
+      ]
+    },
+    {
+      "input": "tests/fixtures/docvortex_migration/pptx_01.ppt",
+      "format": "ppt",
+      "sha256": "2215ba7ee3d845ad745714a6b35ca8d652ec0c2f373e15f56dd520570b0eab6a",
+      "streams": [
+        {
+          "name": "\u0005DocumentSummaryInformation",
+          "sha256": "dcbe2ccadbb736c09838540670feb5d3c6cd49dc085d5d29b65d5a4f0bd5c8e6"
+        },
+        {
+          "name": "\u0005SummaryInformation",
+          "sha256": "613896fedb5179bc7cd5fe24fda96587bff4767bafe3e5a4027543bb3f1e14f0"
+        },
+        {
+          "name": "Current User",
+          "sha256": "7508bfa52208d8612a74abebd5fbe945b24a3547da7c7fd2f4fdf34b9e7e23e6"
+        },
+        {
+          "name": "Pictures",
+          "sha256": "186359be409255ed8233fc60d28e45299f931df07ee15728155e09af699229f9"
+        },
+        {
+          "name": "PowerPoint Document",
+          "sha256": "bcc1f57a992c45ade8ae2e9dd12e4d95c734c1a0b67ba35c0e2ff39bf86f04ed"
+        }
+      ]
+    },
+    {
+      "input": "tests/fixtures/docvortex_migration/xlsx_01.xls",
+      "format": "xls",
+      "sha256": "733225d6eb2659b1503abccc3cf46483dbe15b028cb2b0898cb57ec81c4d3cc0",
+      "streams": [
+        {
+          "name": "\u0005DocumentSummaryInformation",
+          "sha256": "f9a569ab279f0248eb9027d99e84978f75d1d6090481189d385f5a5442a5c1e3"
+        },
+        {
+          "name": "\u0005SummaryInformation",
+          "sha256": "84e6b97cc88761ea1cf6689c2a76ce65cfd20d46ea7f7ca27ce371b2325c6933"
+        },
+        {
+          "name": "Workbook",
+          "sha256": "b95e74d8f09a85c002e182431fdcf66eb432b9df6ef8bc64e0b24f4cb6500879"
+        }
+      ]
+    }
+  ],
+  "casefold": [
+    {
+      "text": "Straße",
+      "expected": "strasse"
+    },
+    {
+      "text": "İΣς",
+      "expected": "i̇σσ"
+    },
+    {
+      "text": "ﬃＫK",
+      "expected": "ffiｋk"
+    },
+    {
+      "text": "WordDocument",
+      "expected": "worddocument"
+    }
+  ]
+}

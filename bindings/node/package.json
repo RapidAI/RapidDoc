@@ -1,0 +1,31 @@
+{
+  "name": "rapid-doc",
+  "version": "0.1.0",
+  "description": "RapidDoc native document SDK for Node.js",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "require": "./index.js",
+      "default": "./index.js"
+    }
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "Apache-2.0",
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "worker.js",
+    "progress.js",
+    "platform.js",
+    "runtime",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  }
+}

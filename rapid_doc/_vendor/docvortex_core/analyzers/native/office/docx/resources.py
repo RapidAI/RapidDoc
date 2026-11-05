@@ -137,11 +137,11 @@ class _DocxResources:
             blob = image_part.blob
         except (AttributeError, KeyError, ValueError):
             return None
-        return self._image_equation_decoder.decode(
+        return self._image_equation_decoder.probe(
             blob,
             part_name=getattr(image_part, "partname", None),
             content_type=getattr(image_part, "content_type", None),
-        )
+        ).latex
 
     @staticmethod
     def _select_docx_compatibility_tokens(
@@ -276,6 +276,7 @@ class _DocxResources:
 
             img_base64 = serialize_office_image(
                 image_part.blob,
+                equation_decoder=self._image_equation_decoder,
                 part_name=getattr(image_part, "partname", None),
                 content_type=getattr(image_part, "content_type", None),
             )

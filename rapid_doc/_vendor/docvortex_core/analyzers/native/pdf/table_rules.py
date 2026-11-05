@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from bisect import bisect_left, bisect_right
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 import statistics
 import math
 import sys
@@ -34,6 +34,7 @@ from .models import (
     _PageSource,
     _PreparedPage,
     _SharedLineIndexSet,
+    _TableAnnotation,
     _TableCandidate,
     _TableContinuationGrid,
     _VisualRow,
@@ -2366,6 +2367,30 @@ def _count_stable_columns_python(
     return result
 
 
+def _merge_enclosed_annotations(target: _TableCandidate, candidate: _TableCandidate) -> None:
+    """保留弱候选证明的外围注释，但不扩大完整网格或改变表体成员。"""
+    if target.core_bbox is None:
+        return
+    bounds, core = target.bbox, target.core_bbox
+    annotations = []
+    for annotation in candidate.annotations:
+        boxes = {}
+        for index, box in annotation.line_bboxes.items():
+            if index not in annotation.line_indices or index in target.line_indices:
+                continue
+            if not (bounds[0] <= box[0] <= box[2] <= bounds[2]
+                    and bounds[1] <= box[1] <= box[3] <= bounds[3]):
+                continue
+            x, y = _bbox_center_x(box), _bbox_center_y(box)
+            if core[0] <= x <= core[2] and core[1] <= y <= core[3]:
+                continue
+            boxes[index] = box
+        if boxes:
+            annotations.append(_TableAnnotation(annotation.kind, _bbox_union_many(list(boxes.values())), set(boxes), boxes))
+    if annotations:
+        _merge_table_candidate_annotations(target, replace(candidate, annotations=annotations))
+
+
 def _merge_table_candidates(candidates: list[_TableCandidate]) -> list[_TableCandidate]:
     """合并同方向且明显重叠的横线候选，避免同一表格重复输出。"""
 
@@ -2387,6 +2412,7 @@ def _merge_table_candidates(candidates: list[_TableCandidate]) -> list[_TableCan
         if target.score >= 100 and candidate.score < 100:
             # A weak rule band cannot grow a confirmed grid across prose or
             # another table, even when a decorative page frame connects them.
+            _merge_enclosed_annotations(target, candidate)
             continue
         target.bbox = _bbox_union(target.bbox, candidate.bbox)
         target.local_bbox = _bbox_union(target.local_bbox, candidate.local_bbox)

@@ -1,0 +1,724 @@
+[
+  {
+    "name": "breaks",
+    "paragraphs": [
+      {
+        "runs": [
+          {
+            "text": "  a\nb\t c  ",
+            "bold": false,
+            "italic": false,
+            "underline": false,
+            "strike": false,
+            "baseline": null,
+            "hyperlink": null
+          }
+        ],
+        "depth": 0,
+        "list_kind": null,
+        "start": null,
+        "pp9rt": 0
+      }
+    ],
+    "title": false,
+    "blocks": [
+      {
+        "type": "text",
+        "content": [
+          {
+            "type": "text",
+            "content": "a b\t c"
+          }
+        ]
+      }
+    ],
+    "html": "a b\t c"
+  },
+  {
+    "name": "links",
+    "paragraphs": [
+      {
+        "runs": [
+          {
+            "text": " a ",
+            "bold": true,
+            "italic": false,
+            "underline": false,
+            "strike": false,
+            "baseline": null,
+            "hyperlink": "https://example.org"
+          },
+          {
+            "text": "b",
+            "bold": false,
+            "italic": false,
+            "underline": true,
+            "strike": false,
+            "baseline": null,
+            "hyperlink": "https://example.org"
+          }
+        ],
+        "depth": 0,
+        "list_kind": null,
+        "start": null,
+        "pp9rt": 0
+      }
+    ],
+    "title": false,
+    "blocks": [
+      {
+        "type": "text",
+        "content": [
+          {
+            "type": "hyperlink",
+            "url": "https://example.org",
+            "content": [
+              {
+                "type": "text",
+                "content": "a ",
+                "styles": [
+                  "bold"
+                ]
+              },
+              {
+                "type": "text",
+                "content": "b",
+                "styles": [
+                  "underline"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "html": "<a href=\"https://example.org\"><strong>a </strong></a><a href=\"https://example.org\"><u>b</u></a>"
+  },
+  {
+    "name": "visible-space",
+    "paragraphs": [
+      {
+        "runs": [
+          {
+            "text": "  ",
+            "bold": false,
+            "italic": false,
+            "underline": true,
+            "strike": false,
+            "baseline": null,
+            "hyperlink": null
+          },
+          {
+            "text": "body",
+            "bold": false,
+            "italic": false,
+            "underline": false,
+            "strike": false,
+            "baseline": null,
+            "hyperlink": null
+          },
+          {
+            "text": " ",
+            "bold": false,
+            "italic": false,
+            "underline": false,
+            "strike": true,
+            "baseline": null,
+            "hyperlink": null
+          }
+        ],
+        "depth": 0,
+        "list_kind": null,
+        "start": null,
+        "pp9rt": 0
+      }
+    ],
+    "title": false,
+    "blocks": [
+      {
+        "type": "text",
+        "content": [
+          {
+            "type": "text",
+            "content": "  ",
+            "styles": [
+              "underline"
+            ]
+          },
+          {
+            "type": "text",
+            "content": "body"
+          },
+          {
+            "type": "text",
+            "content": " ",
+            "styles": [
+              "strikethrough"
+            ]
+          }
+        ]
+      }
+    ],
+    "html": "<u>  </u>body<s> </s>"
+  },
+  {
+    "name": "scripts",
+    "paragraphs": [
+      {
+        "runs": [
+          {
+            "text": "x",
+            "bold": false,
+            "italic": false,
+            "underline": false,
+            "strike": false,
+            "baseline": 1,
+            "hyperlink": null
+          },
+          {
+            "text": " y",
+            "bold": false,
+            "italic": true,
+            "underline": false,
+            "strike": false,
+            "baseline": -1,
+            "hyperlink": null
+          }
+        ],
+        "depth": 0,
+        "list_kind": null,
+        "start": null,
+        "pp9rt": 0
+      }
+    ],
+    "title": false,
+    "blocks": [
+      {
+        "type": "text",
+        "content": [
+          {
+            "type": "text",
+            "content": "x",
+            "styles": [
+              "superscript"
+            ]
+          },
+          {
+            "type": "text",
+            "content": " y",
+            "styles": [
+              "italic",
+              "subscript"
+            ]
+          }
+        ]
+      }
+    ],
+    "html": "<sup>x</sup><em><sub> y</sub></em>"
+  },
+  {
+    "name": "adjacent-styles",
+    "paragraphs": [
+      {
+        "runs": [
+          {
+            "text": "a",
+            "bold": true,
+            "italic": false,
+            "underline": false,
+            "strike": false,
+            "baseline": null,
+            "hyperlink": null
+          },
+          {
+            "text": "b",
+            "bold": true,
+            "italic": false,
+            "underline": false,
+            "strike": false,
+            "baseline": null,
+            "hyperlink": null
+          }
+        ],
+        "depth": 0,
+        "list_kind": null,
+        "start": null,
+        "pp9rt": 0
+      }
+    ],
+    "title": false,
+    "blocks": [
+      {
+        "type": "text",
+        "content": [
+          {
+            "type": "text",
+            "content": "ab",
+            "styles": [
+              "bold"
+            ]
+          }
+        ]
+      }
+    ],
+    "html": "<strong>a</strong><strong>b</strong>"
+  },
+  {
+    "name": "nested-types",
+    "paragraphs": [
+      {
+        "runs": [
+          {
+            "text": "a",
+            "bold": false,
+            "italic": false,
+            "underline": false,
+            "strike": false,
+            "baseline": null,
+            "hyperlink": null
+          }
+        ],
+        "depth": 0,
+        "list_kind": "ordered",
+        "start": 3,
+        "pp9rt": 0
+      },
+      {
+        "runs": [
+          {
+            "text": "b",
+            "bold": false,
+            "italic": false,
+            "underline": false,
+            "strike": false,
+            "baseline": null,
+            "hyperlink": null
+          }
+        ],
+        "depth": 1,
+        "list_kind": "unordered",
+        "start": null,
+        "pp9rt": 0
+      },
+      {
+        "runs": [
+          {
+            "text": "c",
+            "bold": false,
+            "italic": false,
+            "underline": false,
+            "strike": false,
+            "baseline": null,
+            "hyperlink": null
+          }
+        ],
+        "depth": 1,
+        "list_kind": "ordered",
+        "start": 7,
+        "pp9rt": 0
+      },
+      {
+        "runs": [
+          {
+            "text": "d",
+            "bold": false,
+            "italic": false,
+            "underline": false,
+            "strike": false,
+            "baseline": null,
+            "hyperlink": null
+          }
+        ],
+        "depth": 0,
+        "list_kind": "ordered",
+        "start": null,
+        "pp9rt": 0
+      }
+    ],
+    "title": false,
+    "blocks": [
+      {
+        "type": "list",
+        "attribute": "ordered",
+        "ilevel": 0,
+        "content": [
+          {
+            "type": "text",
+            "content": [
+              {
+                "type": "text",
+                "content": "a"
+              }
+            ]
+          },
+          {
+            "type": "list",
+            "attribute": "unordered",
+            "ilevel": 1,
+            "content": [
+              {
+                "type": "text",
+                "content": [
+                  {
+                    "type": "text",
+                    "content": "b"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "list",
+            "attribute": "ordered",
+            "ilevel": 1,
+            "content": [
+              {
+                "type": "text",
+                "content": [
+                  {
+                    "type": "text",
+                    "content": "c"
+                  }
+                ]
+              }
+            ],
+            "start": 7
+          },
+          {
+            "type": "text",
+            "content": [
+              {
+                "type": "text",
+                "content": "d"
+              }
+            ]
+          }
+        ],
+        "start": 3
+      }
+    ],
+    "html": "a<br/>b<br/>c<br/>d"
+  },
+  {
+    "name": "deep",
+    "paragraphs": [
+      {
+        "runs": [
+          {
+            "text": "a",
+            "bold": false,
+            "italic": false,
+            "underline": false,
+            "strike": false,
+            "baseline": null,
+            "hyperlink": null
+          }
+        ],
+        "depth": 12,
+        "list_kind": "unordered",
+        "start": null,
+        "pp9rt": 0
+      }
+    ],
+    "title": false,
+    "blocks": [
+      {
+        "type": "list",
+        "attribute": "unordered",
+        "ilevel": 0,
+        "content": [
+          {
+            "type": "list",
+            "attribute": "unordered",
+            "ilevel": 1,
+            "content": [
+              {
+                "type": "list",
+                "attribute": "unordered",
+                "ilevel": 2,
+                "content": [
+                  {
+                    "type": "list",
+                    "attribute": "unordered",
+                    "ilevel": 3,
+                    "content": [
+                      {
+                        "type": "list",
+                        "attribute": "unordered",
+                        "ilevel": 4,
+                        "content": [
+                          {
+                            "type": "list",
+                            "attribute": "unordered",
+                            "ilevel": 5,
+                            "content": [
+                              {
+                                "type": "list",
+                                "attribute": "unordered",
+                                "ilevel": 6,
+                                "content": [
+                                  {
+                                    "type": "list",
+                                    "attribute": "unordered",
+                                    "ilevel": 7,
+                                    "content": [
+                                      {
+                                        "type": "list",
+                                        "attribute": "unordered",
+                                        "ilevel": 8,
+                                        "content": [
+                                          {
+                                            "type": "list",
+                                            "attribute": "unordered",
+                                            "ilevel": 9,
+                                            "content": [
+                                              {
+                                                "type": "list",
+                                                "attribute": "unordered",
+                                                "ilevel": 10,
+                                                "content": [
+                                                  {
+                                                    "type": "list",
+                                                    "attribute": "unordered",
+                                                    "ilevel": 11,
+                                                    "content": [
+                                                      {
+                                                        "type": "list",
+                                                        "attribute": "unordered",
+                                                        "ilevel": 12,
+                                                        "content": [
+                                                          {
+                                                            "type": "text",
+                                                            "content": [
+                                                              {
+                                                                "type": "text",
+                                                                "content": "a"
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "html": "a"
+  },
+  {
+    "name": "list-boundaries",
+    "paragraphs": [
+      {
+        "runs": [
+          {
+            "text": "a",
+            "bold": false,
+            "italic": false,
+            "underline": false,
+            "strike": false,
+            "baseline": null,
+            "hyperlink": null
+          }
+        ],
+        "depth": 0,
+        "list_kind": "unordered",
+        "start": null,
+        "pp9rt": 0
+      },
+      {
+        "runs": [
+          {
+            "text": "plain",
+            "bold": false,
+            "italic": false,
+            "underline": false,
+            "strike": false,
+            "baseline": null,
+            "hyperlink": null
+          }
+        ],
+        "depth": 0,
+        "list_kind": null,
+        "start": null,
+        "pp9rt": 0
+      },
+      {
+        "runs": [
+          {
+            "text": "b",
+            "bold": false,
+            "italic": false,
+            "underline": false,
+            "strike": false,
+            "baseline": null,
+            "hyperlink": null
+          }
+        ],
+        "depth": 0,
+        "list_kind": "unordered",
+        "start": null,
+        "pp9rt": 0
+      }
+    ],
+    "title": false,
+    "blocks": [
+      {
+        "type": "list",
+        "attribute": "unordered",
+        "ilevel": 0,
+        "content": [
+          {
+            "type": "text",
+            "content": [
+              {
+                "type": "text",
+                "content": "a"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "content": [
+          {
+            "type": "text",
+            "content": "plain"
+          }
+        ]
+      },
+      {
+        "type": "list",
+        "attribute": "unordered",
+        "ilevel": 0,
+        "content": [
+          {
+            "type": "text",
+            "content": [
+              {
+                "type": "text",
+                "content": "b"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "html": "a<br/>plain<br/>b"
+  },
+  {
+    "name": "title-after-list",
+    "paragraphs": [
+      {
+        "runs": [
+          {
+            "text": "list",
+            "bold": false,
+            "italic": false,
+            "underline": false,
+            "strike": false,
+            "baseline": null,
+            "hyperlink": null
+          }
+        ],
+        "depth": 0,
+        "list_kind": "unordered",
+        "start": null,
+        "pp9rt": 0
+      },
+      {
+        "runs": [
+          {
+            "text": "heading",
+            "bold": false,
+            "italic": false,
+            "underline": false,
+            "strike": false,
+            "baseline": null,
+            "hyperlink": null
+          }
+        ],
+        "depth": 0,
+        "list_kind": null,
+        "start": null,
+        "pp9rt": 0
+      },
+      {
+        "runs": [
+          {
+            "text": "body",
+            "bold": false,
+            "italic": false,
+            "underline": false,
+            "strike": false,
+            "baseline": null,
+            "hyperlink": null
+          }
+        ],
+        "depth": 0,
+        "list_kind": null,
+        "start": null,
+        "pp9rt": 0
+      }
+    ],
+    "title": true,
+    "blocks": [
+      {
+        "type": "list",
+        "attribute": "unordered",
+        "ilevel": 0,
+        "content": [
+          {
+            "type": "text",
+            "content": [
+              {
+                "type": "text",
+                "content": "list"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "paragraph_title",
+        "content": [
+          {
+            "type": "text",
+            "content": "heading"
+          }
+        ],
+        "level": 2
+      },
+      {
+        "type": "text",
+        "content": [
+          {
+            "type": "text",
+            "content": "body"
+          }
+        ]
+      }
+    ],
+    "html": "list<br/>heading<br/>body"
+  }
+]

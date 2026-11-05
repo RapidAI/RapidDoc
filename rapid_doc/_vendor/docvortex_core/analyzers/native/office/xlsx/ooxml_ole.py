@@ -487,10 +487,10 @@ def read_sheet_equation_artifacts(
         preview_part = preview_part or shape_preview
         preview_payload = _read_member_bounded(source, preview_part)
         if latex is None and not show_as_icon and preview_payload is not None:
-            latex = image_decoder.decode(
+            latex = image_decoder.probe(
                 preview_payload,
                 part_name=preview_part,
-            )
+            ).latex
         if latex is None and not show_as_icon and not is_linked:
             logger.warning(
                 "XLSX_MTEF_FALLBACK: worksheet={!r}, relationship={!r} has no recoverable native or image-comment equation",
@@ -500,6 +500,7 @@ def read_sheet_equation_artifacts(
         preview = (
             serialize_office_image(
                 preview_payload,
+                equation_decoder=image_decoder,
                 part_name=preview_part,
                 content_type=None,
             )

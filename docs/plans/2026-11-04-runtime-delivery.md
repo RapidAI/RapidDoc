@@ -1,0 +1,9 @@
+# Runtime delivery
+
+All hosts call the same dynamically loaded ORT from Rust. Python CPU/GPU distributions share module paths, so neither is a mandatory dependency: users select `[cpu]` or `[gpu]`, or supply an existing runtime. Installing both extras is unsupported.
+
+Native Rust callers may select `rapiddoc/download-runtime`, with `cuda` to select GPU ORT. In ort 2.0.0-rc.15 `load-dynamic` enables `disable-linking`, which skips ort-sys's own download path. RapidDoc therefore downloads official pinned ORT 1.23.2 archives in its optional build script, checks upstream SHA-256, preserves providers/notices, and stages runtimes beside Cargo outputs. No parser-time download, inference algorithm change, or unconditional dependency on Python is introduced. Supported downloads: Windows MSVC x64 and Linux glibc x64. Other targets use external libraries.
+
+Java platform artifacts carry runtimes rather than requiring a Java ORT wrapper or enabling Cargo downloads. Windows CPU JNI/package tests passed; Linux/CUDA remain separate acceptance work. GPU builds still require compatible NVIDIA system libraries. Packages are not published; the rebuilt Python wheel is installed into the project's .venv with --no-deps, preserving the existing CPU runtime.
+
+Validation: Python base/cpu/gpu metadata inspected in the built wheel; 14 affected Python tests; six Rust SDK tests, including inference on a checked-in ONNX fixture using the freshly downloaded official CPU runtime. Archive selection excludes PDB/static libraries/headers during extraction as well as deployment. Windows deployed ORT libraries and notices occupy about 14 MiB, rather than hundreds of MiB of debug symbols. Linux/GPU archive hashes are pinned from upstream release assets but downloads were not exercised in this local CPU stage.

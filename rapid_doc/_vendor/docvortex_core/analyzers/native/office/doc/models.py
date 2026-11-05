@@ -95,6 +95,7 @@ class DocImagePayload:
     content_type: str
     equation_latex: str | None = None
     render_size_emu: tuple[int, int] | None = None
+    limit_reason: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -142,7 +143,13 @@ class DocTable:
     rows: list[DocTableRow] = field(default_factory=list)
 
 
-DocElement: TypeAlias = DocParagraph | DocImage | DocTable
+@dataclass(slots=True)
+class DocTextbox:
+    cp_start: int
+    elements: list[DocElement] = field(default_factory=list)
+
+
+DocElement: TypeAlias = DocParagraph | DocImage | DocTable | DocTextbox
 
 
 @dataclass(slots=True)

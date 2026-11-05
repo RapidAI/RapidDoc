@@ -1,0 +1,3038 @@
+[
+  {
+    "text": "Task",
+    "bbox": [
+      5.0,
+      6.0,
+      46.0,
+      33.0
+    ],
+    "block_num": 0,
+    "line_num": 0,
+    "span_num": 0
+  },
+  {
+    "text": "Hemisphere",
+    "bbox": [
+      131.0,
+      8.0,
+      216.0,
+      32.0
+    ],
+    "block_num": 0,
+    "line_num": 1,
+    "span_num": 0
+  },
+  {
+    "text": "p (FWE)",
+    "bbox": [
+      253.0,
+      4.0,
+      315.0,
+      34.0
+    ],
+    "block_num": 0,
+    "line_num": 2,
+    "span_num": 0
+  },
+  {
+    "text": "Cluster size",
+    "bbox": [
+      342.0,
+      9.0,
+      423.0,
+      30.0
+    ],
+    "block_num": 0,
+    "line_num": 3,
+    "span_num": 0
+  },
+  {
+    "text": "T",
+    "bbox": [
+      467.0,
+      9.0,
+      485.0,
+      29.0
+    ],
+    "block_num": 0,
+    "line_num": 4,
+    "span_num": 0
+  },
+  {
+    "text": "Peak coordinates",
+    "bbox": [
+      566.0,
+      8.0,
+      683.0,
+      31.0
+    ],
+    "block_num": 0,
+    "line_num": 5,
+    "span_num": 0
+  },
+  {
+    "text": "(voxels)",
+    "bbox": [
+      352.0,
+      22.0,
+      412.0,
+      47.0
+    ],
+    "block_num": 0,
+    "line_num": 6,
+    "span_num": 0
+  },
+  {
+    "text": "x",
+    "bbox": [
+      543.0,
+      34.0,
+      563.0,
+      56.0
+    ],
+    "block_num": 0,
+    "line_num": 7,
+    "span_num": 0
+  },
+  {
+    "text": "y",
+    "bbox": [
+      613.0,
+      35.0,
+      635.0,
+      57.0
+    ],
+    "block_num": 0,
+    "line_num": 8,
+    "span_num": 0
+  },
+  {
+    "text": "z",
+    "bbox": [
+      688.0,
+      35.0,
+      706.0,
+      54.0
+    ],
+    "block_num": 0,
+    "line_num": 9,
+    "span_num": 0
+  },
+  {
+    "text": "Song > proverb",
+    "bbox": [
+      6.0,
+      56.0,
+      83.0,
+      77.0
+    ],
+    "block_num": 0,
+    "line_num": 10,
+    "span_num": 0
+  },
+  {
+    "text": "Repetition",
+    "bbox": [
+      5.0,
+      76.0,
+      65.0,
+      100.0
+    ],
+    "block_num": 0,
+    "line_num": 11,
+    "span_num": 0
+  },
+  {
+    "text": "STG",
+    "bbox": [
+      5.0,
+      98.0,
+      38.0,
+      121.0
+    ],
+    "block_num": 0,
+    "line_num": 12,
+    "span_num": 0
+  },
+  {
+    "text": "R",
+    "bbox": [
+      163.0,
+      98.0,
+      185.0,
+      121.0
+    ],
+    "block_num": 0,
+    "line_num": 13,
+    "span_num": 0
+  },
+  {
+    "text": "<0.001",
+    "bbox": [
+      264.0,
+      98.0,
+      306.0,
+      121.0
+    ],
+    "block_num": 0,
+    "line_num": 14,
+    "span_num": 0
+  },
+  {
+    "text": "12,967",
+    "bbox": [
+      362.0,
+      98.0,
+      404.0,
+      121.0
+    ],
+    "block_num": 0,
+    "line_num": 15,
+    "span_num": 0
+  },
+  {
+    "text": "15.482",
+    "bbox": [
+      455.0,
+      98.0,
+      496.0,
+      121.0
+    ],
+    "block_num": 0,
+    "line_num": 16,
+    "span_num": 0
+  },
+  {
+    "text": "54",
+    "bbox": [
+      540.0,
+      99.0,
+      565.0,
+      121.0
+    ],
+    "block_num": 0,
+    "line_num": 17,
+    "span_num": 0
+  },
+  {
+    "text": "0",
+    "bbox": [
+      614.0,
+      99.0,
+      636.0,
+      121.0
+    ],
+    "block_num": 0,
+    "line_num": 18,
+    "span_num": 0
+  },
+  {
+    "text": "-3",
+    "bbox": [
+      685.0,
+      99.0,
+      711.0,
+      121.0
+    ],
+    "block_num": 0,
+    "line_num": 19,
+    "span_num": 0
+  },
+  {
+    "text": "STG",
+    "bbox": [
+      5.0,
+      118.0,
+      38.0,
+      142.0
+    ],
+    "block_num": 0,
+    "line_num": 20,
+    "span_num": 0
+  },
+  {
+    "text": "R",
+    "bbox": [
+      163.0,
+      119.0,
+      185.0,
+      143.0
+    ],
+    "block_num": 0,
+    "line_num": 21,
+    "span_num": 0
+  },
+  {
+    "text": "14.311",
+    "bbox": [
+      454.0,
+      119.0,
+      496.0,
+      142.0
+    ],
+    "block_num": 0,
+    "line_num": 22,
+    "span_num": 0
+  },
+  {
+    "text": "62",
+    "bbox": [
+      539.0,
+      118.0,
+      567.0,
+      144.0
+    ],
+    "block_num": 0,
+    "line_num": 23,
+    "span_num": 0
+  },
+  {
+    "text": "-16",
+    "bbox": [
+      609.0,
+      120.0,
+      642.0,
+      144.0
+    ],
+    "block_num": 0,
+    "line_num": 24,
+    "span_num": 0
+  },
+  {
+    "text": "1",
+    "bbox": [
+      689.0,
+      121.0,
+      707.0,
+      141.0
+    ],
+    "block_num": 0,
+    "line_num": 25,
+    "span_num": 0
+  },
+  {
+    "text": "Rolandic operculum",
+    "bbox": [
+      5.0,
+      139.0,
+      103.0,
+      166.0
+    ],
+    "block_num": 0,
+    "line_num": 26,
+    "span_num": 0
+  },
+  {
+    "text": "R",
+    "bbox": [
+      163.0,
+      141.0,
+      185.0,
+      166.0
+    ],
+    "block_num": 0,
+    "line_num": 27,
+    "span_num": 0
+  },
+  {
+    "text": "13.432",
+    "bbox": [
+      453.0,
+      140.0,
+      497.0,
+      167.0
+    ],
+    "block_num": 0,
+    "line_num": 28,
+    "span_num": 0
+  },
+  {
+    "text": "62",
+    "bbox": [
+      539.0,
+      141.0,
+      567.0,
+      167.0
+    ],
+    "block_num": 0,
+    "line_num": 29,
+    "span_num": 0
+  },
+  {
+    "text": "-8",
+    "bbox": [
+      610.0,
+      141.0,
+      640.0,
+      167.0
+    ],
+    "block_num": 0,
+    "line_num": 30,
+    "span_num": 0
+  },
+  {
+    "text": "7",
+    "bbox": [
+      687.0,
+      142.0,
+      709.0,
+      166.0
+    ],
+    "block_num": 0,
+    "line_num": 31,
+    "span_num": 0
+  },
+  {
+    "text": "STG",
+    "bbox": [
+      5.0,
+      164.0,
+      38.0,
+      188.0
+    ],
+    "block_num": 0,
+    "line_num": 32,
+    "span_num": 0
+  },
+  {
+    "text": "<0.001",
+    "bbox": [
+      264.0,
+      164.0,
+      306.0,
+      187.0
+    ],
+    "block_num": 0,
+    "line_num": 33,
+    "span_num": 0
+  },
+  {
+    "text": "12,053",
+    "bbox": [
+      362.0,
+      164.0,
+      405.0,
+      187.0
+    ],
+    "block_num": 0,
+    "line_num": 34,
+    "span_num": 0
+  },
+  {
+    "text": "15.140",
+    "bbox": [
+      454.0,
+      164.0,
+      496.0,
+      187.0
+    ],
+    "block_num": 0,
+    "line_num": 35,
+    "span_num": 0
+  },
+  {
+    "text": "-64",
+    "bbox": [
+      538.0,
+      163.0,
+      569.0,
+      188.0
+    ],
+    "block_num": 0,
+    "line_num": 36,
+    "span_num": 0
+  },
+  {
+    "text": "-24",
+    "bbox": [
+      609.0,
+      163.0,
+      641.0,
+      188.0
+    ],
+    "block_num": 0,
+    "line_num": 37,
+    "span_num": 0
+  },
+  {
+    "text": "9",
+    "bbox": [
+      687.0,
+      164.0,
+      710.0,
+      188.0
+    ],
+    "block_num": 0,
+    "line_num": 38,
+    "span_num": 0
+  },
+  {
+    "text": "Heschl",
+    "bbox": [
+      6.0,
+      186.0,
+      47.0,
+      208.0
+    ],
+    "block_num": 0,
+    "line_num": 39,
+    "span_num": 0
+  },
+  {
+    "text": "L",
+    "bbox": [
+      163.0,
+      186.0,
+      185.0,
+      210.0
+    ],
+    "block_num": 0,
+    "line_num": 40,
+    "span_num": 0
+  },
+  {
+    "text": "14.712",
+    "bbox": [
+      454.0,
+      186.0,
+      496.0,
+      209.0
+    ],
+    "block_num": 0,
+    "line_num": 41,
+    "span_num": 0
+  },
+  {
+    "text": "-60",
+    "bbox": [
+      536.0,
+      184.0,
+      570.0,
+      212.0
+    ],
+    "block_num": 0,
+    "line_num": 42,
+    "span_num": 0
+  },
+  {
+    "text": "-12",
+    "bbox": [
+      609.0,
+      186.0,
+      641.0,
+      211.0
+    ],
+    "block_num": 0,
+    "line_num": 43,
+    "span_num": 0
+  },
+  {
+    "text": "7",
+    "bbox": [
+      686.0,
+      186.0,
+      709.0,
+      209.0
+    ],
+    "block_num": 0,
+    "line_num": 44,
+    "span_num": 0
+  },
+  {
+    "text": "PrCG",
+    "bbox": [
+      5.0,
+      206.0,
+      45.0,
+      232.0
+    ],
+    "block_num": 0,
+    "line_num": 45,
+    "span_num": 0
+  },
+  {
+    "text": "14.004",
+    "bbox": [
+      453.0,
+      208.0,
+      496.0,
+      231.0
+    ],
+    "block_num": 0,
+    "line_num": 46,
+    "span_num": 0
+  },
+  {
+    "text": "-52",
+    "bbox": [
+      537.0,
+      207.0,
+      569.0,
+      232.0
+    ],
+    "block_num": 0,
+    "line_num": 47,
+    "span_num": 0
+  },
+  {
+    "text": "-6",
+    "bbox": [
+      610.0,
+      207.0,
+      640.0,
+      232.0
+    ],
+    "block_num": 0,
+    "line_num": 48,
+    "span_num": 0
+  },
+  {
+    "text": "47",
+    "bbox": [
+      683.0,
+      207.0,
+      711.0,
+      232.0
+    ],
+    "block_num": 0,
+    "line_num": 49,
+    "span_num": 0
+  },
+  {
+    "text": "Cerebellum (6)",
+    "bbox": [
+      7.0,
+      230.0,
+      80.0,
+      251.0
+    ],
+    "block_num": 0,
+    "line_num": 50,
+    "span_num": 0
+  },
+  {
+    "text": "L",
+    "bbox": [
+      163.0,
+      229.0,
+      184.0,
+      254.0
+    ],
+    "block_num": 0,
+    "line_num": 51,
+    "span_num": 0
+  },
+  {
+    "text": "<0.001",
+    "bbox": [
+      263.0,
+      228.0,
+      307.0,
+      254.0
+    ],
+    "block_num": 0,
+    "line_num": 52,
+    "span_num": 0
+  },
+  {
+    "text": "11,060",
+    "bbox": [
+      361.0,
+      228.0,
+      405.0,
+      254.0
+    ],
+    "block_num": 0,
+    "line_num": 53,
+    "span_num": 0
+  },
+  {
+    "text": "13.211",
+    "bbox": [
+      454.0,
+      229.0,
+      495.0,
+      252.0
+    ],
+    "block_num": 0,
+    "line_num": 54,
+    "span_num": 0
+  },
+  {
+    "text": "-16",
+    "bbox": [
+      536.0,
+      227.0,
+      570.0,
+      255.0
+    ],
+    "block_num": 0,
+    "line_num": 55,
+    "span_num": 0
+  },
+  {
+    "text": "-60",
+    "bbox": [
+      609.0,
+      229.0,
+      642.0,
+      253.0
+    ],
+    "block_num": 0,
+    "line_num": 56,
+    "span_num": 0
+  },
+  {
+    "text": "-21",
+    "bbox": [
+      682.0,
+      228.0,
+      712.0,
+      254.0
+    ],
+    "block_num": 0,
+    "line_num": 57,
+    "span_num": 0
+  },
+  {
+    "text": "Cerebellum (6)",
+    "bbox": [
+      6.0,
+      251.0,
+      81.0,
+      275.0
+    ],
+    "block_num": 0,
+    "line_num": 58,
+    "span_num": 0
+  },
+  {
+    "text": "R",
+    "bbox": [
+      163.0,
+      252.0,
+      185.0,
+      276.0
+    ],
+    "block_num": 0,
+    "line_num": 59,
+    "span_num": 0
+  },
+  {
+    "text": "11.738",
+    "bbox": [
+      453.0,
+      250.0,
+      497.0,
+      276.0
+    ],
+    "block_num": 0,
+    "line_num": 60,
+    "span_num": 0
+  },
+  {
+    "text": "18",
+    "bbox": [
+      539.0,
+      251.0,
+      568.0,
+      276.0
+    ],
+    "block_num": 0,
+    "line_num": 61,
+    "span_num": 0
+  },
+  {
+    "text": "-62",
+    "bbox": [
+      609.0,
+      251.0,
+      641.0,
+      276.0
+    ],
+    "block_num": 0,
+    "line_num": 62,
+    "span_num": 0
+  },
+  {
+    "text": "-21",
+    "bbox": [
+      682.0,
+      251.0,
+      713.0,
+      276.0
+    ],
+    "block_num": 0,
+    "line_num": 63,
+    "span_num": 0
+  },
+  {
+    "text": "Cerebellum (8)",
+    "bbox": [
+      6.0,
+      274.0,
+      80.0,
+      295.0
+    ],
+    "block_num": 0,
+    "line_num": 64,
+    "span_num": 0
+  },
+  {
+    "text": "9.447",
+    "bbox": [
+      456.0,
+      273.0,
+      494.0,
+      296.0
+    ],
+    "block_num": 0,
+    "line_num": 65,
+    "span_num": 0
+  },
+  {
+    "text": "-22",
+    "bbox": [
+      537.0,
+      271.0,
+      570.0,
+      299.0
+    ],
+    "block_num": 0,
+    "line_num": 66,
+    "span_num": 0
+  },
+  {
+    "text": "-62",
+    "bbox": [
+      609.0,
+      273.0,
+      642.0,
+      297.0
+    ],
+    "block_num": 0,
+    "line_num": 67,
+    "span_num": 0
+  },
+  {
+    "text": "-55",
+    "bbox": [
+      682.0,
+      273.0,
+      714.0,
+      297.0
+    ],
+    "block_num": 0,
+    "line_num": 68,
+    "span_num": 0
+  },
+  {
+    "text": "SMA",
+    "bbox": [
+      5.0,
+      295.0,
+      40.0,
+      318.0
+    ],
+    "block_num": 0,
+    "line_num": 69,
+    "span_num": 0
+  },
+  {
+    "text": "R",
+    "bbox": [
+      161.0,
+      294.0,
+      187.0,
+      319.0
+    ],
+    "block_num": 0,
+    "line_num": 70,
+    "span_num": 0
+  },
+  {
+    "text": "<0.001",
+    "bbox": [
+      264.0,
+      295.0,
+      306.0,
+      318.0
+    ],
+    "block_num": 0,
+    "line_num": 71,
+    "span_num": 0
+  },
+  {
+    "text": "3,271",
+    "bbox": [
+      363.0,
+      294.0,
+      400.0,
+      318.0
+    ],
+    "block_num": 0,
+    "line_num": 72,
+    "span_num": 0
+  },
+  {
+    "text": "8.154",
+    "bbox": [
+      457.0,
+      295.0,
+      495.0,
+      318.0
+    ],
+    "block_num": 0,
+    "line_num": 73,
+    "span_num": 0
+  },
+  {
+    "text": "2",
+    "bbox": [
+      540.0,
+      294.0,
+      566.0,
+      320.0
+    ],
+    "block_num": 0,
+    "line_num": 74,
+    "span_num": 0
+  },
+  {
+    "text": "10",
+    "bbox": [
+      610.0,
+      294.0,
+      640.0,
+      319.0
+    ],
+    "block_num": 0,
+    "line_num": 75,
+    "span_num": 0
+  },
+  {
+    "text": "63",
+    "bbox": [
+      683.0,
+      294.0,
+      712.0,
+      319.0
+    ],
+    "block_num": 0,
+    "line_num": 76,
+    "span_num": 0
+  },
+  {
+    "text": "cc",
+    "bbox": [
+      5.0,
+      316.0,
+      34.0,
+      340.0
+    ],
+    "block_num": 0,
+    "line_num": 77,
+    "span_num": 0
+  },
+  {
+    "text": "L/R",
+    "bbox": [
+      156.0,
+      314.0,
+      190.0,
+      342.0
+    ],
+    "block_num": 0,
+    "line_num": 78,
+    "span_num": 0
+  },
+  {
+    "text": "7.529",
+    "bbox": [
+      456.0,
+      315.0,
+      496.0,
+      341.0
+    ],
+    "block_num": 0,
+    "line_num": 79,
+    "span_num": 0
+  },
+  {
+    "text": "0",
+    "bbox": [
+      540.0,
+      315.0,
+      566.0,
+      341.0
+    ],
+    "block_num": 0,
+    "line_num": 80,
+    "span_num": 0
+  },
+  {
+    "text": "20",
+    "bbox": [
+      611.0,
+      316.0,
+      640.0,
+      341.0
+    ],
+    "block_num": 0,
+    "line_num": 81,
+    "span_num": 0
+  },
+  {
+    "text": "33",
+    "bbox": [
+      683.0,
+      315.0,
+      711.0,
+      341.0
+    ],
+    "block_num": 0,
+    "line_num": 82,
+    "span_num": 0
+  },
+  {
+    "text": "SMA",
+    "bbox": [
+      5.0,
+      337.0,
+      40.0,
+      361.0
+    ],
+    "block_num": 0,
+    "line_num": 83,
+    "span_num": 0
+  },
+  {
+    "text": "R",
+    "bbox": [
+      163.0,
+      338.0,
+      185.0,
+      362.0
+    ],
+    "block_num": 0,
+    "line_num": 84,
+    "span_num": 0
+  },
+  {
+    "text": "5.837",
+    "bbox": [
+      457.0,
+      337.0,
+      494.0,
+      361.0
+    ],
+    "block_num": 0,
+    "line_num": 85,
+    "span_num": 0
+  },
+  {
+    "text": "8",
+    "bbox": [
+      540.0,
+      337.0,
+      566.0,
+      362.0
+    ],
+    "block_num": 0,
+    "line_num": 86,
+    "span_num": 0
+  },
+  {
+    "text": "10",
+    "bbox": [
+      611.0,
+      337.0,
+      639.0,
+      362.0
+    ],
+    "block_num": 0,
+    "line_num": 87,
+    "span_num": 0
+  },
+  {
+    "text": "71",
+    "bbox": [
+      684.0,
+      337.0,
+      712.0,
+      362.0
+    ],
+    "block_num": 0,
+    "line_num": 88,
+    "span_num": 0
+  },
+  {
+    "text": "Completion",
+    "bbox": [
+      5.0,
+      359.0,
+      71.0,
+      383.0
+    ],
+    "block_num": 0,
+    "line_num": 89,
+    "span_num": 0
+  },
+  {
+    "text": "STG",
+    "bbox": [
+      5.0,
+      380.0,
+      38.0,
+      405.0
+    ],
+    "block_num": 0,
+    "line_num": 90,
+    "span_num": 0
+  },
+  {
+    "text": "R",
+    "bbox": [
+      162.0,
+      379.0,
+      186.0,
+      406.0
+    ],
+    "block_num": 0,
+    "line_num": 91,
+    "span_num": 0
+  },
+  {
+    "text": "<0.001",
+    "bbox": [
+      265.0,
+      381.0,
+      306.0,
+      404.0
+    ],
+    "block_num": 0,
+    "line_num": 92,
+    "span_num": 0
+  },
+  {
+    "text": "6,540",
+    "bbox": [
+      362.0,
+      379.0,
+      402.0,
+      405.0
+    ],
+    "block_num": 0,
+    "line_num": 93,
+    "span_num": 0
+  },
+  {
+    "text": "11.770",
+    "bbox": [
+      453.0,
+      379.0,
+      497.0,
+      405.0
+    ],
+    "block_num": 0,
+    "line_num": 94,
+    "span_num": 0
+  },
+  {
+    "text": "52",
+    "bbox": [
+      539.0,
+      380.0,
+      567.0,
+      406.0
+    ],
+    "block_num": 0,
+    "line_num": 95,
+    "span_num": 0
+  },
+  {
+    "text": "-8",
+    "bbox": [
+      610.0,
+      380.0,
+      640.0,
+      405.0
+    ],
+    "block_num": 0,
+    "line_num": 96,
+    "span_num": 0
+  },
+  {
+    "text": "-1",
+    "bbox": [
+      683.0,
+      380.0,
+      712.0,
+      405.0
+    ],
+    "block_num": 0,
+    "line_num": 97,
+    "span_num": 0
+  },
+  {
+    "text": "TP",
+    "bbox": [
+      5.0,
+      402.0,
+      32.0,
+      427.0
+    ],
+    "block_num": 0,
+    "line_num": 98,
+    "span_num": 0
+  },
+  {
+    "text": "R",
+    "bbox": [
+      163.0,
+      403.0,
+      185.0,
+      427.0
+    ],
+    "block_num": 0,
+    "line_num": 99,
+    "span_num": 0
+  },
+  {
+    "text": "10.390",
+    "bbox": [
+      455.0,
+      403.0,
+      496.0,
+      426.0
+    ],
+    "block_num": 0,
+    "line_num": 100,
+    "span_num": 0
+  },
+  {
+    "text": "58",
+    "bbox": [
+      539.0,
+      402.0,
+      567.0,
+      428.0
+    ],
+    "block_num": 0,
+    "line_num": 101,
+    "span_num": 0
+  },
+  {
+    "text": "6",
+    "bbox": [
+      612.0,
+      402.0,
+      639.0,
+      428.0
+    ],
+    "block_num": 0,
+    "line_num": 102,
+    "span_num": 0
+  },
+  {
+    "text": "-3",
+    "bbox": [
+      684.0,
+      402.0,
+      712.0,
+      427.0
+    ],
+    "block_num": 0,
+    "line_num": 103,
+    "span_num": 0
+  },
+  {
+    "text": "STG",
+    "bbox": [
+      5.0,
+      424.0,
+      38.0,
+      448.0
+    ],
+    "block_num": 0,
+    "line_num": 104,
+    "span_num": 0
+  },
+  {
+    "text": "R",
+    "bbox": [
+      162.0,
+      425.0,
+      185.0,
+      448.0
+    ],
+    "block_num": 0,
+    "line_num": 105,
+    "span_num": 0
+  },
+  {
+    "text": "9.332",
+    "bbox": [
+      456.0,
+      425.0,
+      494.0,
+      448.0
+    ],
+    "block_num": 0,
+    "line_num": 106,
+    "span_num": 0
+  },
+  {
+    "text": "62",
+    "bbox": [
+      539.0,
+      424.0,
+      568.0,
+      449.0
+    ],
+    "block_num": 0,
+    "line_num": 107,
+    "span_num": 0
+  },
+  {
+    "text": "-18",
+    "bbox": [
+      609.0,
+      425.0,
+      642.0,
+      448.0
+    ],
+    "block_num": 0,
+    "line_num": 108,
+    "span_num": 0
+  },
+  {
+    "text": "5",
+    "bbox": [
+      686.0,
+      424.0,
+      709.0,
+      448.0
+    ],
+    "block_num": 0,
+    "line_num": 109,
+    "span_num": 0
+  },
+  {
+    "text": "STG",
+    "bbox": [
+      5.0,
+      446.0,
+      38.0,
+      471.0
+    ],
+    "block_num": 0,
+    "line_num": 110,
+    "span_num": 0
+  },
+  {
+    "text": "1",
+    "bbox": [
+      163.0,
+      446.0,
+      184.0,
+      471.0
+    ],
+    "block_num": 0,
+    "line_num": 111,
+    "span_num": 0
+  },
+  {
+    "text": "<0.001",
+    "bbox": [
+      264.0,
+      446.0,
+      305.0,
+      470.0
+    ],
+    "block_num": 0,
+    "line_num": 112,
+    "span_num": 0
+  },
+  {
+    "text": "5,470",
+    "bbox": [
+      362.0,
+      444.0,
+      402.0,
+      472.0
+    ],
+    "block_num": 0,
+    "line_num": 113,
+    "span_num": 0
+  },
+  {
+    "text": "10.655",
+    "bbox": [
+      454.0,
+      446.0,
+      496.0,
+      470.0
+    ],
+    "block_num": 0,
+    "line_num": 114,
+    "span_num": 0
+  },
+  {
+    "text": "-52",
+    "bbox": [
+      537.0,
+      446.0,
+      569.0,
+      472.0
+    ],
+    "block_num": 0,
+    "line_num": 115,
+    "span_num": 0
+  },
+  {
+    "text": "-8",
+    "bbox": [
+      610.0,
+      446.0,
+      640.0,
+      472.0
+    ],
+    "block_num": 0,
+    "line_num": 116,
+    "span_num": 0
+  },
+  {
+    "text": "1",
+    "bbox": [
+      687.0,
+      446.0,
+      709.0,
+      471.0
+    ],
+    "block_num": 0,
+    "line_num": 117,
+    "span_num": 0
+  },
+  {
+    "text": "STG",
+    "bbox": [
+      5.0,
+      468.0,
+      38.0,
+      493.0
+    ],
+    "block_num": 0,
+    "line_num": 118,
+    "span_num": 0
+  },
+  {
+    "text": "L",
+    "bbox": [
+      163.0,
+      469.0,
+      185.0,
+      493.0
+    ],
+    "block_num": 0,
+    "line_num": 119,
+    "span_num": 0
+  },
+  {
+    "text": "9.517",
+    "bbox": [
+      456.0,
+      468.0,
+      496.0,
+      494.0
+    ],
+    "block_num": 0,
+    "line_num": 120,
+    "span_num": 0
+  },
+  {
+    "text": "-62",
+    "bbox": [
+      536.0,
+      467.0,
+      570.0,
+      495.0
+    ],
+    "block_num": 0,
+    "line_num": 121,
+    "span_num": 0
+  },
+  {
+    "text": "-14",
+    "bbox": [
+      608.0,
+      467.0,
+      642.0,
+      495.0
+    ],
+    "block_num": 0,
+    "line_num": 122,
+    "span_num": 0
+  },
+  {
+    "text": "7",
+    "bbox": [
+      686.0,
+      469.0,
+      709.0,
+      493.0
+    ],
+    "block_num": 0,
+    "line_num": 123,
+    "span_num": 0
+  },
+  {
+    "text": "STG",
+    "bbox": [
+      5.0,
+      490.0,
+      38.0,
+      514.0
+    ],
+    "block_num": 0,
+    "line_num": 124,
+    "span_num": 0
+  },
+  {
+    "text": "L",
+    "bbox": [
+      161.0,
+      490.0,
+      186.0,
+      516.0
+    ],
+    "block_num": 0,
+    "line_num": 125,
+    "span_num": 0
+  },
+  {
+    "text": "7.717",
+    "bbox": [
+      457.0,
+      491.0,
+      494.0,
+      514.0
+    ],
+    "block_num": 0,
+    "line_num": 126,
+    "span_num": 0
+  },
+  {
+    "text": "-46",
+    "bbox": [
+      537.0,
+      490.0,
+      569.0,
+      515.0
+    ],
+    "block_num": 0,
+    "line_num": 127,
+    "span_num": 0
+  },
+  {
+    "text": "-38",
+    "bbox": [
+      607.0,
+      487.0,
+      644.0,
+      517.0
+    ],
+    "block_num": 0,
+    "line_num": 128,
+    "span_num": 0
+  },
+  {
+    "text": "15",
+    "bbox": [
+      684.0,
+      490.0,
+      711.0,
+      515.0
+    ],
+    "block_num": 0,
+    "line_num": 129,
+    "span_num": 0
+  },
+  {
+    "text": "SMA",
+    "bbox": [
+      5.0,
+      512.0,
+      40.0,
+      536.0
+    ],
+    "block_num": 0,
+    "line_num": 130,
+    "span_num": 0
+  },
+  {
+    "text": "R",
+    "bbox": [
+      163.0,
+      513.0,
+      185.0,
+      536.0
+    ],
+    "block_num": 0,
+    "line_num": 131,
+    "span_num": 0
+  },
+  {
+    "text": "<0.001",
+    "bbox": [
+      264.0,
+      512.0,
+      305.0,
+      535.0
+    ],
+    "block_num": 0,
+    "line_num": 132,
+    "span_num": 0
+  },
+  {
+    "text": "1,505",
+    "bbox": [
+      362.0,
+      511.0,
+      402.0,
+      537.0
+    ],
+    "block_num": 0,
+    "line_num": 133,
+    "span_num": 0
+  },
+  {
+    "text": "6.512",
+    "bbox": [
+      456.0,
+      511.0,
+      496.0,
+      537.0
+    ],
+    "block_num": 0,
+    "line_num": 134,
+    "span_num": 0
+  },
+  {
+    "text": "2",
+    "bbox": [
+      539.0,
+      512.0,
+      565.0,
+      537.0
+    ],
+    "block_num": 0,
+    "line_num": 135,
+    "span_num": 0
+  },
+  {
+    "text": "6",
+    "bbox": [
+      613.0,
+      513.0,
+      637.0,
+      536.0
+    ],
+    "block_num": 0,
+    "line_num": 136,
+    "span_num": 0
+  },
+  {
+    "text": "61",
+    "bbox": [
+      683.0,
+      512.0,
+      710.0,
+      537.0
+    ],
+    "block_num": 0,
+    "line_num": 137,
+    "span_num": 0
+  },
+  {
+    "text": "cc",
+    "bbox": [
+      5.0,
+      533.0,
+      35.0,
+      558.0
+    ],
+    "block_num": 0,
+    "line_num": 138,
+    "span_num": 0
+  },
+  {
+    "text": "L",
+    "bbox": [
+      163.0,
+      533.0,
+      184.0,
+      558.0
+    ],
+    "block_num": 0,
+    "line_num": 139,
+    "span_num": 0
+  },
+  {
+    "text": "4.906",
+    "bbox": [
+      457.0,
+      534.0,
+      495.0,
+      557.0
+    ],
+    "block_num": 0,
+    "line_num": 140,
+    "span_num": 0
+  },
+  {
+    "text": "-2",
+    "bbox": [
+      539.0,
+      533.0,
+      568.0,
+      559.0
+    ],
+    "block_num": 0,
+    "line_num": 141,
+    "span_num": 0
+  },
+  {
+    "text": "12",
+    "bbox": [
+      611.0,
+      533.0,
+      639.0,
+      559.0
+    ],
+    "block_num": 0,
+    "line_num": 142,
+    "span_num": 0
+  },
+  {
+    "text": "35",
+    "bbox": [
+      684.0,
+      533.0,
+      711.0,
+      558.0
+    ],
+    "block_num": 0,
+    "line_num": 143,
+    "span_num": 0
+  },
+  {
+    "text": "SMA",
+    "bbox": [
+      5.0,
+      556.0,
+      41.0,
+      579.0
+    ],
+    "block_num": 0,
+    "line_num": 144,
+    "span_num": 0
+  },
+  {
+    "text": "L",
+    "bbox": [
+      162.0,
+      555.0,
+      186.0,
+      582.0
+    ],
+    "block_num": 0,
+    "line_num": 145,
+    "span_num": 0
+  },
+  {
+    "text": "4.834",
+    "bbox": [
+      456.0,
+      555.0,
+      496.0,
+      581.0
+    ],
+    "block_num": 0,
+    "line_num": 146,
+    "span_num": 0
+  },
+  {
+    "text": "—4",
+    "bbox": [
+      539.0,
+      555.0,
+      568.0,
+      580.0
+    ],
+    "block_num": 0,
+    "line_num": 147,
+    "span_num": 0
+  },
+  {
+    "text": "4",
+    "bbox": [
+      613.0,
+      557.0,
+      637.0,
+      580.0
+    ],
+    "block_num": 0,
+    "line_num": 148,
+    "span_num": 0
+  },
+  {
+    "text": "73",
+    "bbox": [
+      683.0,
+      555.0,
+      711.0,
+      580.0
+    ],
+    "block_num": 0,
+    "line_num": 149,
+    "span_num": 0
+  },
+  {
+    "text": "Cerebellum (6)",
+    "bbox": [
+      7.0,
+      579.0,
+      80.0,
+      600.0
+    ],
+    "block_num": 0,
+    "line_num": 150,
+    "span_num": 0
+  },
+  {
+    "text": "L",
+    "bbox": [
+      162.0,
+      578.0,
+      184.0,
+      601.0
+    ],
+    "block_num": 0,
+    "line_num": 151,
+    "span_num": 0
+  },
+  {
+    "text": "<0.001",
+    "bbox": [
+      264.0,
+      578.0,
+      306.0,
+      600.0
+    ],
+    "block_num": 0,
+    "line_num": 152,
+    "span_num": 0
+  },
+  {
+    "text": "2,254",
+    "bbox": [
+      362.0,
+      576.0,
+      402.0,
+      602.0
+    ],
+    "block_num": 0,
+    "line_num": 153,
+    "span_num": 0
+  },
+  {
+    "text": "5.626",
+    "bbox": [
+      457.0,
+      577.0,
+      494.0,
+      601.0
+    ],
+    "block_num": 0,
+    "line_num": 154,
+    "span_num": 0
+  },
+  {
+    "text": "-12",
+    "bbox": [
+      537.0,
+      577.0,
+      568.0,
+      601.0
+    ],
+    "block_num": 0,
+    "line_num": 155,
+    "span_num": 0
+  },
+  {
+    "text": "-60",
+    "bbox": [
+      609.0,
+      577.0,
+      641.0,
+      601.0
+    ],
+    "block_num": 0,
+    "line_num": 156,
+    "span_num": 0
+  },
+  {
+    "text": "-19",
+    "bbox": [
+      682.0,
+      577.0,
+      714.0,
+      601.0
+    ],
+    "block_num": 0,
+    "line_num": 157,
+    "span_num": 0
+  },
+  {
+    "text": "Cerebellum (6)",
+    "bbox": [
+      6.0,
+      599.0,
+      81.0,
+      623.0
+    ],
+    "block_num": 0,
+    "line_num": 158,
+    "span_num": 0
+  },
+  {
+    "text": "R",
+    "bbox": [
+      162.0,
+      598.0,
+      187.0,
+      624.0
+    ],
+    "block_num": 0,
+    "line_num": 159,
+    "span_num": 0
+  },
+  {
+    "text": "5.129",
+    "bbox": [
+      456.0,
+      598.0,
+      496.0,
+      624.0
+    ],
+    "block_num": 0,
+    "line_num": 160,
+    "span_num": 0
+  },
+  {
+    "text": "16",
+    "bbox": [
+      539.0,
+      599.0,
+      568.0,
+      624.0
+    ],
+    "block_num": 0,
+    "line_num": 161,
+    "span_num": 0
+  },
+  {
+    "text": "-64",
+    "bbox": [
+      609.0,
+      599.0,
+      641.0,
+      624.0
+    ],
+    "block_num": 0,
+    "line_num": 162,
+    "span_num": 0
+  },
+  {
+    "text": "-15",
+    "bbox": [
+      682.0,
+      599.0,
+      714.0,
+      623.0
+    ],
+    "block_num": 0,
+    "line_num": 163,
+    "span_num": 0
+  },
+  {
+    "text": "Cerebellum (6)",
+    "bbox": [
+      5.0,
+      621.0,
+      81.0,
+      645.0
+    ],
+    "block_num": 0,
+    "line_num": 164,
+    "span_num": 0
+  },
+  {
+    "text": "L",
+    "bbox": [
+      163.0,
+      621.0,
+      185.0,
+      645.0
+    ],
+    "block_num": 0,
+    "line_num": 165,
+    "span_num": 0
+  },
+  {
+    "text": "4.959",
+    "bbox": [
+      456.0,
+      620.0,
+      496.0,
+      646.0
+    ],
+    "block_num": 0,
+    "line_num": 166,
+    "span_num": 0
+  },
+  {
+    "text": "-24",
+    "bbox": [
+      536.0,
+      619.0,
+      570.0,
+      647.0
+    ],
+    "block_num": 0,
+    "line_num": 167,
+    "span_num": 0
+  },
+  {
+    "text": "-62",
+    "bbox": [
+      609.0,
+      621.0,
+      641.0,
+      646.0
+    ],
+    "block_num": 0,
+    "line_num": 168,
+    "span_num": 0
+  },
+  {
+    "text": "-21",
+    "bbox": [
+      680.0,
+      619.0,
+      714.0,
+      647.0
+    ],
+    "block_num": 0,
+    "line_num": 169,
+    "span_num": 0
+  },
+  {
+    "text": "Cerebellum (8)",
+    "bbox": [
+      7.0,
+      643.0,
+      79.0,
+      664.0
+    ],
+    "block_num": 0,
+    "line_num": 170,
+    "span_num": 0
+  },
+  {
+    "text": "L",
+    "bbox": [
+      163.0,
+      643.0,
+      184.0,
+      667.0
+    ],
+    "block_num": 0,
+    "line_num": 171,
+    "span_num": 0
+  },
+  {
+    "text": "0.016",
+    "bbox": [
+      266.0,
+      643.0,
+      304.0,
+      666.0
+    ],
+    "block_num": 0,
+    "line_num": 172,
+    "span_num": 0
+  },
+  {
+    "text": "324",
+    "bbox": [
+      367.0,
+      643.0,
+      399.0,
+      667.0
+    ],
+    "block_num": 0,
+    "line_num": 173,
+    "span_num": 0
+  },
+  {
+    "text": "4.803",
+    "bbox": [
+      457.0,
+      643.0,
+      494.0,
+      666.0
+    ],
+    "block_num": 0,
+    "line_num": 174,
+    "span_num": 0
+  },
+  {
+    "text": "-22",
+    "bbox": [
+      536.0,
+      641.0,
+      570.0,
+      669.0
+    ],
+    "block_num": 0,
+    "line_num": 175,
+    "span_num": 0
+  },
+  {
+    "text": "-62",
+    "bbox": [
+      610.0,
+      642.0,
+      641.0,
+      667.0
+    ],
+    "block_num": 0,
+    "line_num": 176,
+    "span_num": 0
+  },
+  {
+    "text": "-59",
+    "bbox": [
+      682.0,
+      642.0,
+      714.0,
+      667.0
+    ],
+    "block_num": 0,
+    "line_num": 177,
+    "span_num": 0
+  },
+  {
+    "text": "Cerebellum (8)",
+    "bbox": [
+      6.0,
+      666.0,
+      81.0,
+      687.0
+    ],
+    "block_num": 0,
+    "line_num": 178,
+    "span_num": 0
+  },
+  {
+    "text": "L",
+    "bbox": [
+      161.0,
+      664.0,
+      186.0,
+      690.0
+    ],
+    "block_num": 0,
+    "line_num": 179,
+    "span_num": 0
+  },
+  {
+    "text": "4.694",
+    "bbox": [
+      456.0,
+      664.0,
+      496.0,
+      690.0
+    ],
+    "block_num": 0,
+    "line_num": 180,
+    "span_num": 0
+  },
+  {
+    "text": "-34",
+    "bbox": [
+      537.0,
+      664.0,
+      569.0,
+      689.0
+    ],
+    "block_num": 0,
+    "line_num": 181,
+    "span_num": 0
+  },
+  {
+    "text": "-52",
+    "bbox": [
+      609.0,
+      665.0,
+      642.0,
+      689.0
+    ],
+    "block_num": 0,
+    "line_num": 182,
+    "span_num": 0
+  },
+  {
+    "text": "-53",
+    "bbox": [
+      682.0,
+      664.0,
+      715.0,
+      689.0
+    ],
+    "block_num": 0,
+    "line_num": 183,
+    "span_num": 0
+  },
+  {
+    "text": "Cerebellum (8)",
+    "bbox": [
+      6.0,
+      687.0,
+      80.0,
+      708.0
+    ],
+    "block_num": 0,
+    "line_num": 184,
+    "span_num": 0
+  },
+  {
+    "text": "L",
+    "bbox": [
+      162.0,
+      685.0,
+      186.0,
+      712.0
+    ],
+    "block_num": 0,
+    "line_num": 185,
+    "span_num": 0
+  },
+  {
+    "text": "<0.001",
+    "bbox": [
+      263.0,
+      685.0,
+      306.0,
+      711.0
+    ],
+    "block_num": 0,
+    "line_num": 186,
+    "span_num": 0
+  },
+  {
+    "text": "6,540",
+    "bbox": [
+      362.0,
+      685.0,
+      402.0,
+      711.0
+    ],
+    "block_num": 0,
+    "line_num": 187,
+    "span_num": 0
+  },
+  {
+    "text": "4.616",
+    "bbox": [
+      456.0,
+      685.0,
+      496.0,
+      711.0
+    ],
+    "block_num": 0,
+    "line_num": 188,
+    "span_num": 0
+  },
+  {
+    "text": "-26",
+    "bbox": [
+      536.0,
+      684.0,
+      570.0,
+      712.0
+    ],
+    "block_num": 0,
+    "line_num": 189,
+    "span_num": 0
+  },
+  {
+    "text": "-58",
+    "bbox": [
+      609.0,
+      686.0,
+      642.0,
+      711.0
+    ],
+    "block_num": 0,
+    "line_num": 190,
+    "span_num": 0
+  },
+  {
+    "text": "-53",
+    "bbox": [
+      680.0,
+      684.0,
+      715.0,
+      712.0
+    ],
+    "block_num": 0,
+    "line_num": 191,
+    "span_num": 0
+  },
+  {
+    "text": "Improvisation",
+    "bbox": [
+      7.0,
+      709.0,
+      80.0,
+      730.0
+    ],
+    "block_num": 0,
+    "line_num": 192,
+    "span_num": 0
+  },
+  {
+    "text": "STG",
+    "bbox": [
+      6.0,
+      730.0,
+      37.0,
+      753.0
+    ],
+    "block_num": 0,
+    "line_num": 193,
+    "span_num": 0
+  },
+  {
+    "text": "L",
+    "bbox": [
+      163.0,
+      730.0,
+      184.0,
+      753.0
+    ],
+    "block_num": 0,
+    "line_num": 194,
+    "span_num": 0
+  },
+  {
+    "text": "<0.001",
+    "bbox": [
+      264.0,
+      730.0,
+      306.0,
+      753.0
+    ],
+    "block_num": 0,
+    "line_num": 195,
+    "span_num": 0
+  },
+  {
+    "text": "11,408",
+    "bbox": [
+      362.0,
+      730.0,
+      405.0,
+      753.0
+    ],
+    "block_num": 0,
+    "line_num": 196,
+    "span_num": 0
+  },
+  {
+    "text": "8.252",
+    "bbox": [
+      456.0,
+      730.0,
+      495.0,
+      753.0
+    ],
+    "block_num": 0,
+    "line_num": 197,
+    "span_num": 0
+  },
+  {
+    "text": "-48",
+    "bbox": [
+      537.0,
+      730.0,
+      569.0,
+      754.0
+    ],
+    "block_num": 0,
+    "line_num": 198,
+    "span_num": 0
+  },
+  {
+    "text": "-10",
+    "bbox": [
+      609.0,
+      730.0,
+      642.0,
+      754.0
+    ],
+    "block_num": 0,
+    "line_num": 199,
+    "span_num": 0
+  },
+  {
+    "text": "-1",
+    "bbox": [
+      684.0,
+      730.0,
+      712.0,
+      755.0
+    ],
+    "block_num": 0,
+    "line_num": 200,
+    "span_num": 0
+  },
+  {
+    "text": "Rolandic operculum",
+    "bbox": [
+      7.0,
+      753.0,
+      102.0,
+      774.0
+    ],
+    "block_num": 0,
+    "line_num": 201,
+    "span_num": 0
+  },
+  {
+    "text": "L",
+    "bbox": [
+      163.0,
+      752.0,
+      184.0,
+      775.0
+    ],
+    "block_num": 0,
+    "line_num": 202,
+    "span_num": 0
+  },
+  {
+    "text": "8.103",
+    "bbox": [
+      455.0,
+      751.0,
+      495.0,
+      778.0
+    ],
+    "block_num": 0,
+    "line_num": 203,
+    "span_num": 0
+  },
+  {
+    "text": "-54",
+    "bbox": [
+      537.0,
+      752.0,
+      569.0,
+      777.0
+    ],
+    "block_num": 0,
+    "line_num": 204,
+    "span_num": 0
+  },
+  {
+    "text": "-4",
+    "bbox": [
+      611.0,
+      752.0,
+      640.0,
+      778.0
+    ],
+    "block_num": 0,
+    "line_num": 205,
+    "span_num": 0
+  },
+  {
+    "text": "1",
+    "bbox": [
+      687.0,
+      753.0,
+      709.0,
+      777.0
+    ],
+    "block_num": 0,
+    "line_num": 206,
+    "span_num": 0
+  },
+  {
+    "text": "STG",
+    "bbox": [
+      5.0,
+      773.0,
+      38.0,
+      798.0
+    ],
+    "block_num": 0,
+    "line_num": 207,
+    "span_num": 0
+  },
+  {
+    "text": "L",
+    "bbox": [
+      163.0,
+      773.0,
+      184.0,
+      798.0
+    ],
+    "block_num": 0,
+    "line_num": 208,
+    "span_num": 0
+  },
+  {
+    "text": "7.996",
+    "bbox": [
+      457.0,
+      773.0,
+      494.0,
+      798.0
+    ],
+    "block_num": 0,
+    "line_num": 209,
+    "span_num": 0
+  },
+  {
+    "text": "-60",
+    "bbox": [
+      537.0,
+      773.0,
+      569.0,
+      799.0
+    ],
+    "block_num": 0,
+    "line_num": 210,
+    "span_num": 0
+  },
+  {
+    "text": "-10",
+    "bbox": [
+      609.0,
+      773.0,
+      642.0,
+      799.0
+    ],
+    "block_num": 0,
+    "line_num": 211,
+    "span_num": 0
+  },
+  {
+    "text": "5",
+    "bbox": [
+      687.0,
+      773.0,
+      709.0,
+      798.0
+    ],
+    "block_num": 0,
+    "line_num": 212,
+    "span_num": 0
+  },
+  {
+    "text": "Rolandic operculum",
+    "bbox": [
+      7.0,
+      797.0,
+      102.0,
+      818.0
+    ],
+    "block_num": 0,
+    "line_num": 213,
+    "span_num": 0
+  },
+  {
+    "text": "R",
+    "bbox": [
+      163.0,
+      796.0,
+      185.0,
+      820.0
+    ],
+    "block_num": 0,
+    "line_num": 214,
+    "span_num": 0
+  },
+  {
+    "text": "<0.001",
+    "bbox": [
+      264.0,
+      796.0,
+      305.0,
+      819.0
+    ],
+    "block_num": 0,
+    "line_num": 215,
+    "span_num": 0
+  },
+  {
+    "text": "4,995",
+    "bbox": [
+      362.0,
+      795.0,
+      402.0,
+      821.0
+    ],
+    "block_num": 0,
+    "line_num": 216,
+    "span_num": 0
+  },
+  {
+    "text": "7.309",
+    "bbox": [
+      455.0,
+      795.0,
+      495.0,
+      821.0
+    ],
+    "block_num": 0,
+    "line_num": 217,
+    "span_num": 0
+  },
+  {
+    "text": "60",
+    "bbox": [
+      539.0,
+      795.0,
+      567.0,
+      821.0
+    ],
+    "block_num": 0,
+    "line_num": 218,
+    "span_num": 0
+  },
+  {
+    "text": "10",
+    "bbox": [
+      611.0,
+      795.0,
+      639.0,
+      821.0
+    ],
+    "block_num": 0,
+    "line_num": 219,
+    "span_num": 0
+  },
+  {
+    "text": "5",
+    "bbox": [
+      686.0,
+      796.0,
+      709.0,
+      820.0
+    ],
+    "block_num": 0,
+    "line_num": 220,
+    "span_num": 0
+  },
+  {
+    "text": "TP",
+    "bbox": [
+      6.0,
+      818.0,
+      31.0,
+      840.0
+    ],
+    "block_num": 0,
+    "line_num": 221,
+    "span_num": 0
+  },
+  {
+    "text": "R",
+    "bbox": [
+      163.0,
+      818.0,
+      185.0,
+      842.0
+    ],
+    "block_num": 0,
+    "line_num": 222,
+    "span_num": 0
+  },
+  {
+    "text": "7.174",
+    "bbox": [
+      455.0,
+      816.0,
+      496.0,
+      842.0
+    ],
+    "block_num": 0,
+    "line_num": 223,
+    "span_num": 0
+  },
+  {
+    "text": "60",
+    "bbox": [
+      539.0,
+      817.0,
+      567.0,
+      843.0
+    ],
+    "block_num": 0,
+    "line_num": 224,
+    "span_num": 0
+  },
+  {
+    "text": "8",
+    "bbox": [
+      612.0,
+      817.0,
+      639.0,
+      843.0
+    ],
+    "block_num": 0,
+    "line_num": 225,
+    "span_num": 0
+  },
+  {
+    "text": "-5",
+    "bbox": [
+      684.0,
+      817.0,
+      712.0,
+      842.0
+    ],
+    "block_num": 0,
+    "line_num": 226,
+    "span_num": 0
+  },
+  {
+    "text": "STG",
+    "bbox": [
+      5.0,
+      839.0,
+      38.0,
+      862.0
+    ],
+    "block_num": 0,
+    "line_num": 227,
+    "span_num": 0
+  },
+  {
+    "text": "R",
+    "bbox": [
+      162.0,
+      838.0,
+      187.0,
+      865.0
+    ],
+    "block_num": 0,
+    "line_num": 228,
+    "span_num": 0
+  },
+  {
+    "text": "7.104",
+    "bbox": [
+      455.0,
+      838.0,
+      496.0,
+      864.0
+    ],
+    "block_num": 0,
+    "line_num": 229,
+    "span_num": 0
+  },
+  {
+    "text": "62",
+    "bbox": [
+      539.0,
+      838.0,
+      567.0,
+      864.0
+    ],
+    "block_num": 0,
+    "line_num": 230,
+    "span_num": 0
+  },
+  {
+    "text": "-24",
+    "bbox": [
+      609.0,
+      839.0,
+      641.0,
+      864.0
+    ],
+    "block_num": 0,
+    "line_num": 231,
+    "span_num": 0
+  },
+  {
+    "text": "5",
+    "bbox": [
+      685.0,
+      838.0,
+      711.0,
+      864.0
+    ],
+    "block_num": 0,
+    "line_num": 232,
+    "span_num": 0
+  },
+  {
+    "text": "Cerebellum 3)",
+    "bbox": [
+      6.0,
+      861.0,
+      82.0,
+      885.0
+    ],
+    "block_num": 0,
+    "line_num": 233,
+    "span_num": 0
+  },
+  {
+    "text": "L",
+    "bbox": [
+      163.0,
+      861.0,
+      185.0,
+      885.0
+    ],
+    "block_num": 0,
+    "line_num": 234,
+    "span_num": 0
+  },
+  {
+    "text": "0.001",
+    "bbox": [
+      266.0,
+      861.0,
+      303.0,
+      885.0
+    ],
+    "block_num": 0,
+    "line_num": 235,
+    "span_num": 0
+  },
+  {
+    "text": "598",
+    "bbox": [
+      367.0,
+      861.0,
+      399.0,
+      885.0
+    ],
+    "block_num": 0,
+    "line_num": 236,
+    "span_num": 0
+  },
+  {
+    "text": "4.598",
+    "bbox": [
+      457.0,
+      861.0,
+      494.0,
+      885.0
+    ],
+    "block_num": 0,
+    "line_num": 237,
+    "span_num": 0
+  },
+  {
+    "text": "-4",
+    "bbox": [
+      539.0,
+      861.0,
+      567.0,
+      886.0
+    ],
+    "block_num": 0,
+    "line_num": 238,
+    "span_num": 0
+  },
+  {
+    "text": "-40",
+    "bbox": [
+      609.0,
+      861.0,
+      642.0,
+      886.0
+    ],
+    "block_num": 0,
+    "line_num": 239,
+    "span_num": 0
+  },
+  {
+    "text": "-15",
+    "bbox": [
+      682.0,
+      861.0,
+      714.0,
+      886.0
+    ],
+    "block_num": 0,
+    "line_num": 240,
+    "span_num": 0
+  },
+  {
+    "text": "Cerebellum (4-5)",
+    "bbox": [
+      7.0,
+      884.0,
+      90.0,
+      905.0
+    ],
+    "block_num": 0,
+    "line_num": 241,
+    "span_num": 0
+  },
+  {
+    "text": "L",
+    "bbox": [
+      163.0,
+      883.0,
+      185.0,
+      907.0
+    ],
+    "block_num": 0,
+    "line_num": 242,
+    "span_num": 0
+  },
+  {
+    "text": "4.193",
+    "bbox": [
+      456.0,
+      881.0,
+      496.0,
+      908.0
+    ],
+    "block_num": 0,
+    "line_num": 243,
+    "span_num": 0
+  },
+  {
+    "text": "-4",
+    "bbox": [
+      538.0,
+      881.0,
+      569.0,
+      910.0
+    ],
+    "block_num": 0,
+    "line_num": 244,
+    "span_num": 0
+  },
+  {
+    "text": "-60",
+    "bbox": [
+      608.0,
+      881.0,
+      643.0,
+      909.0
+    ],
+    "block_num": 0,
+    "line_num": 245,
+    "span_num": 0
+  },
+  {
+    "text": "-13",
+    "bbox": [
+      681.0,
+      881.0,
+      715.0,
+      909.0
+    ],
+    "block_num": 0,
+    "line_num": 246,
+    "span_num": 0
+  },
+  {
+    "text": "Cerebellum (3)",
+    "bbox": [
+      8.0,
+      906.0,
+      80.0,
+      927.0
+    ],
+    "block_num": 0,
+    "line_num": 247,
+    "span_num": 0
+  },
+  {
+    "text": "R",
+    "bbox": [
+      163.0,
+      906.0,
+      185.0,
+      928.0
+    ],
+    "block_num": 0,
+    "line_num": 248,
+    "span_num": 0
+  },
+  {
+    "text": "4.035",
+    "bbox": [
+      457.0,
+      905.0,
+      494.0,
+      928.0
+    ],
+    "block_num": 0,
+    "line_num": 249,
+    "span_num": 0
+  },
+  {
+    "text": "14",
+    "bbox": [
+      540.0,
+      906.0,
+      565.0,
+      928.0
+    ],
+    "block_num": 0,
+    "line_num": 250,
+    "span_num": 0
+  },
+  {
+    "text": "-38",
+    "bbox": [
+      610.0,
+      905.0,
+      642.0,
+      928.0
+    ],
+    "block_num": 0,
+    "line_num": 251,
+    "span_num": 0
+  },
+  {
+    "text": "-23",
+    "bbox": [
+      682.0,
+      905.0,
+      714.0,
+      928.0
+    ],
+    "block_num": 0,
+    "line_num": 252,
+    "span_num": 0
+  }
+]

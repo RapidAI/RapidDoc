@@ -1,0 +1,11 @@
+[package]
+include = ["src/**", "Cargo.toml", "LICENSE*", "README.md", "UPSTREAM*", "LOCAL-PATCHES.md", "PATCHES.json"]
+description = "Pinned DocVortex Rust subset used by RapidDoc."
+repository = "https://github.com/RapidAI/RapidDoc"
+name = "rapiddoc-docvortex-core"
+version = "0.1.0"
+edition = "2021"
+license = "MIT AND Apache-2.0 AND BSD-3-Clause"
+
+[lib]
+name = "docvortex_core"

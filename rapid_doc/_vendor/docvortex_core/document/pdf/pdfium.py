@@ -1,5 +1,4 @@
 import os
-import threading
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from io import BytesIO
@@ -7,9 +6,13 @@ from typing import Any, Iterator, Sequence, TypeVar
 
 from loguru import logger
 
+from rapid_doc.utils.PyPDFium2Parser import lock as _pdfium_lock
+
 from .font_runtime import PdfiumFontError, PdfiumRuntimeInfo, _FontProvider
 
-_pdfium_lock = threading.RLock()
+# Both wrappers call the same pypdfium2 runtime. A separate vendor lock allows
+# simultaneous native calls even when each wrapper is individually protected.
+# Reuse the host's reentrant lock for fonts, reads, renders and handle cleanup.
 _font_provider: _FontProvider | None = None
 
 T = TypeVar("T")

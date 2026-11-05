@@ -1,0 +1,11 @@
+{
+  "repository": "Local DocVortex checkout",
+  "local_source": "D:\\CodeProjects\\doc\\DocVortex\\rust\\docvortex-pdfium",
+  "commit": "b2ef8d025aed2b1041da6ec6e766e9d317f716ce",
+  "scope": "Three unmodified Rust source files, standalone subset manifest and ReadError adapter; no upstream character/font modules included",
+  "files": {
+    "src/objects.rs": "94c7cf2cc762a08ea28ac2ed1b1356caec628eb8023147ca1ce7789eb5526cc3",
+    "src/paths.rs": "aace3fdede816dccf814f7b99756027507b89669add8b6e8b01e42826ad2cc64",
+    "src/path_evidence.rs": "ffac5c07dda63068162506e61bdaed0417aa0d2286703e0914326da47395a0c1"
+  }
+}

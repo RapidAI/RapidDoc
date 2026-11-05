@@ -1,0 +1,28 @@
+[package]
+name = "rapiddoc-python"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+name = "_native"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+pyo3 = { version = "=0.28.2", features = ["abi3-py310"] }
+rapiddoc-core = { path = "../../rust/rapiddoc-core" }
+rapiddoc = { path = "../../rust/rapiddoc" }
+rapiddoc-pdf = { path = "../../rust/rapiddoc-pdf" }
+serde_json.workspace = true
+serde.workspace = true
+rapiddoc-inference = { path = "../../rust/rapiddoc-inference" }
+rapiddoc-render = { path = "../../rust/rapiddoc-render" }
+rapiddoc-office = { path = "../../rust/rapiddoc-office" }
+mimalloc = { version = "=0.1.52", optional = true, default-features = false }
+
+[features]
+default = ["mimalloc-allocator"]
+cuda = ["rapiddoc/cuda"]
+mimalloc-allocator = ["dep:mimalloc"]
+# Source-tree differential checkpoints, intentionally absent in release wheels.
+migration-tools = []

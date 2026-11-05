@@ -324,6 +324,20 @@ class _LineProjectionMatch:
     source_to_projected: tuple[int | None, ...]
 
 
+_StyleMatchKind = Literal["exact", "formula", "dehyphenated", "fragment"]
+
+
+@dataclass(frozen=True, slots=True)
+class _MatchedStyleRange:
+    """保留样式匹配的源行、实际源区间、目标区间和匹配方式，供脚本冲突裁决。"""
+
+    line: PDFTextStyleLine
+    source_range: PDFTextStyleRange
+    start: int
+    end: int
+    kind: _StyleMatchKind
+
+
 __all__ = [
     "TEXT_DECORATION_MIN_LENGTH_HEIGHT_RATIO",
     "STRIKETHROUGH_CENTER_TOLERANCE_HEIGHT_RATIO",
@@ -382,4 +396,6 @@ __all__ = [
     "_MatchedLinkRange",
     "_RawLinkInterval",
     "_LineProjectionMatch",
+    "_StyleMatchKind",
+    "_MatchedStyleRange",
 ]

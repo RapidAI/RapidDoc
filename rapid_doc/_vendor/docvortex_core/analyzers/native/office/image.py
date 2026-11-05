@@ -1,11 +1,13 @@
 """Flash Office 文档的图片识别、转码与占位图生成。"""
 
+from __future__ import annotations
+
 import base64
 import struct
 from functools import lru_cache
 from io import BytesIO
 from pathlib import PurePosixPath
-from typing import Final
+from typing import TYPE_CHECKING, Final
 
 from loguru import logger
 from metafile_render import MetafileError, MetafileResourceLimitError, render_metafile
@@ -13,6 +15,9 @@ from PIL import Image, ImageDraw, ImageFont, UnidentifiedImageError
 
 from ....foundation._svg_raster import is_svg_image_part, looks_like_svg_payload, serialize_svg_image
 from ....foundation.image_encoding import image_to_b64str
+
+if TYPE_CHECKING:
+    from .equation.image import OfficeImageEquationDecoder
 
 VECTOR_IMAGE_FORMATS = frozenset({"WMF", "EMF"})
 VECTOR_IMAGE_EXTENSIONS = frozenset({".wmf", ".emf"})
@@ -165,6 +170,16 @@ def get_standard_vector_placeholder_data_uri() -> str:
     return _standard_vector_placeholder_data_uri()
 
 
+@lru_cache(maxsize=1)
+def get_image_limit_placeholder_data_uri() -> str:
+    """缓存固定尺寸的安全占位图，不读取被拒绝图片的尺寸或原始载荷。"""
+    placeholder = create_text_placeholder(
+        STANDARD_VECTOR_PLACEHOLDER_SIZE,
+        ["Image omitted", "Safety limit exceeded", "See the original document"],
+    )
+    return image_to_b64str(placeholder, image_format="JPEG")
+
+
 def serialize_vector_part_with_placeholder(
     part_name: object | None = None,
     content_type: str | None = None,
@@ -239,8 +254,18 @@ def serialize_office_image(
     part_name: object | None = None,
     content_type: str | None = None,
     render_size_emu: tuple[int, int] | None = None,
+    equation_decoder: OfficeImageEquationDecoder | None = None,
+    limit_reason: str | None = None,
 ) -> str | None:
     """识别并序列化 Office 图片，透明图保留 PNG，普通位图优先使用 JPEG。"""
+    if limit_reason is None and equation_decoder is not None:
+        limit_reason = equation_decoder.probe(
+            image_data,
+            part_name=part_name,
+            content_type=content_type,
+        ).limit_reason
+    if limit_reason is not None:
+        return get_image_limit_placeholder_data_uri()
     is_wmf_payload = _is_wmf_payload(image_data)
     is_emf_payload = _is_emf_payload(image_data)
     if is_wmf_payload:

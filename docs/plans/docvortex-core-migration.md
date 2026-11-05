@@ -1,5 +1,27 @@
 # DocVortex 核心迁移与 Office 升级执行计划
 
+2026-10-28 当前节点：原 PDF 宿主路由已接入 Rust 原生全文，`parse_pdf_models` 支持 `off/rule/rule_plus_s`、`native_only` 和内置原生区域表格恢复，贯通模型回退、OCR、公式、段落、跨页表格、Markdown、content_list 和图片资产。已完成 release 构建安装（8 分 51 秒）；本阶段安装对照、输出位置和限制统一见[宿主接入验收](2026-10-28-native-pdf-host-integration.md)。跨页 OCR 批次、BGR 渲染和边界坐标类型均按原 Python 保留，未改冻结参考或降低算法精度。`docvortex_mode` 默认仍为 `off`，原生模式显式传 `rule`；增强阅读顺序、CUDA 与同条件性能测量后置，不能据局部样本宣称全部 PDF 等价或普遍更快/更省内存。下方“宿主/Markdown 待接”为历史检查点。
+
+2026-10-28 当前节点：PDF 文件级采集和完整 PdfModel 入口已实现，已统一 release 构建（8 分 41 秒）安装并通过验收：4 文件/20 页、两个示例完整 23 页/13 表格，以及受影响回归均通过。`analyze_native_pdf` 直接接收 PDF，串联可见字符、Form/签名、图像/噪声、全文、行内、表格媒体和末尾文字清洗；不调用 Python 解析器。实际财报发现的整页分数字符/候选成员/全文累计预算按调用层级修复，保留原算法及旧诊断限制。下一阶段为 RapidDoc 默认模型路由与适配器、Markdown 整体验收和性能测量；不是重新实现已经完成的全文阶段。见[文件级对应和证据](2026-10-28-native-pdf-file-integration.md)。以下为历史记录。
+
+2026-10-28 最新节点：全文 spacing、链接/样式/上下标、诊断和表格媒体接线已构建安装通过。915 空格规则、1,645 行内编排、35 原始页源链、6 媒体链/3 解码 PNG 与 3 页实时 PDFium 通过；`finalize_native_document` 可从已采集原始页源/几何输出最终逐页块。剩余文件级证据采集/默认 PDF 路由与用户整篇质量、耗时和峰值内存验收。见[完整接续](2026-10-28-document-inline-integration.md)。下方“全文行内/媒体待接”为历史检查点；无全量/CUDA或整篇/性能提升声明。
+
+2026-10-28 最新安装节点：完整最终页 release/安装通过，211 页级用例、35 原始页源链、1,458 视觉/排序合同及 3 页实时 PDFium 完整输出。`finalize_output=True` 可返回完整排序、归一化的 `model_list`；源码另通过 298 XYCut 和 7 项相关测试。见[完整最终页](2026-10-28-final-page-output.md)。剩余为外层 spacing/行内证据及媒体接线、默认 PDF 和整篇验收；下方进行中记录已由本条覆盖。无全量/CUDA及全文/性能提升声明。
+
+2026-10-28：完整最终页（图注带/图例、视觉区域绑定、全部分组排序、tight 与归一化）已接通，211 页/35 原始页源链源码通过；统一安装验收进行中。新增 `finalize_output=True` 返回 `model_list`。精确剩余为外层全文行内收尾、默认 PDF 文件入口及整篇质量/耗时/内存验收。见[完整对应表](2026-10-28-final-page-output.md)和主链最新记录；以下为历史检查点。
+
+2026-10-28 最终输出内核安装验收：release 构建 7 分 46 秒，已安装至 build/rust-wheel-env。1,248 输出/紧框/行框与文献/窄图形栏序守护对照通过，严格类型和输入所有权保留；118 模块来源 hash 与默认门禁通过。日志 build/native-final-output-wheel-build.txt、build/native-final-output-install.txt、build/native-final-output-compatibility-install.txt。成员/图注/列表新入口再次回归状态见 build/native-final-output-page-blocks-install.txt。仍未在最终页提前接入输出内核，下一步为完整视觉注释与分组排序/行内证据，然后默认 PDF 和整篇质量/耗时/内存验收。无全量或 CUDA，无全文精度/性能提升声明。
+
+2026-10-28 最新：完整文字块之后的成员/标题/图注/环绕正文/来源附注和局部列表已连续完成，新增 `refine_blocks=True` 保留原检查点并返回收尾文字块。211 连续页、35 原始页源整链及全部对应规则通过；安装见[主链记录](2026-10-27-form-runtime-integration.md)。剩余从 `absolute_blocks` 开始的视觉注释/tight、排序/归一化/行内、默认 PDF 与整篇验收。无全量/CUDA或提升声明。下方为历史记录。
+
+2026-10-28 最新：最终行处理及完整 `_build_text_blocks` 已完成，204 连续页、35 原始页源整链和全部段界/脚注/块补合并对照通过。下一句为 `merge_overlapping_member_blocks`，随后图注/成员/局部列表、注释/排序/归一化/行内、默认 PDF 和整篇验收。安装状态见[主链记录](2026-10-27-form-runtime-integration.md)，[职责对应表](2026-10-28-text-block-integration.md)。无全量/CUDA，无全文精度/性能提升声明。下方为历史记录。
+
+2026-10-28 最新安装：最终公式节点已构建安装，243 页面前缀、6 定向正例、35 原始页源整链、两页实时 PDFium 和相关旧入口/兼容性套件通过。下一步继续最终标题/文字/行内/文献块装配排序，再完成默认 PDF 和整篇验收。无全量/CUDA及提升声明，详见[主链记录](2026-10-27-form-runtime-integration.md)。下方为历史记录。
+
+2026-10-28 Rust 后续：最终页面公式接线也已连续完成，覆盖语义/目录、canonical 重放及库存仲裁、墨迹和原样式恢复，1037 原语句、6 正例、35 原始页源整链通过。下一步从 `title_container_bboxes` 继续标题/文字/行内/文献块装配排序，再接默认 PDF 与整篇验收；上述公式接线不再待办。安装状态见[主链记录](2026-10-27-form-runtime-integration.md)。下方为历史记录。
+
+2026-10-28 Rust 最新：完整公式识别/替换仲裁及密集视觉行→同基线→公式输入链已迁移，787 前缀、1059 恢复/分量、1023 输入序列和受影响旧合并/完整页验证通过。公式内核不再待办；下一步接最终页面预语义/目录、canonical 重放、未映射墨迹和样式恢复，再完成文字/行内/文献块装配排序、默认 PDF 与整篇验收。两页实际 PDFium 正例及统一安装状态见[主链记录](2026-10-27-form-runtime-integration.md)。不改旧算法，无全量/CUDA，无效果或性能提升声明。下方保留原规划。
+
 **目标：** 将 RapidDoc 已使用的 DocVortex PDF 规则版面、表格能力迁入项目；升级 docx/xlsx/pptx，增加 doc/xls/ppt 原生解析；移除 fasttext-predict 系列必装依赖；由 RapidDoc 的 CPU/GPU extras 决定安装哪一种 ONNX Runtime。
 
 **架构：** 将必要的上游代码放入私有目录 `rapid_doc/_vendor/docvortex_core/`，保留内部模块结构，通过薄适配层接入现有 pipeline 和 Office middle_json。保持 RapidDoc 的公开输出契约，按能力分批切换；不移植整个 DocVortex 应用、OCR 或导出系统。

@@ -1,0 +1,7 @@
+Aileron: No Rights Reserved.
+Author: Sora Sagano / dot colon.
+https://dotcolon.net/fonts/aileron/
+
+The included default subset is extracted unchanged from Pillow 12.2.0 ImageFont.load_default.
+Its embedded copyright records state: No Rights Reserved.
+Pillow adaptation is covered by PILLOW.txt.

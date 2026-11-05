@@ -1,0 +1,9 @@
+{
+  "repository": "Local DocVortex checkout",
+  "commit": "b2ef8d025aed2b1041da6ec6e766e9d317f716ce",
+  "local_source": "D:/CodeProjects/doc/DocVortex/rust/docvortex-core/src/scripts.rs",
+  "scope": "One unchanged scripts.rs source including CPython integer-set tie order; wrapper imports median/quantile from original fixed core",
+  "files": {
+    "kernel.rs": "79c0925ccbe226bc52da9971572d05dad5837a6d29a0362eebdf1549bbcf873c"
+  }
+}

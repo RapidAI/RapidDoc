@@ -17,9 +17,16 @@ def use_docvortex_table_rules(table_config: dict | None) -> bool:
     config = table_config or {}
     return (
         config.get("use_rule_table", True)
-        and config.get("rule_table_engine", "docvortex") == "docvortex"
+        and config.get("rule_table_engine", "docvortex") in {"docvortex", "docvortex_ocr"}
         and not config.get("force_ocr", False)
     )
+
+
+def use_docvortex_ocr_table_rules(table_config: dict | None) -> bool:
+    """Explicit raster rules remain available when force_ocr disables native text."""
+    config = table_config or {}
+    return bool(config.get("use_rule_table", True)
+                and config.get("rule_table_engine", "docvortex") == "docvortex_ocr")
 
 
 def get_docvortex_mode(layout_config: dict | None) -> str:

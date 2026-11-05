@@ -1,0 +1,467 @@
+{
+  "cases": [
+    {
+      "config": {},
+      "expected": "synthetic_doc.json",
+      "format": "doc",
+      "generator_sha256": {
+        "scripts/migration/generate_corpus.py": "db453e2e870da95e4d6387a59e2df9740c7f9dd551d7b37cf097670f0abe9009",
+        "scripts/migration/pdf_corpus.py": "4f3d54f68a1c8c6e226706bab8202c16546d57175b72c2bac10e5f4c31e7ef05",
+        "tests/native_office/_legacy_doc_test_utils.py": "33e51e0554ed0f91d97de6ad44069027bb106efa28f200edf94573fa7b8eefbf",
+        "tests/native_office/_legacy_ppt_test_utils.py": "b6795a3d83f52ceea4f93ec259d5f05f245cb7174366bdd4222ec61f040065da",
+        "tests/native_office/_legacy_xls_test_utils.py": "f39448bbbf2a8e20d984b7adca2f83abcb678c4c96d90f05129dbb547e857247",
+        "tests/native_office/_mtef_test_utils.py": "d8be55ef9588efa345b868abd1fbb37180ddd38351c2653ca84091f49e16046e",
+        "tests/native_office/_span_test_utils.py": "ed8d65291d394214ba27ed363249656780b0c276d6f8dfc6d3854166bfb47a35"
+      },
+      "id": "synthetic_doc",
+      "input": "tests/migration/inputs/synthetic.doc",
+      "license": "Repository-generated fixture; no external document content",
+      "model_manifest": [],
+      "sha256": "8220ef40d11940cd0c5a52a5cbdd10ea9d14ec8525d2ac5ed989f0f5a5906576",
+      "source": "scripts/migration/generate_corpus.py",
+      "tags": [
+        "synthetic",
+        "smoke",
+        "native-office"
+      ]
+    },
+    {
+      "config": {},
+      "expected": "synthetic_docx.json",
+      "format": "docx",
+      "generator_sha256": {
+        "scripts/migration/generate_corpus.py": "db453e2e870da95e4d6387a59e2df9740c7f9dd551d7b37cf097670f0abe9009",
+        "scripts/migration/pdf_corpus.py": "4f3d54f68a1c8c6e226706bab8202c16546d57175b72c2bac10e5f4c31e7ef05",
+        "tests/native_office/_legacy_doc_test_utils.py": "33e51e0554ed0f91d97de6ad44069027bb106efa28f200edf94573fa7b8eefbf",
+        "tests/native_office/_legacy_ppt_test_utils.py": "b6795a3d83f52ceea4f93ec259d5f05f245cb7174366bdd4222ec61f040065da",
+        "tests/native_office/_legacy_xls_test_utils.py": "f39448bbbf2a8e20d984b7adca2f83abcb678c4c96d90f05129dbb547e857247",
+        "tests/native_office/_mtef_test_utils.py": "d8be55ef9588efa345b868abd1fbb37180ddd38351c2653ca84091f49e16046e",
+        "tests/native_office/_span_test_utils.py": "ed8d65291d394214ba27ed363249656780b0c276d6f8dfc6d3854166bfb47a35"
+      },
+      "id": "synthetic_docx",
+      "input": "tests/migration/inputs/synthetic.docx",
+      "license": "Repository-generated fixture; no external document content",
+      "model_manifest": [],
+      "sha256": "8fa3c5d3f10b2fe30dbe339a098df4e01283f815671da93eab71678623cf36c7",
+      "source": "scripts/migration/generate_corpus.py",
+      "tags": [
+        "synthetic",
+        "smoke",
+        "native-office"
+      ]
+    },
+    {
+      "config": {},
+      "expected": "synthetic_ppt.json",
+      "format": "ppt",
+      "generator_sha256": {
+        "scripts/migration/generate_corpus.py": "db453e2e870da95e4d6387a59e2df9740c7f9dd551d7b37cf097670f0abe9009",
+        "scripts/migration/pdf_corpus.py": "4f3d54f68a1c8c6e226706bab8202c16546d57175b72c2bac10e5f4c31e7ef05",
+        "tests/native_office/_legacy_doc_test_utils.py": "33e51e0554ed0f91d97de6ad44069027bb106efa28f200edf94573fa7b8eefbf",
+        "tests/native_office/_legacy_ppt_test_utils.py": "b6795a3d83f52ceea4f93ec259d5f05f245cb7174366bdd4222ec61f040065da",
+        "tests/native_office/_legacy_xls_test_utils.py": "f39448bbbf2a8e20d984b7adca2f83abcb678c4c96d90f05129dbb547e857247",
+        "tests/native_office/_mtef_test_utils.py": "d8be55ef9588efa345b868abd1fbb37180ddd38351c2653ca84091f49e16046e",
+        "tests/native_office/_span_test_utils.py": "ed8d65291d394214ba27ed363249656780b0c276d6f8dfc6d3854166bfb47a35"
+      },
+      "id": "synthetic_ppt",
+      "input": "tests/migration/inputs/synthetic.ppt",
+      "license": "Repository-generated fixture; no external document content",
+      "model_manifest": [],
+      "sha256": "a73a3ec85cba14e7b9adac569bb324dca8b6efc061a5ead677cb17c37999f2fe",
+      "source": "scripts/migration/generate_corpus.py",
+      "tags": [
+        "synthetic",
+        "smoke",
+        "native-office"
+      ]
+    },
+    {
+      "config": {},
+      "expected": "synthetic_pptx.json",
+      "format": "pptx",
+      "generator_sha256": {
+        "scripts/migration/generate_corpus.py": "db453e2e870da95e4d6387a59e2df9740c7f9dd551d7b37cf097670f0abe9009",
+        "scripts/migration/pdf_corpus.py": "4f3d54f68a1c8c6e226706bab8202c16546d57175b72c2bac10e5f4c31e7ef05",
+        "tests/native_office/_legacy_doc_test_utils.py": "33e51e0554ed0f91d97de6ad44069027bb106efa28f200edf94573fa7b8eefbf",
+        "tests/native_office/_legacy_ppt_test_utils.py": "b6795a3d83f52ceea4f93ec259d5f05f245cb7174366bdd4222ec61f040065da",
+        "tests/native_office/_legacy_xls_test_utils.py": "f39448bbbf2a8e20d984b7adca2f83abcb678c4c96d90f05129dbb547e857247",
+        "tests/native_office/_mtef_test_utils.py": "d8be55ef9588efa345b868abd1fbb37180ddd38351c2653ca84091f49e16046e",
+        "tests/native_office/_span_test_utils.py": "ed8d65291d394214ba27ed363249656780b0c276d6f8dfc6d3854166bfb47a35"
+      },
+      "id": "synthetic_pptx",
+      "input": "tests/migration/inputs/synthetic.pptx",
+      "license": "Repository-generated fixture; no external document content",
+      "model_manifest": [],
+      "sha256": "aba7f3a463dfb04a842744b7a94eb3c95d2c5295c7795fb8fc1fa9183ebcc670",
+      "source": "scripts/migration/generate_corpus.py",
+      "tags": [
+        "synthetic",
+        "smoke",
+        "native-office"
+      ]
+    },
+    {
+      "config": {},
+      "expected": "synthetic_xls.json",
+      "format": "xls",
+      "generator_sha256": {
+        "scripts/migration/generate_corpus.py": "db453e2e870da95e4d6387a59e2df9740c7f9dd551d7b37cf097670f0abe9009",
+        "scripts/migration/pdf_corpus.py": "4f3d54f68a1c8c6e226706bab8202c16546d57175b72c2bac10e5f4c31e7ef05",
+        "tests/native_office/_legacy_doc_test_utils.py": "33e51e0554ed0f91d97de6ad44069027bb106efa28f200edf94573fa7b8eefbf",
+        "tests/native_office/_legacy_ppt_test_utils.py": "b6795a3d83f52ceea4f93ec259d5f05f245cb7174366bdd4222ec61f040065da",
+        "tests/native_office/_legacy_xls_test_utils.py": "f39448bbbf2a8e20d984b7adca2f83abcb678c4c96d90f05129dbb547e857247",
+        "tests/native_office/_mtef_test_utils.py": "d8be55ef9588efa345b868abd1fbb37180ddd38351c2653ca84091f49e16046e",
+        "tests/native_office/_span_test_utils.py": "ed8d65291d394214ba27ed363249656780b0c276d6f8dfc6d3854166bfb47a35"
+      },
+      "id": "synthetic_xls",
+      "input": "tests/migration/inputs/synthetic.xls",
+      "license": "Repository-generated fixture; no external document content",
+      "model_manifest": [],
+      "sha256": "4c307b2a72ab8ee3b6608a63f6c95c0a0ba4a543d6ed69158fa85809b066f347",
+      "source": "scripts/migration/generate_corpus.py",
+      "tags": [
+        "synthetic",
+        "smoke",
+        "native-office"
+      ]
+    },
+    {
+      "config": {},
+      "expected": "synthetic_xlsx.json",
+      "format": "xlsx",
+      "generator_sha256": {
+        "scripts/migration/generate_corpus.py": "db453e2e870da95e4d6387a59e2df9740c7f9dd551d7b37cf097670f0abe9009",
+        "scripts/migration/pdf_corpus.py": "4f3d54f68a1c8c6e226706bab8202c16546d57175b72c2bac10e5f4c31e7ef05",
+        "tests/native_office/_legacy_doc_test_utils.py": "33e51e0554ed0f91d97de6ad44069027bb106efa28f200edf94573fa7b8eefbf",
+        "tests/native_office/_legacy_ppt_test_utils.py": "b6795a3d83f52ceea4f93ec259d5f05f245cb7174366bdd4222ec61f040065da",
+        "tests/native_office/_legacy_xls_test_utils.py": "f39448bbbf2a8e20d984b7adca2f83abcb678c4c96d90f05129dbb547e857247",
+        "tests/native_office/_mtef_test_utils.py": "d8be55ef9588efa345b868abd1fbb37180ddd38351c2653ca84091f49e16046e",
+        "tests/native_office/_span_test_utils.py": "ed8d65291d394214ba27ed363249656780b0c276d6f8dfc6d3854166bfb47a35"
+      },
+      "id": "synthetic_xlsx",
+      "input": "tests/migration/inputs/synthetic.xlsx",
+      "license": "Repository-generated fixture; no external document content",
+      "model_manifest": [],
+      "sha256": "698a1af94f60a20629d29ce1201134f15788025b6ea1395ea0ba60d04d5872eb",
+      "source": "scripts/migration/generate_corpus.py",
+      "tags": [
+        "synthetic",
+        "smoke",
+        "native-office"
+      ]
+    },
+    {
+      "capture": "pdf-facts",
+      "config": {},
+      "expected": "pdf_native.json",
+      "format": "pdf",
+      "generator_sha256": {
+        "scripts/migration/generate_corpus.py": "db453e2e870da95e4d6387a59e2df9740c7f9dd551d7b37cf097670f0abe9009",
+        "scripts/migration/pdf_corpus.py": "4f3d54f68a1c8c6e226706bab8202c16546d57175b72c2bac10e5f4c31e7ef05",
+        "tests/native_office/_legacy_doc_test_utils.py": "33e51e0554ed0f91d97de6ad44069027bb106efa28f200edf94573fa7b8eefbf",
+        "tests/native_office/_legacy_ppt_test_utils.py": "b6795a3d83f52ceea4f93ec259d5f05f245cb7174366bdd4222ec61f040065da",
+        "tests/native_office/_legacy_xls_test_utils.py": "f39448bbbf2a8e20d984b7adca2f83abcb678c4c96d90f05129dbb547e857247",
+        "tests/native_office/_mtef_test_utils.py": "d8be55ef9588efa345b868abd1fbb37180ddd38351c2653ca84091f49e16046e",
+        "tests/native_office/_span_test_utils.py": "ed8d65291d394214ba27ed363249656780b0c276d6f8dfc6d3854166bfb47a35"
+      },
+      "id": "pdf_native",
+      "input": "tests/migration/inputs/pdf_native.pdf",
+      "license": "Repository-generated fixture; no external document content",
+      "model_manifest": [],
+      "sha256": "9f7d444ba404577400a6cf636cd37c09b4a1a77ad8640d9638e4a8f5ba3eed0d",
+      "source": "scripts/migration/pdf_corpus.py",
+      "tags": [
+        "synthetic",
+        "native",
+        "pdf-facts"
+      ]
+    },
+    {
+      "capture": "pdf-facts",
+      "config": {},
+      "expected": "pdf_scan.json",
+      "format": "pdf",
+      "generator_sha256": {
+        "scripts/migration/generate_corpus.py": "db453e2e870da95e4d6387a59e2df9740c7f9dd551d7b37cf097670f0abe9009",
+        "scripts/migration/pdf_corpus.py": "4f3d54f68a1c8c6e226706bab8202c16546d57175b72c2bac10e5f4c31e7ef05",
+        "tests/native_office/_legacy_doc_test_utils.py": "33e51e0554ed0f91d97de6ad44069027bb106efa28f200edf94573fa7b8eefbf",
+        "tests/native_office/_legacy_ppt_test_utils.py": "b6795a3d83f52ceea4f93ec259d5f05f245cb7174366bdd4222ec61f040065da",
+        "tests/native_office/_legacy_xls_test_utils.py": "f39448bbbf2a8e20d984b7adca2f83abcb678c4c96d90f05129dbb547e857247",
+        "tests/native_office/_mtef_test_utils.py": "d8be55ef9588efa345b868abd1fbb37180ddd38351c2653ca84091f49e16046e",
+        "tests/native_office/_span_test_utils.py": "ed8d65291d394214ba27ed363249656780b0c276d6f8dfc6d3854166bfb47a35"
+      },
+      "id": "pdf_scan",
+      "input": "tests/migration/inputs/pdf_scan.pdf",
+      "license": "Repository-generated fixture; no external document content",
+      "model_manifest": [],
+      "sha256": "6640a8380c193cd381b6412f5abff5f956fa5a462f061d26bb9c472a8d194801",
+      "source": "scripts/migration/pdf_corpus.py",
+      "tags": [
+        "synthetic",
+        "scan",
+        "pdf-facts"
+      ]
+    },
+    {
+      "capture": "pdf-facts",
+      "config": {},
+      "expected": "pdf_mixed.json",
+      "format": "pdf",
+      "generator_sha256": {
+        "scripts/migration/generate_corpus.py": "db453e2e870da95e4d6387a59e2df9740c7f9dd551d7b37cf097670f0abe9009",
+        "scripts/migration/pdf_corpus.py": "4f3d54f68a1c8c6e226706bab8202c16546d57175b72c2bac10e5f4c31e7ef05",
+        "tests/native_office/_legacy_doc_test_utils.py": "33e51e0554ed0f91d97de6ad44069027bb106efa28f200edf94573fa7b8eefbf",
+        "tests/native_office/_legacy_ppt_test_utils.py": "b6795a3d83f52ceea4f93ec259d5f05f245cb7174366bdd4222ec61f040065da",
+        "tests/native_office/_legacy_xls_test_utils.py": "f39448bbbf2a8e20d984b7adca2f83abcb678c4c96d90f05129dbb547e857247",
+        "tests/native_office/_mtef_test_utils.py": "d8be55ef9588efa345b868abd1fbb37180ddd38351c2653ca84091f49e16046e",
+        "tests/native_office/_span_test_utils.py": "ed8d65291d394214ba27ed363249656780b0c276d6f8dfc6d3854166bfb47a35"
+      },
+      "id": "pdf_mixed",
+      "input": "tests/migration/inputs/pdf_mixed.pdf",
+      "license": "Repository-generated fixture; no external document content",
+      "model_manifest": [],
+      "sha256": "d6702246fb1a051106d0a28463e541240a395865749e92aefe02de493b254cd7",
+      "source": "scripts/migration/pdf_corpus.py",
+      "tags": [
+        "synthetic",
+        "mixed",
+        "pdf-facts"
+      ]
+    },
+    {
+      "config": {},
+      "expected": "restored_handmade_altpath_docx.json",
+      "format": "docx",
+      "id": "restored_handmade_altpath_docx",
+      "input": "tests/fixtures/docx/handmade-altpath.docx",
+      "license": "See tests/fixtures/DOCVORTEX-LICENSE.md and provenance.json",
+      "model_manifest": [],
+      "sha256": "fb77751c25853f876f9cda0b819819f690c4baadf080c1170ad06ffc98e52545",
+      "source": "tests/fixtures/docx/handmade-altpath.docx",
+      "source_commit": "2c1ec66ee52bb37135599af92aa175bd77fc04d7",
+      "tags": [
+        "restored",
+        "native-office"
+      ]
+    },
+    {
+      "config": {},
+      "expected": "restored_handmade_strict_docx.json",
+      "format": "docx",
+      "id": "restored_handmade_strict_docx",
+      "input": "tests/fixtures/docx/handmade-strict.docx",
+      "license": "See tests/fixtures/DOCVORTEX-LICENSE.md and provenance.json",
+      "model_manifest": [],
+      "sha256": "f65da59839848f8bbe0b72ddc03f8765bf06662994ae980f22095eb85cb0096a",
+      "source": "tests/fixtures/docx/handmade-strict.docx",
+      "source_commit": "2c1ec66ee52bb37135599af92aa175bd77fc04d7",
+      "tags": [
+        "restored",
+        "native-office"
+      ]
+    },
+    {
+      "config": {},
+      "expected": "restored_handmade_altpath_pptx.json",
+      "format": "pptx",
+      "id": "restored_handmade_altpath_pptx",
+      "input": "tests/fixtures/pptx/handmade-altpath.pptx",
+      "license": "See tests/fixtures/DOCVORTEX-LICENSE.md and provenance.json",
+      "model_manifest": [],
+      "sha256": "1f364b417eb31799d7fdfabe00af8e15a689a535fb2ec40dd1aadd38654bbfdf",
+      "source": "tests/fixtures/pptx/handmade-altpath.pptx",
+      "source_commit": "2c1ec66ee52bb37135599af92aa175bd77fc04d7",
+      "tags": [
+        "restored",
+        "native-office"
+      ]
+    },
+    {
+      "config": {},
+      "expected": "restored_handmade_inherit_pptx.json",
+      "format": "pptx",
+      "id": "restored_handmade_inherit_pptx",
+      "input": "tests/fixtures/pptx/handmade-inherit.pptx",
+      "license": "See tests/fixtures/DOCVORTEX-LICENSE.md and provenance.json",
+      "model_manifest": [],
+      "sha256": "4bbab27a28b2532eaa3ad93b86d2667e454f6d40bbf4b178524de3f0a0d0bfe3",
+      "source": "tests/fixtures/pptx/handmade-inherit.pptx",
+      "source_commit": "2c1ec66ee52bb37135599af92aa175bd77fc04d7",
+      "tags": [
+        "restored",
+        "native-office"
+      ]
+    },
+    {
+      "config": {},
+      "expected": "restored_handmade_links_pptx.json",
+      "format": "pptx",
+      "id": "restored_handmade_links_pptx",
+      "input": "tests/fixtures/pptx/handmade-links.pptx",
+      "license": "See tests/fixtures/DOCVORTEX-LICENSE.md and provenance.json",
+      "model_manifest": [],
+      "sha256": "32cc7652099218a1f15190615607697583afb5a76c9fffc2d2dea23b29c66533",
+      "source": "tests/fixtures/pptx/handmade-links.pptx",
+      "source_commit": "2c1ec66ee52bb37135599af92aa175bd77fc04d7",
+      "tags": [
+        "restored",
+        "native-office"
+      ]
+    },
+    {
+      "config": {},
+      "expected": "restored_handmade_math_pptx.json",
+      "format": "pptx",
+      "id": "restored_handmade_math_pptx",
+      "input": "tests/fixtures/pptx/handmade-math.pptx",
+      "license": "See tests/fixtures/DOCVORTEX-LICENSE.md and provenance.json",
+      "model_manifest": [],
+      "sha256": "b95ba383c185208fd171a86f38f0a9ee01e00e5fc72dcdace82c46f844753d4c",
+      "source": "tests/fixtures/pptx/handmade-math.pptx",
+      "source_commit": "2c1ec66ee52bb37135599af92aa175bd77fc04d7",
+      "tags": [
+        "restored",
+        "native-office"
+      ]
+    },
+    {
+      "config": {},
+      "expected": "restored_handmade_order_pptx.json",
+      "format": "pptx",
+      "id": "restored_handmade_order_pptx",
+      "input": "tests/fixtures/pptx/handmade-order.pptx",
+      "license": "See tests/fixtures/DOCVORTEX-LICENSE.md and provenance.json",
+      "model_manifest": [],
+      "sha256": "b05bc15dd2b901373e566e938d988fa387aa27d9f03c0fc5918097fef1652a07",
+      "source": "tests/fixtures/pptx/handmade-order.pptx",
+      "source_commit": "2c1ec66ee52bb37135599af92aa175bd77fc04d7",
+      "tags": [
+        "restored",
+        "native-office"
+      ]
+    },
+    {
+      "config": {},
+      "expected": "restored_handmade_strict_pptx.json",
+      "format": "pptx",
+      "id": "restored_handmade_strict_pptx",
+      "input": "tests/fixtures/pptx/handmade-strict.pptx",
+      "license": "See tests/fixtures/DOCVORTEX-LICENSE.md and provenance.json",
+      "model_manifest": [],
+      "sha256": "8890634f199ede31676cc86ad08db97240fe31eefa3fcf49012466aaa8c53d4b",
+      "source": "tests/fixtures/pptx/handmade-strict.pptx",
+      "source_commit": "2c1ec66ee52bb37135599af92aa175bd77fc04d7",
+      "tags": [
+        "restored",
+        "native-office"
+      ]
+    },
+    {
+      "config": {},
+      "expected": "restored_docx_01_doc.json",
+      "format": "doc",
+      "id": "restored_docx_01_doc",
+      "input": "tests/fixtures/docvortex_migration/docx_01.doc",
+      "license": "See tests/fixtures/DOCVORTEX-LICENSE.md and provenance.json",
+      "model_manifest": [],
+      "sha256": "6aae60b01f0e020c59d2299f217dbd5904df08182a31384db40953937f322fd1",
+      "source": "demo/ms_office_docs/docx_01.doc",
+      "source_commit": "2c1ec66ee52bb37135599af92aa175bd77fc04d7",
+      "tags": [
+        "restored",
+        "native-office"
+      ]
+    },
+    {
+      "config": {},
+      "expected": "restored_docx_01_docx.json",
+      "format": "docx",
+      "id": "restored_docx_01_docx",
+      "input": "tests/fixtures/docvortex_migration/docx_01.docx",
+      "license": "See tests/fixtures/DOCVORTEX-LICENSE.md and provenance.json",
+      "model_manifest": [],
+      "sha256": "86393df4b91412b946c7331e27e762440889b916a0d2ec9331700913f06a7a1b",
+      "source": "demo/ms_office_docs/docx_01.docx",
+      "source_commit": "2c1ec66ee52bb37135599af92aa175bd77fc04d7",
+      "tags": [
+        "restored",
+        "native-office"
+      ]
+    },
+    {
+      "config": {},
+      "expected": "restored_pptx_01_ppt.json",
+      "format": "ppt",
+      "id": "restored_pptx_01_ppt",
+      "input": "tests/fixtures/docvortex_migration/pptx_01.ppt",
+      "license": "See tests/fixtures/DOCVORTEX-LICENSE.md and provenance.json",
+      "model_manifest": [],
+      "sha256": "2215ba7ee3d845ad745714a6b35ca8d652ec0c2f373e15f56dd520570b0eab6a",
+      "source": "demo/ms_office_docs/pptx_01.ppt",
+      "source_commit": "2c1ec66ee52bb37135599af92aa175bd77fc04d7",
+      "tags": [
+        "restored",
+        "native-office"
+      ]
+    },
+    {
+      "config": {},
+      "expected": "restored_pptx_01_pptx.json",
+      "format": "pptx",
+      "id": "restored_pptx_01_pptx",
+      "input": "tests/fixtures/docvortex_migration/pptx_01.pptx",
+      "license": "See tests/fixtures/DOCVORTEX-LICENSE.md and provenance.json",
+      "model_manifest": [],
+      "sha256": "77eec640e70e927d0d5dda6b69dc4317596cb01c220a58b83d9933a58ff0ecc2",
+      "source": "demo/ms_office_docs/pptx_01.pptx",
+      "source_commit": "2c1ec66ee52bb37135599af92aa175bd77fc04d7",
+      "tags": [
+        "restored",
+        "native-office"
+      ]
+    },
+    {
+      "config": {},
+      "expected": "restored_xlsx_01_xls.json",
+      "format": "xls",
+      "id": "restored_xlsx_01_xls",
+      "input": "tests/fixtures/docvortex_migration/xlsx_01.xls",
+      "license": "See tests/fixtures/DOCVORTEX-LICENSE.md and provenance.json",
+      "model_manifest": [],
+      "sha256": "733225d6eb2659b1503abccc3cf46483dbe15b028cb2b0898cb57ec81c4d3cc0",
+      "source": "demo/ms_office_docs/xlsx_01.xls",
+      "source_commit": "2c1ec66ee52bb37135599af92aa175bd77fc04d7",
+      "tags": [
+        "restored",
+        "native-office"
+      ]
+    },
+    {
+      "config": {},
+      "expected": "restored_xlsx_01_xlsx.json",
+      "format": "xlsx",
+      "id": "restored_xlsx_01_xlsx",
+      "input": "tests/fixtures/docvortex_migration/xlsx_01.xlsx",
+      "license": "See tests/fixtures/DOCVORTEX-LICENSE.md and provenance.json",
+      "model_manifest": [],
+      "sha256": "fe3e77a6c16bca8eeccb970e7d788cb7f3a3e4f3ac9c793589892ac190e6b874",
+      "source": "demo/ms_office_docs/xlsx_01.xlsx",
+      "source_commit": "2c1ec66ee52bb37135599af92aa175bd77fc04d7",
+      "tags": [
+        "restored",
+        "native-office"
+      ]
+    }
+  ],
+  "generator_packages": {
+    "numpy": "2.4.6",
+    "onnxruntime": "1.26.0",
+    "onnxruntime-gpu": null,
+    "openpyxl": "3.1.5",
+    "pypdfium2": "5.10.1",
+    "python-docx": "1.2.0",
+    "python-pptx": null,
+    "reportlab": "4.5.1"
+  },
+  "schema_version": 1
+}

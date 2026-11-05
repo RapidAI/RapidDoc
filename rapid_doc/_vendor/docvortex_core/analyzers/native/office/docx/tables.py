@@ -3,6 +3,8 @@
 import base64
 import re
 from contextlib import ExitStack
+from functools import partial
+from html import escape
 from io import BytesIO
 from typing import Any, Optional
 from docx import Document
@@ -22,15 +24,16 @@ from .....content.links import OFFICE_EXTERNAL_HYPERLINK_SCHEMES, sanitize_hyper
 
 from .context import _DocxConstants
 from ..image import is_valid_vector_image_payload, is_vector_image_part, serialize_office_image
+from ..equation.image import OfficeImageEquationDecoder
 
 
-@mammoth_images.img_element
-def _convert_mammoth_table_image(image: Any) -> dict[str, str]:
+def _convert_mammoth_table_image(image: Any, *, equation_decoder: OfficeImageEquationDecoder) -> dict[str, str]:
     """把表格内 WMF/EMF 转为可导出的图片，普通位图保持原始载荷。"""
     with image.open() as stream:
         payload = stream.read()
-    if is_vector_image_part(content_type=image.content_type) or is_valid_vector_image_payload(payload):
-        source = serialize_office_image(payload, content_type=image.content_type)
+    probe = equation_decoder.probe(payload, part_name="DOCX table image", content_type=image.content_type)
+    if probe.limit_reason or is_vector_image_part(content_type=image.content_type) or is_valid_vector_image_payload(payload):
+        source = serialize_office_image(payload, content_type=image.content_type, equation_decoder=equation_decoder)
     else:
         source = f"data:{image.content_type};base64,{base64.b64encode(payload).decode('ascii')}"
     return {"src": source}
@@ -38,6 +41,10 @@ def _convert_mammoth_table_image(image: Any) -> dict[str, str]:
 
 class _DocxTables:
     """集中维护表格，不自行创建文档或持有跨文档缓存。"""
+
+    def _mammoth_image_converter(self):
+        """为预解析和回退绑定同一个文档级探测器，禁止先渲染后检查。"""
+        return mammoth_images.img_element(partial(_convert_mammoth_table_image, equation_decoder=self._image_equation_decoder))
 
     @staticmethod
     def _mammoth_top_level_table_document(document):
@@ -68,23 +75,29 @@ class _DocxTables:
                 未找到可靠 Mammoth 结果，后续走完整文档上下文回退解析
         """
         try:
+            # 仅在当前 convert 的字节对象和文档同时有效时复用；独立调用不能借用上一份文档。
+            docx_obj = (
+                self.docx_obj
+                if self._fallback_docx_bytes is file_bytes and self.docx_obj is not None
+                else Document(BytesIO(file_bytes))
+            )
+            xml_top_tables = [elem for elem in docx_obj.element.body if self._local_name(elem) == "tbl"]
+            if not xml_top_tables:
+                return []
+
             import mammoth as _mammoth
             from bs4 import BeautifulSoup as _BeautifulSoup
 
             result = _mammoth.convert_to_html(
                 BytesIO(file_bytes),
                 transform_document=self._mammoth_top_level_table_document,
-                convert_image=_convert_mammoth_table_image,
+                convert_image=self._mammoth_image_converter(),
             )
             soup = _BeautifulSoup(result.value, "html.parser")
 
             # 仅保留顶层表格，排除嵌套在其他表格单元格内的子表格
             all_tables = soup.find_all("table")
             top_level_tables = [t for t in all_tables if not t.find_parent("table")]
-
-            # 同步加载 DOCX XML，获取所有顶层表格元素，用于公式注入
-            docx_obj = Document(BytesIO(file_bytes))
-            xml_top_tables = [elem for elem in docx_obj.element.body if self._local_name(elem) == "tbl"]
 
             logger.debug(f"Pre-parsed {len(top_level_tables)} top-level tables via filtered mammoth conversion")
 
@@ -116,13 +129,17 @@ class _DocxTables:
         aligned_tables = []
         html_index = 0
         matched_count = 0
+        html_signatures = {}
 
         for xml_table in xml_tables:
+            xml_signature = self._xml_table_signature(xml_table)
             matched_html_table = None
             scan_index = html_index
             while scan_index < len(html_tables):
                 candidate = html_tables[scan_index]
-                if self._mammoth_table_matches_xml_table(candidate, xml_table):
+                if scan_index not in html_signatures:
+                    html_signatures[scan_index] = self._html_table_signature(candidate)
+                if self._table_signatures_match(xml_signature, html_signatures[scan_index]):
                     matched_html_table = candidate
                     html_index = scan_index + 1
                     matched_count += 1
@@ -154,7 +171,11 @@ class _DocxTables:
         """
         xml_signature = _DocxTables._xml_table_signature(xml_table)
         html_signature = _DocxTables._html_table_signature(html_table)
+        return _DocxTables._table_signatures_match(xml_signature, html_signature)
 
+    @staticmethod
+    def _table_signatures_match(xml_signature: dict, html_signature: dict) -> bool:
+        """比较已提取的表格签名，供一次对齐过程复用未修改候选的统计。"""
         if xml_signature["text"] or html_signature["text"]:
             if not _DocxTables._table_text_matches(xml_signature["text"], html_signature["text"]):
                 return False
@@ -450,7 +471,7 @@ class _DocxTables:
         """
         paragraph = Paragraph(xml_para, source_part.document)
 
-        def render_node(node: Any, target: str | None = None) -> str:
+        def render_node(node: Any, target: str | None = None, style: str | None = None) -> str:
             """在链接边界内复用公式 token 与富文本规则，避免按可见标签猜测 URL。"""
             name = self._local_name(node)
             if name == "hyperlink":
@@ -459,17 +480,37 @@ class _DocxTables:
                 relation = source_part.rels.get(rid) if source_part is not None and rid else None
                 address = str(relation.target_ref) if relation is not None else ""
                 link = f"{address}#{anchor}" if anchor else address
-                return "".join(render_node(child, link or None) for child in node)
+                return "".join(render_node(child, link or None, style) for child in node)
+            if name == "r" and str(node.tag) == f"{{{_DocxConstants._BLIP_NAMESPACES['w']}}}r":
+                style = formatting_to_style_str(self._get_format_from_run(Run(node, paragraph)))
+                return "".join(render_node(child, target, style) for child in node)
             if name in {"p", "sdt", "sdtContent", "smartTag", "customXml"}:
-                return "".join(render_node(child, target) for child in node)
-            style = formatting_to_style_str(self._get_format_from_run(Run(node, paragraph))) if name == "r" else None
+                return "".join(render_node(child, target, style) for child in node)
             parts: list[str] = []
-            for kind, value in self._docx_formula_tokens(node, source_part):
+            tokens = self._docx_formula_tokens(node, source_part)
+            for kind, value in tokens:
                 if kind == "text":
                     markup = build_rich_text_html_from_segments([OfficeRichTextSegment(value, style, target)])
                     parts.append(markup.replace("\n", "<br>"))
                 else:
                     parts.append(self.equation_bookends.format(EQ=value))
+            # 公式单元格重建时也保留普通图片或安全占位图，不重复输出已恢复公式的预览。
+            if not any(kind in _DocxConstants._FORMULA_TOKEN_KINDS for kind, _value in tokens):
+                for image in self.picture_xpath_expr(node):
+                    if self._picture_is_equation_preview(image, source_part):
+                        continue
+                    image_part = self._docx_image_part(image, source_part)
+                    if image_part is None:
+                        continue
+                    source = serialize_office_image(
+                        image_part.blob,
+                        part_name=getattr(image_part, "partname", None),
+                        content_type=getattr(image_part, "content_type", None),
+                        equation_decoder=self._image_equation_decoder,
+                    )
+                    if source is not None:
+                        alt = self._docx_image_alt_text(image)
+                        parts.append(f'<img src="{escape(source, quote=True)}" alt="{escape(alt, quote=True)}">')
             return "".join(parts)
 
         content = render_node(xml_para)
@@ -496,7 +537,7 @@ class _DocxTables:
                 read_part = mammoth_docx._part_with_body_reader(None, package, paths, False)
                 embedded_style_map = read_embedded_style_map(BytesIO(file_bytes))
                 conversion_options = read_options(
-                    {"embedded_style_map": embedded_style_map, "convert_image": _convert_mammoth_table_image}
+                    {"embedded_style_map": embedded_style_map, "convert_image": self._mammoth_image_converter()}
                 ).value
                 context = (resources, read_part, paths.main_document, conversion_options)
                 self._mammoth_fallback_context = context

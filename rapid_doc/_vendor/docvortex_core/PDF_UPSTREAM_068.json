@@ -1,0 +1,108 @@
+{
+  "repository": "https://github.com/myhloli/DocVortex",
+  "target_commit": "2de5f42b1884495313d9df63868e6a2f3d85fea0",
+  "selected_commits": [
+    "8a3ff6c7d7898d129a22694070cc56998e5456cf",
+    "72656bee6a4078ad347b8091453aeee436feb60e",
+    "2c6c0adda37c2901632edf6359cb5882f7bcb10a",
+    "d878cba888a7f8261f88e73b71e4d27b6cf5c9a7",
+    "a4c8b2ea718ae783833731dd0094ca24b65243c3"
+  ],
+  "files": [
+    {
+      "path": "analyzers/native/pdf/_table_recovery/candidate.py",
+      "upstream": "src/docvortex/analyzers/native/pdf/_table_recovery/candidate.py",
+      "upstream_sha256": "e34afd5bdd669984644ebaeb909d77f19fd9092f8d0c356b6a84d781a60a9ce4",
+      "installed_sha256": "f66be6500170af7878b21d952ba4e2e737c9434c2d6c7989912979f6d68d4478",
+      "base_sha256": "fea26793fa35091fb45e2a698546443c179e24200c280a1d519d70c0e5ada29a"
+    },
+    {
+      "path": "analyzers/native/pdf/_table_recovery/contracts.py",
+      "upstream": "src/docvortex/analyzers/native/pdf/_table_recovery/contracts.py",
+      "upstream_sha256": "76bf0ee5dfe14686fa778dae284462fcd87f3eebd6f81f13badeea87108abb00",
+      "installed_sha256": "f3e2fbe3c3f904c7c2585b424ba3890455893e165e322871e5ca331081ef9c17",
+      "base_sha256": "990fa680cb0ec4c3d8c1b7f56f4cf26105a908c88a08d1bf62f703a0ce430bb7"
+    },
+    {
+      "path": "analyzers/native/pdf/_table_recovery/engine.py",
+      "upstream": "src/docvortex/analyzers/native/pdf/_table_recovery/engine.py",
+      "upstream_sha256": "43352ab9e6bcca672852a96f767af5cf64a9cad8d3aafbd11dbb618ddcf5aff2",
+      "installed_sha256": "43352ab9e6bcca672852a96f767af5cf64a9cad8d3aafbd11dbb618ddcf5aff2",
+      "base_sha256": "b3cf3454405636a65697f5b450b8c21b376c0c5339a92b26a9c1f49ff9386809"
+    },
+    {
+      "path": "analyzers/native/pdf/_table_recovery/hierarchical.py",
+      "upstream": "src/docvortex/analyzers/native/pdf/_table_recovery/hierarchical.py",
+      "upstream_sha256": "eace03b0daf3840ca5c1db969335ba691c15ec2a56e0d7d156a53b2172aee98a",
+      "installed_sha256": "eace03b0daf3840ca5c1db969335ba691c15ec2a56e0d7d156a53b2172aee98a",
+      "base_sha256": null
+    },
+    {
+      "path": "analyzers/native/pdf/_table_recovery/text.py",
+      "upstream": "src/docvortex/analyzers/native/pdf/_table_recovery/text.py",
+      "upstream_sha256": "931d834fe4bd19cb85c925c1717c19cdc12e9feb1efa7059cd5ccff2e892d132",
+      "installed_sha256": "18c35bf3819b5d49aa9ef4e2920bdd213fa42a1dcd2c03fa1c57ba5793aa76d3",
+      "base_sha256": "e12d0a1a9213691cdf4637ae8112117a58c45e0568b4a2262df771b6336e362b"
+    },
+    {
+      "path": "analyzers/native/pdf/_table_recovery/text_quality.py",
+      "upstream": "src/docvortex/analyzers/native/pdf/_table_recovery/text_quality.py",
+      "upstream_sha256": "0c65544f9ebd3ed41a673f26f097fc00e5e35d016518d8d7d516534142e169a8",
+      "installed_sha256": "dd01a908cbd12e183d03bacab86dfca8a1ba5c3a0abae5e4773bf06b63d2d637",
+      "base_sha256": null
+    },
+    {
+      "path": "analyzers/native/pdf/_table_recovery/vector.py",
+      "upstream": "src/docvortex/analyzers/native/pdf/_table_recovery/vector.py",
+      "upstream_sha256": "80eff2b30c1277da404c4f73346e3747095f823ed7cee1ead029c063c8742b98",
+      "installed_sha256": "f3616650f984d9f2f712116a45d2717497bd6bc834f5fc331dd6e8338e8d4e94",
+      "base_sha256": "a7fadb3a609c235e4a720ea4fb68b944c0ca560c4545036daba2da6e1c57860e"
+    },
+    {
+      "path": "analyzers/native/pdf/inline/matching.py",
+      "upstream": "src/docvortex/analyzers/native/pdf/inline/matching.py",
+      "upstream_sha256": "974a5d8be70e733a9fc7fca5d6ecf9658304a6d6c27e781b15592c2b8b5fae99",
+      "installed_sha256": "48ee3aeafee742144796ac13f0c884b034c794b9642794f2d8412ba0d127c4a2",
+      "base_sha256": "a0f7b76afbec1e60bf26d468832712cbfab101cc102257a8a6862b082bb67572"
+    },
+    {
+      "path": "analyzers/native/pdf/inline/materialize.py",
+      "upstream": "src/docvortex/analyzers/native/pdf/inline/materialize.py",
+      "upstream_sha256": "ebd615f90eb0a76ed6752518ad31523bc424d6d716bff99a2a51b5809ca69e0b",
+      "installed_sha256": "ebd615f90eb0a76ed6752518ad31523bc424d6d716bff99a2a51b5809ca69e0b",
+      "base_sha256": "61b4caef9cc9a282f2b64508a243c043da10984e981ff3c0c073e61efe7b8015"
+    },
+    {
+      "path": "analyzers/native/pdf/inline/types.py",
+      "upstream": "src/docvortex/analyzers/native/pdf/inline/types.py",
+      "upstream_sha256": "a9fa3bf35d3e1f3841c39404e3dfa9eedd9096cffdd34f8ee1bbb38744e0bacd",
+      "installed_sha256": "a9fa3bf35d3e1f3841c39404e3dfa9eedd9096cffdd34f8ee1bbb38744e0bacd",
+      "base_sha256": "575d171905cec2c93605089a9750f6756f3abba51c1fc16c2d17ca763f29ca4e"
+    },
+    {
+      "path": "analyzers/native/pdf/table_text_styles.py",
+      "upstream": "src/docvortex/analyzers/native/pdf/table_text_styles.py",
+      "upstream_sha256": "c73a421dccc245314af8651a99458d27ee0d2b4567f155e995b2884776be025e",
+      "installed_sha256": "c73a421dccc245314af8651a99458d27ee0d2b4567f155e995b2884776be025e",
+      "base_sha256": "1c8cf81a2da2aa4106f9487a756d93368b467e5f7851de34e91478276e982bad"
+    },
+    {
+      "path": "analyzers/native/pdf/table_rules.py",
+      "upstream": "src/docvortex/analyzers/native/pdf/table_rules.py",
+      "upstream_sha256": "21f40fe53282207acce9d31b6451fafc7a2de83626e536c631ce7b6b054ac96e",
+      "installed_sha256": "51be9192c051ed4c269dec7b9c45e8be9f3b0ebf76b9623cdcdad88a6d4fca41",
+      "base_sha256": "750659ae76eea85b7a7021ebade5d17b15e6b8a4cbfa8dd86b80f1acf39817e6"
+    }
+  ],
+  "policy": "Selective behavior ports in Python reference and shared Rust; preserve local layout, physical ownership and horizontal advance spacing. No native-backend requirement or runtime/model upgrade.",
+  "deferred": [
+    "ac4e28c cross-page table merge: compare RapidDoc-specific pipeline first",
+    "72c1151 diagonal watermarks: separate evidence review"
+  ],
+  "tests": "tests/native_pdf/upstream_068_tests.json",
+  "local_followup": {
+    "description": "Preserve complete-grid growth guard; merge only proven enclosed external annotation rows from weak candidates. Full catalog regression passes.",
+    "tests": "tests/native_pdf/test_caption_grid_merge.py",
+    "reference": "tests/fixtures/upstream_068/caption_grid_merge.json.gz"
+  }
+}

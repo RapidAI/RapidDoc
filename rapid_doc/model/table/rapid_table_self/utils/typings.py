@@ -18,6 +18,7 @@ class EngineType(Enum):
     OPENVINO = "openvino"
 
 class ModelType(Enum):
+    TABLE_TRANSFORMER = "table_transformer"
     SLANETPLUS = "slanet_plus"
     SLANET1M = "slanet_1m"
     UNITABLE = "unitable"

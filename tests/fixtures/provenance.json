@@ -1,0 +1,83 @@
+{
+  "source_repository": "DocVortex",
+  "source_commit": "2c1ec66ee52bb37135599af92aa175bd77fc04d7",
+  "license_notice": "DOCVORTEX-LICENSE.md",
+  "scope": "Local regression restoration; source repository root license retained; no independent third-party content clearance asserted",
+  "files": [
+    {
+      "source": "tests/fixtures/pdf_char_dedup.json",
+      "target": "tests/fixtures/pdf_char_dedup.json",
+      "sha256": "7f0110135757d218c80ed418fd13614acbde528b05ee5a65fed773957e3e7220"
+    },
+    {
+      "source": "tests/fixtures/docx/handmade-altpath.docx",
+      "target": "tests/fixtures/docx/handmade-altpath.docx",
+      "sha256": "fb77751c25853f876f9cda0b819819f690c4baadf080c1170ad06ffc98e52545"
+    },
+    {
+      "source": "tests/fixtures/docx/handmade-strict.docx",
+      "target": "tests/fixtures/docx/handmade-strict.docx",
+      "sha256": "f65da59839848f8bbe0b72ddc03f8765bf06662994ae980f22095eb85cb0096a"
+    },
+    {
+      "source": "tests/fixtures/pptx/handmade-altpath.pptx",
+      "target": "tests/fixtures/pptx/handmade-altpath.pptx",
+      "sha256": "1f364b417eb31799d7fdfabe00af8e15a689a535fb2ec40dd1aadd38654bbfdf"
+    },
+    {
+      "source": "tests/fixtures/pptx/handmade-inherit.pptx",
+      "target": "tests/fixtures/pptx/handmade-inherit.pptx",
+      "sha256": "4bbab27a28b2532eaa3ad93b86d2667e454f6d40bbf4b178524de3f0a0d0bfe3"
+    },
+    {
+      "source": "tests/fixtures/pptx/handmade-links.pptx",
+      "target": "tests/fixtures/pptx/handmade-links.pptx",
+      "sha256": "32cc7652099218a1f15190615607697583afb5a76c9fffc2d2dea23b29c66533"
+    },
+    {
+      "source": "tests/fixtures/pptx/handmade-math.pptx",
+      "target": "tests/fixtures/pptx/handmade-math.pptx",
+      "sha256": "b95ba383c185208fd171a86f38f0a9ee01e00e5fc72dcdace82c46f844753d4c"
+    },
+    {
+      "source": "tests/fixtures/pptx/handmade-order.pptx",
+      "target": "tests/fixtures/pptx/handmade-order.pptx",
+      "sha256": "b05bc15dd2b901373e566e938d988fa387aa27d9f03c0fc5918097fef1652a07"
+    },
+    {
+      "source": "tests/fixtures/pptx/handmade-strict.pptx",
+      "target": "tests/fixtures/pptx/handmade-strict.pptx",
+      "sha256": "8890634f199ede31676cc86ad08db97240fe31eefa3fcf49012466aaa8c53d4b"
+    },
+    {
+      "source": "demo/ms_office_docs/docx_01.doc",
+      "target": "tests/fixtures/docvortex_migration/docx_01.doc",
+      "sha256": "6aae60b01f0e020c59d2299f217dbd5904df08182a31384db40953937f322fd1"
+    },
+    {
+      "source": "demo/ms_office_docs/docx_01.docx",
+      "target": "tests/fixtures/docvortex_migration/docx_01.docx",
+      "sha256": "86393df4b91412b946c7331e27e762440889b916a0d2ec9331700913f06a7a1b"
+    },
+    {
+      "source": "demo/ms_office_docs/pptx_01.ppt",
+      "target": "tests/fixtures/docvortex_migration/pptx_01.ppt",
+      "sha256": "2215ba7ee3d845ad745714a6b35ca8d652ec0c2f373e15f56dd520570b0eab6a"
+    },
+    {
+      "source": "demo/ms_office_docs/pptx_01.pptx",
+      "target": "tests/fixtures/docvortex_migration/pptx_01.pptx",
+      "sha256": "77eec640e70e927d0d5dda6b69dc4317596cb01c220a58b83d9933a58ff0ecc2"
+    },
+    {
+      "source": "demo/ms_office_docs/xlsx_01.xls",
+      "target": "tests/fixtures/docvortex_migration/xlsx_01.xls",
+      "sha256": "733225d6eb2659b1503abccc3cf46483dbe15b028cb2b0898cb57ec81c4d3cc0"
+    },
+    {
+      "source": "demo/ms_office_docs/xlsx_01.xlsx",
+      "target": "tests/fixtures/docvortex_migration/xlsx_01.xlsx",
+      "sha256": "fe3e77a6c16bca8eeccb970e7d788cb7f3a3e4f3ac9c793589892ac190e6b874"
+    }
+  ]
+}

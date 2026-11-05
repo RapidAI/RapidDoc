@@ -1,4 +1,4 @@
-"""超限 BLIP 仅丢弃图片，正文、后续图片引用及文档级预算保持有效。"""
+"""超限 BLIP 保留占位图，正文、后续图片引用及文档记录预算保持有效。"""
 
 from io import BytesIO
 import struct
@@ -69,9 +69,14 @@ def test_shared_picture_store_skips_one_image_and_preserves_bse_numbers(kind, mo
     else:
         bad = _officeart_record(0xF01E, bytes(17) + b"x" * 512)
     images = officeart.decode_bstore(_bstore(bad))
-    assert set(images) == {2}
+    assert set(images) == {1, 2}
+    assert images[1].limit_reason is not None
     assert images[2].data == _TINY_PNG
-    assert warnings and any("1" in message and "max_entry_bytes" in message for message in warnings)
+    assert warnings and any(
+        "BSE 1" in message and (
+            "max_entry_bytes" in message or "decompression exceeded its limit" in message
+        ) for message in warnings
+    )
 
 
 def test_declared_oversize_is_rejected_before_decompression(monkeypatch):
@@ -80,6 +85,17 @@ def test_declared_oversize_is_rejected_before_decompression(monkeypatch):
         pytest.fail("Oversize declaration must not reach decompression")
     monkeypatch.setattr(officeart.zlib, "decompressobj", forbidden)
     with pytest.raises(LegacyOfficeResourceLimitError):
+        officeart.decode_blip(officeart.record_at(blip, 0))
+
+
+def test_dib_budget_is_checked_after_bmp_header_is_added(monkeypatch):
+    """Upstream #36 also bounds the final BMP, not only the source DIB."""
+    monkeypatch.setattr(officeart, "MAX_ENTRY_BYTES", 128)
+    dib = bytearray(128)
+    struct.pack_into("<I", dib, 0, 40)
+    struct.pack_into("<H", dib, 14, 24)
+    blip = _officeart_record(0xF01F, bytes(17) + dib)
+    with pytest.raises(LegacyOfficeResourceLimitError, match="bitmap BLIP"):
         officeart.decode_blip(officeart.record_at(blip, 0))
 
 
@@ -100,7 +116,7 @@ def test_doc_inline_oversize_does_not_try_magic_fallback(warnings):
     blip = _metafile(declared_size=officeart.MAX_ENTRY_BYTES + 1, data=_TINY_PNG, compression=0xFE)
     picf = struct.pack("<IH", len(blip) + 6, 6) + blip
     store = doc_images.ImageStore()
-    assert doc_images.inline_picture(picf, offset=0, store=store, budget=DocBudget()) is None
+    assert doc_images.inline_picture(picf, offset=0, store=store, budget=DocBudget()).limit_reason is not None
     assert store.total == 0
     assert warnings
 
@@ -129,7 +145,7 @@ def _doc_with_floating_pictures():
 def test_doc_keeps_text_and_normal_floating_picture_after_oversize(warnings):
     pages = DocModel().predict(BytesIO(_doc_with_floating_pictures()))
     assert "Body survives oversized picture" in str(pages)
-    assert sum(block["type"] == "image" for page in pages for block in page) == 1
+    assert sum(block["type"] == "image" for page in pages for block in page) == 2
     assert warnings
 
 
@@ -144,7 +160,7 @@ def test_xls_keeps_cells_when_one_shared_picture_is_oversize(warnings):
 def test_ppt_picture_map_skips_oversize_without_renumbering(warnings):
     document = PptRecord(0, 15, 0, 0x03E8, _bstore())
     images = ppt_parser._picture_map(document, b"", RecordBudget())
-    assert set(images) == {2} and images[2].data == _TINY_PNG
+    assert set(images) == {1, 2} and images[1].limit_reason is not None and images[2].data == _TINY_PNG
     assert warnings
 
 
@@ -200,7 +216,7 @@ def test_document_record_budget_still_fails_hard(route):
 
 
 @pytest.mark.parametrize("route", ["shared", "ppt", "doc_inline"])
-def test_total_asset_budget_still_fails_hard(route, monkeypatch):
+def test_total_asset_budget_preserves_placeholder(route, monkeypatch):
     good = _officeart_record(0xF01E, bytes(17) + _TINY_PNG)
     if route == "shared":
         monkeypatch.setattr(officeart, "MAX_ASSET_TOTAL_BYTES", 1)
@@ -212,5 +228,8 @@ def test_total_asset_budget_still_fails_hard(route, monkeypatch):
         monkeypatch.setattr(doc_images, "MAX_ASSET_TOTAL_BYTES", 1)
         picf = struct.pack("<IH", len(good) + 6, 6) + good
         call = lambda: doc_images.inline_picture(picf, offset=0, store=doc_images.ImageStore(), budget=DocBudget())
-    with pytest.raises(LegacyOfficeResourceLimitError, match="max_asset_total_bytes"):
-        call()
+    result = call()
+    payload = result if route == "doc_inline" else result[1]
+    assert payload.limit_reason
+    assert not payload.data
+    assert payload.data != _TINY_PNG

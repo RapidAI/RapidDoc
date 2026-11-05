@@ -1,0 +1,20 @@
+{
+  "source_sha256": "e4612a49a858208b977f7f52996a01d8950a7977fb581e3374775d0089ffb1b4",
+  "fixture": "tests/unittest/pdfs/flash_review_20261102/null_tounicode_type1.pdf",
+  "fixture_sha256": "ccd7ab9e5b94199fe09940ede59f700e9a2714023094e59ab11e618b2c40abdd",
+  "derivation": "Original embedded Type1 font resources and ToUnicode streams; synthetic page content and positions, no original prose.",
+  "pages": [
+    {
+      "original_page": 21,
+      "original_font_resource": "/T1_3",
+      "font": "/AAAAAI+CMSY10",
+      "expected": "≥10"
+    },
+    {
+      "original_page": 27,
+      "original_font_resource": "/T1_4",
+      "font": "/AAAAAY+CMMI12",
+      "expected": "wnt/β-catenin"
+    }
+  ]
+}

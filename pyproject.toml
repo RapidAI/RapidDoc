@@ -51,56 +51,34 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-test = [
-    "rapid-doc[cpu]",
-    "pytest",
-    "tomli; python_version < '3.11'",
-    "fuzzywuzzy"
-]
+test = ["rapid-doc[cpu]", "pytest", "tomli; python_version < '3.11'", "fuzzywuzzy"]
 
 cpu = [
     "onnxruntime>=1.18.0",
-#    "openvino>=2024.6.0,<=2026.1.0",
+    #"openvino>=2024.6.0,<=2026.1.0",
 ]
 
 gpu = [
     "onnxruntime-gpu<=1.23.0",
-#    "torch>=2.6.0,<3",
-#    "torchvision",
-#    "safetensors>=0.4.0",
+    #"torch>=2.6.0,<3",
+    #"torchvision",
+    #"safetensors>=0.4.0",
 ]
 
-api = [
-    "fastapi>=0.104.0",
-    "uvicorn[standard]>=0.24.0",
-    "python-multipart>=0.0.6",
-]
+api = ["fastapi>=0.104.0", "uvicorn[standard]>=0.24.0", "python-multipart>=0.0.6"]
 
-s3 = [
-    "boto3>=1.28.43",
-]
+s3 = ["boto3>=1.28.43"]
 
-word = [
-    "pypandoc-binary",
-]
+word = ["pypandoc-binary"]
 
-html = [
-    "markdown-it-py",
-    "mdit-py-plugins",
-    "pygments",
-]
+html = ["markdown-it-py", "mdit-py-plugins", "pygments"]
 
 gradio = [
     "gradio>=5.49.1,!=6.0.0,!=6.0.1,!=6.0.2,!=6.1.0,!=6.2.0,!=6.3.0,!=6.4.0,!=6.5.0,!=6.5.1,!=6.6.0,!=6.7.0,<6.9.0",
     "gradio-pdf>=0.0.22",
 ]
 
-core = [
-    "openvino>=2024.6.0",
-    "onnxruntime-gpu<=1.23.0",
-    "torch>=2.6.0,<3",
-    "torchvision",
-]
+core = ["openvino>=2024.6.0", "onnxruntime-gpu<=1.23.0", "torch>=2.6.0,<3", "torchvision"]
 
 npu = [
     "numpy>=1.21.6,<2",
@@ -108,9 +86,9 @@ npu = [
     "attrs",
     "psutil",
     "onnxruntime-cann==1.22.0",
-#    "torch==2.5.1",
-#    "torch-npu==2.5.1",
-#    "torchvision",
+    #    "torch==2.5.1",
+    #    "torch-npu==2.5.1",
+    #    "torchvision",
 ]
 
 [project.urls]
@@ -138,6 +116,8 @@ rapid_doc = [
     "backend/onnx_ops/licenses/*.txt",
     "backend/onnx_ops/lib/*.so",
     "backend/onnx_ops/lib/*.dll",
+    "model/table/rapid_table_self/table_structure/table_transformer/LICENSE",
+    "model/table/rapid_table_self/table_structure/table_transformer/THIRD_PARTY_NOTICES.md",
     "_vendor/docvortex_core/UPSTREAM.md",
     "_vendor/docvortex_core/licenses/*.txt",
     "_vendor/docvortex_core/resources/fonts/*",

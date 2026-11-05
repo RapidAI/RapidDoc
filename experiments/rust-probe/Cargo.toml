@@ -1,0 +1,10 @@
+[package]
+name = "rapiddoc-runtime-probe"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+pdfium-render = { version = "=0.9.4", default-features = false, features = ["pdfium_7350", "thread_safe"] }
+serde_json.workspace = true
+rapiddoc-core = { path = "../../rust/rapiddoc-core" }

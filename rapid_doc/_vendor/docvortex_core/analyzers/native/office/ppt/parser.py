@@ -11,12 +11,17 @@ import zlib
 from loguru import logger
 
 from ..._shared.hyperlink import sanitize_hyperlink_target
-from ..errors import LegacyOfficeEncryptedError, LegacyOfficeImageResourceLimitError, LegacyOfficeMalformedError, LegacyOfficeResourceLimitError
+from ..errors import (
+    LegacyOfficeEncryptedError,
+    LegacyOfficeImageLimitError,
+    LegacyOfficeMalformedError,
+    LegacyOfficeResourceLimitError,
+)
 from ..legacy.binary import get_i16, get_u16, get_u32
 from ..limits import MAX_ASSET_TOTAL_BYTES, MAX_ENTRY_BYTES, MAX_GRID_SLOTS, MAX_PICTURE_RECORDS, MAX_USER_EDIT_CHAIN
 from ..equation.mtef import decode_equation_object
 from ..legacy.ole import BoundedOleReader
-from ..legacy.officeart import OfficeArtRecord, OfficeImagePayload, decode_blip as decode_officeart_blip
+from ..legacy.officeart import OfficeArtRecord, OfficeImageBudget, OfficeImagePayload, decode_blip as decode_officeart_blip
 from ..image import serialize_office_image
 from ..equation.image import OfficeImageEquationDecoder
 from ..xls.embedded_chart import extract_embedded_chart_html_from_storage
@@ -1407,11 +1412,17 @@ def _picture_map(
     document: PptRecord,
     pictures: bytes,
     budget: RecordBudget,
+    *,
+    image_decoder: OfficeImageEquationDecoder | None = None,
 ) -> dict[int, _ImagePayload]:
     """按 BStore 中 1-based BSE 序号建立图片资源映射。"""
 
     result: dict[int, _ImagePayload] = {}
-    asset_total = 0
+    image_decoder = image_decoder if image_decoder is not None else OfficeImageEquationDecoder()
+    image_budget = OfficeImageBudget(
+        max_bytes=MAX_ASSET_TOTAL_BYTES,
+        check_image=image_decoder.check_limit,
+    )
     bse_records = [record for record in iter_descendants(document, budget=budget) if record.record_type == RT_OFFICEART_BSE]
     for index, bse in enumerate(bse_records[:MAX_PICTURE_RECORDS], start=1):
         decoded = None
@@ -1426,15 +1437,16 @@ def _picture_map(
                         decoded = _decode_blip(picture_record)
             if decoded is None:
                 decoded = _decode_bse_body(bse.payload, budget)
-        except LegacyOfficeImageResourceLimitError as exc:
-            logger.warning("PPT_IMAGE_SKIPPED: BSE {}: {}", index, exc)
+        except LegacyOfficeImageLimitError as exc:
+            result[index] = image_budget.reject(
+                OfficeImagePayload(bse.payload, "bin", "application/octet-stream"),
+                str(exc),
+                source=f"PPT BSE {index} at offset {bse.offset}",
+            )
             continue
         if decoded is None:
             continue
-        asset_total += len(decoded.data)
-        if asset_total > MAX_ASSET_TOTAL_BYTES:
-            raise LegacyOfficeResourceLimitError(f"embedded assets exceed max_asset_total_bytes={MAX_ASSET_TOTAL_BYTES}")
-        result[index] = decoded
+        result[index] = image_budget.admit(decoded, source=f"PPT BSE {index} at offset {bse.offset}.{decoded.extension}")
     if len(bse_records) > MAX_PICTURE_RECORDS:
         logger.warning(f"PPT_PICTURE_LIMIT: ignored BSE records after {MAX_PICTURE_RECORDS}")
     return result
@@ -1455,10 +1467,14 @@ def _image_from_shape(
     if image is None:
         logger.warning(f"PPT_IMAGE_REFERENCE_MISSING: shape={shape.key}, pib={reference}")
         return None
-    latex = equation_decoder.decode(
-        image.data,
-        part_name=f"picture.{image.extension}",
-        content_type=image.content_type,
+    latex = (
+        equation_decoder.probe(
+            image.data,
+            part_name=f"picture.{image.extension}",
+            content_type=image.content_type,
+        ).latex
+        if image.limit_reason is None
+        else None
     )
     if latex:
         return PptEquationElement(
@@ -1472,6 +1488,8 @@ def _image_from_shape(
         part_name=f"picture.{image.extension}",
         content_type=image.content_type,
         render_size_emu=image.render_size_emu,
+        equation_decoder=equation_decoder,
+        limit_reason=image.limit_reason,
     )
     if not data_uri:
         logger.warning(f"PPT_IMAGE_UNSUPPORTED: shape={shape.key}, type={image.content_type}")
@@ -1789,8 +1807,8 @@ def parse_ppt_document(
 
     width, height = _presentation_size(layout.document, budget)
     hyperlinks = _hyperlink_targets(layout.document, budget)
-    image_map = _picture_map(layout.document, pictures, budget)
     image_equation_decoder = OfficeImageEquationDecoder()
+    image_map = _picture_map(layout.document, pictures, budget, image_decoder=image_equation_decoder)
     embedded_objects = _embedded_object_map(layout, powerpoint_document, budget)
     native_equations = _equation_map(embedded_objects)
     native_charts = _chart_map(embedded_objects)

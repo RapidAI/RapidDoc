@@ -380,6 +380,8 @@ class MagicModel:
                     span['latex'] = latex
                 elif html:
                     span['html'] = html
+                    if layout_det.get('text_fallback'):
+                        span['text_fallback'] = True
                     if layout_det.get('latex_boxes'):
                         span['latex_boxes'] = layout_det.get('latex_boxes')
                     elif layout_det.get('img_boxes'):

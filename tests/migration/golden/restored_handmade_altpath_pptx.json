@@ -1,0 +1,40 @@
+{
+  "assets": {},
+  "content_list_json": [
+    {
+      "page_idx": 0,
+      "text": "Relocated deck title",
+      "text_level": 2,
+      "type": "text"
+    }
+  ],
+  "markdown": "## Relocated deck title",
+  "middle_json": {
+    "_backend": "office",
+    "_version_name": "0.9.11",
+    "pdf_info": [
+      {
+        "discarded_blocks": [],
+        "page_idx": 0,
+        "para_blocks": [
+          {
+            "index": 0,
+            "is_numbered_style": false,
+            "level": 2,
+            "lines": [
+              {
+                "spans": [
+                  {
+                    "content": "Relocated deck title",
+                    "type": "text"
+                  }
+                ]
+              }
+            ],
+            "type": "title"
+          }
+        ]
+      }
+    ]
+  }
+}

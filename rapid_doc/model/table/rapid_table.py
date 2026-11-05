@@ -1,8 +1,9 @@
 import cv2
 import numpy as np
+from copy import deepcopy
+from html import unescape
 from loguru import logger
 
-from rapid_doc.backend.pipeline.pipeline_middle_json_mkcontent import inline_left_delimiter, inline_right_delimiter
 from rapid_doc.model.table.rapid_table_self.table_cls import TableCls
 from rapid_doc.model.table.rapid_table_self import ModelType, RapidTable, RapidTableInput, EngineType
 from rapid_doc.model.table.utils import (
@@ -35,6 +36,23 @@ class RapidTableModel(object):
         self.cls_conf_threshold = table_config.get('cls_conf_threshold', 0.9) if table_config else 0.9
         self.enable_blank_cell_rec = table_config.get('enable_blank_cell_rec', False) if table_config else False
         self.model_type = table_config.get("model_type", ModelType.UNET_SLANET_PLUS)
+        if isinstance(self.model_type, str):
+            self.model_type = ModelType('slanet_plus' if self.model_type == 'slanet-plus' else self.model_type)
+        self.fallback_model_type = getattr(table_config.get('fallback_model_type'), 'value', table_config.get('fallback_model_type'))
+        if self.fallback_model_type == 'slanet-plus':
+            self.fallback_model_type = 'slanet_plus'
+        self.fallback_to_text = table_config.get('fallback_to_text', False)
+        if type(self.fallback_to_text) is not bool:
+            raise ValueError('fallback_to_text must be bool')
+        self.fallback_text_loss_threshold = table_config.get('fallback_text_loss_threshold', .2)
+        loss = self.fallback_text_loss_threshold
+        if isinstance(loss, bool) or not isinstance(loss, (int, float)) or not 0 <= loss <= 1:
+            raise ValueError('fallback_text_loss_threshold must be between 0 and 1')
+        supported = ('unet_slanet_plus', 'slanet_plus', 'slanet-plus', 'unet', 'table_transformer')
+        if self.fallback_model_type is not None and self.fallback_model_type not in supported:
+            raise ValueError(f'Unsupported fallback_model_type: {self.fallback_model_type}')
+        self._fallback_config = dict(table_config)
+        self._fallback_model = None
         self.ocr_engine = ocr_engine
 
         # 获取用户传入的 engine_type
@@ -134,6 +152,10 @@ class RapidTableModel(object):
 
     def predict(self, image, ocr_result=None, fill_image_res=None, mfd_res=None, skip_text_in_image=True, skip_table_orientation=None, table_class=None, table_class_score=1.0):
         bgr_image = cv2.cvtColor(np.asarray(image), cv2.COLOR_RGB2BGR)
+        if (self.model_type == ModelType.TABLE_TRANSFORMER or self.fallback_model_type is not None or self.fallback_to_text) and ocr_result is not None:
+            # Formula/image placeholders must not mutate externally supplied OCR.
+            ocr_result = deepcopy(ocr_result)
+            ocr_result = [list(part) for part in ocr_result]
 
         if skip_table_orientation is None:
             skip_table_orientation = ocr_result is not None
@@ -145,38 +167,13 @@ class RapidTableModel(object):
 
         if img_is_portrait and not skip_table_orientation:
 
-            det_res = self.ocr_engine.ocr(bgr_image, rec=False)[0]
-            # Check if table is rotated by analyzing text box aspect ratios
-            is_rotated = False
-            if det_res:
-                vertical_count = 0
-
-                for box_ocr_res in det_res:
-                    p1, p2, p3, p4 = box_ocr_res
-
-                    # Calculate width and height
-                    width = p3[0] - p1[0]
-                    height = p3[1] - p1[1]
-
-                    aspect_ratio = width / height if height > 0 else 1.0
-
-                    # Count vertical vs horizontal text boxes
-                    if aspect_ratio < 0.8:  # Taller than wide - vertical text
-                        vertical_count += 1
-                    # elif aspect_ratio > 1.2:  # Wider than tall - horizontal text
-                    #     horizontal_count += 1
-
-                # If we have more vertical text boxes than horizontal ones,
-                # and vertical ones are significant, table might be rotated
-                if vertical_count >= len(det_res) * 0.3:
-                    is_rotated = True
-
-                # logger.debug(f"Text orientation analysis: vertical={vertical_count}, det_res={len(det_res)}, rotated={is_rotated}")
-
-            # Rotate image if necessary
-            if is_rotated:
-                # logger.debug("Table appears to be in portrait orientation, rotating 90 degrees clockwise")
-                image = cv2.rotate(np.asarray(image), cv2.ROTATE_90_CLOCKWISE)
+            from rapid_doc.model.orientation.rapid_orientation_model import RapidOrientationModel
+            if not hasattr(self, '_orientation_model'):
+                self._orientation_model = RapidOrientationModel()
+            label = self._orientation_model.predict(np.asarray(image), table_mode=True)
+            if label in ('90', '270'):
+                code = cv2.ROTATE_90_CLOCKWISE if label == '270' else cv2.ROTATE_90_COUNTERCLOCKWISE
+                image = cv2.rotate(np.asarray(image), code)
                 bgr_image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
         # Continue with OCR on potentially rotated image
@@ -191,7 +188,10 @@ class RapidTableModel(object):
                 ocr_result = None
 
         if not ocr_result:
-            return None
+            if self.model_type == ModelType.TABLE_TRANSFORMER:
+                ocr_result = [[], [], []]
+            else:
+                return None
         # 把图片结果，添加到ocr_result里。uuid作为占位符，后面保存图片时替换
         if fill_image_res:
             for fill_image in fill_image_res:
@@ -213,6 +213,8 @@ class RapidTableModel(object):
                         del ocr_result[2][idx]
         # 表格内的公式填充
         if mfd_res:
+            from rapid_doc.backend.pipeline.pipeline_middle_json_mkcontent import inline_left_delimiter, inline_right_delimiter
+
             for mfd in mfd_res:
                 if mfd.get('latex'):
                     ocr_result[1].append(
@@ -227,12 +229,44 @@ class RapidTableModel(object):
                 ocr_result[0].append(bbox_to_points(mfd['bbox']))
                 ocr_result[2].append(1)
 
-        """开始识别表格"""
+        main = self._structure(bgr_image, ocr_result, table_class, table_class_score)
+        if self.fallback_model_type is None and not self.fallback_to_text:
+            return main
+        from .fallback import quality, plain_html
+        excluded = [i['uuid'] for i in (fill_image_res or [])]
+        if mfd_res:
+            from rapid_doc.backend.pipeline.pipeline_middle_json_mkcontent import inline_left_delimiter, inline_right_delimiter
+            excluded += [normalize_table_ocr_text(f"{inline_left_delimiter}{f['latex']}{inline_right_delimiter}") if f.get('latex') else normalize_table_ocr_text(f['checkbox']) for f in mfd_res if f.get('latex') or f.get('checkbox')]
+        first = quality(main, ocr_result, excluded)
+        if not first.needs_fallback(self.fallback_text_loss_threshold):
+            return main
+        if self.fallback_model_type is not None and self.fallback_model_type != getattr(self.model_type, 'value', self.model_type):
+            if self._fallback_model is None:
+                config = dict(self._fallback_config)
+                config.pop('fallback_model_type', None)
+                config['model_type'] = self.fallback_model_type
+                config['model_dir_or_path'] = config.pop('fallback_model_dir_or_path', None)
+                self._fallback_model = RapidTableModel(self.ocr_engine, config)
+            alternative = self._fallback_model._structure(bgr_image, ocr_result)
+            second = quality(alternative, ocr_result, excluded)
+            if second.valid and second.retained > first.retained and not second.needs_fallback(self.fallback_text_loss_threshold):
+                logger.info('Table fallback selected: {} (retained {}/{}, main {})', self.fallback_model_type, second.retained, second.total, first.retained)
+                return alternative
+        if self.fallback_to_text:
+            logger.warning('Table text recovery: retained {}/{}; emitting existing OCR text', first.retained, first.total)
+            return plain_html(ocr_result)
+        return main
+
+    def _structure(self, bgr_image, ocr_result, table_class=None, table_class_score=1.0):
         cls = table_class
         cls_score = table_class_score
 
         """使用 rapid_table_self 识别"""
         try:
+            if self.model_type == ModelType.TABLE_TRANSFORMER:
+                # The PDF/OCR pipeline escapes text once. XML serialization will
+                # escape it again, so restore raw text only at this boundary.
+                ocr_result = [ocr_result[0], [unescape(str(text)) for text in ocr_result[1]], ocr_result[2]]
             ocr_result = [ocr_result]
             bgr_image = [bgr_image]
 

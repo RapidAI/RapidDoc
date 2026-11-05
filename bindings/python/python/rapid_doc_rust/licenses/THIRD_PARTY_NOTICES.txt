@@ -1,0 +1,4026 @@
+RapidDoc third-party licenses and copyright notices
+Full shared terms appear once below. Each component retains its own attribution.
+Only identical words are shared; modified/unknown license text remains complete.
+
+=== Full license terms: Apache-2.0 ===
+
+TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+1. Definitions.
+
+   "License" shall mean the terms and conditions for use, reproduction,
+   and distribution as defined by Sections 1 through 9 of this document.
+
+   "Licensor" shall mean the copyright owner or entity authorized by
+   the copyright owner that is granting the License.
+
+   "Legal Entity" shall mean the union of the acting entity and all
+   other entities that control, are controlled by, or are under common
+   control with that entity. For the purposes of this definition,
+   "control" means (i) the power, direct or indirect, to cause the
+   direction or management of such entity, whether by contract or
+   otherwise, or (ii) ownership of fifty percent (50%) or more of the
+   outstanding shares, or (iii) beneficial ownership of such entity.
+
+   "You" (or "Your") shall mean an individual or Legal Entity
+   exercising permissions granted by this License.
+
+   "Source" form shall mean the preferred form for making modifications,
+   including but not limited to software source code, documentation
+   source, and configuration files.
+
+   "Object" form shall mean any form resulting from mechanical
+   transformation or translation of a Source form, including but
+   not limited to compiled object code, generated documentation,
+   and conversions to other media types.
+
+   "Work" shall mean the work of authorship, whether in Source or
+   Object form, made available under the License, as indicated by a
+   copyright notice that is included in or attached to the work
+   (an example is provided in the Appendix below).
+
+   "Derivative Works" shall mean any work, whether in Source or Object
+   form, that is based on (or derived from) the Work and for which the
+   editorial revisions, annotations, elaborations, or other modifications
+   represent, as a whole, an original work of authorship. For the purposes
+   of this License, Derivative Works shall not include works that remain
+   separable from, or merely link (or bind by name) to the interfaces of,
+   the Work and Derivative Works thereof.
+
+   "Contribution" shall mean any work of authorship, including
+   the original version of the Work and any modifications or additions
+   to that Work or Derivative Works thereof, that is intentionally
+   submitted to Licensor for inclusion in the Work by the copyright owner
+   or by an individual or Legal Entity authorized to submit on behalf of
+   the copyright owner. For the purposes of this definition, "submitted"
+   means any form of electronic, verbal, or written communication sent
+   to the Licensor or its representatives, including but not limited to
+   communication on electronic mailing lists, source code control systems,
+   and issue tracking systems that are managed by, or on behalf of, the
+   Licensor for the purpose of discussing and improving the Work, but
+   excluding communication that is conspicuously marked or otherwise
+   designated in writing by the copyright owner as "Not a Contribution."
+
+   "Contributor" shall mean Licensor and any individual or Legal Entity
+   on behalf of whom a Contribution has been received by Licensor and
+   subsequently incorporated within the Work.
+
+2. Grant of Copyright License. Subject to the terms and conditions of
+   this License, each Contributor hereby grants to You a perpetual,
+   worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+   copyright license to reproduce, prepare Derivative Works of,
+   publicly display, publicly perform, sublicense, and distribute the
+   Work and such Derivative Works in Source or Object form.
+
+3. Grant of Patent License. Subject to the terms and conditions of
+   this License, each Contributor hereby grants to You a perpetual,
+   worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+   (except as stated in this section) patent license to make, have made,
+   use, offer to sell, sell, import, and otherwise transfer the Work,
+   where such license applies only to those patent claims licensable
+   by such Contributor that are necessarily infringed by their
+   Contribution(s) alone or by combination of their Contribution(s)
+   with the Work to which such Contribution(s) was submitted. If You
+   institute patent litigation against any entity (including a
+   cross-claim or counterclaim in a lawsuit) alleging that the Work
+   or a Contribution incorporated within the Work constitutes direct
+   or contributory patent infringement, then any patent licenses
+   granted to You under this License for that Work shall terminate
+   as of the date such litigation is filed.
+
+4. Redistribution. You may reproduce and distribute copies of the
+   Work or Derivative Works thereof in any medium, with or without
+   modifications, and in Source or Object form, provided that You
+   meet the following conditions:
+
+   (a) You must give any other recipients of the Work or
+       Derivative Works a copy of this License; and
+
+   (b) You must cause any modified files to carry prominent notices
+       stating that You changed the files; and
+
+   (c) You must retain, in the Source form of any Derivative Works
+       that You distribute, all copyright, patent, trademark, and
+       attribution notices from the Source form of the Work,
+       excluding those notices that do not pertain to any part of
+       the Derivative Works; and
+
+   (d) If the Work includes a "NOTICE" text file as part of its
+       distribution, then any Derivative Works that You distribute must
+       include a readable copy of the attribution notices contained
+       within such NOTICE file, excluding those notices that do not
+       pertain to any part of the Derivative Works, in at least one
+       of the following places: within a NOTICE text file distributed
+       as part of the Derivative Works; within the Source form or
+       documentation, if provided along with the Derivative Works; or,
+       within a display generated by the Derivative Works, if and
+       wherever such third-party notices normally appear. The contents
+       of the NOTICE file are for informational purposes only and
+       do not modify the License. You may add Your own attribution
+       notices within Derivative Works that You distribute, alongside
+       or as an addendum to the NOTICE text from the Work, provided
+       that such additional attribution notices cannot be construed
+       as modifying the License.
+
+   You may add Your own copyright statement to Your modifications and
+   may provide additional or different license terms and conditions
+   for use, reproduction, or distribution of Your modifications, or
+   for any such Derivative Works as a whole, provided Your use,
+   reproduction, and distribution of the Work otherwise complies with
+   the conditions stated in this License.
+
+5. Submission of Contributions. Unless You explicitly state otherwise,
+   any Contribution intentionally submitted for inclusion in the Work
+   by You to the Licensor shall be under the terms and conditions of
+   this License, without any additional terms or conditions.
+   Notwithstanding the above, nothing herein shall supersede or modify
+   the terms of any separate license agreement you may have executed
+   with Licensor regarding such Contributions.
+
+6. Trademarks. This License does not grant permission to use the trade
+   names, trademarks, service marks, or product names of the Licensor,
+   except as required for reasonable and customary use in describing the
+   origin of the Work and reproducing the content of the NOTICE file.
+
+7. Disclaimer of Warranty. Unless required by applicable law or
+   agreed to in writing, Licensor provides the Work (and each
+   Contributor provides its Contributions) on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+   implied, including, without limitation, any warranties or conditions
+   of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+   PARTICULAR PURPOSE. You are solely responsible for determining the
+   appropriateness of using or redistributing the Work and assume any
+   risks associated with Your exercise of permissions under this License.
+
+8. Limitation of Liability. In no event and under no legal theory,
+   whether in tort (including negligence), contract, or otherwise,
+   unless required by applicable law (such as deliberate and grossly
+   negligent acts) or agreed to in writing, shall any Contributor be
+   liable to You for damages, including any direct, indirect, special,
+   incidental, or consequential damages of any character arising as a
+   result of this License or out of the use or inability to use the
+   Work (including but not limited to damages for loss of goodwill,
+   work stoppage, computer failure or malfunction, or any and all
+   other commercial damages or losses), even if such Contributor
+   has been advised of the possibility of such damages.
+
+9. Accepting Warranty or Additional Liability. While redistributing
+   the Work or Derivative Works thereof, You may choose to offer,
+   and charge a fee for, acceptance of support, warranty, indemnity,
+   or other liability obligations and/or rights consistent with this
+   License. However, in accepting such obligations, You may act only
+   on Your own behalf and on Your sole responsibility, not on behalf
+   of any other Contributor, and only if You agree to indemnify,
+   defend, and hold each Contributor harmless for any liability
+   incurred by, or claims asserted against, such Contributor by reason
+   of your accepting any such warranty or additional liability.
+
+END OF TERMS AND CONDITIONS
+
+=== Full license terms: CPython-license-chain ===
+
+A. HISTORY OF THE SOFTWARE
+==========================
+
+Python was created in the early 1990s by Guido van Rossum at Stichting
+Mathematisch Centrum (CWI, see https://www.cwi.nl) in the Netherlands
+as a successor of a language called ABC.  Guido remains Python's
+principal author, although it includes many contributions from others.
+
+In 1995, Guido continued his work on Python at the Corporation for
+National Research Initiatives (CNRI, see https://www.cnri.reston.va.us)
+in Reston, Virginia where he released several versions of the
+software.
+
+In May 2000, Guido and the Python core development team moved to
+BeOpen.com to form the BeOpen PythonLabs team.  In October of the same
+year, the PythonLabs team moved to Digital Creations, which became
+Zope Corporation.  In 2001, the Python Software Foundation (PSF, see
+https://www.python.org/psf/) was formed, a non-profit organization
+created specifically to own Python-related Intellectual Property.
+Zope Corporation was a sponsoring member of the PSF.
+
+All Python releases are Open Source (see https://opensource.org for
+the Open Source Definition).  Historically, most, but not all, Python
+releases have also been GPL-compatible; the table below summarizes
+the various releases.
+
+    Release         Derived     Year        Owner       GPL-
+                    from                                compatible? (1)
+
+    0.9.0 thru 1.2              1991-1995   CWI         yes
+    1.3 thru 1.5.2  1.2         1995-1999   CNRI        yes
+    1.6             1.5.2       2000        CNRI        no
+    2.0             1.6         2000        BeOpen.com  no
+    1.6.1           1.6         2001        CNRI        yes (2)
+    2.1             2.0+1.6.1   2001        PSF         no
+    2.0.1           2.0+1.6.1   2001        PSF         yes
+    2.1.1           2.1+2.0.1   2001        PSF         yes
+    2.1.2           2.1.1       2002        PSF         yes
+    2.1.3           2.1.2       2002        PSF         yes
+    2.2 and above   2.1.1       2001-now    PSF         yes
+
+Footnotes:
+
+(1) GPL-compatible doesn't mean that we're distributing Python under
+    the GPL.  All Python licenses, unlike the GPL, let you distribute
+    a modified version without making your changes open source.  The
+    GPL-compatible licenses make it possible to combine Python with
+    other software that is released under the GPL; the others don't.
+
+(2) According to Richard Stallman, 1.6.1 is not GPL-compatible,
+    because its license has a choice of law clause.  According to
+    CNRI, however, Stallman's lawyer has told CNRI's lawyer that 1.6.1
+    is "not incompatible" with the GPL.
+
+Thanks to the many outside volunteers who have worked under Guido's
+direction to make these releases possible.
+
+
+B. TERMS AND CONDITIONS FOR ACCESSING OR OTHERWISE USING PYTHON
+===============================================================
+
+Python software and documentation are licensed under the
+Python Software Foundation License Version 2.
+
+Starting with Python 3.8.6, examples, recipes, and other code in
+the documentation are dual licensed under the PSF License Version 2
+and the Zero-Clause BSD license.
+
+Some software incorporated into Python is under different licenses.
+The licenses are listed with code falling under that license.
+
+
+PYTHON SOFTWARE FOUNDATION LICENSE VERSION 2
+--------------------------------------------
+
+1. This LICENSE AGREEMENT is between the Python Software Foundation
+("PSF"), and the Individual or Organization ("Licensee") accessing and
+otherwise using this software ("Python") in source or binary form and
+its associated documentation.
+
+2. Subject to the terms and conditions of this License Agreement, PSF hereby
+grants Licensee a nonexclusive, royalty-free, world-wide license to reproduce,
+analyze, test, perform and/or display publicly, prepare derivative works,
+distribute, and otherwise use Python alone or in any derivative version,
+provided, however, that PSF's License Agreement and PSF's notice of copyright,
+i.e., "Copyright (c) 2001 Python Software Foundation; All Rights Reserved"
+are retained in Python alone or in any derivative version prepared by Licensee.
+
+3. In the event Licensee prepares a derivative work that is based on
+or incorporates Python or any part thereof, and wants to make
+the derivative work available to others as provided herein, then
+Licensee hereby agrees to include in any such work a brief summary of
+the changes made to Python.
+
+4. PSF is making Python available to Licensee on an "AS IS"
+basis.  PSF MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR
+IMPLIED.  BY WAY OF EXAMPLE, BUT NOT LIMITATION, PSF MAKES NO AND
+DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS
+FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF PYTHON WILL NOT
+INFRINGE ANY THIRD PARTY RIGHTS.
+
+5. PSF SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF PYTHON
+FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS AS
+A RESULT OF MODIFYING, DISTRIBUTING, OR OTHERWISE USING PYTHON,
+OR ANY DERIVATIVE THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
+
+6. This License Agreement will automatically terminate upon a material
+breach of its terms and conditions.
+
+7. Nothing in this License Agreement shall be deemed to create any
+relationship of agency, partnership, or joint venture between PSF and
+Licensee.  This License Agreement does not grant permission to use PSF
+trademarks or trade name in a trademark sense to endorse or promote
+products or services of Licensee, or any third party.
+
+8. By copying, installing or otherwise using Python, Licensee
+agrees to be bound by the terms and conditions of this License
+Agreement.
+
+
+BEOPEN.COM LICENSE AGREEMENT FOR PYTHON 2.0
+-------------------------------------------
+
+BEOPEN PYTHON OPEN SOURCE LICENSE AGREEMENT VERSION 1
+
+1. This LICENSE AGREEMENT is between BeOpen.com ("BeOpen"), having an
+office at 160 Saratoga Avenue, Santa Clara, CA 95051, and the
+Individual or Organization ("Licensee") accessing and otherwise using
+this software in source or binary form and its associated
+documentation ("the Software").
+
+2. Subject to the terms and conditions of this BeOpen Python License
+Agreement, BeOpen hereby grants Licensee a non-exclusive,
+royalty-free, world-wide license to reproduce, analyze, test, perform
+and/or display publicly, prepare derivative works, distribute, and
+otherwise use the Software alone or in any derivative version,
+provided, however, that the BeOpen Python License is retained in the
+Software, alone or in any derivative version prepared by Licensee.
+
+3. BeOpen is making the Software available to Licensee on an "AS IS"
+basis.  BEOPEN MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR
+IMPLIED.  BY WAY OF EXAMPLE, BUT NOT LIMITATION, BEOPEN MAKES NO AND
+DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS
+FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE SOFTWARE WILL NOT
+INFRINGE ANY THIRD PARTY RIGHTS.
+
+4. BEOPEN SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF THE
+SOFTWARE FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS
+AS A RESULT OF USING, MODIFYING OR DISTRIBUTING THE SOFTWARE, OR ANY
+DERIVATIVE THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
+
+5. This License Agreement will automatically terminate upon a material
+breach of its terms and conditions.
+
+6. This License Agreement shall be governed by and interpreted in all
+respects by the law of the State of California, excluding conflict of
+law provisions.  Nothing in this License Agreement shall be deemed to
+create any relationship of agency, partnership, or joint venture
+between BeOpen and Licensee.  This License Agreement does not grant
+permission to use BeOpen trademarks or trade names in a trademark
+sense to endorse or promote products or services of Licensee, or any
+third party.  As an exception, the "BeOpen Python" logos available at
+http://www.pythonlabs.com/logos.html may be used according to the
+permissions granted on that web page.
+
+7. By copying, installing or otherwise using the software, Licensee
+agrees to be bound by the terms and conditions of this License
+Agreement.
+
+
+CNRI LICENSE AGREEMENT FOR PYTHON 1.6.1
+---------------------------------------
+
+1. This LICENSE AGREEMENT is between the Corporation for National
+Research Initiatives, having an office at 1895 Preston White Drive,
+Reston, VA 20191 ("CNRI"), and the Individual or Organization
+("Licensee") accessing and otherwise using Python 1.6.1 software in
+source or binary form and its associated documentation.
+
+2. Subject to the terms and conditions of this License Agreement, CNRI
+hereby grants Licensee a nonexclusive, royalty-free, world-wide
+license to reproduce, analyze, test, perform and/or display publicly,
+prepare derivative works, distribute, and otherwise use Python 1.6.1
+alone or in any derivative version, provided, however, that CNRI's
+License Agreement and CNRI's notice of copyright, i.e., "Copyright (c)
+1995-2001 Corporation for National Research Initiatives; All Rights
+Reserved" are retained in Python 1.6.1 alone or in any derivative
+version prepared by Licensee.  Alternately, in lieu of CNRI's License
+Agreement, Licensee may substitute the following text (omitting the
+quotes): "Python 1.6.1 is made available subject to the terms and
+conditions in CNRI's License Agreement.  This Agreement together with
+Python 1.6.1 may be located on the internet using the following
+unique, persistent identifier (known as a handle): 1895.22/1013.  This
+Agreement may also be obtained from a proxy server on the internet
+using the following URL: http://hdl.handle.net/1895.22/1013".
+
+3. In the event Licensee prepares a derivative work that is based on
+or incorporates Python 1.6.1 or any part thereof, and wants to make
+the derivative work available to others as provided herein, then
+Licensee hereby agrees to include in any such work a brief summary of
+the changes made to Python 1.6.1.
+
+4. CNRI is making Python 1.6.1 available to Licensee on an "AS IS"
+basis.  CNRI MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR
+IMPLIED.  BY WAY OF EXAMPLE, BUT NOT LIMITATION, CNRI MAKES NO AND
+DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS
+FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF PYTHON 1.6.1 WILL NOT
+INFRINGE ANY THIRD PARTY RIGHTS.
+
+5. CNRI SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF PYTHON
+1.6.1 FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS AS
+A RESULT OF MODIFYING, DISTRIBUTING, OR OTHERWISE USING PYTHON 1.6.1,
+OR ANY DERIVATIVE THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
+
+6. This License Agreement will automatically terminate upon a material
+breach of its terms and conditions.
+
+7. This License Agreement shall be governed by the federal
+intellectual property law of the United States, including without
+limitation the federal copyright law, and, to the extent such
+U.S. federal law does not apply, by the law of the Commonwealth of
+Virginia, excluding Virginia's conflict of law provisions.
+Notwithstanding the foregoing, with regard to derivative works based
+on Python 1.6.1 that incorporate non-separable material that was
+previously distributed under the GNU General Public License (GPL), the
+law of the Commonwealth of Virginia shall govern this License
+Agreement only as to issues arising under or with respect to
+Paragraphs 4, 5, and 7 of this License Agreement.  Nothing in this
+License Agreement shall be deemed to create any relationship of
+agency, partnership, or joint venture between CNRI and Licensee.  This
+License Agreement does not grant permission to use CNRI trademarks or
+trade name in a trademark sense to endorse or promote products or
+services of Licensee, or any third party.
+
+8. By clicking on the "ACCEPT" button where indicated, or by copying,
+installing or otherwise using Python 1.6.1, Licensee agrees to be
+bound by the terms and conditions of this License Agreement.
+
+        ACCEPT
+
+
+CWI LICENSE AGREEMENT FOR PYTHON 0.9.0 THROUGH 1.2
+--------------------------------------------------
+
+Copyright (c) 1991 - 1995, Stichting Mathematisch Centrum Amsterdam,
+The Netherlands.  All rights reserved.
+
+Permission to use, copy, modify, and distribute this software and its
+documentation for any purpose and without fee is hereby granted,
+provided that the above copyright notice appear in all copies and that
+both that copyright notice and this permission notice appear in
+supporting documentation, and that the name of Stichting Mathematisch
+Centrum or CWI not be used in advertising or publicity pertaining to
+distribution of the software without specific, written prior
+permission.
+
+STICHTING MATHEMATISCH CENTRUM DISCLAIMS ALL WARRANTIES WITH REGARD TO
+THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+FITNESS, IN NO EVENT SHALL STICHTING MATHEMATISCH CENTRUM BE LIABLE
+FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
+OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+ZERO-CLAUSE BSD LICENSE FOR CODE IN THE PYTHON DOCUMENTATION
+----------------------------------------------------------------------
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+
+
+
+Additional Conditions for this Windows binary build
+---------------------------------------------------
+
+This program is linked with and uses Microsoft Distributable Code,
+copyrighted by Microsoft Corporation. The Microsoft Distributable Code
+is embedded in each .exe, .dll and .pyd file as a result of running
+the code through a linker.
+
+If you further distribute programs that include the Microsoft
+Distributable Code, you must comply with the restrictions on
+distribution specified by Microsoft. In particular, you must require
+distributors and external end users to agree to terms that protect the
+Microsoft Distributable Code at least as much as Microsoft's own
+requirements for the Distributable Code. See Microsoft's documentation
+(included in its developer tools and on its website at microsoft.com)
+for specific details.
+
+Redistribution of the Windows binary build of the Python interpreter
+complies with this agreement, provided that you do not:
+
+- alter any copyright, trademark or patent notice in Microsoft's
+Distributable Code;
+
+- use Microsoft's trademarks in your programs' names or in a way that
+suggests your programs come from or are endorsed by Microsoft;
+
+- distribute Microsoft's Distributable Code to run on a platform other
+than Microsoft operating systems, run-time technologies or application
+platforms; or
+
+- include Microsoft Distributable Code in malicious, deceptive or
+unlawful programs.
+
+These restrictions apply only to the Microsoft Distributable Code as
+defined above, not to Python itself or any programs running on the
+Python interpreter. The redistribution of the Python interpreter and
+libraries is governed by the Python Software License included with this
+file, or by other licenses as marked.
+
+
+
+--------------------------------------------------------------------------
+
+This program, "bzip2", the associated library "libbzip2", and all
+documentation, are copyright (C) 1996-2019 Julian R Seward.  All
+rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+1. Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+
+2. The origin of this software must not be misrepresented; you must 
+   not claim that you wrote the original software.  If you use this 
+   software in a product, an acknowledgment in the product 
+   documentation would be appreciated but is not required.
+
+3. Altered source versions must be plainly marked as such, and must
+   not be misrepresented as being the original software.
+
+4. The name of the author may not be used to endorse or promote 
+   products derived from this software without specific prior written 
+   permission.
+
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS
+OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Julian Seward, jseward@acm.org
+bzip2/libbzip2 version 1.0.8 of 13 July 2019
+
+--------------------------------------------------------------------------
+
+libffi - Copyright (c) 1996-2022  Anthony Green, Red Hat, Inc and others.
+See source files for details.
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+``Software''), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED ``AS IS'', WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+BSD License
+
+For Zstandard software
+
+Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+ * Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+ * Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+ * Neither the name Facebook, nor Meta, nor the names of its contributors may
+   be used to endorse or promote products derived from this software without
+   specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+                                 Apache License
+                           Version 2.0, January 2004
+                        https://www.apache.org/licenses/
+
+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+   1. Definitions.
+
+      "License" shall mean the terms and conditions for use, reproduction,
+      and distribution as defined by Sections 1 through 9 of this document.
+
+      "Licensor" shall mean the copyright owner or entity authorized by
+      the copyright owner that is granting the License.
+
+      "Legal Entity" shall mean the union of the acting entity and all
+      other entities that control, are controlled by, or are under common
+      control with that entity. For the purposes of this definition,
+      "control" means (i) the power, direct or indirect, to cause the
+      direction or management of such entity, whether by contract or
+      otherwise, or (ii) ownership of fifty percent (50%) or more of the
+      outstanding shares, or (iii) beneficial ownership of such entity.
+
+      "You" (or "Your") shall mean an individual or Legal Entity
+      exercising permissions granted by this License.
+
+      "Source" form shall mean the preferred form for making modifications,
+      including but not limited to software source code, documentation
+      source, and configuration files.
+
+      "Object" form shall mean any form resulting from mechanical
+      transformation or translation of a Source form, including but
+      not limited to compiled object code, generated documentation,
+      and conversions to other media types.
+
+      "Work" shall mean the work of authorship, whether in Source or
+      Object form, made available under the License, as indicated by a
+      copyright notice that is included in or attached to the work
+      (an example is provided in the Appendix below).
+
+      "Derivative Works" shall mean any work, whether in Source or Object
+      form, that is based on (or derived from) the Work and for which the
+      editorial revisions, annotations, elaborations, or other modifications
+      represent, as a whole, an original work of authorship. For the purposes
+      of this License, Derivative Works shall not include works that remain
+      separable from, or merely link (or bind by name) to the interfaces of,
+      the Work and Derivative Works thereof.
+
+      "Contribution" shall mean any work of authorship, including
+      the original version of the Work and any modifications or additions
+      to that Work or Derivative Works thereof, that is intentionally
+      submitted to Licensor for inclusion in the Work by the copyright owner
+      or by an individual or Legal Entity authorized to submit on behalf of
+      the copyright owner. For the purposes of this definition, "submitted"
+      means any form of electronic, verbal, or written communication sent
+      to the Licensor or its representatives, including but not limited to
+      communication on electronic mailing lists, source code control systems,
+      and issue tracking systems that are managed by, or on behalf of, the
+      Licensor for the purpose of discussing and improving the Work, but
+      excluding communication that is conspicuously marked or otherwise
+      designated in writing by the copyright owner as "Not a Contribution."
+
+      "Contributor" shall mean Licensor and any individual or Legal Entity
+      on behalf of whom a Contribution has been received by Licensor and
+      subsequently incorporated within the Work.
+
+   2. Grant of Copyright License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      copyright license to reproduce, prepare Derivative Works of,
+      publicly display, publicly perform, sublicense, and distribute the
+      Work and such Derivative Works in Source or Object form.
+
+   3. Grant of Patent License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      (except as stated in this section) patent license to make, have made,
+      use, offer to sell, sell, import, and otherwise transfer the Work,
+      where such license applies only to those patent claims licensable
+      by such Contributor that are necessarily infringed by their
+      Contribution(s) alone or by combination of their Contribution(s)
+      with the Work to which such Contribution(s) was submitted. If You
+      institute patent litigation against any entity (including a
+      cross-claim or counterclaim in a lawsuit) alleging that the Work
+      or a Contribution incorporated within the Work constitutes direct
+      or contributory patent infringement, then any patent licenses
+      granted to You under this License for that Work shall terminate
+      as of the date such litigation is filed.
+
+   4. Redistribution. You may reproduce and distribute copies of the
+      Work or Derivative Works thereof in any medium, with or without
+      modifications, and in Source or Object form, provided that You
+      meet the following conditions:
+
+      (a) You must give any other recipients of the Work or
+          Derivative Works a copy of this License; and
+
+      (b) You must cause any modified files to carry prominent notices
+          stating that You changed the files; and
+
+      (c) You must retain, in the Source form of any Derivative Works
+          that You distribute, all copyright, patent, trademark, and
+          attribution notices from the Source form of the Work,
+          excluding those notices that do not pertain to any part of
+          the Derivative Works; and
+
+      (d) If the Work includes a "NOTICE" text file as part of its
+          distribution, then any Derivative Works that You distribute must
+          include a readable copy of the attribution notices contained
+          within such NOTICE file, excluding those notices that do not
+          pertain to any part of the Derivative Works, in at least one
+          of the following places: within a NOTICE text file distributed
+          as part of the Derivative Works; within the Source form or
+          documentation, if provided along with the Derivative Works; or,
+          within a display generated by the Derivative Works, if and
+          wherever such third-party notices normally appear. The contents
+          of the NOTICE file are for informational purposes only and
+          do not modify the License. You may add Your own attribution
+          notices within Derivative Works that You distribute, alongside
+          or as an addendum to the NOTICE text from the Work, provided
+          that such additional attribution notices cannot be construed
+          as modifying the License.
+
+      You may add Your own copyright statement to Your modifications and
+      may provide additional or different license terms and conditions
+      for use, reproduction, or distribution of Your modifications, or
+      for any such Derivative Works as a whole, provided Your use,
+      reproduction, and distribution of the Work otherwise complies with
+      the conditions stated in this License.
+
+   5. Submission of Contributions. Unless You explicitly state otherwise,
+      any Contribution intentionally submitted for inclusion in the Work
+      by You to the Licensor shall be under the terms and conditions of
+      this License, without any additional terms or conditions.
+      Notwithstanding the above, nothing herein shall supersede or modify
+      the terms of any separate license agreement you may have executed
+      with Licensor regarding such Contributions.
+
+   6. Trademarks. This License does not grant permission to use the trade
+      names, trademarks, service marks, or product names of the Licensor,
+      except as required for reasonable and customary use in describing the
+      origin of the Work and reproducing the content of the NOTICE file.
+
+   7. Disclaimer of Warranty. Unless required by applicable law or
+      agreed to in writing, Licensor provides the Work (and each
+      Contributor provides its Contributions) on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+      implied, including, without limitation, any warranties or conditions
+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+      PARTICULAR PURPOSE. You are solely responsible for determining the
+      appropriateness of using or redistributing the Work and assume any
+      risks associated with Your exercise of permissions under this License.
+
+   8. Limitation of Liability. In no event and under no legal theory,
+      whether in tort (including negligence), contract, or otherwise,
+      unless required by applicable law (such as deliberate and grossly
+      negligent acts) or agreed to in writing, shall any Contributor be
+      liable to You for damages, including any direct, indirect, special,
+      incidental, or consequential damages of any character arising as a
+      result of this License or out of the use or inability to use the
+      Work (including but not limited to damages for loss of goodwill,
+      work stoppage, computer failure or malfunction, or any and all
+      other commercial damages or losses), even if such Contributor
+      has been advised of the possibility of such damages.
+
+   9. Accepting Warranty or Additional Liability. While redistributing
+      the Work or Derivative Works thereof, You may choose to offer,
+      and charge a fee for, acceptance of support, warranty, indemnity,
+      or other liability obligations and/or rights consistent with this
+      License. However, in accepting such obligations, You may act only
+      on Your own behalf and on Your sole responsibility, not on behalf
+      of any other Contributor, and only if You agree to indemnify,
+      defend, and hold each Contributor harmless for any liability
+      incurred by, or claims asserted against, such Contributor by reason
+      of your accepting any such warranty or additional liability.
+
+   END OF TERMS AND CONDITIONS
+
+This software is copyrighted by the Regents of the University of
+California, Sun Microsystems, Inc., Scriptics Corporation, ActiveState
+Corporation and other parties.  The following terms apply to all files
+associated with the software unless explicitly disclaimed in
+individual files.
+
+The authors hereby grant permission to use, copy, modify, distribute,
+and license this software and its documentation for any purpose, provided
+that existing copyright notices are retained in all copies and that this
+notice is included verbatim in any distributions. No written agreement,
+license, or royalty fee is required for any of the authorized uses.
+Modifications to this software may be copyrighted by their authors
+and need not follow the licensing terms described here, provided that
+the new terms are clearly indicated on the first page of each file where
+they apply.
+
+IN NO EVENT SHALL THE AUTHORS OR DISTRIBUTORS BE LIABLE TO ANY PARTY
+FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES
+ARISING OUT OF THE USE OF THIS SOFTWARE, ITS DOCUMENTATION, OR ANY
+DERIVATIVES THEREOF, EVEN IF THE AUTHORS HAVE BEEN ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+
+THE AUTHORS AND DISTRIBUTORS SPECIFICALLY DISCLAIM ANY WARRANTIES,
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE
+IS PROVIDED ON AN "AS IS" BASIS, AND THE AUTHORS AND DISTRIBUTORS HAVE
+NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
+MODIFICATIONS.
+
+GOVERNMENT USE: If you are acquiring this software on behalf of the
+U.S. government, the Government shall have only "Restricted Rights"
+in the software and related documentation as defined in the Federal
+Acquisition Regulations (FARs) in Clause 52.227.19 (c) (2).  If you
+are acquiring the software on behalf of the Department of Defense, the
+software shall be classified as "Commercial Computer Software" and the
+Government shall have only "Restricted Rights" as defined in Clause
+252.227-7014 (b) (3) of DFARs.  Notwithstanding the foregoing, the
+authors grant the U.S. Government and others acting in its behalf
+permission to use and distribute the software in accordance with the
+terms specified in this license.
+
+This software is copyrighted by the Regents of the University of
+California, Sun Microsystems, Inc., Scriptics Corporation, ActiveState
+Corporation, Apple Inc. and other parties.  The following terms apply to
+all files associated with the software unless explicitly disclaimed in
+individual files.
+
+The authors hereby grant permission to use, copy, modify, distribute,
+and license this software and its documentation for any purpose, provided
+that existing copyright notices are retained in all copies and that this
+notice is included verbatim in any distributions. No written agreement,
+license, or royalty fee is required for any of the authorized uses.
+Modifications to this software may be copyrighted by their authors
+and need not follow the licensing terms described here, provided that
+the new terms are clearly indicated on the first page of each file where
+they apply.
+
+IN NO EVENT SHALL THE AUTHORS OR DISTRIBUTORS BE LIABLE TO ANY PARTY
+FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES
+ARISING OUT OF THE USE OF THIS SOFTWARE, ITS DOCUMENTATION, OR ANY
+DERIVATIVES THEREOF, EVEN IF THE AUTHORS HAVE BEEN ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+
+THE AUTHORS AND DISTRIBUTORS SPECIFICALLY DISCLAIM ANY WARRANTIES,
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE
+IS PROVIDED ON AN "AS IS" BASIS, AND THE AUTHORS AND DISTRIBUTORS HAVE
+NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR
+MODIFICATIONS.
+
+GOVERNMENT USE: If you are acquiring this software on behalf of the
+U.S. government, the Government shall have only "Restricted Rights"
+in the software and related documentation as defined in the Federal
+Acquisition Regulations (FARs) in Clause 52.227.19 (c) (2).  If you
+are acquiring the software on behalf of the Department of Defense, the
+software shall be classified as "Commercial Computer Software" and the
+Government shall have only "Restricted Rights" as defined in Clause
+252.227-7013 (b) (3) of DFARs.  Notwithstanding the foregoing, the
+authors grant the U.S. Government and others acting in its behalf
+permission to use and distribute the software in accordance with the
+terms specified in this license.
+
+=== Full license terms: MIT ===
+
+Permission is hereby granted, free of charge, to any
+person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the
+Software without restriction, including without
+limitation the rights to use, copy, modify, merge,
+publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice
+shall be included in all copies or substantial portions
+of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+=== Components: DOCVORTEX-PDFIUM-PATHS.txt, office/DOCVORTEX.txt ===
+MIT License
+
+Copyright (c) 2026 DocVortex contributors
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: EQUIVALENT-IDEOGRAPH-17.txt ===
+# EquivalentUnifiedIdeograph-17.0.0.txt
+# Date: 2025-08-01
+# © 2025 Unicode®, Inc.
+# Unicode and the Unicode Logo are registered trademarks of Unicode, Inc. in the U.S. and other countries.
+# For terms of use and license, see https://www.unicode.org/terms_of_use.html
+#
+# For documentation, see UAX #44: Unicode Character Database,
+# at https://www.unicode.org/reports/tr44/
+#
+# This file defines the following property:
+#
+# Equivalent_Unified_Ideograph
+#
+# This data file lists CJK radicals and CJK strokes (aka characters
+# that have the Radical=Yes property or are in the CJK Strokes block)
+# for which there are reasonably equivalent CJK unified ideographs in
+# that they are visually identical or near-identical.
+#
+# The file contains a list of lines with mappings from one code point
+# or code point range to an equivalent CJK unified ideograph.
+#
+# Each mapping line contains two fields, separated by a semicolon (';').
+# The first field contains a code point or code point range represented
+# as a variable-length hexadecimal value with 4 to 6 digits. The second
+# field contains a code point represented as a variable-length
+# hexadecimal value with 4 to 6 digits.
+#
+# CJK radicals and CJK strokes for which no reasonably equivalent CJK
+# unified ideographs exist are listed as comments at the end of the file.
+#
+# Formally, the default value of the Equivalent_Unified_Ideograph
+# property for each code point is <none>, unless a mapping to some
+# other character is specified in this data file. When a code point
+# has the default value for the Equivalent_Unified_Ideograph property,
+# that means that no other character exists whose representative glyph
+# is a reasonably equivalent CJK unified ideograph.
+#
+# This file was originally created by Ken Lunde.
+#
+# ############################################################
+#
+# Property: Equivalent_Unified_Ideograph
+#
+# @missing: 0000..10FFFF; <none>
+
+2E81       ; 5382  #     CJK RADICAL CLIFF
+2E82       ; 4E5B  #     CJK RADICAL SECOND ONE
+2E83       ; 4E5A  #     CJK RADICAL SECOND TWO
+2E84       ; 4E59  #     CJK RADICAL SECOND THREE
+2E85       ; 4EBB  #     CJK RADICAL PERSON
+2E86       ; 5182  #     CJK RADICAL BOX
+2E87       ; 20628 #     CJK RADICAL TABLE
+2E88       ; 5200  #     CJK RADICAL KNIFE ONE
+2E89       ; 5202  #     CJK RADICAL KNIFE TWO
+2E8A       ; 535C  #     CJK RADICAL DIVINATION
+2E8B       ; 353E  #     CJK RADICAL SEAL
+2E8C..2E8D ; 5C0F  # [2] CJK RADICAL SMALL ONE..CJK RADICAL SMALL TWO
+2E8E       ; 5140  #     CJK RADICAL LAME ONE
+2E8F       ; 5C23  #     CJK RADICAL LAME TWO
+2E90       ; 5C22  #     CJK RADICAL LAME THREE
+2E91       ; 21BC2 #     CJK RADICAL LAME FOUR
+2E92       ; 5DF3  #     CJK RADICAL SNAKE
+2E93       ; 5E7A  #     CJK RADICAL THREAD
+2E94       ; 5F51  #     CJK RADICAL SNOUT ONE
+2E95       ; 2B739 #     CJK RADICAL SNOUT TWO
+2E96       ; 5FC4  #     CJK RADICAL HEART ONE
+2E97       ; 5FC3  #     CJK RADICAL HEART TWO
+2E98       ; 624C  #     CJK RADICAL HAND
+2E99       ; 6535  #     CJK RADICAL RAP
+2E9B       ; 65E1  #     CJK RADICAL CHOKE
+2E9C       ; 65E5  #     CJK RADICAL SUN
+2E9D       ; 6708  #     CJK RADICAL MOON
+2E9E       ; 6B7A  #     CJK RADICAL DEATH
+2E9F       ; 6BCD  #     CJK RADICAL MOTHER
+2EA0       ; 6C11  #     CJK RADICAL CIVILIAN
+2EA1       ; 6C35  #     CJK RADICAL WATER ONE
+2EA2       ; 6C3A  #     CJK RADICAL WATER TWO
+2EA3       ; 706C  #     CJK RADICAL FIRE
+2EA4..2EA5 ; 722B  # [2] CJK RADICAL PAW ONE..CJK RADICAL PAW TWO
+2EA6       ; 4E2C  #     CJK RADICAL SIMPLIFIED HALF TREE TRUNK
+2EA7       ; 725B  #     CJK RADICAL COW
+2EA8       ; 72AD  #     CJK RADICAL DOG
+2EA9       ; 738B  #     CJK RADICAL JADE
+2EAA       ; 24D14 #     CJK RADICAL BOLT OF CLOTH
+2EAB       ; 76EE  #     CJK RADICAL EYE
+2EAC       ; 793A  #     CJK RADICAL SPIRIT ONE
+2EAD       ; 793B  #     CJK RADICAL SPIRIT TWO
+2EAE       ; 25AD7 #     CJK RADICAL BAMBOO
+2EAF       ; 7CF9  #     CJK RADICAL SILK
+2EB0       ; 7E9F  #     CJK RADICAL C-SIMPLIFIED SILK
+2EB1       ; 7F53  #     CJK RADICAL NET ONE
+2EB2       ; 7F52  #     CJK RADICAL NET TWO
+2EB3       ; 34C1  #     CJK RADICAL NET THREE
+2EB4       ; 5197  #     CJK RADICAL NET FOUR
+2EB5       ; 2626B #     CJK RADICAL MESH
+2EB6       ; 7F8A  #     CJK RADICAL SHEEP
+2EB7       ; 2634C #     CJK RADICAL RAM
+2EB8       ; 2634B #     CJK RADICAL EWE
+2EB9       ; 8002  #     CJK RADICAL OLD
+2EBA       ; 8080  #     CJK RADICAL BRUSH ONE
+2EBB       ; 807F  #     CJK RADICAL BRUSH TWO
+2EBC       ; 8089  #     CJK RADICAL MEAT
+2EBD       ; 26951 #     CJK RADICAL MORTAR
+2EBE..2EC0 ; 8279  # [3] CJK RADICAL GRASS ONE..CJK RADICAL GRASS THREE
+2EC1       ; 864E  #     CJK RADICAL TIGER
+2EC2       ; 8864  #     CJK RADICAL CLOTHES
+2EC3       ; 8980  #     CJK RADICAL WEST ONE
+2EC4       ; 897F  #     CJK RADICAL WEST TWO
+2EC5       ; 89C1  #     CJK RADICAL C-SIMPLIFIED SEE
+2EC6       ; 89D2  #     CJK RADICAL SIMPLIFIED HORN
+2EC7       ; 278B2 #     CJK RADICAL HORN
+2EC8       ; 8BA0  #     CJK RADICAL C-SIMPLIFIED SPEECH
+2EC9       ; 8D1D  #     CJK RADICAL C-SIMPLIFIED SHELL
+2ECA       ; 27FB7 #     CJK RADICAL FOOT
+2ECB       ; 8F66  #     CJK RADICAL C-SIMPLIFIED CART
+2ECC..2ECE ; 8FB6  # [3] CJK RADICAL SIMPLIFIED WALK..CJK RADICAL WALK TWO
+2ECF       ; 9091  #     CJK RADICAL CITY
+2ED0       ; 9485  #     CJK RADICAL C-SIMPLIFIED GOLD
+2ED1       ; 9577  #     CJK RADICAL LONG ONE
+2ED2       ; 9578  #     CJK RADICAL LONG TWO
+2ED3       ; 957F  #     CJK RADICAL C-SIMPLIFIED LONG
+2ED4       ; 95E8  #     CJK RADICAL C-SIMPLIFIED GATE
+2ED5       ; 28E0F #     CJK RADICAL MOUND ONE
+2ED6       ; 961D  #     CJK RADICAL MOUND TWO
+2ED7       ; 96E8  #     CJK RADICAL RAIN
+2ED8       ; 9752  #     CJK RADICAL BLUE
+2ED9       ; 97E6  #     CJK RADICAL C-SIMPLIFIED TANNED LEATHER
+2EDA       ; 9875  #     CJK RADICAL C-SIMPLIFIED LEAF
+2EDB       ; 98CE  #     CJK RADICAL C-SIMPLIFIED WIND
+2EDC       ; 98DE  #     CJK RADICAL C-SIMPLIFIED FLY
+2EDD       ; 98DF  #     CJK RADICAL EAT ONE
+2EDE       ; 2967F #     CJK RADICAL EAT TWO
+2EDF       ; 98E0  #     CJK RADICAL EAT THREE
+2EE0       ; 9963  #     CJK RADICAL C-SIMPLIFIED EAT
+2EE1       ; 29810 #     CJK RADICAL HEAD
+2EE2       ; 9A6C  #     CJK RADICAL C-SIMPLIFIED HORSE
+2EE3       ; 9AA8  #     CJK RADICAL BONE
+2EE4       ; 9B3C  #     CJK RADICAL GHOST
+2EE5       ; 9C7C  #     CJK RADICAL C-SIMPLIFIED FISH
+2EE6       ; 9E1F  #     CJK RADICAL C-SIMPLIFIED BIRD
+2EE7       ; 5364  #     CJK RADICAL C-SIMPLIFIED SALT
+2EE8       ; 9EA6  #     CJK RADICAL SIMPLIFIED WHEAT
+2EE9       ; 9EC4  #     CJK RADICAL SIMPLIFIED YELLOW
+2EEA       ; 9EFE  #     CJK RADICAL C-SIMPLIFIED FROG
+2EEB       ; 6589  #     CJK RADICAL J-SIMPLIFIED EVEN
+2EEC       ; 9F50  #     CJK RADICAL C-SIMPLIFIED EVEN
+2EED       ; 6B6F  #     CJK RADICAL J-SIMPLIFIED TOOTH
+2EEE       ; 9F7F  #     CJK RADICAL C-SIMPLIFIED TOOTH
+2EEF       ; 7ADC  #     CJK RADICAL J-SIMPLIFIED DRAGON
+2EF0       ; 9F99  #     CJK RADICAL C-SIMPLIFIED DRAGON
+2EF1       ; 9F9C  #     CJK RADICAL TURTLE
+2EF2       ; 4E80  #     CJK RADICAL J-SIMPLIFIED TURTLE
+2EF3       ; 9F9F  #     CJK RADICAL C-SIMPLIFIED TURTLE
+2F00       ; 4E00  #     KANGXI RADICAL ONE
+2F01       ; 4E28  #     KANGXI RADICAL LINE
+2F02       ; 4E36  #     KANGXI RADICAL DOT
+2F03       ; 4E3F  #     KANGXI RADICAL SLASH
+2F04       ; 4E59  #     KANGXI RADICAL SECOND
+2F05       ; 4E85  #     KANGXI RADICAL HOOK
+2F06       ; 4E8C  #     KANGXI RADICAL TWO
+2F07       ; 4EA0  #     KANGXI RADICAL LID
+2F08       ; 4EBA  #     KANGXI RADICAL MAN
+2F09       ; 513F  #     KANGXI RADICAL LEGS
+2F0A       ; 5165  #     KANGXI RADICAL ENTER
+2F0B       ; 516B  #     KANGXI RADICAL EIGHT
+2F0C       ; 5182  #     KANGXI RADICAL DOWN BOX
+2F0D       ; 5196  #     KANGXI RADICAL COVER
+2F0E       ; 51AB  #     KANGXI RADICAL ICE
+2F0F       ; 51E0  #     KANGXI RADICAL TABLE
+2F10       ; 51F5  #     KANGXI RADICAL OPEN BOX
+2F11       ; 5200  #     KANGXI RADICAL KNIFE
+2F12       ; 529B  #     KANGXI RADICAL POWER
+2F13       ; 52F9  #     KANGXI RADICAL WRAP
+2F14       ; 5315  #     KANGXI RADICAL SPOON
+2F15       ; 531A  #     KANGXI RADICAL RIGHT OPEN BOX
+2F16       ; 5338  #     KANGXI RADICAL HIDING ENCLOSURE
+2F17       ; 5341  #     KANGXI RADICAL TEN
+2F18       ; 535C  #     KANGXI RADICAL DIVINATION
+2F19       ; 5369  #     KANGXI RADICAL SEAL
+2F1A       ; 5382  #     KANGXI RADICAL CLIFF
+2F1B       ; 53B6  #     KANGXI RADICAL PRIVATE
+2F1C       ; 53C8  #     KANGXI RADICAL AGAIN
+2F1D       ; 53E3  #     KANGXI RADICAL MOUTH
+2F1E       ; 56D7  #     KANGXI RADICAL ENCLOSURE
+2F1F       ; 571F  #     KANGXI RADICAL EARTH
+2F20       ; 58EB  #     KANGXI RADICAL SCHOLAR
+2F21       ; 5902  #     KANGXI RADICAL GO
+2F22       ; 590A  #     KANGXI RADICAL GO SLOWLY
+2F23       ; 5915  #     KANGXI RADICAL EVENING
+2F24       ; 5927  #     KANGXI RADICAL BIG
+2F25       ; 5973  #     KANGXI RADICAL WOMAN
+2F26       ; 5B50  #     KANGXI RADICAL CHILD
+2F27       ; 5B80  #     KANGXI RADICAL ROOF
+2F28       ; 5BF8  #     KANGXI RADICAL INCH
+2F29       ; 5C0F  #     KANGXI RADICAL SMALL
+2F2A       ; 5C22  #     KANGXI RADICAL LAME
+2F2B       ; 5C38  #     KANGXI RADICAL CORPSE
+2F2C       ; 5C6E  #     KANGXI RADICAL SPROUT
+2F2D       ; 5C71  #     KANGXI RADICAL MOUNTAIN
+2F2E       ; 5DDB  #     KANGXI RADICAL RIVER
+2F2F       ; 5DE5  #     KANGXI RADICAL WORK
+2F30       ; 5DF1  #     KANGXI RADICAL ONESELF
+2F31       ; 5DFE  #     KANGXI RADICAL TURBAN
+2F32       ; 5E72  #     KANGXI RADICAL DRY
+2F33       ; 5E7A  #     KANGXI RADICAL SHORT THREAD
+2F34       ; 5E7F  #     KANGXI RADICAL DOTTED CLIFF
+2F35       ; 5EF4  #     KANGXI RADICAL LONG STRIDE
+2F36       ; 5EFE  #     KANGXI RADICAL TWO HANDS
+2F37       ; 5F0B  #     KANGXI RADICAL SHOOT
+2F38       ; 5F13  #     KANGXI RADICAL BOW
+2F39       ; 5F50  #     KANGXI RADICAL SNOUT
+2F3A       ; 5F61  #     KANGXI RADICAL BRISTLE
+2F3B       ; 5F73  #     KANGXI RADICAL STEP
+2F3C       ; 5FC3  #     KANGXI RADICAL HEART
+2F3D       ; 6208  #     KANGXI RADICAL HALBERD
+2F3E       ; 6236  #     KANGXI RADICAL DOOR
+2F3F       ; 624B  #     KANGXI RADICAL HAND
+2F40       ; 652F  #     KANGXI RADICAL BRANCH
+2F41       ; 6534  #     KANGXI RADICAL RAP
+2F42       ; 6587  #     KANGXI RADICAL SCRIPT
+2F43       ; 6597  #     KANGXI RADICAL DIPPER
+2F44       ; 65A4  #     KANGXI RADICAL AXE
+2F45       ; 65B9  #     KANGXI RADICAL SQUARE
+2F46       ; 65E0  #     KANGXI RADICAL NOT
+2F47       ; 65E5  #     KANGXI RADICAL SUN
+2F48       ; 66F0  #     KANGXI RADICAL SAY
+2F49       ; 6708  #     KANGXI RADICAL MOON
+2F4A       ; 6728  #     KANGXI RADICAL TREE
+2F4B       ; 6B20  #     KANGXI RADICAL LACK
+2F4C       ; 6B62  #     KANGXI RADICAL STOP
+2F4D       ; 6B79  #     KANGXI RADICAL DEATH
+2F4E       ; 6BB3  #     KANGXI RADICAL WEAPON
+2F4F       ; 6BCB  #     KANGXI RADICAL DO NOT
+2F50       ; 6BD4  #     KANGXI RADICAL COMPARE
+2F51       ; 6BDB  #     KANGXI RADICAL FUR
+2F52       ; 6C0F  #     KANGXI RADICAL CLAN
+2F53       ; 6C14  #     KANGXI RADICAL STEAM
+2F54       ; 6C34  #     KANGXI RADICAL WATER
+2F55       ; 706B  #     KANGXI RADICAL FIRE
+2F56       ; 722A  #     KANGXI RADICAL CLAW
+2F57       ; 7236  #     KANGXI RADICAL FATHER
+2F58       ; 723B  #     KANGXI RADICAL DOUBLE X
+2F59       ; 723F  #     KANGXI RADICAL HALF TREE TRUNK
+2F5A       ; 7247  #     KANGXI RADICAL SLICE
+2F5B       ; 7259  #     KANGXI RADICAL FANG
+2F5C       ; 725B  #     KANGXI RADICAL COW
+2F5D       ; 72AC  #     KANGXI RADICAL DOG
+2F5E       ; 7384  #     KANGXI RADICAL PROFOUND
+2F5F       ; 7389  #     KANGXI RADICAL JADE
+2F60       ; 74DC  #     KANGXI RADICAL MELON
+2F61       ; 74E6  #     KANGXI RADICAL TILE
+2F62       ; 7518  #     KANGXI RADICAL SWEET
+2F63       ; 751F  #     KANGXI RADICAL LIFE
+2F64       ; 7528  #     KANGXI RADICAL USE
+2F65       ; 7530  #     KANGXI RADICAL FIELD
+2F66       ; 758B  #     KANGXI RADICAL BOLT OF CLOTH
+2F67       ; 7592  #     KANGXI RADICAL SICKNESS
+2F68       ; 7676  #     KANGXI RADICAL DOTTED TENT
+2F69       ; 767D  #     KANGXI RADICAL WHITE
+2F6A       ; 76AE  #     KANGXI RADICAL SKIN
+2F6B       ; 76BF  #     KANGXI RADICAL DISH
+2F6C       ; 76EE  #     KANGXI RADICAL EYE
+2F6D       ; 77DB  #     KANGXI RADICAL SPEAR
+2F6E       ; 77E2  #     KANGXI RADICAL ARROW
+2F6F       ; 77F3  #     KANGXI RADICAL STONE
+2F70       ; 793A  #     KANGXI RADICAL SPIRIT
+2F71       ; 79B8  #     KANGXI RADICAL TRACK
+2F72       ; 79BE  #     KANGXI RADICAL GRAIN
+2F73       ; 7A74  #     KANGXI RADICAL CAVE
+2F74       ; 7ACB  #     KANGXI RADICAL STAND
+2F75       ; 7AF9  #     KANGXI RADICAL BAMBOO
+2F76       ; 7C73  #     KANGXI RADICAL RICE
+2F77       ; 7CF8  #     KANGXI RADICAL SILK
+2F78       ; 7F36  #     KANGXI RADICAL JAR
+2F79       ; 7F51  #     KANGXI RADICAL NET
+2F7A       ; 7F8A  #     KANGXI RADICAL SHEEP
+2F7B       ; 7FBD  #     KANGXI RADICAL FEATHER
+2F7C       ; 8001  #     KANGXI RADICAL OLD
+2F7D       ; 800C  #     KANGXI RADICAL AND
+2F7E       ; 8012  #     KANGXI RADICAL PLOW
+2F7F       ; 8033  #     KANGXI RADICAL EAR
+2F80       ; 807F  #     KANGXI RADICAL BRUSH
+2F81       ; 8089  #     KANGXI RADICAL MEAT
+2F82       ; 81E3  #     KANGXI RADICAL MINISTER
+2F83       ; 81EA  #     KANGXI RADICAL SELF
+2F84       ; 81F3  #     KANGXI RADICAL ARRIVE
+2F85       ; 81FC  #     KANGXI RADICAL MORTAR
+2F86       ; 820C  #     KANGXI RADICAL TONGUE
+2F87       ; 821B  #     KANGXI RADICAL OPPOSE
+2F88       ; 821F  #     KANGXI RADICAL BOAT
+2F89       ; 826E  #     KANGXI RADICAL STOPPING
+2F8A       ; 8272  #     KANGXI RADICAL COLOR
+2F8B       ; 8278  #     KANGXI RADICAL GRASS
+2F8C       ; 864D  #     KANGXI RADICAL TIGER
+2F8D       ; 866B  #     KANGXI RADICAL INSECT
+2F8E       ; 8840  #     KANGXI RADICAL BLOOD
+2F8F       ; 884C  #     KANGXI RADICAL WALK ENCLOSURE
+2F90       ; 8863  #     KANGXI RADICAL CLOTHES
+2F91       ; 897E  #     KANGXI RADICAL WEST
+2F92       ; 898B  #     KANGXI RADICAL SEE
+2F93       ; 89D2  #     KANGXI RADICAL HORN
+2F94       ; 8A00  #     KANGXI RADICAL SPEECH
+2F95       ; 8C37  #     KANGXI RADICAL VALLEY
+2F96       ; 8C46  #     KANGXI RADICAL BEAN
+2F97       ; 8C55  #     KANGXI RADICAL PIG
+2F98       ; 8C78  #     KANGXI RADICAL BADGER
+2F99       ; 8C9D  #     KANGXI RADICAL SHELL
+2F9A       ; 8D64  #     KANGXI RADICAL RED
+2F9B       ; 8D70  #     KANGXI RADICAL RUN
+2F9C       ; 8DB3  #     KANGXI RADICAL FOOT
+2F9D       ; 8EAB  #     KANGXI RADICAL BODY
+2F9E       ; 8ECA  #     KANGXI RADICAL CART
+2F9F       ; 8F9B  #     KANGXI RADICAL BITTER
+2FA0       ; 8FB0  #     KANGXI RADICAL MORNING
+2FA1       ; 8FB5  #     KANGXI RADICAL WALK
+2FA2       ; 9091  #     KANGXI RADICAL CITY
+2FA3       ; 9149  #     KANGXI RADICAL WINE
+2FA4       ; 91C6  #     KANGXI RADICAL DISTINGUISH
+2FA5       ; 91CC  #     KANGXI RADICAL VILLAGE
+2FA6       ; 91D1  #     KANGXI RADICAL GOLD
+2FA7       ; 9577  #     KANGXI RADICAL LONG
+2FA8       ; 9580  #     KANGXI RADICAL GATE
+2FA9       ; 961C  #     KANGXI RADICAL MOUND
+2FAA       ; 96B6  #     KANGXI RADICAL SLAVE
+2FAB       ; 96B9  #     KANGXI RADICAL SHORT TAILED BIRD
+2FAC       ; 96E8  #     KANGXI RADICAL RAIN
+2FAD       ; 9751  #     KANGXI RADICAL BLUE
+2FAE       ; 975E  #     KANGXI RADICAL WRONG
+2FAF       ; 9762  #     KANGXI RADICAL FACE
+2FB0       ; 9769  #     KANGXI RADICAL LEATHER
+2FB1       ; 97CB  #     KANGXI RADICAL TANNED LEATHER
+2FB2       ; 97ED  #     KANGXI RADICAL LEEK
+2FB3       ; 97F3  #     KANGXI RADICAL SOUND
+2FB4       ; 9801  #     KANGXI RADICAL LEAF
+2FB5       ; 98A8  #     KANGXI RADICAL WIND
+2FB6       ; 98DB  #     KANGXI RADICAL FLY
+2FB7       ; 98DF  #     KANGXI RADICAL EAT
+2FB8       ; 9996  #     KANGXI RADICAL HEAD
+2FB9       ; 9999  #     KANGXI RADICAL FRAGRANT
+2FBA       ; 99AC  #     KANGXI RADICAL HORSE
+2FBB       ; 9AA8  #     KANGXI RADICAL BONE
+2FBC       ; 9AD8  #     KANGXI RADICAL TALL
+2FBD       ; 9ADF  #     KANGXI RADICAL HAIR
+2FBE       ; 9B25  #     KANGXI RADICAL FIGHT
+2FBF       ; 9B2F  #     KANGXI RADICAL SACRIFICIAL WINE
+2FC0       ; 9B32  #     KANGXI RADICAL CAULDRON
+2FC1       ; 9B3C  #     KANGXI RADICAL GHOST
+2FC2       ; 9B5A  #     KANGXI RADICAL FISH
+2FC3       ; 9CE5  #     KANGXI RADICAL BIRD
+2FC4       ; 9E75  #     KANGXI RADICAL SALT
+2FC5       ; 9E7F  #     KANGXI RADICAL DEER
+2FC6       ; 9EA5  #     KANGXI RADICAL WHEAT
+2FC7       ; 9EBB  #     KANGXI RADICAL HEMP
+2FC8       ; 9EC3  #     KANGXI RADICAL YELLOW
+2FC9       ; 9ECD  #     KANGXI RADICAL MILLET
+2FCA       ; 9ED1  #     KANGXI RADICAL BLACK
+2FCB       ; 9EF9  #     KANGXI RADICAL EMBROIDERY
+2FCC       ; 9EFD  #     KANGXI RADICAL FROG
+2FCD       ; 9F0E  #     KANGXI RADICAL TRIPOD
+2FCE       ; 9F13  #     KANGXI RADICAL DRUM
+2FCF       ; 9F20  #     KANGXI RADICAL RAT
+2FD0       ; 9F3B  #     KANGXI RADICAL NOSE
+2FD1       ; 9F4A  #     KANGXI RADICAL EVEN
+2FD2       ; 9F52  #     KANGXI RADICAL TOOTH
+2FD3       ; 9F8D  #     KANGXI RADICAL DRAGON
+2FD4       ; 9F9C  #     KANGXI RADICAL TURTLE
+2FD5       ; 9FA0  #     KANGXI RADICAL FLUTE
+31C6       ; 200CC #     CJK STROKE HZG
+31CF       ; 4E40  #     CJK STROKE N
+31D0       ; 4E00  #     CJK STROKE H
+31D1       ; 4E28  #     CJK STROKE S
+31D2..31D3 ; 4E3F  # [2] CJK STROKE P..CJK STROKE SP
+31D4       ; 4E36  #     CJK STROKE D
+31D5       ; 200CD #     CJK STROKE HZ
+31D6       ; 4E5B  #     CJK STROKE HG
+31D7       ; 200CA #     CJK STROKE SZ
+31D8       ; 200CE #     CJK STROKE SWZ
+31D9       ; 2010C #     CJK STROKE ST
+31DA       ; 4E85  #     CJK STROKE SG
+31DB       ; 21FE8 #     CJK STROKE PD
+31DC       ; 200CB #     CJK STROKE PZ
+31DD       ; 4E40  #     CJK STROKE TN
+31DE       ; 200D1 #     CJK STROKE SZZ
+31DF       ; 4E5A  #     CJK STROKE SWG
+31E0       ; 4E59  #     CJK STROKE HXWG
+31E1       ; 2010E #     CJK STROKE HZZZG
+
+# The following characters have no equivalent CJK unified ideograph.
+
+# 2E80; CJK RADICAL REPEAT
+# 31C0; CJK STROKE T
+# 31C1; CJK STROKE WG
+# 31C2; CJK STROKE XG
+# 31C3; CJK STROKE BXG
+# 31C4; CJK STROKE SW
+# 31C5; CJK STROKE HZZ
+# 31C7; CJK STROKE HP
+# 31C8; CJK STROKE HZWG
+# 31C9; CJK STROKE SZWG
+# 31CA; CJK STROKE HZT
+# 31CB; CJK STROKE HZZP
+# 31CC; CJK STROKE HPWG
+# 31CD; CJK STROKE HZW
+# 31CE; CJK STROKE HZZZ
+# 31E2; CJK STROKE PG
+# 31E3; CJK STROKE Q
+# 31E4; CJK STROKE HXG
+# 31E5; CJK STROKE SZP
+
+# EOF
+
+
+=== Components: LOPDF-LICENSE.txt ===
+MIT License
+
+Copyright (c) 2016 Junfeng Liu
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: MAGIKA-NOTICE.txt ===
+Magika code-language classification
+Copyright 2024 Google LLC
+Model: standard_v3_3, original RapidDoc vendored model/config.
+Source: https://github.com/google/magika
+Feature extraction and high-confidence selection ported from the Apache-2.0 Python implementation.
+
+
+                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   
+[Full Apache-2.0 terms above apply here.]
+
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "[]"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright [yyyy] [name of copyright owner]
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+=== Components: MIMALLOC-LICENSE.txt ===
+Rust allocator dependencies (static linkage, no CRT override)
+
+mimalloc-0.1.52\LICENSE.txt
+
+Copyright 2019 Octavian Oncescu
+
+
+[Full MIT terms above apply here.]
+
+
+libmimalloc-sys-0.1.49\LICENSE.txt
+
+Copyright 2019 Octavian Oncescu
+
+
+[Full MIT terms above apply here.]
+
+
+libmimalloc-sys-0.1.49\c_src\mimalloc\v3\LICENSE
+
+MIT License
+
+Copyright (c) 2018-2025 Microsoft Corporation, Daan Leijen
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: NUM-RATIONAL-LICENSE-MIT.txt, NUM-TRAITS-LICENSE-MIT.txt, cargo-runtime/bitflags-2.13.2/LICENSE-MIT, cargo-runtime/log-0.4.34/LICENSE-MIT, office/chart-dependencies/log-0.4.34/LICENSE-MIT, office/chart-dependencies/num-traits-0.2.19/LICENSE-MIT, office/image-dependencies/bitflags-2.13.2/LICENSE-MIT, office/image-dependencies/log-0.4.34/LICENSE-MIT, office/image-dependencies/num-traits-0.2.19/LICENSE-MIT ===
+Copyright (c) 2014 The Rust Project Developers
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: NUMPY-PAIRWISE.txt ===
+Pairwise FP64 summation order adapted from NumPy 2.4.6 loops_utils.h.src.
+Source: https://github.com/numpy/numpy/blob/v2.4.6/numpy/_core/src/umath/loops_utils.h.src
+
+Copyright (c) 2005-2025, NumPy Developers.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+    * Redistributions of source code must retain the above copyright
+       notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+       copyright notice, this list of conditions and the following
+       disclaimer in the documentation and/or other materials provided
+       with the distribution.
+
+    * Neither the name of the NumPy Developers nor the names of any
+       contributors may be used to endorse or promote products derived
+       from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+=== Components: OPENCV-RASTER-NOTICE.txt ===
+Native docvortex_ocr raster processing
+Sources: OpenCV 4.12.0 modules/imgproc/src/{canny,hough,thresh}.cpp; existing affine interpolation follows imgwarp.cpp.
+Ported Canny L1, probabilistic Hough, adaptive Gaussian threshold, binary axis morphology and eight-connected components. No OpenCV shared-library dependency.
+
+/*M///////////////////////////////////////////////////////////////////////////////////////
+//
+//  IMPORTANT: READ BEFORE DOWNLOADING, COPYING, INSTALLING OR USING.
+//
+//  By downloading, copying, installing or using the software you agree to this license.
+//  If you do not agree to this license, do not download, install,
+//  copy or use the software.
+//
+//
+//                           License Agreement
+//                For Open Source Computer Vision Library
+//
+// Copyright (C) 2000, Intel Corporation, all rights reserved.
+// Copyright (C) 2013, OpenCV Foundation, all rights reserved.
+// Copyright (C) 2014, Itseez, Inc, all rights reserved.
+// Third party copyrights are property of their respective owners.
+//
+// Redistribution and use in source and binary forms, with or without modification,
+// are permitted provided that the following conditions are met:
+//
+//   * Redistribution's of source code must retain the above copyright notice,
+//     this list of conditions and the following disclaimer.
+//
+//   * Redistribution's in binary form must reproduce the above copyright notice,
+//     this list of conditions and the following disclaimer in the documentation
+//     and/or other materials provided with the distribution.
+//
+//   * The name of the copyright holders may not be used to endorse or promote products
+//     derived from this software without specific prior written permission.
+//
+// This software is provided by the copyright holders and contributors "as is" and
+// any express or implied warranties, including, but not limited to, the implied
+// warranties of merchantability and fitness for a particular purpose are disclaimed.
+// In no event shall the Intel Corporation or contributors be liable for any direct,
+// indirect, incidental, special, exemplary, or consequential damages
+// (including, but not limited to, procurement of substitute goods or services;
+// loss of use, data, or profits; or business interruption) however caused
+// and on any theory of liability, whether in contract, strict liability,
+// or tort (including negligence or otherwise) arising in any way out of
+// the use of this software, even if advised of the possibility of such damage.
+//
+//M*/
+
+
+
+=== Components: OPENCV-WARP.txt ===
+OpenCV 4.13.0 warpPerspective/remap cubic and perspective/JacobiSVD compatibility port
+https://raw.githubusercontent.com/opencv/opencv/4.13.0/modules/imgproc/src/imgwarp.cpp
+https://raw.githubusercontent.com/opencv/opencv/4.13.0/modules/core/src/lapack.cpp
+
+/*M///////////////////////////////////////////////////////////////////////////////////////
+//
+//  IMPORTANT: READ BEFORE DOWNLOADING, COPYING, INSTALLING OR USING.
+//
+//  By downloading, copying, installing or using the software you agree to this license.
+//  If you do not agree to this license, do not download, install,
+//  copy or use the software.
+//
+//
+//                           License Agreement
+//                For Open Source Computer Vision Library
+//
+// Copyright (C) 2000-2008, Intel Corporation, all rights reserved.
+// Copyright (C) 2009, Willow Garage Inc., all rights reserved.
+// Copyright (C) 2014-2015, Itseez Inc., all rights reserved.
+// Third party copyrights are property of their respective owners.
+//
+// Redistribution and use in source and binary forms, with or without modification,
+// are permitted provided that the following conditions are met:
+//
+//   * Redistribution's of source code must retain the above copyright notice,
+//     this list of conditions and the following disclaimer.
+//
+//   * Redistribution's in binary form must reproduce the above copyright notice,
+//     this list of conditions and the following disclaimer in the documentation
+//     and/or other materials provided with the distribution.
+//
+//   * The name of the copyright holders may not be used to endorse or promote products
+//     derived from this software without specific prior written permission.
+//
+// This software is provided by the copyright holders and contributors "as is" and
+// any express or implied warranties, including, but not limited to, the implied
+// warranties of merchantability and fitness for a particular purpose are disclaimed.
+// In no event shall the Intel Corporation or contributors be liable for any direct,
+// indirect, incidental, special, exemplary, or consequential damages
+// (including, but not limited to, procurement of substitute goods or services;
+// loss of use, data, or profits; or business interruption) however caused
+// and on any theory of liability, whether in contract, strict liability,
+// or tort (including negligence or otherwise) arising in any way out of
+// the use of this software, even if advised of the possibility of such damage.
+//
+//M*/
+
+
+=== Components: PDFTEXT.txt ===
+Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   
+[Full Apache-2.0 terms above apply here.]
+
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "[]"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright 2024 Vikas Paruchuri
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+=== Components: PYPDFIUM2.txt ===
+
+                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   
+[Full Apache-2.0 terms above apply here.]
+
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "[]"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright [yyyy] [name of copyright owner]
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+
+=== Components: PYTHON-CODECS-LICENSE.txt, PYTHON-MATH.txt, PYTHON-SET.txt ===
+
+[Full CPython-license-chain terms above apply here.]
+
+
+
+
+=== Components: TATR-NOTICE.txt ===
+# Table Transformer
+
+Model: microsoft/table-transformer-structure-recognition-v1.1-all (MIT),
+Hugging Face revision 7587a7ef111d9dcbf8ac695f1376ab7014340a0c.
+
+`postprocess.py` is copied from Microsoft table-transformer `src/postprocess.py`,
+with the Rect import changed to a local finite-rectangle implementation.
+`structure.py` contains selected unchanged functions from `src/inference.py`,
+with minimal imports, local Rect and relative postprocess import. Copyright Microsoft Corporation.
+Source revision: 16d124f616109746b7785f03085100f1f6247575.
+Source: https://github.com/microsoft/table-transformer . See LICENSE (MIT).
+
+The adapter adds NumPy output conversion, single-table selection, empty-grid guard,
+and HTML serialization with aligned logical spans and clipped input-coordinate boxes.
+
+RapidDoc integration additionally preserves HTML rows fully covered by rowspan,
+applies the declared table confidence threshold before single-table selection,
+and validates OCR batch alignment rather than silently dropping supplied text.
+
+Rust translation preserves the selected structure and postprocess algorithms.
+
+    MIT License
+
+    Copyright (c) Microsoft Corporation.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE
+
+
+=== Components: UNICODE-DATA.txt ===
+UNICODE LICENSE V3
+
+COPYRIGHT AND PERMISSION NOTICE
+
+Copyright © 1991-2026 Unicode, Inc.
+
+NOTICE TO USER: Carefully read the following legal agreement. BY
+DOWNLOADING, INSTALLING, COPYING OR OTHERWISE USING DATA FILES, AND/OR
+SOFTWARE, YOU UNEQUIVOCALLY ACCEPT, AND AGREE TO BE BOUND BY, ALL OF THE
+TERMS AND CONDITIONS OF THIS AGREEMENT. IF YOU DO NOT AGREE, DO NOT
+DOWNLOAD, INSTALL, COPY, DISTRIBUTE OR USE THE DATA FILES OR SOFTWARE.
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of data files and any associated documentation (the "Data Files") or
+software and any associated documentation (the "Software") to deal in the
+Data Files or Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, and/or sell
+copies of the Data Files or Software, and to permit persons to whom the
+Data Files or Software are furnished to do so, provided that either (a)
+this copyright and permission notice appear with all copies of the Data
+Files or Software, or (b) this copyright and permission notice appear in
+associated Documentation.
+
+THE DATA FILES AND SOFTWARE ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
+KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF
+THIRD PARTY RIGHTS.
+
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR HOLDERS INCLUDED IN THIS NOTICE
+BE LIABLE FOR ANY CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES,
+OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,
+WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THE DATA
+FILES OR SOFTWARE.
+
+Except as contained in this notice, the name of a copyright holder shall
+not be used in advertising or otherwise to promote the sale, use or other
+dealings in these Data Files or Software without prior written
+authorization of the copyright holder.
+
+
+=== Components: cargo-runtime/base64-0.23.1/LICENSE-MIT, office/image-dependencies/base64-0.23.1/LICENSE-MIT ===
+The MIT License (MIT)
+
+Copyright (c) 2025 Alice Maz, Marshall Pierce
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: cargo-runtime/block-buffer-0.10.4/LICENSE-MIT ===
+Copyright (c) 2018-2019 The RustCrypto Project Developers
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: cargo-runtime/bytes-1.12.1/LICENSE ===
+Copyright (c) 2018 Carl Lerche
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: cargo-runtime/cfg-if-1.0.5/LICENSE-MIT, office/chart-dependencies/cfg-if-1.0.5/LICENSE-MIT, office/image-dependencies/cfg-if-1.0.5/LICENSE-MIT ===
+Copyright (c) 2014 Alex Crichton
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: cargo-runtime/cpufeatures-0.2.17/LICENSE-MIT ===
+Copyright (c) 2020-2025 The RustCrypto Project Developers
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: cargo-runtime/crypto-common-0.1.7/LICENSE-MIT ===
+Copyright (c) 2021 RustCrypto Developers
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: cargo-runtime/digest-0.10.7/LICENSE-MIT ===
+Copyright (c) 2017 Artyom Pavlov
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: cargo-runtime/generic-array-0.14.7/LICENSE ===
+The MIT License (MIT)
+
+Copyright (c) 2015 Bartłomiej Kamiński
+
+
+[Full MIT terms above apply here.]
+
+
+=== Components: cargo-runtime/getrandom-0.2.17/LICENSE-MIT ===
+Copyright (c) 2018-2024 The rust-random Project Developers
+Copyright (c) 2014 The Rust Project Developers
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: cargo-runtime/http-1.5.0/LICENSE-MIT ===
+Copyright (c) 2017 http-rs authors
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: cargo-runtime/httparse-1.10.1/LICENSE-MIT ===
+Copyright (c) 2015-2025 Sean McArthur
+
+
+[Full MIT terms above apply here.]
+
+
+
+
+=== Components: cargo-runtime/itoa-1.0.18/LICENSE-MIT, cargo-runtime/once_cell-1.21.4/LICENSE-MIT, cargo-runtime/utf8-zero-0.8.1/LICENSE-MIT, office/chart-dependencies/once_cell-1.21.4/LICENSE-MIT, office/image-dependencies/adler2-2.0.1/LICENSE-MIT, office/image-dependencies/once_cell-1.21.4/LICENSE-MIT ===
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: cargo-runtime/libc-0.2.191/LICENSE-MIT, office/chart-dependencies/libc-0.2.191/LICENSE-MIT ===
+Copyright (c) The Rust Project Developers
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: cargo-runtime/lock_api-0.4.14/LICENSE-MIT, cargo-runtime/parking_lot-0.12.5/LICENSE-MIT, cargo-runtime/parking_lot_core-0.9.12/LICENSE-MIT ===
+Copyright (c) 2016 The Rust Project Developers
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: cargo-runtime/percent-encoding-2.3.2/LICENSE-MIT, office/image-dependencies/data-url-0.3.2/LICENSE-MIT ===
+Copyright (c) 2013-2025 The rust-url developers
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: cargo-runtime/ring-0.17.14/LICENSE ===
+*ring* uses an "ISC" license, like BoringSSL used to use, for new code
+files. See LICENSE-other-bits for the text of that license.
+
+See LICENSE-BoringSSL for code that was sourced from BoringSSL under the
+Apache 2.0 license. Some code that was sourced from BoringSSL under the ISC
+license. In each case, the license info is at the top of the file.
+
+See src/polyfill/once_cell/LICENSE-APACHE and src/polyfill/once_cell/LICENSE-MIT
+for the license to code that was sourced from the once_cell project.
+
+
+=== Components: cargo-runtime/ring-0.17.14/LICENSE-BoringSSL ===
+
+                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   
+[Full Apache-2.0 terms above apply here.]
+
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "[]"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright [yyyy] [name of copyright owner]
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+
+Licenses for support code
+-------------------------
+
+Parts of the TLS test suite are under the Go license. This code is not included
+in BoringSSL (i.e. libcrypto and libssl) when compiled, however, so
+distributing code linked against BoringSSL does not trigger this license:
+
+Copyright (c) 2009 The Go Authors. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+BoringSSL uses the Chromium test infrastructure to run a continuous build,
+trybots etc. The scripts which manage this, and the script for generating build
+metadata, are under the Chromium license. Distributing code linked against
+BoringSSL does not trigger this license.
+
+Copyright 2015 The Chromium Authors. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+=== Components: cargo-runtime/ring-0.17.14/LICENSE-other-bits ===
+Copyright 2015-2025 Brian Smith.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+
+=== Components: cargo-runtime/rustls-0.23.46/LICENSE-ISC ===
+ISC License (ISC)
+Copyright (c) 2016, Joseph Birr-Pixton <jpixton@gmail.com>
+
+Permission to use, copy, modify, and/or distribute this software for
+any purpose with or without fee is hereby granted, provided that the
+above copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
+ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
+THIS SOFTWARE.
+
+
+=== Components: cargo-runtime/rustls-0.23.46/LICENSE-MIT ===
+Copyright (c) 2016 Joseph Birr-Pixton <jpixton@gmail.com>
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: cargo-runtime/rustls-pki-types-1.15.1/LICENSE-MIT ===
+Copyright (c) 2023 Dirkjan Ochtman <dirkjan@ochtman.nl>
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: cargo-runtime/rustls-webpki-0.103.16/LICENSE ===
+Except as otherwise noted, this project is licensed under the following
+(ISC-style) terms:
+
+Copyright 2015 Brian Smith.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHORS DISCLAIM ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+The files under third-party/chromium are licensed as described in
+third-party/chromium/LICENSE.
+
+
+=== Components: cargo-runtime/scopeguard-1.2.0/LICENSE-MIT ===
+Copyright (c) 2016-2019 Ulrik Sverdrup "bluss" and scopeguard developers
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: cargo-runtime/sha2-0.10.9/LICENSE-MIT ===
+Copyright (c) 2006-2009 Graydon Hoare
+Copyright (c) 2009-2013 Mozilla Foundation
+Copyright (c) 2016 Artyom Pavlov
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: cargo-runtime/smallvec-1.16.3/LICENSE-MIT, office/image-dependencies/smallvec-1.16.3/LICENSE-MIT ===
+Copyright (c) 2018 The Servo Project Developers
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: cargo-runtime/subtle-2.6.1/LICENSE ===
+Copyright (c) 2016-2017 Isis Agora Lovecruft, Henry de Valence. All rights reserved.
+Copyright (c) 2016-2024 Isis Agora Lovecruft. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+1. Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+
+
+=== Components: cargo-runtime/typenum-1.20.1/LICENSE ===
+MIT OR Apache-2.0
+
+=== Components: cargo-runtime/typenum-1.20.1/LICENSE-MIT ===
+The MIT License (MIT)
+
+Copyright (c) 2014 Paho Lurie-Gregg
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: cargo-runtime/untrusted-0.9.0/LICENSE.txt ===
+// Copyright 2015-2016 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR
+// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+
+=== Components: cargo-runtime/ureq-3.5.1/LICENSE-MIT ===
+MIT License
+
+Copyright (c) 2019 Martin Algesten
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: cargo-runtime/ureq-proto-0.7.1/LICENSE-MIT.txt ===
+Copyright 2022 Martin Algesten
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: cargo-runtime/webpki-roots-1.0.11/LICENSE ===
+# Community Data License Agreement - Permissive - Version 2.0
+
+This is the Community Data License Agreement - Permissive, Version
+2.0 (the "agreement"). Data Provider(s) and Data Recipient(s) agree
+as follows:
+
+## 1. Provision of the Data
+
+1.1. A Data Recipient may use, modify, and share the Data made
+available by Data Provider(s) under this agreement if that Data
+Recipient follows the terms of this agreement.
+
+1.2. This agreement does not impose any restriction on a Data
+Recipient's use, modification, or sharing of any portions of the
+Data that are in the public domain or that may be used, modified,
+or shared under any other legal exception or limitation.
+
+## 2. Conditions for Sharing Data
+
+2.1. A Data Recipient may share Data, with or without modifications, so
+long as the Data Recipient makes available the text of this agreement
+with the shared Data.
+
+## 3. No Restrictions on Results
+
+3.1. This agreement does not impose any restriction or obligations
+with respect to the use, modification, or sharing of Results.
+
+## 4. No Warranty; Limitation of Liability
+
+4.1. All Data Recipients receive the Data subject to the following
+terms:
+
+THE DATA IS PROVIDED ON AN "AS IS" BASIS, WITHOUT REPRESENTATIONS,
+WARRANTIES OR CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED
+INCLUDING, WITHOUT LIMITATION, ANY WARRANTIES OR CONDITIONS OF TITLE,
+NON-INFRINGEMENT, MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+NO DATA PROVIDER SHALL HAVE ANY LIABILITY FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING
+WITHOUT LIMITATION LOST PROFITS), HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE DATA OR RESULTS,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+## 5. Definitions
+
+5.1. "Data" means the material received by a Data Recipient under
+this agreement.
+
+5.2. "Data Provider" means any person who is the source of Data
+provided under this agreement and in reliance on a Data Recipient's
+agreement to its terms.
+
+5.3. "Data Recipient" means any person who receives Data directly
+or indirectly from a Data Provider and agrees to the terms of this
+agreement.
+
+5.4. "Results" means any outcome obtained by computational analysis
+of Data, including for example machine learning models and models'
+insights.
+
+
+=== Components: cargo-runtime/windows-link-0.2.1/license-apache-2.0, office/chart-dependencies/windows-link-0.2.1/license-apache-2.0 ===
+                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   
+[Full Apache-2.0 terms above apply here.]
+
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "[]"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright (c) Microsoft Corporation.
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+
+=== Components: cargo-runtime/windows-link-0.2.1/license-mit, office/chart-dependencies/windows-link-0.2.1/license-mit ===
+    MIT License
+
+    Copyright (c) Microsoft Corporation.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE
+
+
+=== Components: cargo-runtime/zeroize-1.9.1/LICENSE-MIT ===
+Copyright (c) 2018-2026 The RustCrypto Project Developers
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: fonttools-glyph-data/ADOBE-AGL.txt ===
+Copyright 2002-2019 Adobe (http://www.adobe.com/).
+
+Redistribution and use in source and binary forms, with or
+without modification, are permitted provided that the
+following conditions are met:
+
+Redistributions of source code must retain the above
+copyright notice, this list of conditions and the following
+disclaimer.
+
+Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following
+disclaimer in the documentation and/or other materials
+provided with the distribution.
+
+Neither the name of Adobe nor the names of its contributors
+may be used to endorse or promote products derived from this
+software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+=== Components: fonttools-glyph-data/LICENSE ===
+MIT License
+
+Copyright (c) 2017 Just van Rossum
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: migration/CHARACTER-DEDUP-NOTICE.txt/0cc847e02277.txt ===
+DocVortex character deduplication compatibility
+The adapter reuses unchanged docvortex-core text_snapshot.rs and dedup.rs (MIT); DOCVORTEX-PDFIUM-PATHS.txt contains the upstream DocVortex license.
+Unicode 16.0.0 whitespace/Han policy was exported from CPython 3.14 unicodedata. NFKC uses unicode-normalization 0.1.24 (Unicode 16.0.0), checked against all 4964 nonidentity single-scalar CPython mappings.
+Radicals use only U+2E80..U+2FDF of EquivalentUnifiedIdeograph-17.0.0.txt, copyright 2025 Unicode, Inc.; the original file is EQUIVALENT-IDEOGRAPH-17.txt. License: UNICODE-DATA.txt (https://www.unicode.org/license.txt).
+The policy applies only to same-glyph mapping groups and hidden-copy comparison, preserving the legacy output characters elsewhere.
+
+
+=== Components: migration/DOCVORTEX-PDFIUM-PATHS-NOTICE.txt/90404e30740a.txt ===
+DocVortex PDFium paths subset, commit b2ef8d025aed2b1041da6ec6e766e9d317f716ce.
+Unchanged objects.rs, paths.rs and path_evidence.rs from local DocVortex/rust/docvortex-pdfium. MIT license: DOCVORTEX-PDFIUM-PATHS.txt. Standalone Rust adapter uses existing initialized PDFium runtime under its global lock. No upstream character/font code included.
+
+
+=== Components: migration/DROID-FONT-NOTICE.txt/51d8f4d0ad49.txt ===
+
+   Copyright (c) 2005-2008, The Android Open Source Project
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+
+                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   
+[Full Apache-2.0 terms above apply here.]
+
+
+
+
+=== Components: migration/FORMULA-DECODE-NOTICE.txt/81347e278c72.txt ===
+Formula decoder uses Hugging Face tokenizers 0.22.2 (Apache-2.0), pinned to the legacy Python tokenizer version.
+Source: https://github.com/huggingface/tokenizers/tree/v0.22.2/tokenizers
+Full license: TOKENIZERS.txt.
+
+formula_html_entities.txt contains sorted html.entities.html5 keys from Python 3.14.5.
+Generator: scripts/migration/generate_formula_entities.py.
+Source: https://github.com/python/cpython/blob/v3.14.5/Lib/html/entities.py
+Python PSF license: PYTHON-UNICODE.txt (also used for the existing Python Unicode tables).
+These names only gate unsupported ftfy inputs; they do not implement HTML or ftfy decoding.
+
+
+=== Components: migration/NATIVE-FIXED-CJK-FONT-NOTICE.txt/f053de0cc588.txt ===
+Native fixed CJK font runtime
+Font callback implementation copied from local DocVortex rust/docvortex-pdfium/src/fonts.rs (MIT).
+Font policy ported from DocVortex document/pdf/font_runtime.py (MIT).
+Upstream license: DOCVORTEX-PDFIUM-PATHS.txt.
+The adapter uses the same initialized PDFium library and retains all callback owners
+for its process lifetime. Python callbacks are replaced by exact frozen strict codec
+tables and Unicode casefold mappings generated with the recorded Python version.
+Decoder mapping data is derived from CPython; PSF notice: PYTHON-SET.txt.
+DroidSansFallbackFull.ttf is Copyright (c) 2005-2008 The Android Open Source Project,
+licensed under Apache-2.0; the complete font notice is bundled as DROID-FONT-NOTICE.txt.
+Pinned font SHA256: 8a4dea0899424438af25a6f1f6eb61e5d111d85367eece0a5d30170861ae6b2e.
+No claim of document-wide parity, quality improvement, or performance improvement.
+
+
+=== Components: migration/NUMPY-SORT-NOTICE.txt/630fd5cdc6e2.txt ===
+Original NumPy-compatible native OCR sorting backend
+Source: https://github.com/intel/x86-simd-sort/tree/5adb33411f3cea8bdbafa9d91bd75bc4bf19c7dd
+Used by NumPy 2.4.6. Headers are unmodified; native ABI adapter is in rapiddoc-inference.
+
+BSD 3-Clause License
+
+Copyright (c) 2022, Intel. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its
+   contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+NumPy scalar argsort adaptation (quicksort.cpp, BSD):
+Copyright (c) 2005-2025, NumPy Developers.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+    * Redistributions of source code must retain the above copyright
+       notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above
+       copyright notice, this list of conditions and the following
+       disclaimer in the documentation and/or other materials provided
+       with the distribution.
+
+    * Neither the name of the NumPy Developers nor the names of any
+       contributors may be used to endorse or promote products derived
+       from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+
+=== Components: migration/PDFTEXT-NOTICE.txt/6ff3f3a8ece0.txt ===
+This Rust port adapts pdftext 0.7.1 pdf/chars.py and pdf/pages.py
+by Vik Paruchuri (https://github.com/VikParuchuri/pdftext), Apache-2.0.
+Modified: native Rust ownership, bounded resources, serde JSON output;
+RapidDoc adjacent-offset deduplication and default thresholds are retained.
+Full license: PDFTEXT.txt.
+
+
+=== Components: migration/PDFTEXT-NOTICE.txt/cd2679480aa7.txt ===
+This Rust port adapts pdftext 0.7.1 pdf/chars.py and pdf/pages.py
+by Vik Paruchuri (https://github.com/VikParuchuri/pdftext), Apache-2.0.
+Modified: native Rust ownership, bounded resources, serde JSON output;
+RapidDoc adjacent-offset deduplication and default thresholds are retained.
+Full license: PDFTEXT.txt.
+
+character_primitives.rs ports the DocVortex get_chars ctypes reference path (extract.py), which retains portions derived from pdftext 0.7.1. Additional geometry, source metadata, visibility flags and surrogate restoration follow DocVortex. See PDFTEXT.txt and DOCVORTEX-PDFIUM-PATHS.txt.
+
+
+=== Components: migration/PYPDFIUM2-NOTICE.txt/91af52396186.txt ===
+The original-resolution bitmap scaling adapts pypdfium2 5.10.1
+_helpers/pageobjects.py and _helpers/matrix.py.
+Copyright 2026 geisserml <geisserml@gmail.com>.
+Source: https://github.com/pypdfium2-team/pypdfium2
+Licensed under Apache-2.0 OR BSD-3-Clause; this port uses Apache-2.0.
+Modified: Rust ownership, bounded resources, raw PNG output and error diagnostics.
+Full Apache-2.0 license: PYPDFIUM2.txt.
+
+
+=== Components: migration/PYTHON-MATH-NOTICE.txt/b2f40c5b69f1.txt ===
+CPython 3.14 accurate two-dimensional hypot compatibility
+Source: https://github.com/python/cpython/blob/v3.14.0/Modules/mathmodule.c
+Copyright Python Software Foundation and contributors. PSF License (PYTHON-MATH.txt).
+legacy_vectors.rs adapts vector_norm, dl_fast_sum and dl_mul to Rust f64 arithmetic for old DocVortex stroke-width fidelity. Limited to two coordinates; tested against the independent CPython baseline. Uses f64::mul_add for the compensated product.
+
+
+=== Components: migration/PYTHON-SET-NOTICE.txt/b54847cbb974.txt ===
+CPython 3.14 integer set iteration compatibility
+Source: https://github.com/python/cpython/blob/v3.14.0/Objects/setobject.c
+Copyright Python Software Foundation and contributors. PSF License (PYTHON-SET.txt).
+The Rust implementation models insertion, growth, probing and table iteration without deletion for bounded integer indices and source IDs. The original distinct nonnegative index entry preserves legacy physical-rule nearest-distance ties. The signed source-ID entry permits duplicates, models the -1 to -2 hash mapping, and preserves legacy raw-character projection order on 64-bit CPython. It is not a general Python set implementation.
+
+
+=== Components: office/AILERON.txt ===
+Aileron: No Rights Reserved.
+Author: Sora Sagano / dot colon.
+https://dotcolon.net/fonts/aileron/
+
+The included default subset is extracted unchanged from Pillow 12.2.0 ImageFont.load_default.
+Its embedded copyright records state: No Rights Reserved.
+Pillow adaptation is covered by PILLOW.txt.
+
+
+=== Components: office/CFB.txt ===
+MIT License
+
+Copyright (c) 2017 Matthew D. Steele
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/CLIPPER-SYS.txt ===
+Copyright 2019 Easymov Robotics
+
+Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted, provided that the above copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+
+=== Components: office/CLIPPER.txt ===
+Boost Software License - Version 1.0 - August 17th, 2003
+
+Permission is hereby granted, free of charge, to any person or organization
+obtaining a copy of the software and accompanying documentation covered by
+this license (the "Software") to use, reproduce, display, distribute,
+execute, and transmit the Software, and to prepare derivative works of the
+Software, and to permit third-parties to whom the Software is furnished to
+do so, all subject to the following:
+
+The copyright notices in the Software and this entire statement, including
+the above license grant, this restriction and the following disclaimer,
+must be included in all copies of the Software, in whole or in part, and
+all derivative works of the Software, unless such copies or derivative
+works are solely in the form of machine-executable object code generated by
+a source language processor.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO EVENT
+SHALL THE COPYRIGHT HOLDERS OR ANYONE DISTRIBUTING THE SOFTWARE BE LIABLE
+FOR ANY DAMAGES OR OTHER LIABILITY, WHETHER IN CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+
+=== Components: office/FREETYPE-SYS.txt ===
+The MIT License (MIT)
+
+Copyright (c) 2014 PistonDevelopers
+
+
+[Full MIT terms above apply here.]
+
+
+
+
+=== Components: office/FREETYPE.txt ===
+                    The FreeType Project LICENSE
+                    ----------------------------
+
+                            2006-Jan-27
+
+                    Copyright 1996-2002, 2006 by
+          David Turner, Robert Wilhelm, and Werner Lemberg
+
+
+
+Introduction
+============
+
+  The FreeType  Project is distributed in  several archive packages;
+  some of them may contain, in addition to the FreeType font engine,
+  various tools and  contributions which rely on, or  relate to, the
+  FreeType Project.
+
+  This  license applies  to all  files found  in such  packages, and
+  which do not  fall under their own explicit  license.  The license
+  affects  thus  the  FreeType   font  engine,  the  test  programs,
+  documentation and makefiles, at the very least.
+
+  This  license   was  inspired  by  the  BSD,   Artistic,  and  IJG
+  (Independent JPEG  Group) licenses, which  all encourage inclusion
+  and  use of  free  software in  commercial  and freeware  products
+  alike.  As a consequence, its main points are that:
+
+    o We don't promise that this software works. However, we will be
+      interested in any kind of bug reports. (`as is' distribution)
+
+    o You can  use this software for whatever you  want, in parts or
+      full form, without having to pay us. (`royalty-free' usage)
+
+    o You may not pretend that  you wrote this software.  If you use
+      it, or  only parts of it,  in a program,  you must acknowledge
+      somewhere  in  your  documentation  that  you  have  used  the
+      FreeType code. (`credits')
+
+  We  specifically  permit  and  encourage  the  inclusion  of  this
+  software, with  or without modifications,  in commercial products.
+  We  disclaim  all warranties  covering  The  FreeType Project  and
+  assume no liability related to The FreeType Project.
+
+
+  Finally,  many  people  asked  us  for  a  preferred  form  for  a
+  credit/disclaimer to use in compliance with this license.  We thus
+  encourage you to use the following text:
+
+   """
+    Portions of this software are copyright © <year> The FreeType
+    Project (www.freetype.org).  All rights reserved.
+   """
+
+  Please replace <year> with the value from the FreeType version you
+  actually use.
+
+
+Legal Terms
+===========
+
+0. Definitions
+--------------
+
+  Throughout this license,  the terms `package', `FreeType Project',
+  and  `FreeType  archive' refer  to  the  set  of files  originally
+  distributed  by the  authors  (David Turner,  Robert Wilhelm,  and
+  Werner Lemberg) as the `FreeType Project', be they named as alpha,
+  beta or final release.
+
+  `You' refers to  the licensee, or person using  the project, where
+  `using' is a generic term including compiling the project's source
+  code as  well as linking it  to form a  `program' or `executable'.
+  This  program is  referred to  as  `a program  using the  FreeType
+  engine'.
+
+  This  license applies  to all  files distributed  in  the original
+  FreeType  Project,   including  all  source   code,  binaries  and
+  documentation,  unless  otherwise  stated   in  the  file  in  its
+  original, unmodified form as  distributed in the original archive.
+  If you are  unsure whether or not a particular  file is covered by
+  this license, you must contact us to verify this.
+
+  The FreeType  Project is copyright (C) 1996-2000  by David Turner,
+  Robert Wilhelm, and Werner Lemberg.  All rights reserved except as
+  specified below.
+
+1. No Warranty
+--------------
+
+  THE FREETYPE PROJECT  IS PROVIDED `AS IS' WITHOUT  WARRANTY OF ANY
+  KIND, EITHER  EXPRESS OR IMPLIED,  INCLUDING, BUT NOT  LIMITED TO,
+  WARRANTIES  OF  MERCHANTABILITY   AND  FITNESS  FOR  A  PARTICULAR
+  PURPOSE.  IN NO EVENT WILL ANY OF THE AUTHORS OR COPYRIGHT HOLDERS
+  BE LIABLE  FOR ANY DAMAGES CAUSED  BY THE USE OR  THE INABILITY TO
+  USE, OF THE FREETYPE PROJECT.
+
+2. Redistribution
+-----------------
+
+  This  license  grants  a  worldwide, royalty-free,  perpetual  and
+  irrevocable right  and license to use,  execute, perform, compile,
+  display,  copy,   create  derivative  works   of,  distribute  and
+  sublicense the  FreeType Project (in  both source and  object code
+  forms)  and  derivative works  thereof  for  any  purpose; and  to
+  authorize others  to exercise  some or all  of the  rights granted
+  herein, subject to the following conditions:
+
+    o Redistribution of  source code  must retain this  license file
+      (`FTL.TXT') unaltered; any  additions, deletions or changes to
+      the original  files must be clearly  indicated in accompanying
+      documentation.   The  copyright   notices  of  the  unaltered,
+      original  files must  be  preserved in  all  copies of  source
+      files.
+
+    o Redistribution in binary form must provide a  disclaimer  that
+      states  that  the software is based in part of the work of the
+      FreeType Team,  in  the  distribution  documentation.  We also
+      encourage you to put an URL to the FreeType web page  in  your
+      documentation, though this isn't mandatory.
+
+  These conditions  apply to any  software derived from or  based on
+  the FreeType Project,  not just the unmodified files.   If you use
+  our work, you  must acknowledge us.  However, no  fee need be paid
+  to us.
+
+3. Advertising
+--------------
+
+  Neither the  FreeType authors and  contributors nor you  shall use
+  the name of the  other for commercial, advertising, or promotional
+  purposes without specific prior written permission.
+
+  We suggest,  but do not require, that  you use one or  more of the
+  following phrases to refer  to this software in your documentation
+  or advertising  materials: `FreeType Project',  `FreeType Engine',
+  `FreeType library', or `FreeType Distribution'.
+
+  As  you have  not signed  this license,  you are  not  required to
+  accept  it.   However,  as  the FreeType  Project  is  copyrighted
+  material, only  this license, or  another one contracted  with the
+  authors, grants you  the right to use, distribute,  and modify it.
+  Therefore,  by  using,  distributing,  or modifying  the  FreeType
+  Project, you indicate that you understand and accept all the terms
+  of this license.
+
+4. Contacts
+-----------
+
+  There are two mailing lists related to FreeType:
+
+    o freetype@nongnu.org
+
+      Discusses general use and applications of FreeType, as well as
+      future and  wanted additions to the  library and distribution.
+      If  you are looking  for support,  start in  this list  if you
+      haven't found anything to help you in the documentation.
+
+    o freetype-devel@nongnu.org
+
+      Discusses bugs,  as well  as engine internals,  design issues,
+      specific licenses, porting, etc.
+
+  Our home page can be found at
+
+    https://www.freetype.org
+
+
+--- end of FTL.TXT ---
+
+
+=== Components: office/IJG.txt ===
+libjpeg-turbo note:  This file has been modified by The libjpeg-turbo Project
+to include only information relevant to libjpeg-turbo, to wordsmith certain
+sections, and to remove impolitic language that existed in the libjpeg v8
+README.  It is included only for reference.  Please see README.md for
+information specific to libjpeg-turbo.
+
+
+The Independent JPEG Group's JPEG software
+==========================================
+
+This distribution contains a release of the Independent JPEG Group's free JPEG
+software.  You are welcome to redistribute this software and to use it for any
+purpose, subject to the conditions under LEGAL ISSUES, below.
+
+This software is the work of Tom Lane, Guido Vollbeding, Philip Gladstone,
+Bill Allombert, Jim Boucher, Lee Crocker, Bob Friesenhahn, Ben Jackson,
+Julian Minguillon, Luis Ortiz, George Phillips, Davide Rossi, Ge' Weijers,
+and other members of the Independent JPEG Group.
+
+IJG is not affiliated with the ISO/IEC JTC1/SC29/WG1 standards committee
+(also known as JPEG, together with ITU-T SG16).
+
+
+DOCUMENTATION ROADMAP
+=====================
+
+This file contains the following sections:
+
+OVERVIEW            General description of JPEG and the IJG software.
+LEGAL ISSUES        Copyright, lack of warranty, terms of distribution.
+REFERENCES          Where to learn more about JPEG.
+ARCHIVE LOCATIONS   Where to find newer versions of this software.
+FILE FORMAT WARS    Software *not* to get.
+TO DO               Plans for future IJG releases.
+
+Other documentation files in the distribution are:
+
+User documentation:
+  doc/usage.txt         Usage instructions for cjpeg, djpeg, jpegtran,
+                        rdjpgcom, and wrjpgcom.
+  doc/*.1               Unix-style man pages for programs (same info as
+                        usage.txt).
+  doc/wizard.txt        Advanced usage instructions for JPEG wizards only.
+  doc/change.log        Version-to-version change highlights.
+Programmer and internal documentation:
+  doc/libjpeg.txt       How to use the JPEG library in your own programs.
+  src/example.c         Sample code for calling the JPEG library.
+  doc/structure.txt     Overview of the JPEG library's internal structure.
+  doc/coderules.txt     Coding style rules --- please read if you contribute
+                        code.
+
+Please read at least usage.txt.  Some information can also be found in the JPEG
+FAQ (Frequently Asked Questions) article.  See ARCHIVE LOCATIONS below to find
+out where to obtain the FAQ article.
+
+If you want to understand how the JPEG code works, we suggest reading one or
+more of the REFERENCES, then looking at the documentation files (in roughly
+the order listed) before diving into the code.
+
+
+OVERVIEW
+========
+
+This package contains C software to implement JPEG image encoding, decoding,
+and transcoding.  JPEG (pronounced "jay-peg") is a standardized compression
+method for full-color and grayscale images.  JPEG's strong suit is compressing
+photographic images or other types of images that have smooth color and
+brightness transitions between neighboring pixels.  Images with sharp lines or
+other abrupt features may not compress well with JPEG, and a higher JPEG
+quality may have to be used to avoid visible compression artifacts with such
+images.
+
+JPEG is normally lossy, meaning that the output pixels are not necessarily
+identical to the input pixels.  However, on photographic content and other
+"smooth" images, very good compression ratios can be obtained with no visible
+compression artifacts, and extremely high compression ratios are possible if
+you are willing to sacrifice image quality (by reducing the "quality" setting
+in the compressor.)
+
+This software implements JPEG baseline, extended-sequential, progressive, and
+lossless compression processes.  Provision is made for supporting all variants
+of these processes, although some uncommon parameter settings aren't
+implemented yet.  We have made no provision for supporting the hierarchical
+processes defined in the standard.
+
+We provide a set of library routines for reading and writing JPEG image files,
+plus two sample applications "cjpeg" and "djpeg", which use the library to
+perform conversion between JPEG and some other popular image file formats.
+The library is intended to be reused in other applications.
+
+In order to support file conversion and viewing software, we have included
+considerable functionality beyond the bare JPEG coding/decoding capability;
+for example, the color quantization modules are not strictly part of JPEG
+decoding, but they are essential for output to colormapped file formats.  These
+extra functions can be compiled out of the library if not required for a
+particular application.
+
+We have also included "jpegtran", a utility for lossless transcoding between
+different JPEG processes, and "rdjpgcom" and "wrjpgcom", two simple
+applications for inserting and extracting textual comments in JFIF files.
+
+The emphasis in designing this software has been on achieving portability and
+flexibility, while also making it fast enough to be useful.  In particular,
+the software is not intended to be read as a tutorial on JPEG.  (See the
+REFERENCES section for introductory material.)  Rather, it is intended to
+be reliable, portable, industrial-strength code.  We do not claim to have
+achieved that goal in every aspect of the software, but we strive for it.
+
+We welcome the use of this software as a component of commercial products.
+No royalty is required, but we do ask for an acknowledgement in product
+documentation, as described under LEGAL ISSUES.
+
+
+LEGAL ISSUES
+============
+
+In plain English:
+
+1. We don't promise that this software works.  (But if you find any bugs,
+   please let us know!)
+2. You can use this software for whatever you want.  You don't have to pay us.
+3. You may not pretend that you wrote this software.  If you use it in a
+   program, you must acknowledge somewhere in your documentation that
+   you've used the IJG code.
+
+In legalese:
+
+The authors make NO WARRANTY or representation, either express or implied,
+with respect to this software, its quality, accuracy, merchantability, or
+fitness for a particular purpose.  This software is provided "AS IS", and you,
+its user, assume the entire risk as to its quality and accuracy.
+
+This software is copyright (C) 1991-2020, Thomas G. Lane, Guido Vollbeding.
+All Rights Reserved except as specified below.
+
+Permission is hereby granted to use, copy, modify, and distribute this
+software (or portions thereof) for any purpose, without fee, subject to these
+conditions:
+(1) If any part of the source code for this software is distributed, then this
+README file must be included, with this copyright and no-warranty notice
+unaltered; and any additions, deletions, or changes to the original files
+must be clearly indicated in accompanying documentation.
+(2) If only executable code is distributed, then the accompanying
+documentation must state that "this software is based in part on the work of
+the Independent JPEG Group".
+(3) Permission for use of this software is granted only if the user accepts
+full responsibility for any undesirable consequences; the authors accept
+NO LIABILITY for damages of any kind.
+
+These conditions apply to any software derived from or based on the IJG code,
+not just to the unmodified library.  If you use our work, you ought to
+acknowledge us.
+
+Permission is NOT granted for the use of any IJG author's name or company name
+in advertising or publicity relating to this software or products derived from
+it.  This software may be referred to only as "the Independent JPEG Group's
+software".
+
+We specifically permit and encourage the use of this software as the basis of
+commercial products, provided that all warranty or liability claims are
+assumed by the product vendor.
+
+
+REFERENCES
+==========
+
+We recommend reading one or more of these references before trying to
+understand the innards of the JPEG software.
+
+The best short technical introduction to the JPEG compression algorithm is
+        Wallace, Gregory K.  "The JPEG Still Picture Compression Standard",
+        Communications of the ACM, April 1991 (vol. 34 no. 4), pp. 30-44.
+(Adjacent articles in that issue discuss MPEG motion picture compression,
+applications of JPEG, and related topics.)  If you don't have the CACM issue
+handy, a PDF file containing a revised version of Wallace's article is
+available at http://www.ijg.org/files/Wallace.JPEG.pdf.  The file (actually
+a preprint for an article that appeared in IEEE Trans. Consumer Electronics)
+omits the sample images that appeared in CACM, but it includes corrections
+and some added material.  Note: the Wallace article is copyright ACM and IEEE,
+and it may not be used for commercial purposes.
+
+A somewhat less technical, more leisurely introduction to JPEG can be found in
+"The Data Compression Book" by Mark Nelson and Jean-loup Gailly, published by
+M&T Books (New York), 2nd ed. 1996, ISBN 1-55851-434-1.  This book provides
+good explanations and example C code for a multitude of compression methods
+including JPEG.  It is an excellent source if you are comfortable reading C
+code but don't know much about data compression in general.  The book's JPEG
+sample code is far from industrial-strength, but when you are ready to look
+at a full implementation, you've got one here...
+
+The best currently available description of JPEG is the textbook "JPEG Still
+Image Data Compression Standard" by William B. Pennebaker and Joan L.
+Mitchell, published by Van Nostrand Reinhold, 1993, ISBN 0-442-01272-1.
+Price US$59.95, 638 pp.  The book includes the complete text of the ISO JPEG
+standards (DIS 10918-1 and draft DIS 10918-2).
+
+The original JPEG standard is divided into two parts, Part 1 being the actual
+specification, while Part 2 covers compliance testing methods.  Part 1 is
+titled "Digital Compression and Coding of Continuous-tone Still Images,
+Part 1: Requirements and guidelines" and has document numbers ISO/IEC IS
+10918-1, ITU-T T.81.  Part 2 is titled "Digital Compression and Coding of
+Continuous-tone Still Images, Part 2: Compliance testing" and has document
+numbers ISO/IEC IS 10918-2, ITU-T T.83.
+
+The JPEG standard does not specify all details of an interchangeable file
+format.  For the omitted details, we follow the "JFIF" conventions, revision
+1.02.  JFIF version 1 has been adopted as ISO/IEC 10918-5 (05/2013) and
+Recommendation ITU-T T.871 (05/2011): Information technology - Digital
+compression and coding of continuous-tone still images: JPEG File Interchange
+Format (JFIF).  It is available as a free download in PDF file format from
+https://www.iso.org/standard/54989.html and http://www.itu.int/rec/T-REC-T.871.
+A PDF file of the older JFIF 1.02 specification is available at
+http://www.w3.org/Graphics/JPEG/jfif3.pdf.
+
+The TIFF 6.0 file format specification can be obtained from
+http://mirrors.ctan.org/graphics/tiff/TIFF6.ps.gz.  The JPEG incorporation
+scheme found in the TIFF 6.0 spec of 3-June-92 has a number of serious
+problems.  IJG does not recommend use of the TIFF 6.0 design (TIFF Compression
+tag 6).  Instead, we recommend the JPEG design proposed by TIFF Technical Note
+#2 (Compression tag 7).  Copies of this Note can be obtained from
+http://www.ijg.org/files/.  It is expected that the next revision
+of the TIFF spec will replace the 6.0 JPEG design with the Note's design.
+Although IJG's own code does not support TIFF/JPEG, the free libtiff library
+uses our library to implement TIFF/JPEG per the Note.
+
+
+ARCHIVE LOCATIONS
+=================
+
+The "official" archive site for this software is www.ijg.org.
+The most recent released version can always be found there in
+directory "files".
+
+The JPEG FAQ (Frequently Asked Questions) article is a source of some
+general information about JPEG.  It is available at
+http://www.faqs.org/faqs/jpeg-faq.
+
+
+FILE FORMAT COMPATIBILITY
+=========================
+
+This software implements ITU T.81 | ISO/IEC 10918 with some extensions from
+ITU T.871 | ISO/IEC 10918-5 (JPEG File Interchange Format-- see REFERENCES).
+Informally, the term "JPEG image" or "JPEG file" most often refers to JFIF or
+a subset thereof, but there are other formats containing the name "JPEG" that
+are incompatible with the original JPEG standard or with JFIF (for instance,
+JPEG 2000 and JPEG XR).  This software therefore does not support these
+formats.  Indeed, one of the original reasons for developing this free software
+was to help force convergence on a common, interoperable format standard for
+JPEG files.
+
+JFIF is a minimal or "low end" representation.  TIFF/JPEG (TIFF revision 6.0 as
+modified by TIFF Technical Note #2) can be used for "high end" applications
+that need to record a lot of additional data about an image.
+
+
+TO DO
+=====
+
+Please send bug reports, offers of help, etc. to jpeg-info@jpegclub.org.
+
+
+=== Components: office/LIBJPEG-TURBO.txt ===
+libjpeg-turbo Licenses
+======================
+
+libjpeg-turbo is covered by two compatible BSD-style open source licenses:
+
+- The IJG (Independent JPEG Group) License, which is listed in
+  [README.ijg](README.ijg)
+
+  This license applies to the libjpeg API library and associated programs,
+  including any code inherited from libjpeg and any modifications to that
+  code.  Note that the libjpeg-turbo SIMD source code bears the
+  [zlib License](https://opensource.org/licenses/Zlib), but in the context of
+  the overall libjpeg API library, the terms of the zlib License are subsumed
+  by the terms of the IJG License.
+
+- The Modified (3-clause) BSD License, which is listed below
+
+  This license applies to the TurboJPEG API library and associated programs, as
+  well as the build system.  Note that the TurboJPEG API library wraps the
+  libjpeg API library, so in the context of the overall TurboJPEG API library,
+  both the terms of the IJG License and the terms of the Modified (3-clause)
+  BSD License apply.
+
+
+Complying with the libjpeg-turbo Licenses
+=========================================
+
+This section provides a roll-up of the libjpeg-turbo licensing terms, to the
+best of our understanding.  This is not a license in and of itself.  It is
+intended solely for clarification.
+
+1.  If you are distributing a modified version of the libjpeg-turbo source,
+    then:
+
+    1.  You cannot alter or remove any existing copyright or license notices
+        from the source.
+
+        **Origin**
+        - Clause 1 of the IJG License
+        - Clause 1 of the Modified BSD License
+        - Clauses 1 and 3 of the zlib License
+
+    2.  You must add your own copyright notice to the header of each source
+        file you modified, so others can tell that you modified that file.  (If
+        there is not an existing copyright header in that file, then you can
+        simply add a notice stating that you modified the file.)
+
+        **Origin**
+        - Clause 1 of the IJG License
+        - Clause 2 of the zlib License
+
+    3.  You must include the IJG README file, and you must not alter any of the
+        copyright or license text in that file.
+
+        **Origin**
+        - Clause 1 of the IJG License
+
+2.  If you are distributing only libjpeg-turbo binaries without the source, or
+    if you are distributing an application that statically links with
+    libjpeg-turbo, then:
+
+    1.  Your product documentation must include a message stating:
+
+        This software is based in part on the work of the Independent JPEG
+        Group.
+
+        **Origin**
+        - Clause 2 of the IJG license
+
+    2.  If your binary distribution includes or uses the TurboJPEG API, then
+        your product documentation must include the text of the Modified BSD
+        License (see below.)
+
+        **Origin**
+        - Clause 2 of the Modified BSD License
+
+3.  You cannot use the name of the IJG or The libjpeg-turbo Project or the
+    contributors thereof in advertising, publicity, etc.
+
+    **Origin**
+    - IJG License
+    - Clause 3 of the Modified BSD License
+
+4.  The IJG and The libjpeg-turbo Project do not warrant libjpeg-turbo to be
+    free of defects, nor do we accept any liability for undesirable
+    consequences resulting from your use of the software.
+
+    **Origin**
+    - IJG License
+    - Modified BSD License
+    - zlib License
+
+
+The Modified (3-clause) BSD License
+===================================
+
+Copyright (C)2009-2024 D. R. Commander.  All Rights Reserved.<br>
+Copyright (C)2015 Viktor Szathmáry.  All Rights Reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+- Redistributions of source code must retain the above copyright notice,
+  this list of conditions and the following disclaimer.
+- Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+- Neither the name of the libjpeg-turbo Project nor the names of its
+  contributors may be used to endorse or promote products derived from this
+  software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS",
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+
+
+Why Two Licenses?
+=================
+
+The zlib License could have been used instead of the Modified (3-clause) BSD
+License, and since the IJG License effectively subsumes the distribution
+conditions of the zlib License, this would have effectively placed
+libjpeg-turbo binary distributions under the IJG License.  However, the IJG
+License specifically refers to the Independent JPEG Group and does not extend
+attribution and endorsement protections to other entities.  Thus, it was
+desirable to choose a license that granted us the same protections for new code
+that were granted to the IJG for code derived from their software.
+
+
+=== Components: office/MAMMOTH.txt ===
+Copyright (c) 2013, Michael Williamson
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met: 
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer. 
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution. 
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+=== Components: office/METAFILE-RENDER.txt ===
+MIT License
+
+Copyright (c) 2026 Xiaomeng Zhao (myhloli)
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/OPENPYXL.txt ===
+This software is under the MIT Licence
+======================================
+
+Copyright (c) 2010 openpyxl
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/PILLOW.txt ===
+The Python Imaging Library (PIL) is
+
+    Copyright © 1997-2011 by Secret Labs AB
+    Copyright © 1995-2011 by Fredrik Lundh and contributors
+
+Pillow is the friendly PIL fork. It is
+
+    Copyright © 2010 by Jeffrey 'Alex' Clark and contributors
+
+Like PIL, Pillow is licensed under the open source MIT-CMU License:
+
+By obtaining, using, and/or copying this software and/or its associated
+documentation, you agree that you have read, understood, and will comply
+with the following terms and conditions:
+
+Permission to use, copy, modify and distribute this software and its
+documentation for any purpose and without fee is hereby granted,
+provided that the above copyright notice appears in all copies, and that
+both that copyright notice and this permission notice appear in supporting
+documentation, and that the name of Secret Labs AB or the author not be
+used in advertising or publicity pertaining to distribution of the software
+without specific, written prior permission.
+
+SECRET LABS AB AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS.
+IN NO EVENT SHALL SECRET LABS AB OR THE AUTHOR BE LIABLE FOR ANY SPECIAL,
+INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE
+OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+
+
+=== Components: office/PYLATEXENC.txt ===
+The MIT License (MIT)
+
+Copyright (c) 2015-2019 Philippe Faist
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/PYPPTX-WITH-OXML.txt, office/PYTHON-DOCX.txt ===
+The MIT License (MIT)
+Copyright (c) 2013 Steve Canny, https://github.com/scanny
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/PYTHON-UNICODE.txt ===
+Unicode casefold mapping generated from CPython 3.14.5 / Unicode 16.0.0.
+No Python runtime is linked.
+
+
+[Full CPython-license-chain terms above apply here.]
+
+
+
+
+Additional XLS legacy codec tables generated from CPython 3.14.5 codecs (CP874, Shift-JIS, GBK, EUC-KR, Big5, CP1250-1258). Native immutable data only; no Python runtime linked. Generator and per-table SHA256 are recorded in packaging/office-native-provenance.json.
+
+Additional DOC Windows codec tables (CP932, CP949, CP950) are generated from CPython codecs and use the same license above. These tables preserve DOC-specific decoding semantics and do not substitute the distinct XLS codec aliases. No Python runtime is linked; see scripts/migration/export_doc_codec_tables.py and packaging/office-native-provenance.json.
+
+
+=== Components: office/RESVG-PY.txt ===
+Copyright (C) 2024, baseplate-admin
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/TURBOJPEG-BINDINGS.txt ===
+Copyright 2023 Jan Špaček
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the “Software”), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+=== Components: office/chart-dependencies/bumpalo-3.20.3/LICENSE-MIT ===
+Copyright (c) 2019 Nick Fitzgerald
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/chart-dependencies/chrono-0.4.45/LICENSE.txt ===
+Rust-chrono is dual-licensed under The MIT License [1] and
+Apache 2.0 License [2]. Copyright (c) 2014--2026, Kang Seonghoon and
+contributors.
+
+Nota Bene: This is same as the Rust Project's own license.
+
+
+[1]: <http://opensource.org/licenses/MIT>, which is reproduced below:
+
+~~~~
+The MIT License (MIT)
+
+Copyright (c) 2014, Kang Seonghoon.
+
+
+[Full MIT terms above apply here.]
+
+~~~~
+
+
+[2]: <http://www.apache.org/licenses/LICENSE-2.0>, which is reproduced below:
+
+~~~~
+                              Apache License
+                        Version 2.0, January 2004
+                     http://www.apache.org/licenses/
+
+
+[Full Apache-2.0 terms above apply here.]
+
+
+APPENDIX: How to apply the Apache License to your work.
+
+   To apply the Apache License to your work, attach the following
+   boilerplate notice, with the fields enclosed by brackets "[]"
+   replaced with your own identifying information. (Don't include
+   the brackets!)  The text should be enclosed in the appropriate
+   comment syntax for the file format. We also recommend that a
+   file or class name and description of purpose be included on the
+   same "printed page" as the copyright notice for easier
+   identification within third-party archives.
+
+Copyright [yyyy] [name of copyright owner]
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+~~~~
+
+
+
+=== Components: office/chart-dependencies/libm-0.2.16/LICENSE.txt, office/image-dependencies/libm-0.2.16/LICENSE.txt ===
+rust-lang/libm as a whole is available for use under the MIT license:
+
+------------------------------------------------------------------------------
+
+[Full MIT terms above apply here.]
+
+------------------------------------------------------------------------------
+
+As a contributor, you agree that your code can be used under either the MIT
+license or the Apache-2.0 license:
+
+------------------------------------------------------------------------------
+                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   
+[Full Apache-2.0 terms above apply here.]
+
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "[]"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+------------------------------------------------------------------------------
+
+This Rust library contains the following copyrights:
+
+    Copyright (c) 2018 Jorge Aparicio
+
+Portions of this software are derived from third-party works licensed under
+terms compatible with the above MIT license:
+
+* musl libc https://www.musl-libc.org/. This library contains the following
+  copyright:
+
+      Copyright © 2005-2020 Rich Felker, et al.
+
+* The CORE-MATH project https://core-math.gitlabpages.inria.fr/. CORE-MATH
+  routines are available under the MIT license on a per-file basis.
+
+The musl libc COPYRIGHT file also includes the following notice relevant to
+math portions of the library:
+
+------------------------------------------------------------------------------
+Much of the math library code (src/math/* and src/complex/*) is
+Copyright © 1993,2004 Sun Microsystems or
+Copyright © 2003-2011 David Schultz or
+Copyright © 2003-2009 Steven G. Kargl or
+Copyright © 2003-2009 Bruce D. Evans or
+Copyright © 2008 Stephen L. Moshier or
+Copyright © 2017-2018 Arm Limited
+and labelled as such in comments in the individual source files. All
+have been licensed under extremely permissive terms.
+------------------------------------------------------------------------------
+
+Copyright notices are retained in src/* files where relevant.
+
+
+=== Components: office/image-dependencies/arrayref-0.3.9/LICENSE ===
+Copyright (c) 2015 David Roundy <roundyd@physics.oregonstate.edu>
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+1. Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the
+   distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+=== Components: office/image-dependencies/arrayvec-0.7.8/LICENSE-MIT ===
+Copyright (c) Ulrik Sverdrup "bluss" 2015-2023
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/image-dependencies/bytemuck-1.25.2/LICENSE-MIT ===
+MIT License
+
+Copyright (c) 2019 Daniel "Lokathor" Gee.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice (including the next paragraph) shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+=== Components: office/image-dependencies/byteorder-lite-0.1.0/LICENSE-MIT, office/image-dependencies/memchr-2.8.3/LICENSE-MIT ===
+The MIT License (MIT)
+
+Copyright (c) 2015 Andrew Gallant
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/image-dependencies/color_quant-1.1.0/LICENSE ===
+The MIT License (MIT)
+
+Copyright (c) 2016 PistonDevelopers
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/image-dependencies/crc32fast-1.5.3/LICENSE-MIT ===
+MIT License
+
+Copyright (c) 2018 Sam Rijs, Alex Crichton and contributors
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/image-dependencies/fax-0.2.7/LICENSE ===
+Copyright © 2021 The pdf-rs contributers.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+=== Components: office/image-dependencies/fdeflate-0.3.7/LICENSE-MIT, office/image-dependencies/image-0.25.10/LICENSE-MIT, office/image-dependencies/image-webp-0.2.4/LICENSE-MIT ===
+MIT License
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/image-dependencies/flate2-1.1.10/LICENSE-MIT ===
+Copyright (c) 2014-2026 Alex Crichton
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/image-dependencies/float-cmp-0.9.0/LICENSE ===
+Copyright (c) 2014-2020 Optimal Computing (NZ) Ltd
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/image-dependencies/font-types-0.12.7/LICENSE-MIT, office/image-dependencies/read-fonts-0.41.0/LICENSE-MIT, office/image-dependencies/skrifa-0.44.0/LICENSE-MIT ===
+Copyright (c) 2019 Fontations Developers
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/image-dependencies/fontdb-0.24.0/LICENSE ===
+The MIT License (MIT)
+
+Copyright (c) 2020 Yevhenii Reizner
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/image-dependencies/gif-0.14.2/LICENSE-MIT ===
+The MIT License (MIT)
+
+Copyright (c) 2015 nwin
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/image-dependencies/half-2.7.1/LICENSE-MIT ===
+MIT License
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/image-dependencies/harfrust-0.12.0/LICENSE ===
+The MIT License (MIT)
+
+Copyright (c) HarfBuzz developers
+Copyright (c) 2020 Yevhenii Reizner
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/image-dependencies/imagesize-0.15.0/LICENSE ===
+MIT License
+
+Copyright (c) 2017 Maiddog
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/image-dependencies/kurbo-0.13.1/LICENSE-MIT, office/image-dependencies/polycool-0.4.0/LICENSE-MIT ===
+Copyright (c) 2018 Raph Levien
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/image-dependencies/memchr-2.8.3/COPYING ===
+This project is dual-licensed under the Unlicense and MIT licenses.
+
+You may use this code under the terms of either license.
+
+
+=== Components: office/image-dependencies/miniz_oxide-0.8.9/LICENSE, office/image-dependencies/miniz_oxide-0.9.1/LICENSE ===
+MIT License
+
+Copyright 2013-2014 RAD Game Tools and Valve Software
+Copyright 2010-2014 Rich Geldreich and Tenacious Software LLC
+Copyright (c) 2017 Frommi
+Copyright (c) 2017-2024 oyvindln
+
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/image-dependencies/miniz_oxide-0.8.9/LICENSE-MIT.md, office/image-dependencies/miniz_oxide-0.9.1/LICENSE-MIT.md ===
+MIT License
+
+Copyright 2013-2014 RAD Game Tools and Valve Software
+Copyright 2010-2014 Rich Geldreich and Tenacious Software LLC
+Copyright (c) 2017 Frommi
+Copyright (c) 2017-2024 oyvindln
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/image-dependencies/moxcms-0.8.1/LICENSE-APACHE.md, office/image-dependencies/pxfm-0.1.30/LICENSE-APACHE.md ===
+                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   
+[Full Apache-2.0 terms above apply here.]
+
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "[]"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright 2024 Radzivon Bartoshyk
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+
+=== Components: office/image-dependencies/moxcms-0.8.1/LICENSE.md, office/image-dependencies/pxfm-0.1.30/LICENSE.md ===
+Copyright (c) Radzivon Bartoshyk. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+1.  Redistributions of source code must retain the above copyright notice, this
+    list of conditions and the following disclaimer.
+
+2.  Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+
+3.  Neither the name of the copyright holder nor the names of its
+    contributors may be used to endorse or promote products derived from
+    this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=== Components: office/image-dependencies/pico-args-0.5.0/LICENSE ===
+Copyright (c) 2019 Yevhenii Reizner
+
+
+[Full MIT terms above apply here.]
+
+
+
+
+=== Components: office/image-dependencies/png-0.18.1/LICENSE-MIT ===
+Copyright (c) 2015 nwin
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/image-dependencies/quick-error-2.0.1/LICENSE-APACHE ===
+                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   
+[Full Apache-2.0 terms above apply here.]
+
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "{}"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright {yyyy} {name of copyright owner}
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+
+
+=== Components: office/image-dependencies/quick-error-2.0.1/LICENSE-MIT ===
+Copyright (c) 2015 The quick-error Developers
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/image-dependencies/resvg-0.48.0/LICENSE-MIT, office/image-dependencies/usvg-0.48.1/LICENSE-MIT ===
+Copyright 2017 the Resvg Authors
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/image-dependencies/rgb-0.8.53/LICENSE ===
+MIT License
+
+Copyright (c) 2019 Kornel
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/image-dependencies/roxmltree-0.21.2/LICENSE-MIT ===
+The MIT License (MIT)
+
+Copyright (c) 2018 Yevhenii Reizner
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/image-dependencies/simd-adler32-0.3.10/LICENSE.md ===
+MIT License
+
+Copyright (c) [2021] [Marvin Countryman]
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/image-dependencies/simplecss-0.2.2/LICENSE-MIT, office/image-dependencies/unicode-vo-0.1.0/LICENSE-MIT ===
+The MIT License (MIT)
+
+Copyright (c) 2018 Reizner Evgeniy
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/image-dependencies/siphasher-1.0.4/COPYING ===
+Copyright 2012-2016 The Rust Project Developers.
+Copyright 2016-2026 Frank Denis.
+
+Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
+<LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
+option.
+
+
+=== Components: office/image-dependencies/siphasher-1.0.4/LICENSE-MIT ===
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/image-dependencies/slotmap-1.1.1/LICENSE ===
+Copyright (c) 2021 Orson Peters <orsonpeters@gmail.com>
+
+This software is provided 'as-is', without any express or implied warranty. In
+no event will the authors be held liable for any damages arising from the use of
+this software.
+
+Permission is granted to anyone to use this software for any purpose, including
+commercial applications, and to alter it and redistribute it freely, subject to
+the following restrictions:
+
+ 1. The origin of this software must not be misrepresented; you must not claim
+    that you wrote the original software. If you use this software in a product,
+    an acknowledgment in the product documentation would be appreciated but is
+    not required.
+
+ 2. Altered source versions must be plainly marked as such, and must not be
+    misrepresented as being the original software.
+
+ 3. This notice may not be removed or altered from any source distribution.
+
+
+=== Components: office/image-dependencies/strict-num-0.1.1/LICENSE ===
+Copyright (c) 2022 Yevhenii Reizner
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/image-dependencies/svgtypes-0.16.1/LICENSE-MIT ===
+Copyright (c) 2018 Yevhenii Reizner
+
+
+[Full MIT terms above apply here.]
+
+
+
+
+=== Components: office/image-dependencies/tiff-0.11.3/LICENSE ===
+MIT License
+
+Copyright (c) 2018 PistonDevelopers
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/image-dependencies/tiny-skia-0.12.0/LICENSE, office/image-dependencies/tiny-skia-path-0.12.0/LICENSE ===
+Copyright (c) 2011 Google Inc. All rights reserved.
+Copyright (c) 2020 Yevhenii Reizner All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+  * Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+
+  * Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in
+    the documentation and/or other materials provided with the
+    distribution.
+
+  * Neither the name of the copyright holder nor the names of its
+    contributors may be used to endorse or promote products derived
+    from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+=== Components: office/image-dependencies/tinyvec-1.13.3/LICENSE-MIT.md ===
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/image-dependencies/unicode-bidi-0.3.18/COPYRIGHT ===
+This project is copyright 2015, The Servo Project Developers (given in the
+file AUTHORS).
+
+Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+http://www.apache.org/licenses/LICENSE-2.0> or the MIT license <LICENSE-MIT or
+http://opensource.org/licenses/MIT>, at your option. All files in the project
+carrying such notice may not be copied, modified, or distributed except
+according to those terms.
+
+
+=== Components: office/image-dependencies/unicode-bidi-0.3.18/LICENSE-MIT ===
+Copyright (c) 2015 The Rust Project Developers
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/image-dependencies/unicode-script-0.5.8/LICENSE-MIT ===
+MIT License
+
+Copyright (c) 2019 Manish Goregaokar
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/image-dependencies/unicode-vo-0.1.0/LICENSE-APACHE ===
+                              Apache License
+                        Version 2.0, January 2004
+                     http://www.apache.org/licenses/
+
+
+[Full Apache-2.0 terms above apply here.]
+
+
+APPENDIX: How to apply the Apache License to your work.
+
+   To apply the Apache License to your work, attach the following
+   boilerplate notice, with the fields enclosed by brackets "[]"
+   replaced with your own identifying information. (Don't include
+   the brackets!)  The text should be enclosed in the appropriate
+   comment syntax for the file format. We also recommend that a
+   file or class name and description of purpose be included on the
+   same "printed page" as the copyright notice for easier
+   identification within third-party archives.
+
+Copyright [yyyy] [name of copyright owner]
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+=== Components: office/image-dependencies/weezl-0.1.12/LICENSE-MIT ===
+The MIT License (MIT)
+
+Copyright (c) HeroicKatora 2020
+
+
+[Full MIT terms above apply here.]
+
+
+
+
+=== Components: office/image-dependencies/xmlwriter-0.1.0/LICENSE ===
+The MIT License (MIT)
+
+Copyright (c) 2019 Reizner Evgeniy
+
+
+[Full MIT terms above apply here.]
+
+
+
+=== Components: office/image-dependencies/zerocopy-0.8.63/LICENSE-BSD ===
+Copyright 2019 The Fuchsia Authors.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+=== Components: office/image-dependencies/zerocopy-0.8.63/LICENSE-MIT ===
+Copyright 2023 The Fuchsia Authors
+
+
+[Full MIT terms above apply here.]
+
+
+
+
+=== Components: office/image-dependencies/zlib-rs-0.6.8/LICENSE ===
+(C) 2024 Trifecta Tech Foundation 
+
+This software is provided 'as-is', without any express or implied
+warranty. In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not
+   claim that you wrote the original software. If you use this software
+   in a product, an acknowledgment in the product documentation would be
+   appreciated but is not required.
+
+2. Altered source versions must be plainly marked as such, and must not be
+   misrepresented as being the original software.
+
+3. This notice may not be removed or altered from any source distribution.
+
+
+=== Components: office/image-dependencies/zune-core-0.5.3/LICENSE-MIT, office/image-dependencies/zune-jpeg-0.5.15/LICENSE-MIT ===
+MIT License
+
+Copyright (c) zune-image developers
+
+
+[Full MIT terms above apply here.]
+
+

@@ -1,0 +1,8 @@
+{
+  "generator": "scripts/migration/generate_table_unicode.py",
+  "generator_sha256": "4f699d6b22bf420e211dc52486b5d17e9ffdac9bf1fef74ba33e251778dfa675",
+  "python": "3.14.5 (tags/v3.14.5:5607950, May 10 2026, 10:43:50) [MSC v.1944 64 bit (AMD64)]",
+  "ranges": 775,
+  "semantic": "1=isalpha or isdigit,2=isspace,4=Nd; ranges omit zero flags",
+  "unicode": "16.0.0"
+}

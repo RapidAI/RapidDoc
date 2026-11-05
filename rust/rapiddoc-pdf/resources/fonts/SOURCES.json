@@ -1,0 +1,18 @@
+{
+  "files": {
+    "DroidSansFallbackFull.ttf": "8a4dea0899424438af25a6f1f6eb61e5d111d85367eece0a5d30170861ae6b2e",
+    "NOTICE": "51d8f4d0ad492381dbe33a874f89eff51ee8b96b701ede2ada4e2dfc2985b624",
+    "big5.bin": "96247eed1c2f377f75c1ed4d784c55bb536de770527572b3172b6a482f1b9dd7",
+    "cp932.bin": "635c217ace9a41783aea17eac71885f5ce5b86f4f47efd029cc141d10492226f",
+    "cp949.bin": "970fbab387930cd374f251838f8b8b6a7c1d0c0147fdd8d2390ba24444376b0b",
+    "gb18030-ranges.json": "452bbdee60c1cd6e375feb070abb336f55f7de9a62f2e6fef4dbddb17af20992",
+    "gb18030.bin": "de84254f04e53afde788479a4b021360213028ec1d698b1c0cbc949a5f25e07f",
+    "manifest.json": "aee13cea7fdc0ef30c96c0f870089f1e4f6c80070b3999478e0479f7a1ed67d3",
+    "policy.json": "c2ceae180f794af2f763c213257e4ff5f7f8783951014ffa17a32d3ed1cad3a4"
+  },
+  "policy_sha256": "cd25ba2992f746bdc3f77159d9535e04c854d8d9d92269da23c3dc5728c38c2b",
+  "policy_source": "rapid_doc/_vendor/docvortex_core/document/pdf/font_runtime.py",
+  "provider_sha256": "d451fc9ef9e6636f00c66d69f1925ef5d9d4a6b2b961421a81574293d4167a3e",
+  "provider_source": "D:\\CodeProjects\\doc\\DocVortex\\rust\\docvortex-pdfium\\src\\fonts.rs",
+  "python_version": "3.14.5 (tags/v3.14.5:5607950, May 10 2026, 10:43:50) [MSC v.1944 64 bit (AMD64)]"
+}

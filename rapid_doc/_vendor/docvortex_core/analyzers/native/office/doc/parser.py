@@ -51,6 +51,7 @@ from .models import (
 )
 from .pieces import Piece, TextStream, codec_for_lid, extract_text, legacy_single_piece, parse_clx
 from .records import DocBudget, parse_plc
+from .stories import textbox_ranges, comment_ranges
 from .sprm import PapDelta, apply_character_sprms, apply_paragraph_sprms, chpx_picture_location, chpx_style_id
 from .styles import Stylesheet, parse_stylesheet
 
@@ -815,7 +816,9 @@ def parse_doc_document(
         prefix="en",
         budget=budget,
     )
-    note_refs = {**foot_refs, **end_refs}
+    comment_refs, comments = comment_ranges(table_stream, fib.pair(4), fib.pair(5),
+        fib.story_bases['annotation'], fib.story_count(7), fib.ccp_text, budget)
+    note_refs = {**foot_refs, **end_refs, **comment_refs}
     store = ImageStore()
     assembler = _Assembler(
         text=text,
@@ -844,8 +847,30 @@ def parse_doc_document(
         budget=budget,
     )
     elements = _assemble_main_elements(main_paragraphs, floating, budget)
+    from .models import DocTextbox
+    for anchor, start, end in textbox_ranges(table_stream, fib.pair(56), fib.pair(40),
+            fib.story_bases['textbox'], fib.story_count(9), budget):
+        box = _assemble_main_elements(assembler.paragraphs(start, end), [], budget)
+        if box:
+            elements.append(DocTextbox(anchor, box))
+    elements.sort(key=lambda e: (e.cp if isinstance(e, DocImage) else e.cp_start,
+                                2 if isinstance(e, DocTextbox) else 1 if isinstance(e, DocImage) else 0))
     ranges = _section_ranges(table_stream, fib, budget)
     sections = _distribute_sections(ranges, elements)
     _attach_headers(sections, assembler, table_stream, fib, budget)
     _attach_notes(sections, assembler, foot_ranges, end_ranges)
+    _attach_notes(sections, assembler, comments, [])
+    header_ranges = _header_story_ranges(table_stream, fib, budget)
+    for anchor, start, end in textbox_ranges(table_stream, fib.pair(58), fib.pair(41),
+            fib.story_bases['header_textbox'], fib.story_count(10), budget):
+        for section_index, section in enumerate(sections):
+            group = 6 + section_index * 6
+            for slot in (0, 1, 4, 2, 3, 5):
+                if group + slot >= len(header_ranges):
+                    continue
+                a, b = header_ranges[group + slot]
+                if a <= anchor < b:
+                    target = section.headers if slot in (0, 1, 4) else section.footers
+                    target.extend(assembler.paragraphs(start, end))
+                    break
     return DocDocument(sections=sections)

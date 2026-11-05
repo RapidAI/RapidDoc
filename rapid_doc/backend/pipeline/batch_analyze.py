@@ -116,7 +116,7 @@ class BatchAnalyze:
             img_orientation_cls_model = atom_model_manager.get_atom_model(
                 atom_model_name=AtomicModel.ImgOrientationCls,
             )
-            for i, np_img in enumerate(np_images):
+            for i, np_img in tqdm(enumerate(np_images), total=len(np_images), desc="Orientation Predict"):
                 h, w = np_img.shape[:2]
                 rotate_label = img_orientation_cls_model.predict(np_img)
                 if rotate_label in ["90", "270"]:

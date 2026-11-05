@@ -15,7 +15,7 @@ from .model_init import AtomModelSingleton
 from .model_list import AtomicModel
 from ...model.table.utils import normalize_table_ocr_text
 from ...model.table.rule_table import build_rule_table, build_track_table
-from ...model.docvortex_adapter import recover_docvortex_table, use_docvortex_table_rules
+from ...model.docvortex_adapter import recover_docvortex_table, use_docvortex_table_rules, use_docvortex_ocr_table_rules
 from ...utils.bbox_utils import normalize_to_int_bbox
 from ...utils.boxbase import rotate_table_image
 from ...utils.enum_class import CategoryId
@@ -356,6 +356,7 @@ def _process_single_table(
     # 表格配置
     table_force_ocr = table_config.get("force_ocr", False)
     skip_text_in_image = table_config.get("skip_text_in_image", True)
+    ocr_rule_candidate = use_docvortex_ocr_table_rules(table_config)
     table_use_word_box = table_config.get("use_word_box", False)
     table_formula_enable = table_config.get("table_formula_enable", True)
     table_image_enable = table_config.get("table_image_enable", True)
@@ -411,7 +412,7 @@ def _process_single_table(
                 logger.warning(f'DocVortex table failed, fallback to model: {exc}')
 
     # The model is initialized only after the native route declines this table.
-    table_model = atom_model_manager.get_atom_model(
+    table_model = None if ocr_rule_candidate else atom_model_manager.get_atom_model(
         atom_model_name='table', lang=_lang, ocr_config=ocr_config,
         table_config=table_config,
     )
@@ -492,7 +493,7 @@ def _process_single_table(
         img_orientation_cls_model = atom_model_manager.get_atom_model(
             atom_model_name=AtomicModel.ImgOrientationCls,
         )
-        rotate_label = img_orientation_cls_model.predict(bgr_image, det_res)
+        rotate_label = img_orientation_cls_model.predict(bgr_image, det_res, table_mode=True)
     if rotate_label in ["90", "270"]:
         rotate_table_image(table_res_dict, rotate_label)
         # 旋转后的表格需要重新获取文本框
@@ -530,6 +531,50 @@ def _process_single_table(
             page_dict, table_res_dict, scale, table_extract_original_image
         )
 
+    # Known formulas and embedded layout images remain on the model route even
+    # if their output flags are disabled. A full scanned-page image is not an
+    # embedded cell image, so ori_image_list alone is not an exclusion here.
+    known_formula = known_image = False
+    if ocr_rule_candidate:
+        poly = table_res_dict['table_res']['poly']
+        table_bbox_scaled = (poly[0], poly[1], poly[4], poly[5])
+        known_formula = any(
+            item.get('bbox') and _box_center_in(table_bbox_scaled, item['bbox'])
+            for item in table_res_dict['single_page_mfdetrec_res'] + table_res_dict['checkbox_res']
+        )
+        known_image = bool(table_res_dict['table_res'].get('layout_image_list'))
+    if ocr_rule_candidate and not (known_formula or known_image or adjusted_mfdetrec_res or fill_image_res):
+        from ...model.table.docvortex_ocr import recover_ocr_table, save_ocr_diagnostics
+
+        report = {}
+        try:
+            rule_result = recover_ocr_table(table_res_dict['table_img'], ocr_result, diagnostics=report)
+            if rule_result is not None and rule_result.html.strip() and rule_result.confidence >= rule_table_score_threshold:
+                table_res_dict['table_res'].pop('layout_image_list', None)
+                table_res_dict['table_res'].update(
+                    html=rule_result.html, rule_table_score=rule_result.confidence,
+                    table_parse_method='docvortex_ocr', rule_table_source=rule_result.source)
+                return
+            if rule_result is not None:
+                report.update(reason='below_rule_table_score_threshold', accepted=False)
+            logger.debug(f'DocVortex OCR table declined: {report.get("reason")}; fallback to model')
+        except Exception as exc:
+            report.update(reason='adapter_error', error=str(exc), accepted=False)
+            logger.warning(f'DocVortex OCR table failed, fallback to model: {exc}')
+        finally:
+            debug_dir = table_config.get('rule_table_debug_dir')
+            if debug_dir:
+                try:
+                    save_ocr_diagnostics(debug_dir, table_res_dict['table_img'], report)
+                except Exception as exc:
+                    logger.warning(f'DocVortex OCR diagnostic save failed: {exc}')
+
+    if table_model is None:
+        table_model = atom_model_manager.get_atom_model(
+            atom_model_name='table', lang=_lang, ocr_config=ocr_config,
+            table_config=table_config,
+        )
+
     table_res_dict['table_res'].pop('layout_image_list', None)
 
     predict_kwargs = {'skip_table_orientation': True}
@@ -545,10 +590,14 @@ def _process_single_table(
         **predict_kwargs,
     )
 
-    if html_code and '<table>' in html_code and '</table>' in html_code:
+    from rapid_doc.model.table.fallback import TextFallback
+    text_fallback = isinstance(html_code, TextFallback)
+    if text_fallback or html_code and '<table>' in html_code and '</table>' in html_code:
         start_index = html_code.find('<table>')
         end_index = html_code.rfind('</table>') + len('</table>')
-        table_res_dict['table_res']['html'] = html_code[start_index:end_index]
+        table_res_dict['table_res']['html'] = str(html_code) if text_fallback else html_code[start_index:end_index]
+        if text_fallback:
+            table_res_dict['table_res']['text_fallback'] = True
 
         # 保存公式和图片位置信息
         formula_boxes = [

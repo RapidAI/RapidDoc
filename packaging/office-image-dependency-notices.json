@@ -1,0 +1,752 @@
+{
+  "roots": [
+    "image 0.25.10",
+    "tiff 0.11.3",
+    "resvg 0.48.0",
+    "usvg 0.48.1"
+  ],
+  "packages": [
+    {
+      "name": "adler2",
+      "version": "2.0.1",
+      "license": "0BSD OR MIT OR Apache-2.0",
+      "repository": "https://github.com/oyvindln/adler2",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/adler2-2.0.1/LICENSE-0BSD",
+        "rust/rapiddoc-office/licenses/image-dependencies/adler2-2.0.1/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/adler2-2.0.1/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "arrayref",
+      "version": "0.3.9",
+      "license": "BSD-2-Clause",
+      "repository": "https://github.com/droundy/arrayref",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/arrayref-0.3.9/LICENSE"
+      ]
+    },
+    {
+      "name": "arrayvec",
+      "version": "0.7.8",
+      "license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/bluss/arrayvec",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/arrayvec-0.7.8/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/arrayvec-0.7.8/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "autocfg",
+      "version": "1.5.1",
+      "license": "Apache-2.0 OR MIT",
+      "repository": "https://github.com/cuviper/autocfg",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/autocfg-1.5.1/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/autocfg-1.5.1/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "base64",
+      "version": "0.23.1",
+      "license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/marshallpierce/rust-base64",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/base64-0.23.1/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/base64-0.23.1/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "bitflags",
+      "version": "2.13.2",
+      "license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/bitflags/bitflags",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/bitflags-2.13.2/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/bitflags-2.13.2/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "bytemuck",
+      "version": "1.25.2",
+      "license": "Zlib OR Apache-2.0 OR MIT",
+      "repository": "https://github.com/Lokathor/bytemuck",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/bytemuck-1.25.2/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/bytemuck-1.25.2/LICENSE-MIT",
+        "rust/rapiddoc-office/licenses/image-dependencies/bytemuck-1.25.2/LICENSE-ZLIB"
+      ]
+    },
+    {
+      "name": "bytemuck_derive",
+      "version": "1.12.1",
+      "license": "Zlib OR Apache-2.0 OR MIT",
+      "repository": "https://github.com/Lokathor/bytemuck",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/bytemuck_derive-1.12.1/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/bytemuck_derive-1.12.1/LICENSE-MIT",
+        "rust/rapiddoc-office/licenses/image-dependencies/bytemuck_derive-1.12.1/LICENSE-ZLIB"
+      ]
+    },
+    {
+      "name": "byteorder-lite",
+      "version": "0.1.0",
+      "license": "Unlicense OR MIT",
+      "repository": "https://github.com/image-rs/byteorder-lite",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/byteorder-lite-0.1.0/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "cfg-if",
+      "version": "1.0.5",
+      "license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/rust-lang/cfg-if",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/cfg-if-1.0.5/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/cfg-if-1.0.5/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "color_quant",
+      "version": "1.1.0",
+      "license": "MIT",
+      "repository": "https://github.com/image-rs/color_quant.git",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/color_quant-1.1.0/LICENSE"
+      ]
+    },
+    {
+      "name": "crc32fast",
+      "version": "1.5.3",
+      "license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/srijs/rust-crc32fast",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/crc32fast-1.5.3/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/crc32fast-1.5.3/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "crunchy",
+      "version": "0.2.4",
+      "license": "MIT",
+      "repository": "https://github.com/eira-fransham/crunchy",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/crunchy-0.2.4/LICENSE"
+      ]
+    },
+    {
+      "name": "data-url",
+      "version": "0.3.2",
+      "license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/servo/rust-url",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/data-url-0.3.2/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/data-url-0.3.2/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "euclid",
+      "version": "0.22.14",
+      "license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/servo/euclid",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/euclid-0.22.14/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/euclid-0.22.14/LICENSE-MIT",
+        "rust/rapiddoc-office/licenses/image-dependencies/euclid-0.22.14/COPYRIGHT"
+      ]
+    },
+    {
+      "name": "fax",
+      "version": "0.2.7",
+      "license": "MIT",
+      "repository": "https://github.com/pdf-rs/fax",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/fax-0.2.7/LICENSE"
+      ]
+    },
+    {
+      "name": "fdeflate",
+      "version": "0.3.7",
+      "license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/image-rs/fdeflate",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/fdeflate-0.3.7/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/fdeflate-0.3.7/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "flate2",
+      "version": "1.1.10",
+      "license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/rust-lang/flate2-rs",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/flate2-1.1.10/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/flate2-1.1.10/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "float-cmp",
+      "version": "0.9.0",
+      "license": "MIT",
+      "repository": "https://github.com/mikedilger/float-cmp",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/float-cmp-0.9.0/LICENSE"
+      ]
+    },
+    {
+      "name": "font-types",
+      "version": "0.12.7",
+      "license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/googlefonts/fontations",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/font-types-0.12.7/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/font-types-0.12.7/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "fontdb",
+      "version": "0.24.0",
+      "license": "MIT",
+      "repository": "https://github.com/RazrFalcon/fontdb",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/fontdb-0.24.0/LICENSE"
+      ]
+    },
+    {
+      "name": "gif",
+      "version": "0.14.2",
+      "license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/image-rs/image-gif",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/gif-0.14.2/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/gif-0.14.2/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "half",
+      "version": "2.7.1",
+      "license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/VoidStarKat/half-rs",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/half-2.7.1/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/half-2.7.1/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "harfrust",
+      "version": "0.12.0",
+      "license": "MIT",
+      "repository": "https://github.com/harfbuzz/harfrust",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/harfrust-0.12.0/LICENSE"
+      ]
+    },
+    {
+      "name": "image",
+      "version": "0.25.10",
+      "license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/image-rs/image",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/image-0.25.10/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/image-0.25.10/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "image-webp",
+      "version": "0.2.4",
+      "license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/image-rs/image-webp",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/image-webp-0.2.4/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/image-webp-0.2.4/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "imagesize",
+      "version": "0.15.0",
+      "license": "MIT",
+      "repository": "https://github.com/Roughsketch/imagesize",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/imagesize-0.15.0/LICENSE"
+      ]
+    },
+    {
+      "name": "kurbo",
+      "version": "0.13.1",
+      "license": "Apache-2.0 OR MIT",
+      "repository": "https://github.com/linebender/kurbo",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/kurbo-0.13.1/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/kurbo-0.13.1/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "libm",
+      "version": "0.2.16",
+      "license": "MIT",
+      "repository": "https://github.com/rust-lang/compiler-builtins",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/libm-0.2.16/LICENSE.txt"
+      ]
+    },
+    {
+      "name": "log",
+      "version": "0.4.34",
+      "license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/rust-lang/log",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/log-0.4.34/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/log-0.4.34/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "memchr",
+      "version": "2.8.3",
+      "license": "Unlicense OR MIT",
+      "repository": "https://github.com/BurntSushi/memchr",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/memchr-2.8.3/LICENSE-MIT",
+        "rust/rapiddoc-office/licenses/image-dependencies/memchr-2.8.3/COPYING"
+      ]
+    },
+    {
+      "name": "miniz_oxide",
+      "version": "0.9.1",
+      "license": "MIT OR Zlib OR Apache-2.0",
+      "repository": "https://github.com/Frommi/miniz_oxide/tree/master/miniz_oxide",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/miniz_oxide-0.9.1/LICENSE",
+        "rust/rapiddoc-office/licenses/image-dependencies/miniz_oxide-0.9.1/LICENSE-APACHE.md",
+        "rust/rapiddoc-office/licenses/image-dependencies/miniz_oxide-0.9.1/LICENSE-MIT.md",
+        "rust/rapiddoc-office/licenses/image-dependencies/miniz_oxide-0.9.1/LICENSE-ZLIB.md"
+      ]
+    },
+    {
+      "name": "miniz_oxide",
+      "version": "0.8.9",
+      "license": "MIT OR Zlib OR Apache-2.0",
+      "repository": "https://github.com/Frommi/miniz_oxide/tree/master/miniz_oxide",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/miniz_oxide-0.8.9/LICENSE",
+        "rust/rapiddoc-office/licenses/image-dependencies/miniz_oxide-0.8.9/LICENSE-APACHE.md",
+        "rust/rapiddoc-office/licenses/image-dependencies/miniz_oxide-0.8.9/LICENSE-MIT.md",
+        "rust/rapiddoc-office/licenses/image-dependencies/miniz_oxide-0.8.9/LICENSE-ZLIB.md"
+      ]
+    },
+    {
+      "name": "moxcms",
+      "version": "0.8.1",
+      "license": "BSD-3-Clause OR Apache-2.0",
+      "repository": "https://github.com/awxkee/moxcms.git",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/moxcms-0.8.1/LICENSE-APACHE.md",
+        "rust/rapiddoc-office/licenses/image-dependencies/moxcms-0.8.1/LICENSE.md"
+      ]
+    },
+    {
+      "name": "num-traits",
+      "version": "0.2.19",
+      "license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/rust-num/num-traits",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/num-traits-0.2.19/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/num-traits-0.2.19/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "once_cell",
+      "version": "1.21.4",
+      "license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/matklad/once_cell",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/once_cell-1.21.4/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/once_cell-1.21.4/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "pico-args",
+      "version": "0.5.0",
+      "license": "MIT",
+      "repository": "https://github.com/RazrFalcon/pico-args",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/pico-args-0.5.0/LICENSE"
+      ]
+    },
+    {
+      "name": "png",
+      "version": "0.18.1",
+      "license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/image-rs/image-png",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/png-0.18.1/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/png-0.18.1/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "polycool",
+      "version": "0.4.0",
+      "license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/linebender/kurbo",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/polycool-0.4.0/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/polycool-0.4.0/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "proc-macro2",
+      "version": "1.0.107",
+      "license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/dtolnay/proc-macro2",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/proc-macro2-1.0.107/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/proc-macro2-1.0.107/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "pxfm",
+      "version": "0.1.30",
+      "license": "BSD-3-Clause OR Apache-2.0",
+      "repository": "https://github.com/awxkee/pxfm",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/pxfm-0.1.30/LICENSE-APACHE.md",
+        "rust/rapiddoc-office/licenses/image-dependencies/pxfm-0.1.30/LICENSE.md"
+      ]
+    },
+    {
+      "name": "quick-error",
+      "version": "2.0.1",
+      "license": "MIT/Apache-2.0",
+      "repository": "http://github.com/tailhook/quick-error",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/quick-error-2.0.1/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/quick-error-2.0.1/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "quote",
+      "version": "1.0.47",
+      "license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/dtolnay/quote",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/quote-1.0.47/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/quote-1.0.47/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "read-fonts",
+      "version": "0.41.0",
+      "license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/googlefonts/fontations",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/read-fonts-0.41.0/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/read-fonts-0.41.0/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "resvg",
+      "version": "0.48.0",
+      "license": "Apache-2.0 OR MIT",
+      "repository": "https://github.com/linebender/resvg",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/resvg-0.48.0/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/resvg-0.48.0/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "rgb",
+      "version": "0.8.53",
+      "license": "MIT",
+      "repository": "https://github.com/kornelski/rust-rgb",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/rgb-0.8.53/LICENSE"
+      ]
+    },
+    {
+      "name": "roxmltree",
+      "version": "0.21.2",
+      "license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/RazrFalcon/roxmltree",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/roxmltree-0.21.2/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/roxmltree-0.21.2/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "simd-adler32",
+      "version": "0.3.10",
+      "license": "MIT",
+      "repository": "https://github.com/mcountryman/simd-adler32",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/simd-adler32-0.3.10/LICENSE.md"
+      ]
+    },
+    {
+      "name": "simplecss",
+      "version": "0.2.2",
+      "license": "Apache-2.0 OR MIT",
+      "repository": "https://github.com/linebender/simplecss",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/simplecss-0.2.2/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/simplecss-0.2.2/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "siphasher",
+      "version": "1.0.4",
+      "license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/jedisct1/rust-siphash",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/siphasher-1.0.4/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/siphasher-1.0.4/LICENSE-MIT",
+        "rust/rapiddoc-office/licenses/image-dependencies/siphasher-1.0.4/COPYING"
+      ]
+    },
+    {
+      "name": "skrifa",
+      "version": "0.44.0",
+      "license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/googlefonts/fontations",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/skrifa-0.44.0/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/skrifa-0.44.0/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "slotmap",
+      "version": "1.1.1",
+      "license": "Zlib",
+      "repository": "https://github.com/orlp/slotmap",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/slotmap-1.1.1/LICENSE"
+      ]
+    },
+    {
+      "name": "smallvec",
+      "version": "1.16.3",
+      "license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/servo/rust-smallvec",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/smallvec-1.16.3/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/smallvec-1.16.3/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "strict-num",
+      "version": "0.1.1",
+      "license": "MIT",
+      "repository": "https://github.com/RazrFalcon/strict-num",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/strict-num-0.1.1/LICENSE"
+      ]
+    },
+    {
+      "name": "svgtypes",
+      "version": "0.16.1",
+      "license": "Apache-2.0 OR MIT",
+      "repository": "https://github.com/linebender/svgtypes",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/svgtypes-0.16.1/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/svgtypes-0.16.1/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "syn",
+      "version": "3.0.9",
+      "license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/dtolnay/syn",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/syn-3.0.9/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/syn-3.0.9/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "syn",
+      "version": "2.0.119",
+      "license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/dtolnay/syn",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/syn-2.0.119/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/syn-2.0.119/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "tiff",
+      "version": "0.11.3",
+      "license": "MIT",
+      "repository": "https://github.com/image-rs/image-tiff",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/tiff-0.11.3/LICENSE"
+      ]
+    },
+    {
+      "name": "tiny-skia",
+      "version": "0.12.0",
+      "license": "BSD-3-Clause",
+      "repository": "https://github.com/linebender/tiny-skia",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/tiny-skia-0.12.0/LICENSE"
+      ]
+    },
+    {
+      "name": "tiny-skia-path",
+      "version": "0.12.0",
+      "license": "BSD-3-Clause",
+      "repository": "https://github.com/linebender/tiny-skia/tree/master/path",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/tiny-skia-path-0.12.0/LICENSE"
+      ]
+    },
+    {
+      "name": "tinyvec",
+      "version": "1.13.3",
+      "license": "Zlib OR Apache-2.0 OR MIT",
+      "repository": "https://github.com/Lokathor/tinyvec",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/tinyvec-1.13.3/LICENSE-APACHE.md",
+        "rust/rapiddoc-office/licenses/image-dependencies/tinyvec-1.13.3/LICENSE-MIT.md",
+        "rust/rapiddoc-office/licenses/image-dependencies/tinyvec-1.13.3/LICENSE-ZLIB.md"
+      ]
+    },
+    {
+      "name": "unicode-bidi",
+      "version": "0.3.18",
+      "license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/servo/unicode-bidi",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/unicode-bidi-0.3.18/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/unicode-bidi-0.3.18/LICENSE-MIT",
+        "rust/rapiddoc-office/licenses/image-dependencies/unicode-bidi-0.3.18/COPYRIGHT"
+      ]
+    },
+    {
+      "name": "unicode-ident",
+      "version": "1.0.27",
+      "license": "(MIT OR Apache-2.0) AND Unicode-3.0",
+      "repository": "https://github.com/dtolnay/unicode-ident",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/unicode-ident-1.0.27/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/unicode-ident-1.0.27/LICENSE-MIT",
+        "rust/rapiddoc-office/licenses/image-dependencies/unicode-ident-1.0.27/LICENSE-UNICODE"
+      ]
+    },
+    {
+      "name": "unicode-script",
+      "version": "0.5.8",
+      "license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/unicode-rs/unicode-script",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/unicode-script-0.5.8/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/unicode-script-0.5.8/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "unicode-vo",
+      "version": "0.1.0",
+      "license": "MIT/Apache-2.0",
+      "repository": "https://github.com/RazrFalcon/unicode-vo",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/unicode-vo-0.1.0/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/unicode-vo-0.1.0/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "usvg",
+      "version": "0.48.1",
+      "license": "Apache-2.0 OR MIT",
+      "repository": "https://github.com/linebender/resvg",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/usvg-0.48.1/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/usvg-0.48.1/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "version_check",
+      "version": "0.9.5",
+      "license": "MIT/Apache-2.0",
+      "repository": "https://github.com/SergioBenitez/version_check",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/version_check-0.9.5/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/version_check-0.9.5/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "weezl",
+      "version": "0.1.12",
+      "license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/image-rs/weezl",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/weezl-0.1.12/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/weezl-0.1.12/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "xmlwriter",
+      "version": "0.1.0",
+      "license": "MIT",
+      "repository": "https://github.com/RazrFalcon/xmlwriter",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/xmlwriter-0.1.0/LICENSE"
+      ]
+    },
+    {
+      "name": "zerocopy",
+      "version": "0.8.63",
+      "license": "BSD-2-Clause OR Apache-2.0 OR MIT",
+      "repository": "https://github.com/google/zerocopy",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/zerocopy-0.8.63/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/zerocopy-0.8.63/LICENSE-BSD",
+        "rust/rapiddoc-office/licenses/image-dependencies/zerocopy-0.8.63/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "zerocopy-derive",
+      "version": "0.8.63",
+      "license": "BSD-2-Clause OR Apache-2.0 OR MIT",
+      "repository": "https://github.com/google/zerocopy",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/zerocopy-derive-0.8.63/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/zerocopy-derive-0.8.63/LICENSE-BSD",
+        "rust/rapiddoc-office/licenses/image-dependencies/zerocopy-derive-0.8.63/LICENSE-MIT"
+      ]
+    },
+    {
+      "name": "zlib-rs",
+      "version": "0.6.8",
+      "license": "Zlib",
+      "repository": "https://github.com/trifectatechfoundation/zlib-rs",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/zlib-rs-0.6.8/LICENSE"
+      ]
+    },
+    {
+      "name": "zune-core",
+      "version": "0.5.3",
+      "license": "MIT OR Apache-2.0 OR Zlib",
+      "repository": "https://github.com/etemesi254/zune-image",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/zune-core-0.5.3/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/zune-core-0.5.3/LICENSE-MIT",
+        "rust/rapiddoc-office/licenses/image-dependencies/zune-core-0.5.3/LICENSE-ZLIB"
+      ]
+    },
+    {
+      "name": "zune-jpeg",
+      "version": "0.5.15",
+      "license": "MIT OR Apache-2.0 OR Zlib",
+      "repository": "https://github.com/etemesi254/zune-image/tree/dev/crates/zune-jpeg",
+      "notices": [
+        "rust/rapiddoc-office/licenses/image-dependencies/zune-jpeg-0.5.15/LICENSE-APACHE",
+        "rust/rapiddoc-office/licenses/image-dependencies/zune-jpeg-0.5.15/LICENSE-MIT",
+        "rust/rapiddoc-office/licenses/image-dependencies/zune-jpeg-0.5.15/LICENSE-ZLIB"
+      ]
+    }
+  ],
+  "missing_top_level_notices": [],
+  "notice_archive": {
+    "text": "rust/rapiddoc-office/licenses/THIRD_PARTY_NOTICES.txt",
+    "index": "rust/rapiddoc-office/licenses/third-party-notices.json",
+    "paths": "notices paths identify original entries in the archive"
+  }
+}

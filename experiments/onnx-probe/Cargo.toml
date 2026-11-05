@@ -1,0 +1,14 @@
+[package]
+name = "rapiddoc-onnx-probe"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+rapiddoc-inference = { path = "../../rust/rapiddoc-inference" }
+serde = { workspace = true }
+serde_json.workspace = true
+ort.workspace = true
+
+[features]
+cuda = ["rapiddoc-inference/cuda"]

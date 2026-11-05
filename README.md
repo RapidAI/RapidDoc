@@ -16,6 +16,27 @@
 
 **KittyDoc 已经成为 RapidAI 开源家族成员**
 
+## 选择解析引擎与语言 SDK
+
+RapidDoc 提供原 Python 实现和共享 Rust 引擎。原 Python 包继续使用 `rapid-doc`；新的 Python、Java、Go、Node.js 绑定调用同一套 Rust 解析核心，不需要安装原 Python 包。Rust、Java、Go 和 Node.js 应用运行时不需要 Python 环境。
+
+| 使用方式 | 包名 / 引入名 | 使用文档 |
+| --- | --- | --- |
+| 原 Python | `rapid-doc` / `rapid_doc` | [安装与使用](#安装与使用原-python-实现) |
+| Rust 引擎的 Python 绑定 | `rapid-doc-rust` / `rapid_doc_rust` | [Python SDK](bindings/python/README.md) |
+| Rust | `rapiddoc` | [Rust SDK](rust/rapiddoc/README.md) |
+| Java | `io.github.rapidai:rapid-doc` | [Java SDK](bindings/java/README.md) |
+| Go | `github.com/RapidAI/RapidDoc/bindings/go` | [Go SDK](bindings/go/README.md) |
+| Node.js / TypeScript | `rapid-doc`（npm） | [Node.js SDK](bindings/node/README.md) |
+
+**发布状态：新 Rust SDK 及各语言绑定当前为 `0.1.0` 发布候选，尚未发布到公共包仓库。** 版本变更记录见 [CHANGELOG.md](CHANGELOG.md)，发布构建与验证流程见[发布说明](docs/publishing.md)。
+
+Rust 引擎支持 PDF、DOC、DOCX、XLS、XLSX、PPT、PPTX，Office 格式直接原生解析；PDF 模型推理使用 ONNX Runtime。PDFium、ORT、GEOS 及 CUDA 算子等运行库的提供方式随语言和平台包而异，不能只复制一个动态库部署。模型缺失时按配置自动下载，也可使用已有模型目录，详见[模型配置](docs/rust-models.md)。
+
+原 Python 与 Rust 的配置和扩展能力尚未完全一致：Rust 完整 PDF 流程支持 V2/V3 版面、公式 S/M/L、UNET/SLANet 和 Table Transformer；Plus-L 完整 PDF 阅读顺序、增强阅读顺序及 `use_word_box=True` 字符框拆分仍未接入。原 Python 的 Torch、其他 OCR 推理引擎及 `CustomBaseModel` 扩展不代表 Rust 绑定也支持。完整支持范围与默认值以各 SDK 文档为准。
+
+现有 [Docker / FastAPI 部署](docker/README.md)仍使用原 Python 实现，尚未切换为 Rust 镜像。两套引擎的输出、耗时和内存应在相同模型、参数及文档下比较，不保证仅更换语言即可获得固定倍数的性能提升。
+
 ---
 
 > ✨如果该项目对您有帮助，您的star是我不断优化的动力！！！
@@ -24,6 +45,8 @@
 > - [gitee点击前往](https://gitee.com/hzkitty/KittyDoc)
 
 ## 👏 项目特点
+
+本节介绍原 Python 实现；Rust SDK 的模型和参数支持范围见上方导航。
 
 - **OCR 识别**
   - 使用 [RapidOCR](https://github.com/RapidAI/RapidOCR) 支持多种推理引擎
@@ -469,6 +492,10 @@ Pipeline 模型使用 PP-DocLayoutV3、PP-OCRv6-small、PP-FormulaNet_plus-M、U
 
 ## 🛠️ 安装RapidDoc
 
+### 安装与使用原 Python 实现
+
+以下安装命令使用 `rapid-doc`，不会安装新的 Rust 引擎；Rust 引擎的 Python 绑定请参阅 [Python SDK 文档](bindings/python/README.md)。
+
 #### 使用pip安装
 ```bash
 # CPU 环境
@@ -579,27 +606,6 @@ for output in outputs:
 - [部分表格模型RapidTable](https://www.modelscope.cn/models/RapidAI/RapidTable) 
 
 ---
-
-## 📌 TODO
-
-- [x] 跨页表格合并
-- [x] 复选框识别，使用opencv（默认关闭、opencv识别存在误检）
-- [x] 提供 fastapi，支持cpu和gpu版本的docker镜像构建
-- [x] 文本型pdf，表格非OCR文本提取
-- [x] 文本型pdf，使用pypdfium2提取文本框bbox
-- [x] 文本型pdf，支持0/90/270度三个方向的表格解析
-- [x] 文本型pdf，使用pypdfium2提取原始图片（默认截图会导致清晰度降低和图片边界可能丢失部分）
-- [x] 表格内公式提取，表格内图片提取
-- [x] 优化阅读顺序，支持多栏、竖排等复杂版面恢复
-- [x] OCR 和公式默认使用 ONNX Runtime，支持 CUDA GPU 推理；公式仍可显式选择 Torch
-- [x] 版面、表格模型支持openvino
-- [x] markdown转docx、html
-- [x] 支持 PP-DocLayoutV2 版面识别+阅读顺序
-- [x] OmniDocBench评测
-- [x] 支持自定义的ocr、table、公式。支持PaddleOCR-VL系列
-- [x] 支持docx/doc、pptx/ppt、xlsx/xls的原生解析（不使用模型）
-- [x] 支持印章文本检测
-- [x] 文档方向90°、270°矫正（默认关闭），表格方向90°、270°矫正（默认开启）
 
 ## 🙏 致谢
 

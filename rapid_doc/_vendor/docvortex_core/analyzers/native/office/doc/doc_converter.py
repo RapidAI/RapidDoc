@@ -29,6 +29,7 @@ from .models import (
     DocTable,
     DocTableCell,
     DocTextRun,
+    DocTextbox,
     DocVisualPayload,
 )
 from .parser import parse_doc_document
@@ -193,6 +194,7 @@ class DocConverter:
             part_name=f"image.{payload.extension}",
             content_type=payload.content_type,
             render_size_emu=payload.render_size_emu,
+            limit_reason=payload.limit_reason,
         )
 
     @classmethod
@@ -348,7 +350,7 @@ class DocConverter:
             and not (paragraph.is_title or paragraph.heading_level is not None or paragraph.is_caption or paragraph.is_code)
         ):
             blocks.extend({"type": BlockType.EQUATION, "content": run.text} for run in formula_runs)
-        elif content:
+        elif content or (paragraph.is_code and cls._plain_text(paragraph)):
             if paragraph.is_title:
                 block: dict[str, Any] = {
                     "type": BlockType.DOC_TITLE,
@@ -530,6 +532,12 @@ class DocConverter:
         list_identity: int | None = None
         index_stack: list[dict[str, Any]] = []
         for element in section.elements:
+            if isinstance(element, DocTextbox):
+                list_stack.clear()
+                list_identity = None
+                index_stack.clear()
+                page.extend(cls._section_page(DocSection(0, 0, elements=element.elements)))
+                continue
             if isinstance(element, DocParagraph) and element.is_toc:
                 list_stack.clear()
                 list_identity = None

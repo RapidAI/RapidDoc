@@ -1,0 +1,58 @@
+name: Check or publish Rust crates (manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        default: '0.1.0'
+        required: true
+        type: string
+      publish:
+        description: Upload after verifying all extracted crate packages
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: crates-publish
+  cancel-in-progress: false
+
+jobs:
+  crates:
+    runs-on: ubuntu-22.04
+    environment: sdk-crates
+    env:
+      CARGO_BUILD_JOBS: '2'
+      CARGO_INCREMENTAL: '0'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: '1.92.0'
+      - name: Native build prerequisites
+        run: sudo apt-get update && sudo apt-get install -y build-essential cmake ninja-build nasm
+      - name: Version and package readiness guards
+        env:
+          VERSION: ${{ inputs.version }}
+        run: python scripts/release/common.py "$VERSION"
+      - name: Check packages or publish in dependency order
+        env:
+          PUBLISH: ${{ inputs.publish }}
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        shell: python
+        run: |
+          import os, subprocess, sys
+          subprocess.run([sys.executable, 'scripts/release/crates.py'] +
+                         (['--publish'] if os.environ['PUBLISH'] == 'true' else []), check=True)
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: crates-readiness
+          path: |
+            build/release/crates-readiness.json
+            target/package/*.crate

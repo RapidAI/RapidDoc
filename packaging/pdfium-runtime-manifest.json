@@ -1,0 +1,21 @@
+{
+  "library": "rapiddoc_pdfium.dll",
+  "license_files": {
+    "licenses/BUILD_LICENSES/freetype.txt": "f4b133e25df1f86ad3ffea453aa0e613f0474f34778dbbb3e437e7b2724937d8",
+    "licenses/third-party-notices.json": "65b661bdb158e4e8a5b2abc30301e7b46d1a812fe32e1a8ffd943a2bafd5b866",
+    "licenses/THIRD_PARTY_NOTICES.txt": "563eb3185abb6413f06b9d87c21ba14882334a840700e04ca73a1d54d87e6e7b"
+  },
+  "platform": "win32",
+  "sha256": "e66bd5aefc2829f12ef41227f83a6ec6d60673ec77ef64153a05e7ffbae9072e",
+  "source": "Local pypdfium2 distribution; explicit development staging; no automatic download",
+  "version": {
+    "build": 7891,
+    "flags": [],
+    "hash": null,
+    "major": 151,
+    "minor": 0,
+    "n_commits": 0,
+    "origin": "pdfium-binaries",
+    "patch": 0
+  }
+}

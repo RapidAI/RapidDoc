@@ -1,0 +1,56 @@
+[package]
+repository = "https://github.com/RapidAI/RapidDoc"
+description = "Native document parsing for PDF and Microsoft Office."
+include = [
+    "src/**",
+    "build.rs",
+    "build/**",
+    "native/**",
+    "vendor/**",
+    "assets/**",
+    "resources/**",
+    "models.json",
+    "licenses/**",
+    "Cargo.toml",
+    "LICENSE",
+    "README.md",
+]
+name = "rapiddoc"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[features]
+cuda = ["rapiddoc-inference/cuda"]
+# Keep dynamic loading: ort's own download feature is skipped in this mode.
+download-runtime = ["dep:ureq", "dep:zip", "dep:tar", "dep:flate2", "dep:sha2"]
+
+[dependencies]
+rapiddoc-core = { version = "=0.1.0", path = "../rapiddoc-core" }
+rapiddoc-pdf = { version = "=0.1.0", path = "../rapiddoc-pdf" }
+rapiddoc-native = { version = "=0.1.0", path = "../rapiddoc-native" }
+rapiddoc-render = { version = "=0.1.0", path = "../rapiddoc-render" }
+rapiddoc-inference = { version = "=0.1.0", path = "../rapiddoc-inference" }
+rapiddoc-office = { version = "=0.1.0", path = "../rapiddoc-office" }
+serde.workspace = true
+serde_json.workspace = true
+image = { version = "0.25", default-features = false, features = ["png"] }
+sha2 = "0.10"
+md-5 = "=0.10.6"
+unicode-normalization = "=0.1.24"
+base64 = "=0.13.1"
+num-rational = "=0.4.2"
+num-traits = "=0.2.19"
+regex = "=1.13.1"
+ureq = { version = "=3.5.1", default-features = false, features = ["rustls"] }
+percent-encoding = "=2.3.2"
+
+[dev-dependencies]
+flate2 = "=1.1.10"
+
+[build-dependencies]
+ureq = { version = "=3.5.1", default-features = false, features = ["rustls"], optional = true }
+sha2 = { version = "0.10", optional = true }
+zip = { version = "=9.1.3", default-features = false, features = ["deflate"], optional = true }
+tar = { version = "0.4", optional = true }
+flate2 = { version = "=1.1.10", optional = true }

@@ -1,0 +1,377 @@
+{
+  "api": {
+    "MakeMode": [
+      "class MakeMode:\n    MM_MD = 'mm_markdown'\n    NLP_MD = 'nlp_markdown'\n    CONTENT_LIST = 'content_list'\n    CONTENT_LIST_V2 = 'content_list_v2'"
+    ],
+    "RapidDoc": {
+      "__call__": "self, inputs: str | bytes | Path | BinaryIO | list[str | bytes | Path | BinaryIO], output_dir: str | Path | None=None, image_writer: DataWriter | None=None, md_writer: DataWriter | None=None, image_output_mode: str | None=None, image_dir_name: str | None=None, parse_method: str | None=None, formula_enable: bool | None=None, table_enable: bool | None=None, lang: str | list[str] | None=None, start_page_id: int=0, end_page_id: int | None=None, f_dump_middle_json: bool=True, f_dump_content_list: bool=True, f_draw_layout_bbox: bool=False, f_draw_span_bbox: bool=False",
+      "__init__": "self, layout_config: dict[str, Any] | None=None, ocr_config: dict[str, Any] | None=None, formula_config: dict[str, Any] | None=None, table_config: dict[str, Any] | None=None, checkbox_config: dict[str, Any] | None=None, image_config: dict[str, Any] | None=None, parse_method: str='auto', formula_enable: bool=True, table_enable: bool=True, lang: str='ch', make_md_mode: str=MakeMode.MM_MD, output_dir: str | Path | None=None, image_writer: DataWriter | None=None, md_writer: DataWriter | None=None, image_dir_name: str='images', image_output_mode: str='url', preload_model: bool=False, pdf_pages_batch: int=64",
+      "fields": [],
+      "warmup": "self, lang: str | None=None, formula_enable: bool | None=None, table_enable: bool | None=None"
+    },
+    "RapidDocOutput": {
+      "__iter__": "self",
+      "fields": [
+        "markdown: str = ''",
+        "images: dict[str, bytes] = field(default_factory=dict)",
+        "middle_json: dict[str, Any] | None = None",
+        "content_list_json: list[Any] | None = None"
+      ]
+    }
+  },
+  "api_source_sha256": "c9e13f1e51ce9c5541e285c711e0c9ac4d637c24a8d25e46a9b95fd9a6a3cf01",
+  "environment": {
+    "git_status": " M tests/native_office/test_office_robust_fixtures.py\n M tests/native_pdf/test_reported_layout_regressions.py\nAM todo.md\n?? docs/plans/2026-10-22-rust-feasibility.md\n?? docs/plans/2026-10-22-rust-migration-plan.md\n?? docs/plans/rust-migration-status.md\n?? scripts/\n?? tests/fixtures/\n?? tests/migration/\n",
+    "head": "d0e98fb550f741a3b979bf79217f7f8e180f8812",
+    "packages": {
+      "numpy": "2.4.6",
+      "onnxruntime": "1.26.0",
+      "onnxruntime-gpu": null,
+      "openpyxl": "3.1.5",
+      "pypdfium2": "5.10.1",
+      "python-docx": "1.2.0",
+      "python-pptx": null,
+      "reportlab": "4.5.1"
+    },
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.14.5 (tags/v3.14.5:5607950, May 10 2026, 10:43:50) [MSC v.1944 64 bit (AMD64)]"
+  },
+  "missing_references": [
+    "docs/migrations/docvortex-image-limit-fix.md",
+    "docs/migrations/docvortex-layout-optimization.md",
+    "docs/migrations/docvortex-partial-grid-body-label-fix.md",
+    "docs/migrations/docvortex-source-manifest.json",
+    "docs/migrations/docvortex-table-graphic-fix.md",
+    "docs/migrations/docvortex-table-media-toc-fix.md",
+    "docs/migrations/pdf-body-marginal-fix.md",
+    "docs/migrations/pdf-leading-flow-order.md",
+    "docs/migrations/pdf-table-edge-defaults.md",
+    "docs/migrations/pdf-table-terminal-continuation.md",
+    "docs/migrations/test_pdf_body_marginal_roles.py"
+  ],
+  "model_catalog": [
+    {
+      "declared_config": {
+        "pp_formulanet_plus_l": {
+          "SHA256": "f6686782c2bb5f84000ff9da4788ac672e736fa2d0652f483a140fa8401b3d32",
+          "model_dir_or_path": "https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/v1.0.1/formula/PP-FormulaNet_plus-L/pp_formulanet_plus_l.onnx"
+        },
+        "pp_formulanet_plus_m": {
+          "SHA256": "52afa60ff51ad66cd7840a74188a058fe99081e617d3bd780117a2d67d94f50d",
+          "model_dir_or_path": "https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/v1.0.1/formula/PP-FormulaNet_plus-M/pp_formulanet_plus_m.onnx"
+        },
+        "pp_formulanet_plus_s": {
+          "SHA256": "a97f156a3d5fc957f29321083cba1517ffde29e99fbd6d2d36958f1fe128fbbf",
+          "model_dir_or_path": "https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/v1.0.1/formula/PP-FormulaNet_plus-S/pp_formulanet_plus_s.onnx"
+        }
+      },
+      "name": "onnxruntime",
+      "scope": "parity-candidate",
+      "source": "rapid_doc/model/formula/rapid_formula_self/configs/default_models.yaml",
+      "validation": "Not loaded; license and tensor contract pending"
+    },
+    {
+      "declared_config": {
+        "pp_formulanet_plus_m": {
+          "SHA256": "034efee70ef56d8ab7cf3b9b945865cdaf22461ad03b0f6e68bf9234f167f035",
+          "dict_url": "https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/master/formula/PP-FormulaNet_plus-M/pp_formulanet_plus_m_inference.yml",
+          "model_dir_or_path": "https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/master/formula/PP-FormulaNet_plus-M/pp_formulanet_plus_m.pth"
+        }
+      },
+      "name": "torch",
+      "scope": "parity-candidate",
+      "source": "rapid_doc/model/formula/rapid_formula_self/configs/default_models.yaml",
+      "validation": "Not loaded; license and tensor contract pending"
+    },
+    {
+      "declared_config": {
+        "SHA256": "3e0a48f1eead902e83e04695430597e92207ef50e19b06bdf65f46096ba6bbd3",
+        "model_dir_or_path": "https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/v1.0.0/layout/PP-DocLayout_plus-L/pp_doclayout_plus_l.onnx"
+      },
+      "name": "pp_doclayout_plus_l",
+      "scope": "parity-candidate",
+      "source": "rapid_doc/model/layout/rapid_layout_self/configs/default_models.yaml",
+      "validation": "Not loaded; license and tensor contract pending"
+    },
+    {
+      "declared_config": {
+        "SHA256": "9fedca3a2ebfdce73fc36f7842a4cabe0a4fe8c0ee33a446ca358ed500907b29",
+        "model_dir_or_path": "https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/master/layout/PP-DocLayoutV2/pp_doclayoutv2.onnx"
+      },
+      "name": "pp_doclayoutv2",
+      "scope": "parity-candidate",
+      "source": "rapid_doc/model/layout/rapid_layout_self/configs/default_models.yaml",
+      "validation": "Not loaded; license and tensor contract pending"
+    },
+    {
+      "declared_config": {
+        "SHA256": "b9a2759e51ee2cc9d98f10cea21caf5862043b882b5f57c683eaf6fa247196a3",
+        "model_dir_or_path": "https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/master/layout/PP-DocLayoutV3/pp_doclayoutv3.onnx"
+      },
+      "name": "pp_doclayoutv3",
+      "scope": "parity-candidate",
+      "source": "rapid_doc/model/layout/rapid_layout_self/configs/default_models.yaml",
+      "validation": "Not loaded; license and tensor contract pending"
+    },
+    {
+      "declared_config": {
+        "SHA256": "116d4a65052187be1ed408d6286fc5a5a07de361a1c85969d633d7ca56a73c05",
+        "model_dir_or_path": "https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/v1.0.0/layout/PP-DocLayout-L/pp_doclayout_l.onnx"
+      },
+      "name": "pp_doclayout_l",
+      "scope": "parity-candidate",
+      "source": "rapid_doc/model/layout/rapid_layout_self/configs/default_models.yaml",
+      "validation": "Not loaded; license and tensor contract pending"
+    },
+    {
+      "declared_config": {
+        "SHA256": "2e5997712f69e2db59e78fc837e0e3ee9e71cba4d41fa57125e438950f37196d",
+        "model_dir_or_path": "https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/v1.0.0/layout/PP-DocLayout-M/pp_doclayout_m.onnx"
+      },
+      "name": "pp_doclayout_m",
+      "scope": "parity-candidate",
+      "source": "rapid_doc/model/layout/rapid_layout_self/configs/default_models.yaml",
+      "validation": "Not loaded; license and tensor contract pending"
+    },
+    {
+      "declared_config": {
+        "SHA256": "0ae97252feb0d64ee2c70ee0449ec9de4b08140056f32ce3c725c16ca50142e4",
+        "model_dir_or_path": "https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/v1.0.0/layout/PP-DocLayout-S/pp_doclayout_s.onnx"
+      },
+      "name": "pp_doclayout_s",
+      "scope": "parity-candidate",
+      "source": "rapid_doc/model/layout/rapid_layout_self/configs/default_models.yaml",
+      "validation": "Not loaded; license and tensor contract pending"
+    },
+    {
+      "declared_config": {
+        "SHA256": "3b452baef10ecabd615491bc82cc4d49475fbc2cd7a8e535044f2c6bb28fb9fe",
+        "model_dir_or_path": "https://www.modelscope.cn/models/RapidAI/RapidLayout/resolve/v1.0.0/onnx/doclayout/doclayout_yolo_docstructbench_imgsz1024.onnx"
+      },
+      "name": "doclayout_docstructbench",
+      "scope": "parity-candidate",
+      "source": "rapid_doc/model/layout/rapid_layout_self/configs/default_models.yaml",
+      "validation": "Not loaded; license and tensor contract pending"
+    },
+    {
+      "declared_config": {
+        "SHA256": "d0996593ce241ecc4ea08811a858a2ac1a7e438e3260f98562010fd8efc6951e",
+        "model_dir_or_path": "https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/v1.0.0/table/RT-DETR-L_wired_table_cell_det/rt_detr_l_wired_table_cell_det.onnx"
+      },
+      "name": "rt_detr_l_wired_table_cell_det",
+      "scope": "parity-candidate",
+      "source": "rapid_doc/model/layout/rapid_layout_self/configs/default_models.yaml",
+      "validation": "Not loaded; license and tensor contract pending"
+    },
+    {
+      "declared_config": {
+        "SHA256": "3085db96c666ac5dfb9ae52b119ac4fa739f4a320c71c51fda28bd7fd700807e",
+        "model_dir_or_path": "https://www.modelscope.cn/models/RapidAI/RapidDoc/resolve/v1.0.0/table/RT-DETR-L_wireless_table_cell_det/rt_detr_l_wireless_table_cell_det.onnx"
+      },
+      "name": "rt_detr_l_wireless_table_cell_det",
+      "scope": "parity-candidate",
+      "source": "rapid_doc/model/layout/rapid_layout_self/configs/default_models.yaml",
+      "validation": "Not loaded; license and tensor contract pending"
+    },
+    {
+      "declared_config": {
+        "SHA256": "2cae17d16a16f9df7229e21665fe3fbe06f3ca85b2024772ee3e3142e955aa60",
+        "model_dir_or_path": "https://www.modelscope.cn/models/RapidAI/RapidTable/resolve/v2.0.0/en_ppstructure_mobile_v2_SLANet.onnx"
+      },
+      "name": "ppstructure_en",
+      "scope": "parity-candidate",
+      "source": "rapid_doc/model/table/rapid_table_self/default_models.yaml",
+      "validation": "Not loaded; license and tensor contract pending"
+    },
+    {
+      "declared_config": {
+        "SHA256": "ddfc6c97ee4db2a5e9de4de8b6a14508a39d42d228503219fdfebfac364885e3",
+        "model_dir_or_path": "https://www.modelscope.cn/models/RapidAI/RapidTable/resolve/v2.0.0/ch_ppstructure_mobile_v2_SLANet.onnx"
+      },
+      "name": "ppstructure_zh",
+      "scope": "parity-candidate",
+      "source": "rapid_doc/model/table/rapid_table_self/default_models.yaml",
+      "validation": "Not loaded; license and tensor contract pending"
+    },
+    {
+      "declared_config": {
+        "SHA256": "d57a942af6a2f57d6a4a0372573c696a2379bf5857c45e2ac69993f3b334514b",
+        "model_dir_or_path": "https://www.modelscope.cn/models/RapidAI/RapidTable/resolve/v2.0.0/slanet-plus.onnx"
+      },
+      "name": "slanet_plus",
+      "scope": "parity-candidate",
+      "source": "rapid_doc/model/table/rapid_table_self/default_models.yaml",
+      "validation": "Not loaded; license and tensor contract pending"
+    },
+    {
+      "declared_config": {
+        "SHA256": {
+          "decoder.pth": "fa342ef3de259576a01a5545ede804208ef35a124935e30df4768e6708dcb6cb",
+          "encoder.pth": "2c66b3c6a3d1c86a00985bab2cd79412fc2b668ff39d338bc3c63d383b08684d",
+          "vocab.json": "05037d02c48d106639bc90284aa847e5e2151d4746b3f5efe1628599efbd668a"
+        },
+        "model_dir_or_path": "https://www.modelscope.cn/models/RapidAI/RapidTable/resolve/v2.0.0/unitable"
+      },
+      "name": "unitable",
+      "scope": "excluded",
+      "source": "rapid_doc/model/table/rapid_table_self/default_models.yaml",
+      "validation": "Not loaded; license and tensor contract pending"
+    },
+    {
+      "declared_config": {
+        "SHA256": "0ea48d3a17e35ef5c2e498a5e799566073234d39b1079ca21d9f4fafe73c6d20",
+        "model_dir_or_path": "https://www.modelscope.cn/models/RapidAI/RapidTable/resolve/master/unet.onnx"
+      },
+      "name": "unet",
+      "scope": "parity-candidate",
+      "source": "rapid_doc/model/table/rapid_table_self/default_models.yaml",
+      "validation": "Not loaded; license and tensor contract pending"
+    },
+    {
+      "declared_config": {
+        "SHA256": "21c801f0c403cf960f9f1ccaecf506585b3b98421208033755b9e67cd2371492",
+        "model_dir_or_path": "https://www.modelscope.cn/models/RapidAI/RapidTable/resolve/master/table_cls/paddle_cls.onnx"
+      },
+      "name": "paddle_cls",
+      "scope": "parity-candidate",
+      "source": "rapid_doc/model/table/rapid_table_self/default_models.yaml",
+      "validation": "Not loaded; license and tensor contract pending"
+    },
+    {
+      "declared_config": {
+        "SHA256": "ef940037471c49f5d35ba2b1d9df9a19eabddf03f1689026d2a5bcab5efe577b",
+        "model_dir_or_path": "https://www.modelscope.cn/models/RapidAI/RapidTable/resolve/master/table_cls/q_cls.onnx"
+      },
+      "name": "q_cls",
+      "scope": "parity-candidate",
+      "source": "rapid_doc/model/table/rapid_table_self/default_models.yaml",
+      "validation": "Not loaded; license and tensor contract pending"
+    }
+  ],
+  "model_inventory_scope": "Repository only; external caches and tensor contracts pending",
+  "resources": [
+    {
+      "path": "rapid_doc/model/formula/rapid_formula_self/configs/default_models.yaml",
+      "sha256": "297876ba81a9edc9ed0fb4b2f305359c4e1e305c48f2cdcf2a683daa028df020",
+      "size": 1157
+    },
+    {
+      "path": "rapid_doc/model/formula/rapid_formula_self/configs/engine_cfg.yaml",
+      "sha256": "ad47c7892a3b443aab07b78d7f97851fe555ad46ee212e222fa3af90da8e2cbc",
+      "size": 1161
+    },
+    {
+      "path": "rapid_doc/model/formula/rapid_formula_self/networks/pp_formulanet_arch_config.yaml",
+      "sha256": "a7be87ac1ad8321703082a533d49f39f133ec9e0fff2594b22730f3c53ade0e0",
+      "size": 538
+    },
+    {
+      "path": "rapid_doc/model/layout/rapid_layout_self/configs/default_models.yaml",
+      "sha256": "419de8a10b41ee981a3df9cdaed53eee5f0cb60548db5c145648656981cf67c8",
+      "size": 2161
+    },
+    {
+      "path": "rapid_doc/model/layout/rapid_layout_self/configs/engine_cfg.yaml",
+      "sha256": "2ce09eb8e3e8d4ffb866fb10d6b5b1ea4434845b08aff83d921c1e92dd4f442e",
+      "size": 1047
+    },
+    {
+      "path": "rapid_doc/model/layout/rapid_layout_self/models/pp_doclayoutv3.onnx",
+      "sha256": "b9a2759e51ee2cc9d98f10cea21caf5862043b882b5f57c683eaf6fa247196a3",
+      "size": 129956092
+    },
+    {
+      "path": "rapid_doc/model/magika/models/standard_v3_3/model.onnx",
+      "sha256": "fe2d2eb49c5f88a9e0a6c048e15d6ffdf86235519c2afc535044de433169ec8c",
+      "size": 3163737
+    },
+    {
+      "path": "rapid_doc/model/orientation/rapid_orientation/config.yaml",
+      "sha256": "6a0ae438229f38137cccfa388c9795d706b168f4c4b963da5a0e9be50b661cfe",
+      "size": 366
+    },
+    {
+      "path": "rapid_doc/model/table/rapid_table_self/default_models.yaml",
+      "sha256": "063f678a397d8cca1cdea5293ee8a0cfe99dd29044373b547956bcab90822fed",
+      "size": 1592
+    },
+    {
+      "path": "rapid_doc/model/table/rapid_table_self/engine_cfg.yaml",
+      "sha256": "25287e96b9524b2c47cd2a1a919e30ee9eaccad5d32db9b8eb205bb5f444fafb",
+      "size": 1234
+    },
+    {
+      "path": "rapid_doc/model/table/rapid_table_self/models/paddle_cls.onnx",
+      "sha256": "21c801f0c403cf960f9f1ccaecf506585b3b98421208033755b9e67cd2371492",
+      "size": 6771838
+    },
+    {
+      "path": "rapid_doc/model/table/rapid_table_self/models/q_cls.onnx",
+      "sha256": "ef940037471c49f5d35ba2b1d9df9a19eabddf03f1689026d2a5bcab5efe577b",
+      "size": 16793553
+    },
+    {
+      "path": "rapid_doc/model/table/rapid_table_self/models/slanet-plus.onnx",
+      "sha256": "d57a942af6a2f57d6a4a0372573c696a2379bf5857c45e2ac69993f3b334514b",
+      "size": 7758305
+    },
+    {
+      "path": "rapid_doc/model/table/rapid_table_self/models/unet.onnx",
+      "sha256": "0ea48d3a17e35ef5c2e498a5e799566073234d39b1079ca21d9f4fafe73c6d20",
+      "size": 8335007
+    },
+    {
+      "path": "rapid_doc/resources/arch_config.yaml",
+      "sha256": "2c9d593c9f1803008f31c5f802a9485316d6a588f2dc3aaa2b64be9e5aaaf2e3",
+      "size": 11339
+    },
+    {
+      "path": "rapid_doc/resources/pp-ocrv4_mobile_seal_det.onnx",
+      "sha256": "e6109a1022b5ebf0822fc00646ef2398a7ef387390ca5c978de79352b1314204",
+      "size": 4826518
+    },
+    {
+      "path": "rapid_doc/resources/PP-OCRv6_det_small.onnx",
+      "sha256": "d73e0058b7a8086bbd57f3d10b8bcd4ff95363f67e06e2762b5e814fe9c9410e",
+      "size": 9880512
+    },
+    {
+      "path": "rapid_doc/resources/PP-OCRv6_rec_small.onnx",
+      "sha256": "e84474bdbbdd5a7c43448f0aa75871b1ba9df4927732953decb9aaecbc18b8ab",
+      "size": 21234343
+    },
+    {
+      "path": "rapid_doc/resources/rapid_orientation.onnx",
+      "sha256": "2f62c9bfb830a0b417241269fde7ef2d0ad5446c0ed2b8af33b1f6543545e8e2",
+      "size": 6783084
+    },
+    {
+      "path": "rapid_doc/resources/slanet-1m.onnx",
+      "sha256": "53099b464f7e62e60f45cd7889ef8997247ebab1cd567a00b74a059e08cc605d",
+      "size": 7671903
+    }
+  ],
+  "scope": {
+    "deferred": [
+      "CANN",
+      "DirectML",
+      "Node.js",
+      "Java",
+      "Go",
+      "C ABI"
+    ],
+    "excluded": [
+      "VLM",
+      "UniTable torch",
+      "PyTorch runtime",
+      "OpenVINO backend",
+      "Paddle backend"
+    ],
+    "parity": [
+      "Python API (captured signatures)",
+      "native PDF",
+      "six Office formats",
+      "ONNX CPU/CUDA"
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+[package]
+name = "rapiddoc-java"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+name = "rapid_doc_jni"
+crate-type = ["cdylib"]
+
+[dependencies]
+jni = "=0.21.1"
+rapiddoc = { path = "../../rust/rapiddoc" }
+rapiddoc-core = { path = "../../rust/rapiddoc-core" }
+serde_json.workspace = true
+mimalloc = { version = "=0.1.52", optional = true, default-features = false }
+
+[features]
+# A single JNI engine supports CPU and CUDA; the independently selected ORT
+# distribution supplies the available providers, without linking CUDA here.
+default = ["mimalloc-allocator", "cuda"]
+cuda = ["rapiddoc/cuda"]
+mimalloc-allocator = ["dep:mimalloc"]

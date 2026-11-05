@@ -1,0 +1,41 @@
+[workspace]
+members = [
+    "rust/vendor/lopdf-f64",
+    "rust/vendor/docvortex-core",
+    "rust/vendor/docvortex-pdfium-paths",
+    "rust/rapiddoc-core",
+    "rust/rapiddoc-pdf",
+    "rust/rapiddoc-native",
+    "rust/rapiddoc-render",
+    "rust/rapiddoc-inference",
+    "rust/rapiddoc-office",
+    "rust/rapiddoc",
+    "rust/rapiddoc-cli",
+    "experiments/rust-probe",
+    "experiments/onnx-probe",
+    "bindings/python",
+    "bindings/java",
+    "bindings/c",
+    "bindings/node",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+
+[workspace.dependencies]
+serde = { version = "1.0", features = ["derive"] }
+# 保留 Python JSON 的 FP64 往返精度，避免严格几何边界因解析误差改变分支。
+serde_json = { version = "1.0", features = ["float_roundtrip"] }
+pdfium-render = { version = "=0.9.4", default-features = false, features = [
+    "pdfium_7350",
+    "thread_safe",
+] }
+# Keep the C API compatible with the deployed 1.23 CUDA runtime and newer ORT.
+ort = { version = "=2.0.0-rc.15", default-features = false, features = [
+    "std",
+    "load-dynamic",
+    "api-23",
+] }

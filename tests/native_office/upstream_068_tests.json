@@ -1,0 +1,42 @@
+{
+  "repository": "https://github.com/myhloli/DocVortex",
+  "commit": "2de5f42b1884495313d9df63868e6a2f3d85fea0",
+  "files": [
+    {
+      "upstream": "tests/unittest/test_docx_preparse_reuse.py",
+      "target": "tests/native_office/test_upstream_068_docx_preparse.py",
+      "upstream_sha256": "1760e235eeb926926944a337509534227b633657a602332e4f702a960106f992",
+      "changes": "Package import relocation; image export test uses RapidDoc public API."
+    },
+    {
+      "upstream": "tests/unittest/test_xls_record_views.py",
+      "target": "tests/native_office/test_upstream_068_xls_views.py",
+      "upstream_sha256": "03705b55852c15562000d2610150591dddd3dc4dc627bf79061c056e32a096c2",
+      "changes": "Package import relocation; image export test uses RapidDoc public API."
+    },
+    {
+      "upstream": "tests/unittest/test_xlsx_image_sources.py",
+      "target": "tests/native_office/test_upstream_068_xlsx_images.py",
+      "upstream_sha256": "7b80498e01655e66f0965dc85046d878605d734ac78bd57e6b1da6144d3ed8e5",
+      "changes": "Package import relocation; image export test uses RapidDoc public API."
+    },
+    {
+      "upstream": "tests/unittest/test_xlsx_projection_cache.py",
+      "target": "tests/native_office/test_upstream_068_xlsx_cache.py",
+      "upstream_sha256": "a4326a6e4da4e9d8c1a5e78ea4836df7f778e733c36eeb4686dbb748a49efa5c",
+      "changes": "Package import relocation; image export test uses RapidDoc public API."
+    },
+    {
+      "upstream": "tests/unittest/_image_mtef_test_utils.py",
+      "target": "tests/native_office/_image_mtef_test_utils.py",
+      "upstream_sha256": "5d3ba22718faa10ae6490f5434c2af6a1ca04162e8fc6404f34f4121988418be",
+      "changes": "Package import relocation; image export test uses RapidDoc public API."
+    },
+    {
+      "upstream": "tests/unittest/_mtef_v5_test_utils.py",
+      "target": "tests/native_office/_mtef_v5_test_utils.py",
+      "upstream_sha256": "6e4f047534fd58e4e5a931e6f3777b56d0a43025b7fb0965b4f14557674aa06a",
+      "changes": "Package import relocation; image export test uses RapidDoc public API."
+    }
+  ]
+}

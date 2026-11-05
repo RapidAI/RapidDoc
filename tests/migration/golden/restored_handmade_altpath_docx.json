@@ -1,0 +1,59 @@
+{
+  "assets": {},
+  "content_list_json": [
+    {
+      "page_idx": 0,
+      "text": "Relocated heading",
+      "text_level": 2,
+      "type": "text"
+    },
+    {
+      "page_idx": 0,
+      "text": "Body found via rels",
+      "type": "text"
+    }
+  ],
+  "markdown": "## Relocated heading\n\nBody found via rels",
+  "middle_json": {
+    "_backend": "office",
+    "_version_name": "0.9.11",
+    "pdf_info": [
+      {
+        "discarded_blocks": [],
+        "page_idx": 0,
+        "para_blocks": [
+          {
+            "index": 0,
+            "is_numbered_style": false,
+            "level": 2,
+            "lines": [
+              {
+                "spans": [
+                  {
+                    "content": "Relocated heading",
+                    "type": "text"
+                  }
+                ]
+              }
+            ],
+            "type": "title"
+          },
+          {
+            "index": 1,
+            "lines": [
+              {
+                "spans": [
+                  {
+                    "content": "Body found via rels",
+                    "type": "text"
+                  }
+                ]
+              }
+            ],
+            "type": "text"
+          }
+        ]
+      }
+    ]
+  }
+}

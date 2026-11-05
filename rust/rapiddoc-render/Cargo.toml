@@ -1,0 +1,28 @@
+[package]
+repository = "https://github.com/RapidAI/RapidDoc"
+description = "Document rendering contracts for RapidDoc."
+include = [
+    "src/**",
+    "build.rs",
+    "build/**",
+    "native/**",
+    "vendor/**",
+    "assets/**",
+    "resources/**",
+    "models.json",
+    "licenses/**",
+    "Cargo.toml",
+    "LICENSE",
+    "README.md",
+]
+name = "rapiddoc-render"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+rapiddoc-core = { version = "=0.1.0", path = "../rapiddoc-core" }
+rapiddoc-native = { version = "=0.1.0", path = "../rapiddoc-native" }
+
+[dev-dependencies]
+serde_json.workspace = true

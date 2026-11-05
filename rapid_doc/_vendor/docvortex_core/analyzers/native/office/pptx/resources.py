@@ -239,10 +239,10 @@ class _PptxResources:
 
         image_bytes, content_type = image_data
 
-        latex = self._image_equation_decoder.decode(
+        latex = self._image_equation_decoder.probe(
             image_bytes,
             content_type=content_type,
-        )
+        ).latex
         if latex:
             self.cur_page.append(
                 {
@@ -253,18 +253,23 @@ class _PptxResources:
             return
 
         if content_type == "image/svg+xml":
-            img_base64 = serialize_office_image(image_bytes, content_type=content_type)
+            img_base64 = serialize_office_image(
+                image_bytes, equation_decoder=self._image_equation_decoder, content_type=content_type
+            )
             if img_base64 is None:
                 # SVG 光栅化失败时回退到 PowerPoint 为 SVG 原生伴随存储的栅量 blip。
                 fallback_data = self._get_shape_image_data(shape, include_svg=False)
                 if fallback_data is not None and fallback_data[1] != "image/svg+xml":
-                    img_base64 = serialize_office_image(fallback_data[0], content_type=fallback_data[1])
+                    img_base64 = serialize_office_image(
+                        fallback_data[0], equation_decoder=self._image_equation_decoder, content_type=fallback_data[1]
+                    )
             if img_base64 is not None:
                 self.cur_page.append(self._build_image_block(img_base64, shape))
             return
 
         img_base64 = serialize_office_image(
             image_bytes,
+            equation_decoder=self._image_equation_decoder,
             content_type=content_type,
         )
         if img_base64 is None:
@@ -306,10 +311,10 @@ class _PptxResources:
         if image_data is None:
             return None
         image_bytes, content_type = image_data
-        return self._image_equation_decoder.decode(
+        return self._image_equation_decoder.probe(
             image_bytes,
             content_type=content_type,
-        )
+        ).latex
 
     @staticmethod
     def _find_first_embedded_image_rid(shape, *, include_svg: bool = True) -> Optional[str]:

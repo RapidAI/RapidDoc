@@ -6,6 +6,7 @@ import time
 import threading
 from collections.abc import Sequence
 from contextlib import contextmanager
+from functools import partial
 from io import BytesIO
 from pathlib import Path
 from typing import Iterator, Literal, cast
@@ -361,6 +362,7 @@ class PDFDocument:
         self._page_rotations: dict[int, Literal[0, 90, 180, 270]] = {}
         self._form_reader = None
         self._form_reader_ready = False
+        self._unicode_fallbacks: dict[int, dict[int, int]] = {}
         self.render_scale = render_scale
         self.render_max_edge = render_max_edge
 
@@ -473,6 +475,8 @@ class PDFDocument:
         finally:
             self._form_reader = None
             self._form_reader_ready = False
+            if hasattr(self, "_unicode_fallbacks"):
+                self._unicode_fallbacks.clear()
             if getattr(self, "_pdf_doc_opened", None) is not None:
                 with _pdfium_lock:
                     _try_close(self._pdf_doc_opened)
@@ -670,6 +674,7 @@ class PDFDocument:
             compact=True,
             compact_only=not reference,
             paint_page_reader=(lambda: self._get_form_resource_page(page_idx)) if visible_only else None,
+            unicode_resolver=partial(self._resolve_page_unicode, page_idx),
         )
         if text is not None and not isinstance(text, PDFPageTextGeometry):
             self._owned_text_snapshots[key] = text
@@ -773,6 +778,15 @@ class PDFDocument:
         except Exception:
             return None
 
+    def _resolve_page_unicode(self, page_idx: int, textpage: pdfium.PdfTextPage, indices: list[int]) -> dict[int, int]:
+        """Only inspect font resources for explicit NUL characters; keep no native handles."""
+        if page_idx not in self._unicode_fallbacks:
+            from .unicode_fallback import recover_null_unicode
+            all_indices = [i for i in range(textpage.count_chars()) if pdfium_c.FPDFText_GetUnicode(textpage.raw, i) == 0]
+            self._unicode_fallbacks[page_idx] = recover_null_unicode(textpage, all_indices, self._get_form_resource_page(page_idx))
+        replacements = self._unicode_fallbacks[page_idx]
+        return {index: replacements[index] for index in indices if index in replacements}
+
     def _get_page_text_geometry(
         self,
         page_idx: int,
@@ -781,7 +795,8 @@ class PDFDocument:
     ) -> PDFPageTextGeometry:
         """在同一 PDFium textpage 生命周期内物化字符及可选扩展几何。"""
         with self._open_page(page_idx) as page:
-            return _extract_page_text_geometry(page, include_extended_geometry=include_extended_geometry)
+            options = {"unicode_resolver": partial(self._resolve_page_unicode, page_idx)} if _extract_page_text_geometry is _STANDARD_TEXT_GEOMETRY_EXTRACTOR else {}
+            return _extract_page_text_geometry(page, include_extended_geometry=include_extended_geometry, **options)
 
     def get_page_lines(self, page_idx: int) -> list[Line]:
         chars = self.get_page_chars(page_idx)

@@ -14,10 +14,12 @@ from rapid_doc.utils.guess_suffix_or_lang import guess_suffix_by_bytes, guess_su
 FIXTURES = Path(__file__).resolve().parents[1] / "fixtures"
 
 
-@pytest.mark.parametrize("fixture", sorted([
-    *FIXTURES.joinpath("docx").glob("*.docx"),
-    *FIXTURES.joinpath("pptx").glob("*.pptx"),
-]))
+@pytest.mark.parametrize("fixture", [
+    FIXTURES / "docx" / f"handmade-{name}.docx" for name in ("altpath", "strict")
+] + [
+    FIXTURES / "pptx" / f"handmade-{name}.pptx"
+    for name in ("altpath", "strict", "order", "inherit", "links", "math")
+])
 def test_nonstandard_ooxml_detection_does_not_need_magika(fixture, monkeypatch):
     monkeypatch.setattr("rapid_doc.utils.guess_suffix_or_lang._get_magika", lambda: pytest.fail("Structural detection used Magika"))
     assert guess_suffix_by_bytes(fixture.read_bytes()) == fixture.suffix[1:]

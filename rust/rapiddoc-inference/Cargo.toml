@@ -1,0 +1,43 @@
+[package]
+repository = "https://github.com/RapidAI/RapidDoc"
+description = "ONNX model inference and preprocessing for RapidDoc."
+include = [
+    "src/**",
+    "build.rs",
+    "build/**",
+    "native/**",
+    "vendor/**",
+    "assets/**",
+    "resources/**",
+    "models.json",
+    "licenses/**",
+    "Cargo.toml",
+    "LICENSE",
+    "README.md",
+]
+name = "rapiddoc-inference"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[features]
+default = []
+cuda = ["ort/cuda"]
+
+[dependencies]
+ort.workspace = true
+rapiddoc-core = { version = "=0.1.0", path = "../rapiddoc-core" }
+serde.workspace = true
+serde_json.workspace = true
+sha2 = "0.10"
+image = { version = "0.25", default-features = false, features = ["png"] }
+imageproc = { version = "=0.25.0", default-features = false }
+tokenizers = { version = "=0.22.2", default-features = false, features = ["fancy-regex"] }
+regex = "1.12"
+fancy-regex = "=0.14.0"
+unicode-normalization = "=0.1.24"
+libloading = "=0.9.0"
+ureq = { version = "=3.5.1", default-features = false, features = ["rustls"] }
+
+[build-dependencies]
+cc = "=1.9.0"

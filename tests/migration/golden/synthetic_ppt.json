@@ -1,0 +1,82 @@
+{
+  "assets": {},
+  "content_list_json": [
+    {
+      "page_idx": 0,
+      "text": "First slide text",
+      "type": "text"
+    },
+    {
+      "page_idx": 1,
+      "text": "Second slide text",
+      "type": "text"
+    },
+    {
+      "page_idx": 1,
+      "text": "Notes for the second slide",
+      "type": "page_footnote"
+    }
+  ],
+  "markdown": "First slide text\n\nSecond slide text",
+  "middle_json": {
+    "_backend": "office",
+    "_version_name": "0.9.11",
+    "pdf_info": [
+      {
+        "discarded_blocks": [],
+        "page_idx": 0,
+        "para_blocks": [
+          {
+            "index": 0,
+            "lines": [
+              {
+                "spans": [
+                  {
+                    "content": "First slide text",
+                    "type": "text"
+                  }
+                ]
+              }
+            ],
+            "type": "text"
+          }
+        ]
+      },
+      {
+        "discarded_blocks": [
+          {
+            "index": 1,
+            "lines": [
+              {
+                "spans": [
+                  {
+                    "content": "Notes for the second slide",
+                    "type": "text"
+                  }
+                ]
+              }
+            ],
+            "type": "page_footnote"
+          }
+        ],
+        "page_idx": 1,
+        "para_blocks": [
+          {
+            "index": 0,
+            "lines": [
+              {
+                "spans": [
+                  {
+                    "content": "Second slide text",
+                    "type": "text"
+                  }
+                ]
+              }
+            ],
+            "type": "text"
+          }
+        ]
+      }
+    ]
+  }
+}

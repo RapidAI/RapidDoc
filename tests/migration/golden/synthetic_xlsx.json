@@ -1,0 +1,44 @@
+{
+  "assets": {},
+  "content_list_json": [
+    {
+      "page_idx": 0,
+      "table_body": "<table>\n  <tr>\n    <th><p>中文</p></th>\n    <th><p>English</p></th>\n    <th><p></p></th>\n  </tr>\n  <tr>\n    <td><p>12.5</p></td>\n    <td colspan=\"2\"><p>merged</p></td>\n  </tr>\n</table>",
+      "table_caption": [],
+      "type": "table"
+    }
+  ],
+  "markdown": "<table>\n  <tr>\n    <th><p>中文</p></th>\n    <th><p>English</p></th>\n    <th><p></p></th>\n  </tr>\n  <tr>\n    <td><p>12.5</p></td>\n    <td colspan=\"2\"><p>merged</p></td>\n  </tr>\n</table>",
+  "middle_json": {
+    "_backend": "office",
+    "_version_name": "0.9.11",
+    "pdf_info": [
+      {
+        "discarded_blocks": [],
+        "page_idx": 0,
+        "para_blocks": [
+          {
+            "blocks": [
+              {
+                "index": 0,
+                "lines": [
+                  {
+                    "spans": [
+                      {
+                        "html": "<table>\n  <tr>\n    <th><p>中文</p></th>\n    <th><p>English</p></th>\n    <th><p></p></th>\n  </tr>\n  <tr>\n    <td><p>12.5</p></td>\n    <td colspan=\"2\"><p>merged</p></td>\n  </tr>\n</table>",
+                        "type": "table"
+                      }
+                    ]
+                  }
+                ],
+                "type": "table_body"
+              }
+            ],
+            "index": 0,
+            "type": "table"
+          }
+        ]
+      }
+    ]
+  }
+}

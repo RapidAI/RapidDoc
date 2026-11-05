@@ -1,0 +1,20 @@
+[package]
+name = "rapiddoc-c"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+name = "rapid_doc_c"
+crate-type = ["cdylib"]
+
+[features]
+default = ["cuda", "mimalloc-allocator"]
+cuda = ["rapiddoc/cuda"]
+mimalloc-allocator = ["dep:mimalloc"]
+
+[dependencies]
+rapiddoc = { path = "../../rust/rapiddoc" }
+rapiddoc-core = { path = "../../rust/rapiddoc-core" }
+serde_json.workspace = true
+mimalloc = { version = "=0.1.52", optional = true, default-features = false }

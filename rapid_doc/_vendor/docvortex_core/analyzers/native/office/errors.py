@@ -33,5 +33,5 @@ class LegacyOfficeResourceLimitError(LegacyOfficeError):
     code = "resource_limit"
 
 
-class LegacyOfficeImageResourceLimitError(LegacyOfficeResourceLimitError):
-    """单张图片超限；仅由图片资源入口捕获，不放宽文档级预算。"""
+class LegacyOfficeImageLimitError(LegacyOfficeResourceLimitError):
+    """单张 BLIP 图片超过大小限制，可在图片收集边界跳过。"""

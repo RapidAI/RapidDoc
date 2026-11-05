@@ -1,0 +1,2142 @@
+[
+  {
+    "name": "shadow",
+    "source": "7-SunSpot2 Manual RevA 032613_英文版.pdf",
+    "page": 1,
+    "expected": "INSTRUCTION",
+    "chars": [
+      {
+        "bbox": [
+          385.3809509277344,
+          91.01275634765625,
+          391.50250244140625,
+          115.58709716796875
+        ],
+        "char": "I",
+        "rotation": 0.0,
+        "font": {
+          "name": "ArialMT",
+          "flags": 524320,
+          "size": 1.0,
+          "weight": 440
+        },
+        "char_idx": 0,
+        "source_indices": [
+          0
+        ],
+        "raw_code": 73,
+        "text_object_id": 0,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          385.3809509277344,
+          110.94091796875
+        ]
+      },
+      {
+        "bbox": [
+          387.4200134277344,
+          93.0518798828125,
+          393.54156494140625,
+          117.626220703125
+        ],
+        "char": "I",
+        "rotation": 0.0,
+        "font": {
+          "name": "ArialMT",
+          "flags": 524320,
+          "size": 1.0,
+          "weight": 440
+        },
+        "char_idx": 1,
+        "source_indices": [
+          1
+        ],
+        "raw_code": 73,
+        "text_object_id": 1,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          387.4200134277344,
+          112.97998046875
+        ]
+      },
+      {
+        "bbox": [
+          391.5025329589844,
+          91.01275634765625,
+          407.4009704589844,
+          115.58709716796875
+        ],
+        "char": "N",
+        "rotation": 0.0,
+        "font": {
+          "name": "ArialMT",
+          "flags": 524320,
+          "size": 1.0,
+          "weight": 440
+        },
+        "char_idx": 2,
+        "source_indices": [
+          2
+        ],
+        "raw_code": 78,
+        "text_object_id": 2,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          391.5025329589844,
+          110.94091796875
+        ]
+      },
+      {
+        "bbox": [
+          393.5415954589844,
+          93.0518798828125,
+          409.4400634765625,
+          117.626220703125
+        ],
+        "char": "N",
+        "rotation": 0.0,
+        "font": {
+          "name": "ArialMT",
+          "flags": 524320,
+          "size": 1.0,
+          "weight": 440
+        },
+        "char_idx": 3,
+        "source_indices": [
+          3
+        ],
+        "raw_code": 78,
+        "text_object_id": 3,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          393.54156494140625,
+          112.97998046875
+        ]
+      },
+      {
+        "bbox": [
+          407.4031677246094,
+          91.01275634765625,
+          422.09051513671875,
+          115.58709716796875
+        ],
+        "char": "S",
+        "rotation": 0.0,
+        "font": {
+          "name": "ArialMT",
+          "flags": 524320,
+          "size": 1.0,
+          "weight": 440
+        },
+        "char_idx": 4,
+        "source_indices": [
+          4
+        ],
+        "raw_code": 83,
+        "text_object_id": 4,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          407.4031677246094,
+          110.94091796875
+        ]
+      },
+      {
+        "bbox": [
+          409.4422607421875,
+          93.0518798828125,
+          424.1296081542969,
+          117.626220703125
+        ],
+        "char": "S",
+        "rotation": 0.0,
+        "font": {
+          "name": "ArialMT",
+          "flags": 524320,
+          "size": 1.0,
+          "weight": 440
+        },
+        "char_idx": 5,
+        "source_indices": [
+          5
+        ],
+        "raw_code": 83,
+        "text_object_id": 5,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          409.4422302246094,
+          112.97998046875
+        ]
+      },
+      {
+        "bbox": [
+          422.1037292480469,
+          91.01275634765625,
+          435.5579528808594,
+          115.58709716796875
+        ],
+        "char": "T",
+        "rotation": 0.0,
+        "font": {
+          "name": "ArialMT",
+          "flags": 524320,
+          "size": 1.0,
+          "weight": 440
+        },
+        "char_idx": 6,
+        "source_indices": [
+          6
+        ],
+        "raw_code": 84,
+        "text_object_id": 6,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          422.1037292480469,
+          110.94091796875
+        ]
+      },
+      {
+        "bbox": [
+          424.14276123046875,
+          93.0518798828125,
+          437.59698486328125,
+          117.626220703125
+        ],
+        "char": "T",
+        "rotation": 0.0,
+        "font": {
+          "name": "ArialMT",
+          "flags": 524320,
+          "size": 1.0,
+          "weight": 440
+        },
+        "char_idx": 7,
+        "source_indices": [
+          7
+        ],
+        "raw_code": 84,
+        "text_object_id": 7,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          424.14276123046875,
+          112.97998046875
+        ]
+      },
+      {
+        "bbox": [
+          435.4852600097656,
+          91.01275634765625,
+          451.3836975097656,
+          115.58709716796875
+        ],
+        "char": "R",
+        "rotation": 0.0,
+        "font": {
+          "name": "ArialMT",
+          "flags": 524320,
+          "size": 1.0,
+          "weight": 440
+        },
+        "char_idx": 8,
+        "source_indices": [
+          8
+        ],
+        "raw_code": 82,
+        "text_object_id": 8,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          435.4852600097656,
+          110.94091796875
+        ]
+      },
+      {
+        "bbox": [
+          437.5243225097656,
+          93.0518798828125,
+          453.4227600097656,
+          117.626220703125
+        ],
+        "char": "R",
+        "rotation": 0.0,
+        "font": {
+          "name": "ArialMT",
+          "flags": 524320,
+          "size": 1.0,
+          "weight": 440
+        },
+        "char_idx": 9,
+        "source_indices": [
+          9
+        ],
+        "raw_code": 82,
+        "text_object_id": 9,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          437.5243225097656,
+          112.97998046875
+        ]
+      },
+      {
+        "bbox": [
+          451.3858947753906,
+          91.01275634765625,
+          467.2843322753906,
+          115.58709716796875
+        ],
+        "char": "U",
+        "rotation": 0.0,
+        "font": {
+          "name": "ArialMT",
+          "flags": 524320,
+          "size": 1.0,
+          "weight": 440
+        },
+        "char_idx": 10,
+        "source_indices": [
+          10
+        ],
+        "raw_code": 85,
+        "text_object_id": 10,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          451.38592529296875,
+          110.94091796875
+        ]
+      },
+      {
+        "bbox": [
+          453.4249572753906,
+          93.0518798828125,
+          469.3233947753906,
+          117.626220703125
+        ],
+        "char": "U",
+        "rotation": 0.0,
+        "font": {
+          "name": "ArialMT",
+          "flags": 524320,
+          "size": 1.0,
+          "weight": 440
+        },
+        "char_idx": 11,
+        "source_indices": [
+          11
+        ],
+        "raw_code": 85,
+        "text_object_id": 11,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          453.4249572753906,
+          112.97998046875
+        ]
+      },
+      {
+        "bbox": [
+          467.28656005859375,
+          91.01275634765625,
+          483.18499755859375,
+          115.58709716796875
+        ],
+        "char": "C",
+        "rotation": 0.0,
+        "font": {
+          "name": "ArialMT",
+          "flags": 524320,
+          "size": 1.0,
+          "weight": 440
+        },
+        "char_idx": 12,
+        "source_indices": [
+          12
+        ],
+        "raw_code": 67,
+        "text_object_id": 12,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          467.28656005859375,
+          110.94091796875
+        ]
+      },
+      {
+        "bbox": [
+          469.3255920410156,
+          93.0518798828125,
+          485.2240295410156,
+          117.626220703125
+        ],
+        "char": "C",
+        "rotation": 0.0,
+        "font": {
+          "name": "ArialMT",
+          "flags": 524320,
+          "size": 1.0,
+          "weight": 440
+        },
+        "char_idx": 13,
+        "source_indices": [
+          13
+        ],
+        "raw_code": 67,
+        "text_object_id": 13,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          469.3255920410156,
+          112.97998046875
+        ]
+      },
+      {
+        "bbox": [
+          483.18719482421875,
+          91.01275634765625,
+          496.64141845703125,
+          115.58709716796875
+        ],
+        "char": "T",
+        "rotation": 0.0,
+        "font": {
+          "name": "ArialMT",
+          "flags": 524320,
+          "size": 1.0,
+          "weight": 440
+        },
+        "char_idx": 14,
+        "source_indices": [
+          14
+        ],
+        "raw_code": 84,
+        "text_object_id": 14,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          483.18719482421875,
+          110.94091796875
+        ]
+      },
+      {
+        "bbox": [
+          485.22625732421875,
+          93.0518798828125,
+          498.68048095703125,
+          117.626220703125
+        ],
+        "char": "T",
+        "rotation": 0.0,
+        "font": {
+          "name": "ArialMT",
+          "flags": 524320,
+          "size": 1.0,
+          "weight": 440
+        },
+        "char_idx": 15,
+        "source_indices": [
+          15
+        ],
+        "raw_code": 84,
+        "text_object_id": 15,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          485.22625732421875,
+          112.97998046875
+        ]
+      },
+      {
+        "bbox": [
+          496.5665283203125,
+          91.01275634765625,
+          502.6880798339844,
+          115.58709716796875
+        ],
+        "char": "I",
+        "rotation": 0.0,
+        "font": {
+          "name": "ArialMT",
+          "flags": 524320,
+          "size": 1.0,
+          "weight": 440
+        },
+        "char_idx": 16,
+        "source_indices": [
+          16
+        ],
+        "raw_code": 73,
+        "text_object_id": 16,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          496.5665283203125,
+          110.94091796875
+        ]
+      },
+      {
+        "bbox": [
+          498.6056213378906,
+          93.0518798828125,
+          504.7272033691406,
+          117.626220703125
+        ],
+        "char": "I",
+        "rotation": 0.0,
+        "font": {
+          "name": "ArialMT",
+          "flags": 524320,
+          "size": 1.0,
+          "weight": 440
+        },
+        "char_idx": 17,
+        "source_indices": [
+          17
+        ],
+        "raw_code": 73,
+        "text_object_id": 17,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          498.6055908203125,
+          112.97998046875
+        ]
+      },
+      {
+        "bbox": [
+          502.6881103515625,
+          91.01275634765625,
+          519.8197021484375,
+          115.58709716796875
+        ],
+        "char": "O",
+        "rotation": 0.0,
+        "font": {
+          "name": "ArialMT",
+          "flags": 524320,
+          "size": 1.0,
+          "weight": 440
+        },
+        "char_idx": 18,
+        "source_indices": [
+          18
+        ],
+        "raw_code": 79,
+        "text_object_id": 18,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          502.6881103515625,
+          110.94091796875
+        ]
+      },
+      {
+        "bbox": [
+          504.7271423339844,
+          93.0518798828125,
+          521.8587036132812,
+          117.626220703125
+        ],
+        "char": "O",
+        "rotation": 0.0,
+        "font": {
+          "name": "ArialMT",
+          "flags": 524320,
+          "size": 1.0,
+          "weight": 440
+        },
+        "char_idx": 19,
+        "source_indices": [
+          19
+        ],
+        "raw_code": 79,
+        "text_object_id": 19,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          504.7271423339844,
+          112.97998046875
+        ]
+      },
+      {
+        "bbox": [
+          519.788818359375,
+          91.01275634765625,
+          535.687255859375,
+          115.58709716796875
+        ],
+        "char": "N",
+        "rotation": 0.0,
+        "font": {
+          "name": "ArialMT",
+          "flags": 524320,
+          "size": 1.0,
+          "weight": 440
+        },
+        "char_idx": 20,
+        "source_indices": [
+          20
+        ],
+        "raw_code": 78,
+        "text_object_id": 20,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          519.788818359375,
+          110.94091796875
+        ]
+      },
+      {
+        "bbox": [
+          521.827880859375,
+          93.0518798828125,
+          537.726318359375,
+          117.626220703125
+        ],
+        "char": "N",
+        "rotation": 0.0,
+        "font": {
+          "name": "ArialMT",
+          "flags": 524320,
+          "size": 1.0,
+          "weight": 440
+        },
+        "char_idx": 21,
+        "source_indices": [
+          21
+        ],
+        "raw_code": 78,
+        "text_object_id": 21,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          521.827880859375,
+          112.97998046875
+        ]
+      }
+    ]
+  },
+  {
+    "name": "cjk",
+    "source": "text_duplicate_badcase_1.pdf",
+    "page": 1,
+    "expected": "18年5月2日",
+    "chars": [
+      {
+        "bbox": [
+          55.055198669433594,
+          106.219970703125,
+          62.839202880859375,
+          120.219970703125
+        ],
+        "char": "1",
+        "rotation": 0.0,
+        "font": {
+          "name": "Helvetica",
+          "flags": 524320,
+          "size": 1.0,
+          "weight": 490
+        },
+        "char_idx": 50,
+        "source_indices": [
+          50
+        ],
+        "raw_code": 49,
+        "text_object_id": 3,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          55.055198669433594,
+          117.0
+        ]
+      },
+      {
+        "bbox": [
+          63.082801818847656,
+          106.219970703125,
+          70.86680603027344,
+          120.219970703125
+        ],
+        "char": "8",
+        "rotation": 0.0,
+        "font": {
+          "name": "Helvetica",
+          "flags": 524320,
+          "size": 1.0,
+          "weight": 490
+        },
+        "char_idx": 51,
+        "source_indices": [
+          51
+        ],
+        "raw_code": 56,
+        "text_object_id": 3,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          63.082801818847656,
+          117.0
+        ]
+      },
+      {
+        "bbox": [
+          71.11304473876953,
+          103.67196655273438,
+          85.11304473876953,
+          119.96798706054688
+        ],
+        "char": "年",
+        "rotation": 0.0,
+        "font": {
+          "name": "MRWJDF+PingFangSC-Regular",
+          "flags": 524292,
+          "size": 1.0,
+          "weight": 350
+        },
+        "char_idx": 52,
+        "source_indices": [
+          52
+        ],
+        "raw_code": 24180,
+        "text_object_id": 4,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          71.113037109375,
+          117.0
+        ]
+      },
+      {
+        "bbox": [
+          71.11304473876953,
+          103.67196655273438,
+          85.11304473876953,
+          119.96798706054688
+        ],
+        "char": "年",
+        "rotation": 0.0,
+        "font": {
+          "name": "MRWJDF+PingFangSC-Regular",
+          "flags": 524292,
+          "size": 1.0,
+          "weight": 350
+        },
+        "char_idx": 53,
+        "source_indices": [
+          53
+        ],
+        "raw_code": 63886,
+        "text_object_id": 4,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          71.113037109375,
+          117.0
+        ]
+      },
+      {
+        "bbox": [
+          85.35517883300781,
+          106.219970703125,
+          93.13917541503906,
+          120.219970703125
+        ],
+        "char": "5",
+        "rotation": 0.0,
+        "font": {
+          "name": "Helvetica",
+          "flags": 524320,
+          "size": 1.0,
+          "weight": 490
+        },
+        "char_idx": 54,
+        "source_indices": [
+          54
+        ],
+        "raw_code": 53,
+        "text_object_id": 5,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          85.35517120361328,
+          117.0
+        ]
+      },
+      {
+        "bbox": [
+          93.38343048095703,
+          103.67196655273438,
+          107.38343048095703,
+          119.96798706054688
+        ],
+        "char": "⽉",
+        "rotation": 0.0,
+        "font": {
+          "name": "MRWJDF+PingFangSC-Regular",
+          "flags": 524292,
+          "size": 1.0,
+          "weight": 350
+        },
+        "char_idx": 55,
+        "source_indices": [
+          55
+        ],
+        "raw_code": 12105,
+        "text_object_id": 6,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          93.38343048095703,
+          117.0
+        ]
+      },
+      {
+        "bbox": [
+          93.38343048095703,
+          103.67196655273438,
+          107.38343048095703,
+          119.96798706054688
+        ],
+        "char": "月",
+        "rotation": 0.0,
+        "font": {
+          "name": "MRWJDF+PingFangSC-Regular",
+          "flags": 524292,
+          "size": 1.0,
+          "weight": 350
+        },
+        "char_idx": 56,
+        "source_indices": [
+          56
+        ],
+        "raw_code": 26376,
+        "text_object_id": 6,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          93.38343048095703,
+          117.0
+        ]
+      },
+      {
+        "bbox": [
+          107.62555694580078,
+          106.219970703125,
+          115.40955352783203,
+          120.219970703125
+        ],
+        "char": "2",
+        "rotation": 0.0,
+        "font": {
+          "name": "Helvetica",
+          "flags": 524320,
+          "size": 1.0,
+          "weight": 490
+        },
+        "char_idx": 57,
+        "source_indices": [
+          57
+        ],
+        "raw_code": 50,
+        "text_object_id": 7,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          107.62554931640625,
+          117.0
+        ]
+      },
+      {
+        "bbox": [
+          115.65380859375,
+          103.67196655273438,
+          129.65380859375,
+          119.96798706054688
+        ],
+        "char": "⽇",
+        "rotation": 0.0,
+        "font": {
+          "name": "MRWJDF+PingFangSC-Regular",
+          "flags": 524292,
+          "size": 1.0,
+          "weight": 350
+        },
+        "char_idx": 58,
+        "source_indices": [
+          58
+        ],
+        "raw_code": 12103,
+        "text_object_id": 8,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          115.65380859375,
+          117.0
+        ]
+      },
+      {
+        "bbox": [
+          115.65380859375,
+          103.67196655273438,
+          129.65380859375,
+          119.96798706054688
+        ],
+        "char": "日",
+        "rotation": 0.0,
+        "font": {
+          "name": "MRWJDF+PingFangSC-Regular",
+          "flags": 524292,
+          "size": 1.0,
+          "weight": 350
+        },
+        "char_idx": 59,
+        "source_indices": [
+          59
+        ],
+        "raw_code": 26085,
+        "text_object_id": 8,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          115.65380859375,
+          117.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "bloom",
+    "source": "distributed-bloom-filter.pdf",
+    "page": 1,
+    "expected": "-effici",
+    "chars": [
+      {
+        "bbox": [
+          311.0557861328125,
+          266.675048828125,
+          314.95318603515625,
+          277.29132080078125
+        ],
+        "char": "-",
+        "rotation": 0.0,
+        "font": {
+          "name": "CMR12",
+          "flags": 524292,
+          "size": 11.9552001953125,
+          "weight": 325
+        },
+        "char_idx": 121,
+        "source_indices": [
+          121
+        ],
+        "raw_code": 45,
+        "text_object_id": 4,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          311.0557861328125,
+          274.97198486328125
+        ]
+      },
+      {
+        "bbox": [
+          314.95318603515625,
+          266.675048828125,
+          320.1536865234375,
+          277.29132080078125
+        ],
+        "char": "e",
+        "rotation": 0.0,
+        "font": {
+          "name": "CMR12",
+          "flags": 524292,
+          "size": 11.9552001953125,
+          "weight": 325
+        },
+        "char_idx": 122,
+        "source_indices": [
+          122
+        ],
+        "raw_code": 101,
+        "text_object_id": 4,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          314.95318603515625,
+          274.97198486328125
+        ]
+      },
+      {
+        "bbox": [
+          320.1537170410156,
+          266.5555419921875,
+          329.9091491699219,
+          277.29132080078125
+        ],
+        "char": "f",
+        "rotation": 0.0,
+        "font": {
+          "name": "CMR12",
+          "flags": 524292,
+          "size": 11.9552001953125,
+          "weight": 325
+        },
+        "char_idx": 123,
+        "source_indices": [
+          123
+        ],
+        "raw_code": 102,
+        "text_object_id": 4,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          320.1537170410156,
+          274.97198486328125
+        ]
+      },
+      {
+        "bbox": [
+          320.1537170410156,
+          266.5555419921875,
+          329.9091491699219,
+          277.29132080078125
+        ],
+        "char": "f",
+        "rotation": 0.0,
+        "font": {
+          "name": "CMR12",
+          "flags": 524292,
+          "size": 11.9552001953125,
+          "weight": 325
+        },
+        "char_idx": 124,
+        "source_indices": [
+          124
+        ],
+        "raw_code": 102,
+        "text_object_id": 4,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          320.1537170410156,
+          274.97198486328125
+        ]
+      },
+      {
+        "bbox": [
+          320.1537170410156,
+          266.5555419921875,
+          329.9091491699219,
+          277.29132080078125
+        ],
+        "char": "i",
+        "rotation": 0.0,
+        "font": {
+          "name": "CMR12",
+          "flags": 524292,
+          "size": 11.9552001953125,
+          "weight": 325
+        },
+        "char_idx": 125,
+        "source_indices": [
+          125
+        ],
+        "raw_code": 105,
+        "text_object_id": 4,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          320.1537170410156,
+          274.97198486328125
+        ]
+      },
+      {
+        "bbox": [
+          329.9091491699219,
+          266.675048828125,
+          335.1096496582031,
+          277.29132080078125
+        ],
+        "char": "c",
+        "rotation": 0.0,
+        "font": {
+          "name": "CMR12",
+          "flags": 524292,
+          "size": 11.9552001953125,
+          "weight": 325
+        },
+        "char_idx": 126,
+        "source_indices": [
+          126
+        ],
+        "raw_code": 99,
+        "text_object_id": 4,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          329.9091491699219,
+          274.97198486328125
+        ]
+      },
+      {
+        "bbox": [
+          335.10968017578125,
+          266.675048828125,
+          338.3614807128906,
+          277.29132080078125
+        ],
+        "char": "i",
+        "rotation": 0.0,
+        "font": {
+          "name": "CMR12",
+          "flags": 524292,
+          "size": 11.9552001953125,
+          "weight": 325
+        },
+        "char_idx": 127,
+        "source_indices": [
+          127
+        ],
+        "raw_code": 105,
+        "text_object_id": 4,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          335.10968017578125,
+          274.97198486328125
+        ]
+      }
+    ]
+  },
+  {
+    "name": "bathymetry",
+    "source": "Predicting bathymetry using multisource differential marine geodetic data with multilayer perceptron neural network.pdf",
+    "page": 1,
+    "expected": "differ",
+    "chars": [
+      {
+        "bbox": [
+          97.0999984741211,
+          188.83404541015625,
+          108.36799621582031,
+          217.22003173828125
+        ],
+        "char": "d",
+        "rotation": 0.0,
+        "font": {
+          "name": "EAAAAA+NotoSans-SemiBold",
+          "flags": 524321,
+          "size": 18.0,
+          "weight": 0
+        },
+        "char_idx": 179,
+        "source_indices": [
+          179
+        ],
+        "raw_code": 100,
+        "text_object_id": 73,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          97.0999984741211,
+          207.08001708984375
+        ]
+      },
+      {
+        "bbox": [
+          108.36799621582031,
+          188.83404541015625,
+          113.46199798583984,
+          217.22003173828125
+        ],
+        "char": "i",
+        "rotation": 0.0,
+        "font": {
+          "name": "EAAAAA+NotoSans-SemiBold",
+          "flags": 524321,
+          "size": 18.0,
+          "weight": 0
+        },
+        "char_idx": 180,
+        "source_indices": [
+          180
+        ],
+        "raw_code": 105,
+        "text_object_id": 74,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          108.36799621582031,
+          207.08001708984375
+        ]
+      },
+      {
+        "bbox": [
+          113.46199798583984,
+          188.83404541015625,
+          127.59199523925781,
+          217.22003173828125
+        ],
+        "char": "f",
+        "rotation": 0.0,
+        "font": {
+          "name": "EAAAAA+NotoSans-SemiBold",
+          "flags": 524321,
+          "size": 18.0,
+          "weight": 0
+        },
+        "char_idx": 181,
+        "source_indices": [
+          181
+        ],
+        "raw_code": 102,
+        "text_object_id": 75,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          113.46199798583984,
+          207.08001708984375
+        ]
+      },
+      {
+        "bbox": [
+          113.46199798583984,
+          188.83404541015625,
+          127.59199523925781,
+          217.22003173828125
+        ],
+        "char": "f",
+        "rotation": 0.0,
+        "font": {
+          "name": "EAAAAA+NotoSans-SemiBold",
+          "flags": 524321,
+          "size": 18.0,
+          "weight": 0
+        },
+        "char_idx": 182,
+        "source_indices": [
+          182
+        ],
+        "raw_code": 102,
+        "text_object_id": 75,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          113.46199798583984,
+          207.08001708984375
+        ]
+      },
+      {
+        "bbox": [
+          126.78199768066406,
+          188.83404541015625,
+          137.31199645996094,
+          217.22003173828125
+        ],
+        "char": "e",
+        "rotation": 0.0,
+        "font": {
+          "name": "EAAAAA+NotoSans-SemiBold",
+          "flags": 524321,
+          "size": 18.0,
+          "weight": 0
+        },
+        "char_idx": 183,
+        "source_indices": [
+          183
+        ],
+        "raw_code": 101,
+        "text_object_id": 76,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          126.78199768066406,
+          207.08001708984375
+        ]
+      },
+      {
+        "bbox": [
+          137.31199645996094,
+          188.83404541015625,
+          145.12399291992188,
+          217.22003173828125
+        ],
+        "char": "r",
+        "rotation": 0.0,
+        "font": {
+          "name": "EAAAAA+NotoSans-SemiBold",
+          "flags": 524321,
+          "size": 18.0,
+          "weight": 0
+        },
+        "char_idx": 184,
+        "source_indices": [
+          184
+        ],
+        "raw_code": 114,
+        "text_object_id": 77,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          137.31199645996094,
+          207.08001708984375
+        ]
+      }
+    ]
+  },
+  {
+    "name": "sheared_hidden_title",
+    "source": "char_overlaps_case1.pdf",
+    "page": 1,
+    "expected": "最快速最高效通过考试",
+    "chars": [
+      {
+        "bbox": [
+          814.3216552734375,
+          30.5419921875,
+          830.9833374023438,
+          42.696990966796875
+        ],
+        "char": "最",
+        "rotation": 0.3217482566833496,
+        "font": {
+          "name": "OXTGJM+MicrosoftYaHei",
+          "flags": 524292,
+          "size": 1.0,
+          "weight": 480
+        },
+        "char_idx": 12,
+        "source_indices": [
+          12
+        ],
+        "raw_code": 26368,
+        "text_object_id": 2,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          814.7030029296875,
+          40.967987060546875
+        ]
+      },
+      {
+        "bbox": [
+          827.2869873046875,
+          30.11297607421875,
+          843.996337890625,
+          42.722991943359375
+        ],
+        "char": "快",
+        "rotation": 0.3217482566833496,
+        "font": {
+          "name": "OXTGJM+MicrosoftYaHei",
+          "flags": 524292,
+          "size": 1.0,
+          "weight": 480
+        },
+        "char_idx": 13,
+        "source_indices": [
+          13
+        ],
+        "raw_code": 24555,
+        "text_object_id": 2,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          827.7030029296875,
+          40.967987060546875
+        ]
+      },
+      {
+        "bbox": [
+          840.3389892578125,
+          30.06097412109375,
+          857.130615234375,
+          42.527984619140625
+        ],
+        "char": "速",
+        "rotation": 0.3217482566833496,
+        "font": {
+          "name": "OXTGJM+MicrosoftYaHei",
+          "flags": 524292,
+          "size": 1.0,
+          "weight": 480
+        },
+        "char_idx": 14,
+        "source_indices": [
+          14
+        ],
+        "raw_code": 36895,
+        "text_object_id": 2,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          840.7030029296875,
+          40.967987060546875
+        ]
+      },
+      {
+        "bbox": [
+          853.3216552734375,
+          30.5419921875,
+          869.9833374023438,
+          42.696990966796875
+        ],
+        "char": "最",
+        "rotation": 0.3217482566833496,
+        "font": {
+          "name": "OXTGJM+MicrosoftYaHei",
+          "flags": 524292,
+          "size": 1.0,
+          "weight": 480
+        },
+        "char_idx": 15,
+        "source_indices": [
+          15
+        ],
+        "raw_code": 26368,
+        "text_object_id": 2,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          853.7030029296875,
+          40.967987060546875
+        ]
+      },
+      {
+        "bbox": [
+          866.434326171875,
+          29.826995849609375,
+          883.1566162109375,
+          42.553985595703125
+        ],
+        "char": "高",
+        "rotation": 0.3217482566833496,
+        "font": {
+          "name": "OXTGJM+MicrosoftYaHei",
+          "flags": 524292,
+          "size": 1.0,
+          "weight": 480
+        },
+        "char_idx": 16,
+        "source_indices": [
+          16
+        ],
+        "raw_code": 39640,
+        "text_object_id": 2,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          866.7030029296875,
+          40.967987060546875
+        ]
+      },
+      {
+        "bbox": [
+          879.1700439453125,
+          29.917999267578125,
+          896.3602905273438,
+          42.761993408203125
+        ],
+        "char": "效",
+        "rotation": 0.3217482566833496,
+        "font": {
+          "name": "OXTGJM+MicrosoftYaHei",
+          "flags": 524292,
+          "size": 1.0,
+          "weight": 480
+        },
+        "char_idx": 17,
+        "source_indices": [
+          17
+        ],
+        "raw_code": 25928,
+        "text_object_id": 2,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          879.7030029296875,
+          40.967987060546875
+        ]
+      },
+      {
+        "bbox": [
+          892.3563232421875,
+          30.24298095703125,
+          909.0699462890625,
+          42.475982666015625
+        ],
+        "char": "通",
+        "rotation": 0.3217482566833496,
+        "font": {
+          "name": "OXTGJM+MicrosoftYaHei",
+          "flags": 524292,
+          "size": 1.0,
+          "weight": 480
+        },
+        "char_idx": 18,
+        "source_indices": [
+          18
+        ],
+        "raw_code": 36890,
+        "text_object_id": 2,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          892.7030029296875,
+          40.967987060546875
+        ]
+      },
+      {
+        "bbox": [
+          905.486328125,
+          30.03497314453125,
+          922.165283203125,
+          42.319976806640625
+        ],
+        "char": "过",
+        "rotation": 0.3217482566833496,
+        "font": {
+          "name": "OXTGJM+MicrosoftYaHei",
+          "flags": 524292,
+          "size": 1.0,
+          "weight": 480
+        },
+        "char_idx": 19,
+        "source_indices": [
+          19
+        ],
+        "raw_code": 36807,
+        "text_object_id": 2,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          905.7030029296875,
+          40.967987060546875
+        ]
+      },
+      {
+        "bbox": [
+          918.3909912109375,
+          30.03497314453125,
+          934.9443359375,
+          42.332977294921875
+        ],
+        "char": "考",
+        "rotation": 0.3217482566833496,
+        "font": {
+          "name": "OXTGJM+MicrosoftYaHei",
+          "flags": 524292,
+          "size": 1.0,
+          "weight": 480
+        },
+        "char_idx": 20,
+        "source_indices": [
+          20
+        ],
+        "raw_code": 32771,
+        "text_object_id": 2,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          918.7030029296875,
+          40.967987060546875
+        ]
+      },
+      {
+        "bbox": [
+          931.3346557617188,
+          29.970001220703125,
+          948.1869506835938,
+          42.618988037109375
+        ],
+        "char": "试",
+        "rotation": 0.3217482566833496,
+        "font": {
+          "name": "OXTGJM+MicrosoftYaHei",
+          "flags": 524292,
+          "size": 1.0,
+          "weight": 480
+        },
+        "char_idx": 21,
+        "source_indices": [
+          21
+        ],
+        "raw_code": 35797,
+        "text_object_id": 2,
+        "text_render_mode": 0,
+        "writing_angle": 0.0,
+        "origin": [
+          931.7030029296875,
+          40.967987060546875
+        ]
+      },
+      {
+        "bbox": [
+          810.9998779296875,
+          27.15203857421875,
+          824.7998657226562,
+          44.138214111328125
+        ],
+        "char": "最",
+        "rotation": 0.0,
+        "font": {
+          "name": "SimSun",
+          "flags": 524320,
+          "size": 8.0,
+          "weight": 0
+        },
+        "char_idx": 509,
+        "source_indices": [
+          509
+        ],
+        "raw_code": 26368,
+        "text_object_id": 103,
+        "text_render_mode": 3,
+        "writing_angle": 0.0,
+        "origin": [
+          811.0,
+          41.757720947265625
+        ]
+      },
+      {
+        "bbox": [
+          824.7998657226562,
+          27.15203857421875,
+          838.5999145507812,
+          44.138214111328125
+        ],
+        "char": "快",
+        "rotation": 0.0,
+        "font": {
+          "name": "SimSun",
+          "flags": 524320,
+          "size": 8.0,
+          "weight": 0
+        },
+        "char_idx": 510,
+        "source_indices": [
+          510
+        ],
+        "raw_code": 24555,
+        "text_object_id": 103,
+        "text_render_mode": 3,
+        "writing_angle": 0.0,
+        "origin": [
+          824.7999877929688,
+          41.757720947265625
+        ]
+      },
+      {
+        "bbox": [
+          838.5999145507812,
+          27.15203857421875,
+          852.39990234375,
+          44.138214111328125
+        ],
+        "char": "速",
+        "rotation": 0.0,
+        "font": {
+          "name": "SimSun",
+          "flags": 524320,
+          "size": 8.0,
+          "weight": 0
+        },
+        "char_idx": 511,
+        "source_indices": [
+          511
+        ],
+        "raw_code": 36895,
+        "text_object_id": 103,
+        "text_render_mode": 3,
+        "writing_angle": 0.0,
+        "origin": [
+          838.5999755859375,
+          41.757720947265625
+        ]
+      },
+      {
+        "bbox": [
+          852.3999633789062,
+          27.15203857421875,
+          866.199951171875,
+          44.138214111328125
+        ],
+        "char": "最",
+        "rotation": 0.0,
+        "font": {
+          "name": "SimSun",
+          "flags": 524320,
+          "size": 8.0,
+          "weight": 0
+        },
+        "char_idx": 512,
+        "source_indices": [
+          512
+        ],
+        "raw_code": 26368,
+        "text_object_id": 103,
+        "text_render_mode": 3,
+        "writing_angle": 0.0,
+        "origin": [
+          852.4000244140625,
+          41.757720947265625
+        ]
+      },
+      {
+        "bbox": [
+          866.199951171875,
+          27.15203857421875,
+          879.9999389648438,
+          44.138214111328125
+        ],
+        "char": "高",
+        "rotation": 0.0,
+        "font": {
+          "name": "SimSun",
+          "flags": 524320,
+          "size": 8.0,
+          "weight": 0
+        },
+        "char_idx": 513,
+        "source_indices": [
+          513
+        ],
+        "raw_code": 39640,
+        "text_object_id": 103,
+        "text_render_mode": 3,
+        "writing_angle": 0.0,
+        "origin": [
+          866.2000122070312,
+          41.757720947265625
+        ]
+      },
+      {
+        "bbox": [
+          879.9998779296875,
+          27.15203857421875,
+          893.7999267578125,
+          44.138214111328125
+        ],
+        "char": "效",
+        "rotation": 0.0,
+        "font": {
+          "name": "SimSun",
+          "flags": 524320,
+          "size": 8.0,
+          "weight": 0
+        },
+        "char_idx": 514,
+        "source_indices": [
+          514
+        ],
+        "raw_code": 25928,
+        "text_object_id": 103,
+        "text_render_mode": 3,
+        "writing_angle": 0.0,
+        "origin": [
+          880.0,
+          41.757720947265625
+        ]
+      },
+      {
+        "bbox": [
+          893.7999267578125,
+          27.15203857421875,
+          907.5999145507812,
+          44.138214111328125
+        ],
+        "char": "通",
+        "rotation": 0.0,
+        "font": {
+          "name": "SimSun",
+          "flags": 524320,
+          "size": 8.0,
+          "weight": 0
+        },
+        "char_idx": 515,
+        "source_indices": [
+          515
+        ],
+        "raw_code": 36890,
+        "text_object_id": 103,
+        "text_render_mode": 3,
+        "writing_angle": 0.0,
+        "origin": [
+          893.7999877929688,
+          41.757720947265625
+        ]
+      },
+      {
+        "bbox": [
+          907.5999145507812,
+          27.15203857421875,
+          921.39990234375,
+          44.138214111328125
+        ],
+        "char": "过",
+        "rotation": 0.0,
+        "font": {
+          "name": "SimSun",
+          "flags": 524320,
+          "size": 8.0,
+          "weight": 0
+        },
+        "char_idx": 516,
+        "source_indices": [
+          516
+        ],
+        "raw_code": 36807,
+        "text_object_id": 103,
+        "text_render_mode": 3,
+        "writing_angle": 0.0,
+        "origin": [
+          907.5999755859375,
+          41.757720947265625
+        ]
+      },
+      {
+        "bbox": [
+          921.39990234375,
+          27.15203857421875,
+          935.1998901367188,
+          44.138214111328125
+        ],
+        "char": "考",
+        "rotation": 0.0,
+        "font": {
+          "name": "SimSun",
+          "flags": 524320,
+          "size": 8.0,
+          "weight": 0
+        },
+        "char_idx": 517,
+        "source_indices": [
+          517
+        ],
+        "raw_code": 32771,
+        "text_object_id": 103,
+        "text_render_mode": 3,
+        "writing_angle": 0.0,
+        "origin": [
+          921.4000244140625,
+          41.757720947265625
+        ]
+      },
+      {
+        "bbox": [
+          935.1998901367188,
+          27.15203857421875,
+          948.9998779296875,
+          44.138214111328125
+        ],
+        "char": "试",
+        "rotation": 0.0,
+        "font": {
+          "name": "SimSun",
+          "flags": 524320,
+          "size": 8.0,
+          "weight": 0
+        },
+        "char_idx": 518,
+        "source_indices": [
+          518
+        ],
+        "raw_code": 35797,
+        "text_object_id": 103,
+        "text_render_mode": 3,
+        "writing_angle": 0.0,
+        "origin": [
+          935.2000122070312,
+          41.757720947265625
+        ]
+      },
+      {
+        "bbox": [
+          810.9998779296875,
+          27.1519775390625,
+          824.7998657226562,
+          44.13818359375
+        ],
+        "char": "最",
+        "rotation": 0.0,
+        "font": {
+          "name": "SimSun",
+          "flags": 524320,
+          "size": 8.0,
+          "weight": 0
+        },
+        "char_idx": 974,
+        "source_indices": [
+          974
+        ],
+        "raw_code": 26368,
+        "text_object_id": 122,
+        "text_render_mode": 3,
+        "writing_angle": 0.0,
+        "origin": [
+          811.0,
+          41.75775146484375
+        ]
+      },
+      {
+        "bbox": [
+          824.7998657226562,
+          27.1519775390625,
+          838.5999145507812,
+          44.13818359375
+        ],
+        "char": "快",
+        "rotation": 0.0,
+        "font": {
+          "name": "SimSun",
+          "flags": 524320,
+          "size": 8.0,
+          "weight": 0
+        },
+        "char_idx": 975,
+        "source_indices": [
+          975
+        ],
+        "raw_code": 24555,
+        "text_object_id": 122,
+        "text_render_mode": 3,
+        "writing_angle": 0.0,
+        "origin": [
+          824.7999877929688,
+          41.75775146484375
+        ]
+      },
+      {
+        "bbox": [
+          838.5999145507812,
+          27.1519775390625,
+          852.39990234375,
+          44.13818359375
+        ],
+        "char": "速",
+        "rotation": 0.0,
+        "font": {
+          "name": "SimSun",
+          "flags": 524320,
+          "size": 8.0,
+          "weight": 0
+        },
+        "char_idx": 976,
+        "source_indices": [
+          976
+        ],
+        "raw_code": 36895,
+        "text_object_id": 122,
+        "text_render_mode": 3,
+        "writing_angle": 0.0,
+        "origin": [
+          838.5999755859375,
+          41.75775146484375
+        ]
+      },
+      {
+        "bbox": [
+          852.3999633789062,
+          27.1519775390625,
+          866.199951171875,
+          44.13818359375
+        ],
+        "char": "最",
+        "rotation": 0.0,
+        "font": {
+          "name": "SimSun",
+          "flags": 524320,
+          "size": 8.0,
+          "weight": 0
+        },
+        "char_idx": 977,
+        "source_indices": [
+          977
+        ],
+        "raw_code": 26368,
+        "text_object_id": 122,
+        "text_render_mode": 3,
+        "writing_angle": 0.0,
+        "origin": [
+          852.4000244140625,
+          41.75775146484375
+        ]
+      },
+      {
+        "bbox": [
+          866.199951171875,
+          27.1519775390625,
+          879.9999389648438,
+          44.13818359375
+        ],
+        "char": "高",
+        "rotation": 0.0,
+        "font": {
+          "name": "SimSun",
+          "flags": 524320,
+          "size": 8.0,
+          "weight": 0
+        },
+        "char_idx": 978,
+        "source_indices": [
+          978
+        ],
+        "raw_code": 39640,
+        "text_object_id": 122,
+        "text_render_mode": 3,
+        "writing_angle": 0.0,
+        "origin": [
+          866.2000122070312,
+          41.75775146484375
+        ]
+      },
+      {
+        "bbox": [
+          879.9998779296875,
+          27.1519775390625,
+          893.7999267578125,
+          44.13818359375
+        ],
+        "char": "效",
+        "rotation": 0.0,
+        "font": {
+          "name": "SimSun",
+          "flags": 524320,
+          "size": 8.0,
+          "weight": 0
+        },
+        "char_idx": 979,
+        "source_indices": [
+          979
+        ],
+        "raw_code": 25928,
+        "text_object_id": 122,
+        "text_render_mode": 3,
+        "writing_angle": 0.0,
+        "origin": [
+          880.0,
+          41.75775146484375
+        ]
+      },
+      {
+        "bbox": [
+          893.7999267578125,
+          27.1519775390625,
+          907.5999145507812,
+          44.13818359375
+        ],
+        "char": "通",
+        "rotation": 0.0,
+        "font": {
+          "name": "SimSun",
+          "flags": 524320,
+          "size": 8.0,
+          "weight": 0
+        },
+        "char_idx": 980,
+        "source_indices": [
+          980
+        ],
+        "raw_code": 36890,
+        "text_object_id": 122,
+        "text_render_mode": 3,
+        "writing_angle": 0.0,
+        "origin": [
+          893.7999877929688,
+          41.75775146484375
+        ]
+      },
+      {
+        "bbox": [
+          907.5999145507812,
+          27.1519775390625,
+          921.39990234375,
+          44.13818359375
+        ],
+        "char": "过",
+        "rotation": 0.0,
+        "font": {
+          "name": "SimSun",
+          "flags": 524320,
+          "size": 8.0,
+          "weight": 0
+        },
+        "char_idx": 981,
+        "source_indices": [
+          981
+        ],
+        "raw_code": 36807,
+        "text_object_id": 122,
+        "text_render_mode": 3,
+        "writing_angle": 0.0,
+        "origin": [
+          907.5999755859375,
+          41.75775146484375
+        ]
+      },
+      {
+        "bbox": [
+          921.39990234375,
+          27.1519775390625,
+          935.1998901367188,
+          44.13818359375
+        ],
+        "char": "考",
+        "rotation": 0.0,
+        "font": {
+          "name": "SimSun",
+          "flags": 524320,
+          "size": 8.0,
+          "weight": 0
+        },
+        "char_idx": 982,
+        "source_indices": [
+          982
+        ],
+        "raw_code": 32771,
+        "text_object_id": 122,
+        "text_render_mode": 3,
+        "writing_angle": 0.0,
+        "origin": [
+          921.4000244140625,
+          41.75775146484375
+        ]
+      },
+      {
+        "bbox": [
+          935.1998901367188,
+          27.1519775390625,
+          948.9998779296875,
+          44.13818359375
+        ],
+        "char": "试",
+        "rotation": 0.0,
+        "font": {
+          "name": "SimSun",
+          "flags": 524320,
+          "size": 8.0,
+          "weight": 0
+        },
+        "char_idx": 983,
+        "source_indices": [
+          983
+        ],
+        "raw_code": 35797,
+        "text_object_id": 122,
+        "text_render_mode": 3,
+        "writing_angle": 0.0,
+        "origin": [
+          935.2000122070312,
+          41.75775146484375
+        ]
+      }
+    ]
+  }
+]

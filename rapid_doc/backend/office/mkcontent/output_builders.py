@@ -357,6 +357,11 @@ def _collect_caption_v2(para_block, caption_type: str) -> list[dict]:
     return caption_content
 
 
+def _code_text(block):
+    return '\n'.join(''.join(span.get('content', '') for span in line.get('spans', []))
+                     for line in block.get('lines', []))
+
+
 def mk_blocks_to_markdown(para_blocks, make_mode, img_buket_path='', page_idx=None):
     page_markdown = []
     for para_block in para_blocks:
@@ -372,6 +377,11 @@ def mk_blocks_to_markdown(para_blocks, make_mode, img_buket_path='', page_idx=No
                     and bookmark_anchor.strip().startswith("_Toc")
                 ):
                     para_text = f'<a id="{bookmark_anchor.strip()}"></a>\n{para_text}'
+        elif para_type == BlockType.CODE:
+            text = _code_text(para_block)
+            longest = max((len(m.group()) for m in re.finditer(r'`+', text)), default=0)
+            fence = '`' * max(3, longest + 1)
+            para_text = f'{fence}\n{text}\n{fence}'
         elif para_type == BlockType.LIST:
             para_text = merge_list_to_markdown(para_block)
         elif para_type == BlockType.INDEX:
@@ -454,6 +464,8 @@ def make_blocks_to_content_list(para_block, img_buket_path, page_idx):
             'type': para_type,
             'text': merge_para_with_text(para_block),
         }
+    elif para_type == BlockType.CODE:
+        para_content = {'type': 'code', 'text': _code_text(para_block), 'text_format': 'code'}
     elif para_type == BlockType.LIST:
         para_content = {
             'type': para_type,
@@ -586,6 +598,8 @@ def make_blocks_to_content_list_v2(para_block, img_buket_path):
                 'paragraph_content': merge_para_with_text_v2(para_block),
             }
         }
+    elif para_type == BlockType.CODE:
+        para_content = {'type': 'code', 'content': {'code_content': _code_text(para_block)}}
     elif para_type == BlockType.INTERLINE_EQUATION:
         _, math_content = get_body_data(para_block)
         para_content = {

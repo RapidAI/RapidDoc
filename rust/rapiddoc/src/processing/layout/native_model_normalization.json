@@ -1,0 +1,41 @@
+{
+  "natural": [
+    "aside_text",
+    "caption",
+    "chart_caption",
+    "chart_footnote",
+    "code_caption",
+    "code_footnote",
+    "doc_title",
+    "footer",
+    "footnote",
+    "header",
+    "image_caption",
+    "image_footnote",
+    "index",
+    "list",
+    "page_footnote",
+    "page_number",
+    "paragraph_title",
+    "phonetic",
+    "ref_text",
+    "table_caption",
+    "table_footnote",
+    "text"
+  ],
+  "opaque": [
+    "canvas",
+    "code",
+    "embed",
+    "eq",
+    "iframe",
+    "math",
+    "object",
+    "pre",
+    "script",
+    "style",
+    "svg",
+    "template",
+    "textarea"
+  ]
+}

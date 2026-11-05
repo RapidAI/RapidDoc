@@ -1,0 +1,5562 @@
+{
+  "capture": "pdf-facts",
+  "pages": [
+    {
+      "chars": [
+        {
+          "bbox": [
+            20.0,
+            19.1400146484375,
+            26.672000885009766,
+            32.532012939453125
+          ],
+          "char": "L",
+          "char_idx": 0,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            20.0,
+            30.0
+          ],
+          "raw_code": 76,
+          "rotation": 0.0,
+          "source_indices": [
+            0
+          ],
+          "text_object_id": 0,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            26.672000885009766,
+            19.1400146484375,
+            33.34400177001953,
+            32.532012939453125
+          ],
+          "char": "e",
+          "char_idx": 1,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            26.672000885009766,
+            30.0
+          ],
+          "raw_code": 101,
+          "rotation": 0.0,
+          "source_indices": [
+            1
+          ],
+          "text_object_id": 0,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            33.34400177001953,
+            19.1400146484375,
+            37.099998474121094,
+            32.532012939453125
+          ],
+          "char": "f",
+          "char_idx": 2,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            33.34400177001953,
+            30.0
+          ],
+          "raw_code": 102,
+          "rotation": 0.0,
+          "source_indices": [
+            2
+          ],
+          "text_object_id": 0,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            36.68000030517578,
+            19.1400146484375,
+            40.01599884033203,
+            32.532012939453125
+          ],
+          "char": "t",
+          "char_idx": 3,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            36.68000030517578,
+            30.0
+          ],
+          "raw_code": 116,
+          "rotation": 0.0,
+          "source_indices": [
+            3
+          ],
+          "text_object_id": 0,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            40.01599884033203,
+            19.1400146484375,
+            43.35200119018555,
+            32.532012939453125
+          ],
+          "char": " ",
+          "char_idx": 4,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            40.01599884033203,
+            30.0
+          ],
+          "raw_code": 32,
+          "rotation": 0.0,
+          "source_indices": [
+            4
+          ],
+          "text_object_id": 0,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            43.35200119018555,
+            19.1400146484375,
+            47.51599884033203,
+            32.532012939453125
+          ],
+          "char": "r",
+          "char_idx": 5,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            43.35200119018555,
+            30.0
+          ],
+          "raw_code": 114,
+          "rotation": 0.0,
+          "source_indices": [
+            5
+          ],
+          "text_object_id": 0,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            47.347999572753906,
+            19.1400146484375,
+            54.02000045776367,
+            32.532012939453125
+          ],
+          "char": "o",
+          "char_idx": 6,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            47.347999572753906,
+            30.0
+          ],
+          "raw_code": 111,
+          "rotation": 0.0,
+          "source_indices": [
+            6
+          ],
+          "text_object_id": 0,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            54.02000045776367,
+            19.1400146484375,
+            62.68400192260742,
+            32.532012939453125
+          ],
+          "char": "w",
+          "char_idx": 7,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            54.02000045776367,
+            30.0
+          ],
+          "raw_code": 119,
+          "rotation": 0.0,
+          "source_indices": [
+            7
+          ],
+          "text_object_id": 0,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            62.683998107910156,
+            19.1400146484375,
+            66.0199966430664,
+            32.532012939453125
+          ],
+          "char": " ",
+          "char_idx": 8,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            62.683998107910156,
+            30.0
+          ],
+          "raw_code": 32,
+          "rotation": 0.0,
+          "source_indices": [
+            8
+          ],
+          "text_object_id": 0,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            66.0199966430664,
+            19.1400146484375,
+            72.69200134277344,
+            32.532012939453125
+          ],
+          "char": "0",
+          "char_idx": 9,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            66.0199966430664,
+            30.0
+          ],
+          "raw_code": 48,
+          "rotation": 0.0,
+          "source_indices": [
+            9
+          ],
+          "text_object_id": 0,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            72.6919937133789,
+            30.0,
+            72.6919937133789,
+            30.0
+          ],
+          "char": " ",
+          "char_idx": 10,
+          "font": {
+            "flags": 0,
+            "name": "",
+            "size": 1.0,
+            "weight": -1
+          },
+          "is_generated": true,
+          "origin": [
+            72.6919937133789,
+            30.0
+          ],
+          "raw_code": 32,
+          "rotation": 0.0,
+          "source_indices": [
+            10
+          ],
+          "text_object_id": null,
+          "text_render_mode": null,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            220.0,
+            19.1400146484375,
+            228.66400146484375,
+            32.532012939453125
+          ],
+          "char": "R",
+          "char_idx": 11,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            220.0,
+            30.0
+          ],
+          "raw_code": 82,
+          "rotation": 0.0,
+          "source_indices": [
+            11
+          ],
+          "text_object_id": 1,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            228.66400146484375,
+            19.1400146484375,
+            231.3280029296875,
+            32.532012939453125
+          ],
+          "char": "i",
+          "char_idx": 12,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            228.66400146484375,
+            30.0
+          ],
+          "raw_code": 105,
+          "rotation": 0.0,
+          "source_indices": [
+            12
+          ],
+          "text_object_id": 1,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            231.3280029296875,
+            19.1400146484375,
+            238.0,
+            32.532012939453125
+          ],
+          "char": "g",
+          "char_idx": 13,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            231.3280029296875,
+            30.0
+          ],
+          "raw_code": 103,
+          "rotation": 0.0,
+          "source_indices": [
+            13
+          ],
+          "text_object_id": 1,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            238.0,
+            19.1400146484375,
+            244.6719970703125,
+            32.532012939453125
+          ],
+          "char": "h",
+          "char_idx": 14,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            238.0,
+            30.0
+          ],
+          "raw_code": 104,
+          "rotation": 0.0,
+          "source_indices": [
+            14
+          ],
+          "text_object_id": 1,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            244.6719970703125,
+            19.1400146484375,
+            248.00799560546875,
+            32.532012939453125
+          ],
+          "char": "t",
+          "char_idx": 15,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            244.6719970703125,
+            30.0
+          ],
+          "raw_code": 116,
+          "rotation": 0.0,
+          "source_indices": [
+            15
+          ],
+          "text_object_id": 1,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            248.00799560546875,
+            19.1400146484375,
+            251.343994140625,
+            32.532012939453125
+          ],
+          "char": " ",
+          "char_idx": 16,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            248.00799560546875,
+            30.0
+          ],
+          "raw_code": 32,
+          "rotation": 0.0,
+          "source_indices": [
+            16
+          ],
+          "text_object_id": 1,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            251.343994140625,
+            19.1400146484375,
+            255.50799560546875,
+            32.532012939453125
+          ],
+          "char": "r",
+          "char_idx": 17,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            251.343994140625,
+            30.0
+          ],
+          "raw_code": 114,
+          "rotation": 0.0,
+          "source_indices": [
+            17
+          ],
+          "text_object_id": 1,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            255.33999633789062,
+            19.1400146484375,
+            262.0119934082031,
+            32.532012939453125
+          ],
+          "char": "o",
+          "char_idx": 18,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            255.33999633789062,
+            30.0
+          ],
+          "raw_code": 111,
+          "rotation": 0.0,
+          "source_indices": [
+            18
+          ],
+          "text_object_id": 1,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            262.0119934082031,
+            19.1400146484375,
+            270.6759948730469,
+            32.532012939453125
+          ],
+          "char": "w",
+          "char_idx": 19,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            262.0119934082031,
+            30.0
+          ],
+          "raw_code": 119,
+          "rotation": 0.0,
+          "source_indices": [
+            19
+          ],
+          "text_object_id": 1,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            270.6759948730469,
+            19.1400146484375,
+            274.0119934082031,
+            32.532012939453125
+          ],
+          "char": " ",
+          "char_idx": 20,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            270.6759948730469,
+            30.0
+          ],
+          "raw_code": 32,
+          "rotation": 0.0,
+          "source_indices": [
+            20
+          ],
+          "text_object_id": 1,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            274.0119934082031,
+            19.1400146484375,
+            280.6839904785156,
+            32.532012939453125
+          ],
+          "char": "0",
+          "char_idx": 21,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            274.0119934082031,
+            30.0
+          ],
+          "raw_code": 48,
+          "rotation": 0.0,
+          "source_indices": [
+            21
+          ],
+          "text_object_id": 1,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            280.6839904785156,
+            30.0,
+            280.6839904785156,
+            30.0
+          ],
+          "char": "\r",
+          "char_idx": 22,
+          "font": {
+            "flags": 0,
+            "name": "",
+            "size": 1.0,
+            "weight": -1
+          },
+          "is_generated": true,
+          "origin": [
+            280.6839904785156,
+            30.0
+          ],
+          "raw_code": 13,
+          "rotation": 0.0,
+          "source_indices": [
+            22
+          ],
+          "text_object_id": null,
+          "text_render_mode": null,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            280.6839904785156,
+            30.0,
+            280.6839904785156,
+            30.0
+          ],
+          "char": "\n",
+          "char_idx": 23,
+          "font": {
+            "flags": 0,
+            "name": "",
+            "size": 1.0,
+            "weight": -1
+          },
+          "is_generated": true,
+          "origin": [
+            280.6839904785156,
+            30.0
+          ],
+          "raw_code": 10,
+          "rotation": 0.0,
+          "source_indices": [
+            23
+          ],
+          "text_object_id": null,
+          "text_render_mode": null,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            20.0,
+            35.1400146484375,
+            26.672000885009766,
+            48.532012939453125
+          ],
+          "char": "L",
+          "char_idx": 24,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            20.0,
+            46.0
+          ],
+          "raw_code": 76,
+          "rotation": 0.0,
+          "source_indices": [
+            24
+          ],
+          "text_object_id": 2,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            26.672000885009766,
+            35.1400146484375,
+            33.34400177001953,
+            48.532012939453125
+          ],
+          "char": "e",
+          "char_idx": 25,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            26.672000885009766,
+            46.0
+          ],
+          "raw_code": 101,
+          "rotation": 0.0,
+          "source_indices": [
+            25
+          ],
+          "text_object_id": 2,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            33.34400177001953,
+            35.1400146484375,
+            37.099998474121094,
+            48.532012939453125
+          ],
+          "char": "f",
+          "char_idx": 26,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            33.34400177001953,
+            46.0
+          ],
+          "raw_code": 102,
+          "rotation": 0.0,
+          "source_indices": [
+            26
+          ],
+          "text_object_id": 2,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            36.68000030517578,
+            35.1400146484375,
+            40.01599884033203,
+            48.532012939453125
+          ],
+          "char": "t",
+          "char_idx": 27,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            36.68000030517578,
+            46.0
+          ],
+          "raw_code": 116,
+          "rotation": 0.0,
+          "source_indices": [
+            27
+          ],
+          "text_object_id": 2,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            40.01599884033203,
+            35.1400146484375,
+            43.35200119018555,
+            48.532012939453125
+          ],
+          "char": " ",
+          "char_idx": 28,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            40.01599884033203,
+            46.0
+          ],
+          "raw_code": 32,
+          "rotation": 0.0,
+          "source_indices": [
+            28
+          ],
+          "text_object_id": 2,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            43.35200119018555,
+            35.1400146484375,
+            47.51599884033203,
+            48.532012939453125
+          ],
+          "char": "r",
+          "char_idx": 29,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            43.35200119018555,
+            46.0
+          ],
+          "raw_code": 114,
+          "rotation": 0.0,
+          "source_indices": [
+            29
+          ],
+          "text_object_id": 2,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            47.347999572753906,
+            35.1400146484375,
+            54.02000045776367,
+            48.532012939453125
+          ],
+          "char": "o",
+          "char_idx": 30,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            47.347999572753906,
+            46.0
+          ],
+          "raw_code": 111,
+          "rotation": 0.0,
+          "source_indices": [
+            30
+          ],
+          "text_object_id": 2,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            54.02000045776367,
+            35.1400146484375,
+            62.68400192260742,
+            48.532012939453125
+          ],
+          "char": "w",
+          "char_idx": 31,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            54.02000045776367,
+            46.0
+          ],
+          "raw_code": 119,
+          "rotation": 0.0,
+          "source_indices": [
+            31
+          ],
+          "text_object_id": 2,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            62.683998107910156,
+            35.1400146484375,
+            66.0199966430664,
+            48.532012939453125
+          ],
+          "char": " ",
+          "char_idx": 32,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            62.683998107910156,
+            46.0
+          ],
+          "raw_code": 32,
+          "rotation": 0.0,
+          "source_indices": [
+            32
+          ],
+          "text_object_id": 2,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            66.0199966430664,
+            35.1400146484375,
+            72.69200134277344,
+            48.532012939453125
+          ],
+          "char": "1",
+          "char_idx": 33,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            66.0199966430664,
+            46.0
+          ],
+          "raw_code": 49,
+          "rotation": 0.0,
+          "source_indices": [
+            33
+          ],
+          "text_object_id": 2,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            72.6919937133789,
+            46.0,
+            72.6919937133789,
+            46.0
+          ],
+          "char": " ",
+          "char_idx": 34,
+          "font": {
+            "flags": 0,
+            "name": "",
+            "size": 1.0,
+            "weight": -1
+          },
+          "is_generated": true,
+          "origin": [
+            72.6919937133789,
+            46.0
+          ],
+          "raw_code": 32,
+          "rotation": 0.0,
+          "source_indices": [
+            34
+          ],
+          "text_object_id": null,
+          "text_render_mode": null,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            220.0,
+            35.1400146484375,
+            228.66400146484375,
+            48.532012939453125
+          ],
+          "char": "R",
+          "char_idx": 35,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            220.0,
+            46.0
+          ],
+          "raw_code": 82,
+          "rotation": 0.0,
+          "source_indices": [
+            35
+          ],
+          "text_object_id": 3,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            228.66400146484375,
+            35.1400146484375,
+            231.3280029296875,
+            48.532012939453125
+          ],
+          "char": "i",
+          "char_idx": 36,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            228.66400146484375,
+            46.0
+          ],
+          "raw_code": 105,
+          "rotation": 0.0,
+          "source_indices": [
+            36
+          ],
+          "text_object_id": 3,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            231.3280029296875,
+            35.1400146484375,
+            238.0,
+            48.532012939453125
+          ],
+          "char": "g",
+          "char_idx": 37,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            231.3280029296875,
+            46.0
+          ],
+          "raw_code": 103,
+          "rotation": 0.0,
+          "source_indices": [
+            37
+          ],
+          "text_object_id": 3,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            238.0,
+            35.1400146484375,
+            244.6719970703125,
+            48.532012939453125
+          ],
+          "char": "h",
+          "char_idx": 38,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            238.0,
+            46.0
+          ],
+          "raw_code": 104,
+          "rotation": 0.0,
+          "source_indices": [
+            38
+          ],
+          "text_object_id": 3,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            244.6719970703125,
+            35.1400146484375,
+            248.00799560546875,
+            48.532012939453125
+          ],
+          "char": "t",
+          "char_idx": 39,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            244.6719970703125,
+            46.0
+          ],
+          "raw_code": 116,
+          "rotation": 0.0,
+          "source_indices": [
+            39
+          ],
+          "text_object_id": 3,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            248.00799560546875,
+            35.1400146484375,
+            251.343994140625,
+            48.532012939453125
+          ],
+          "char": " ",
+          "char_idx": 40,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            248.00799560546875,
+            46.0
+          ],
+          "raw_code": 32,
+          "rotation": 0.0,
+          "source_indices": [
+            40
+          ],
+          "text_object_id": 3,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            251.343994140625,
+            35.1400146484375,
+            255.50799560546875,
+            48.532012939453125
+          ],
+          "char": "r",
+          "char_idx": 41,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            251.343994140625,
+            46.0
+          ],
+          "raw_code": 114,
+          "rotation": 0.0,
+          "source_indices": [
+            41
+          ],
+          "text_object_id": 3,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            255.33999633789062,
+            35.1400146484375,
+            262.0119934082031,
+            48.532012939453125
+          ],
+          "char": "o",
+          "char_idx": 42,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            255.33999633789062,
+            46.0
+          ],
+          "raw_code": 111,
+          "rotation": 0.0,
+          "source_indices": [
+            42
+          ],
+          "text_object_id": 3,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            262.0119934082031,
+            35.1400146484375,
+            270.6759948730469,
+            48.532012939453125
+          ],
+          "char": "w",
+          "char_idx": 43,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            262.0119934082031,
+            46.0
+          ],
+          "raw_code": 119,
+          "rotation": 0.0,
+          "source_indices": [
+            43
+          ],
+          "text_object_id": 3,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            270.6759948730469,
+            35.1400146484375,
+            274.0119934082031,
+            48.532012939453125
+          ],
+          "char": " ",
+          "char_idx": 44,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            270.6759948730469,
+            46.0
+          ],
+          "raw_code": 32,
+          "rotation": 0.0,
+          "source_indices": [
+            44
+          ],
+          "text_object_id": 3,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            274.0119934082031,
+            35.1400146484375,
+            280.6839904785156,
+            48.532012939453125
+          ],
+          "char": "1",
+          "char_idx": 45,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            274.0119934082031,
+            46.0
+          ],
+          "raw_code": 49,
+          "rotation": 0.0,
+          "source_indices": [
+            45
+          ],
+          "text_object_id": 3,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            280.6839904785156,
+            46.0,
+            280.6839904785156,
+            46.0
+          ],
+          "char": "\r",
+          "char_idx": 46,
+          "font": {
+            "flags": 0,
+            "name": "",
+            "size": 1.0,
+            "weight": -1
+          },
+          "is_generated": true,
+          "origin": [
+            280.6839904785156,
+            46.0
+          ],
+          "raw_code": 13,
+          "rotation": 0.0,
+          "source_indices": [
+            46
+          ],
+          "text_object_id": null,
+          "text_render_mode": null,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            280.6839904785156,
+            46.0,
+            280.6839904785156,
+            46.0
+          ],
+          "char": "\n",
+          "char_idx": 47,
+          "font": {
+            "flags": 0,
+            "name": "",
+            "size": 1.0,
+            "weight": -1
+          },
+          "is_generated": true,
+          "origin": [
+            280.6839904785156,
+            46.0
+          ],
+          "raw_code": 10,
+          "rotation": 0.0,
+          "source_indices": [
+            47
+          ],
+          "text_object_id": null,
+          "text_render_mode": null,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            20.0,
+            51.1400146484375,
+            26.672000885009766,
+            64.53201293945312
+          ],
+          "char": "L",
+          "char_idx": 48,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            20.0,
+            62.0
+          ],
+          "raw_code": 76,
+          "rotation": 0.0,
+          "source_indices": [
+            48
+          ],
+          "text_object_id": 4,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            26.672000885009766,
+            51.1400146484375,
+            33.34400177001953,
+            64.53201293945312
+          ],
+          "char": "e",
+          "char_idx": 49,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            26.672000885009766,
+            62.0
+          ],
+          "raw_code": 101,
+          "rotation": 0.0,
+          "source_indices": [
+            49
+          ],
+          "text_object_id": 4,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            33.34400177001953,
+            51.1400146484375,
+            37.099998474121094,
+            64.53201293945312
+          ],
+          "char": "f",
+          "char_idx": 50,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            33.34400177001953,
+            62.0
+          ],
+          "raw_code": 102,
+          "rotation": 0.0,
+          "source_indices": [
+            50
+          ],
+          "text_object_id": 4,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            36.68000030517578,
+            51.1400146484375,
+            40.01599884033203,
+            64.53201293945312
+          ],
+          "char": "t",
+          "char_idx": 51,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            36.68000030517578,
+            62.0
+          ],
+          "raw_code": 116,
+          "rotation": 0.0,
+          "source_indices": [
+            51
+          ],
+          "text_object_id": 4,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            40.01599884033203,
+            51.1400146484375,
+            43.35200119018555,
+            64.53201293945312
+          ],
+          "char": " ",
+          "char_idx": 52,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            40.01599884033203,
+            62.0
+          ],
+          "raw_code": 32,
+          "rotation": 0.0,
+          "source_indices": [
+            52
+          ],
+          "text_object_id": 4,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            43.35200119018555,
+            51.1400146484375,
+            47.51599884033203,
+            64.53201293945312
+          ],
+          "char": "r",
+          "char_idx": 53,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            43.35200119018555,
+            62.0
+          ],
+          "raw_code": 114,
+          "rotation": 0.0,
+          "source_indices": [
+            53
+          ],
+          "text_object_id": 4,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            47.347999572753906,
+            51.1400146484375,
+            54.02000045776367,
+            64.53201293945312
+          ],
+          "char": "o",
+          "char_idx": 54,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            47.347999572753906,
+            62.0
+          ],
+          "raw_code": 111,
+          "rotation": 0.0,
+          "source_indices": [
+            54
+          ],
+          "text_object_id": 4,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            54.02000045776367,
+            51.1400146484375,
+            62.68400192260742,
+            64.53201293945312
+          ],
+          "char": "w",
+          "char_idx": 55,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            54.02000045776367,
+            62.0
+          ],
+          "raw_code": 119,
+          "rotation": 0.0,
+          "source_indices": [
+            55
+          ],
+          "text_object_id": 4,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            62.683998107910156,
+            51.1400146484375,
+            66.0199966430664,
+            64.53201293945312
+          ],
+          "char": " ",
+          "char_idx": 56,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            62.683998107910156,
+            62.0
+          ],
+          "raw_code": 32,
+          "rotation": 0.0,
+          "source_indices": [
+            56
+          ],
+          "text_object_id": 4,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            66.0199966430664,
+            51.1400146484375,
+            72.69200134277344,
+            64.53201293945312
+          ],
+          "char": "2",
+          "char_idx": 57,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            66.0199966430664,
+            62.0
+          ],
+          "raw_code": 50,
+          "rotation": 0.0,
+          "source_indices": [
+            57
+          ],
+          "text_object_id": 4,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            72.6919937133789,
+            62.0,
+            72.6919937133789,
+            62.0
+          ],
+          "char": " ",
+          "char_idx": 58,
+          "font": {
+            "flags": 0,
+            "name": "",
+            "size": 1.0,
+            "weight": -1
+          },
+          "is_generated": true,
+          "origin": [
+            72.6919937133789,
+            62.0
+          ],
+          "raw_code": 32,
+          "rotation": 0.0,
+          "source_indices": [
+            58
+          ],
+          "text_object_id": null,
+          "text_render_mode": null,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            220.0,
+            51.1400146484375,
+            228.66400146484375,
+            64.53201293945312
+          ],
+          "char": "R",
+          "char_idx": 59,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            220.0,
+            62.0
+          ],
+          "raw_code": 82,
+          "rotation": 0.0,
+          "source_indices": [
+            59
+          ],
+          "text_object_id": 5,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            228.66400146484375,
+            51.1400146484375,
+            231.3280029296875,
+            64.53201293945312
+          ],
+          "char": "i",
+          "char_idx": 60,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            228.66400146484375,
+            62.0
+          ],
+          "raw_code": 105,
+          "rotation": 0.0,
+          "source_indices": [
+            60
+          ],
+          "text_object_id": 5,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            231.3280029296875,
+            51.1400146484375,
+            238.0,
+            64.53201293945312
+          ],
+          "char": "g",
+          "char_idx": 61,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            231.3280029296875,
+            62.0
+          ],
+          "raw_code": 103,
+          "rotation": 0.0,
+          "source_indices": [
+            61
+          ],
+          "text_object_id": 5,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            238.0,
+            51.1400146484375,
+            244.6719970703125,
+            64.53201293945312
+          ],
+          "char": "h",
+          "char_idx": 62,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            238.0,
+            62.0
+          ],
+          "raw_code": 104,
+          "rotation": 0.0,
+          "source_indices": [
+            62
+          ],
+          "text_object_id": 5,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            244.6719970703125,
+            51.1400146484375,
+            248.00799560546875,
+            64.53201293945312
+          ],
+          "char": "t",
+          "char_idx": 63,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            244.6719970703125,
+            62.0
+          ],
+          "raw_code": 116,
+          "rotation": 0.0,
+          "source_indices": [
+            63
+          ],
+          "text_object_id": 5,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            248.00799560546875,
+            51.1400146484375,
+            251.343994140625,
+            64.53201293945312
+          ],
+          "char": " ",
+          "char_idx": 64,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            248.00799560546875,
+            62.0
+          ],
+          "raw_code": 32,
+          "rotation": 0.0,
+          "source_indices": [
+            64
+          ],
+          "text_object_id": 5,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            251.343994140625,
+            51.1400146484375,
+            255.50799560546875,
+            64.53201293945312
+          ],
+          "char": "r",
+          "char_idx": 65,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            251.343994140625,
+            62.0
+          ],
+          "raw_code": 114,
+          "rotation": 0.0,
+          "source_indices": [
+            65
+          ],
+          "text_object_id": 5,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            255.33999633789062,
+            51.1400146484375,
+            262.0119934082031,
+            64.53201293945312
+          ],
+          "char": "o",
+          "char_idx": 66,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            255.33999633789062,
+            62.0
+          ],
+          "raw_code": 111,
+          "rotation": 0.0,
+          "source_indices": [
+            66
+          ],
+          "text_object_id": 5,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            262.0119934082031,
+            51.1400146484375,
+            270.6759948730469,
+            64.53201293945312
+          ],
+          "char": "w",
+          "char_idx": 67,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            262.0119934082031,
+            62.0
+          ],
+          "raw_code": 119,
+          "rotation": 0.0,
+          "source_indices": [
+            67
+          ],
+          "text_object_id": 5,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            270.6759948730469,
+            51.1400146484375,
+            274.0119934082031,
+            64.53201293945312
+          ],
+          "char": " ",
+          "char_idx": 68,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            270.6759948730469,
+            62.0
+          ],
+          "raw_code": 32,
+          "rotation": 0.0,
+          "source_indices": [
+            68
+          ],
+          "text_object_id": 5,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            274.0119934082031,
+            51.1400146484375,
+            280.6839904785156,
+            64.53201293945312
+          ],
+          "char": "2",
+          "char_idx": 69,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            274.0119934082031,
+            62.0
+          ],
+          "raw_code": 50,
+          "rotation": 0.0,
+          "source_indices": [
+            69
+          ],
+          "text_object_id": 5,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            280.6839904785156,
+            62.0,
+            280.6839904785156,
+            62.0
+          ],
+          "char": "\r",
+          "char_idx": 70,
+          "font": {
+            "flags": 0,
+            "name": "",
+            "size": 1.0,
+            "weight": -1
+          },
+          "is_generated": true,
+          "origin": [
+            280.6839904785156,
+            62.0
+          ],
+          "raw_code": 13,
+          "rotation": 0.0,
+          "source_indices": [
+            70
+          ],
+          "text_object_id": null,
+          "text_render_mode": null,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            280.6839904785156,
+            62.0,
+            280.6839904785156,
+            62.0
+          ],
+          "char": "\n",
+          "char_idx": 71,
+          "font": {
+            "flags": 0,
+            "name": "",
+            "size": 1.0,
+            "weight": -1
+          },
+          "is_generated": true,
+          "origin": [
+            280.6839904785156,
+            62.0
+          ],
+          "raw_code": 10,
+          "rotation": 0.0,
+          "source_indices": [
+            71
+          ],
+          "text_object_id": null,
+          "text_render_mode": null,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            20.0,
+            67.1400146484375,
+            26.672000885009766,
+            80.53201293945312
+          ],
+          "char": "L",
+          "char_idx": 72,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            20.0,
+            78.0
+          ],
+          "raw_code": 76,
+          "rotation": 0.0,
+          "source_indices": [
+            72
+          ],
+          "text_object_id": 6,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            26.672000885009766,
+            67.1400146484375,
+            33.34400177001953,
+            80.53201293945312
+          ],
+          "char": "e",
+          "char_idx": 73,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            26.672000885009766,
+            78.0
+          ],
+          "raw_code": 101,
+          "rotation": 0.0,
+          "source_indices": [
+            73
+          ],
+          "text_object_id": 6,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            33.34400177001953,
+            67.1400146484375,
+            37.099998474121094,
+            80.53201293945312
+          ],
+          "char": "f",
+          "char_idx": 74,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            33.34400177001953,
+            78.0
+          ],
+          "raw_code": 102,
+          "rotation": 0.0,
+          "source_indices": [
+            74
+          ],
+          "text_object_id": 6,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            36.68000030517578,
+            67.1400146484375,
+            40.01599884033203,
+            80.53201293945312
+          ],
+          "char": "t",
+          "char_idx": 75,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            36.68000030517578,
+            78.0
+          ],
+          "raw_code": 116,
+          "rotation": 0.0,
+          "source_indices": [
+            75
+          ],
+          "text_object_id": 6,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            40.01599884033203,
+            67.1400146484375,
+            43.35200119018555,
+            80.53201293945312
+          ],
+          "char": " ",
+          "char_idx": 76,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            40.01599884033203,
+            78.0
+          ],
+          "raw_code": 32,
+          "rotation": 0.0,
+          "source_indices": [
+            76
+          ],
+          "text_object_id": 6,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            43.35200119018555,
+            67.1400146484375,
+            47.51599884033203,
+            80.53201293945312
+          ],
+          "char": "r",
+          "char_idx": 77,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            43.35200119018555,
+            78.0
+          ],
+          "raw_code": 114,
+          "rotation": 0.0,
+          "source_indices": [
+            77
+          ],
+          "text_object_id": 6,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            47.347999572753906,
+            67.1400146484375,
+            54.02000045776367,
+            80.53201293945312
+          ],
+          "char": "o",
+          "char_idx": 78,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            47.347999572753906,
+            78.0
+          ],
+          "raw_code": 111,
+          "rotation": 0.0,
+          "source_indices": [
+            78
+          ],
+          "text_object_id": 6,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            54.02000045776367,
+            67.1400146484375,
+            62.68400192260742,
+            80.53201293945312
+          ],
+          "char": "w",
+          "char_idx": 79,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            54.02000045776367,
+            78.0
+          ],
+          "raw_code": 119,
+          "rotation": 0.0,
+          "source_indices": [
+            79
+          ],
+          "text_object_id": 6,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            62.683998107910156,
+            67.1400146484375,
+            66.0199966430664,
+            80.53201293945312
+          ],
+          "char": " ",
+          "char_idx": 80,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            62.683998107910156,
+            78.0
+          ],
+          "raw_code": 32,
+          "rotation": 0.0,
+          "source_indices": [
+            80
+          ],
+          "text_object_id": 6,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            66.0199966430664,
+            67.1400146484375,
+            72.69200134277344,
+            80.53201293945312
+          ],
+          "char": "3",
+          "char_idx": 81,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            66.0199966430664,
+            78.0
+          ],
+          "raw_code": 51,
+          "rotation": 0.0,
+          "source_indices": [
+            81
+          ],
+          "text_object_id": 6,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            72.6919937133789,
+            78.0,
+            72.6919937133789,
+            78.0
+          ],
+          "char": " ",
+          "char_idx": 82,
+          "font": {
+            "flags": 0,
+            "name": "",
+            "size": 1.0,
+            "weight": -1
+          },
+          "is_generated": true,
+          "origin": [
+            72.6919937133789,
+            78.0
+          ],
+          "raw_code": 32,
+          "rotation": 0.0,
+          "source_indices": [
+            82
+          ],
+          "text_object_id": null,
+          "text_render_mode": null,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            220.0,
+            67.1400146484375,
+            228.66400146484375,
+            80.53201293945312
+          ],
+          "char": "R",
+          "char_idx": 83,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            220.0,
+            78.0
+          ],
+          "raw_code": 82,
+          "rotation": 0.0,
+          "source_indices": [
+            83
+          ],
+          "text_object_id": 7,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            228.66400146484375,
+            67.1400146484375,
+            231.3280029296875,
+            80.53201293945312
+          ],
+          "char": "i",
+          "char_idx": 84,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            228.66400146484375,
+            78.0
+          ],
+          "raw_code": 105,
+          "rotation": 0.0,
+          "source_indices": [
+            84
+          ],
+          "text_object_id": 7,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            231.3280029296875,
+            67.1400146484375,
+            238.0,
+            80.53201293945312
+          ],
+          "char": "g",
+          "char_idx": 85,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            231.3280029296875,
+            78.0
+          ],
+          "raw_code": 103,
+          "rotation": 0.0,
+          "source_indices": [
+            85
+          ],
+          "text_object_id": 7,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            238.0,
+            67.1400146484375,
+            244.6719970703125,
+            80.53201293945312
+          ],
+          "char": "h",
+          "char_idx": 86,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            238.0,
+            78.0
+          ],
+          "raw_code": 104,
+          "rotation": 0.0,
+          "source_indices": [
+            86
+          ],
+          "text_object_id": 7,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            244.6719970703125,
+            67.1400146484375,
+            248.00799560546875,
+            80.53201293945312
+          ],
+          "char": "t",
+          "char_idx": 87,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            244.6719970703125,
+            78.0
+          ],
+          "raw_code": 116,
+          "rotation": 0.0,
+          "source_indices": [
+            87
+          ],
+          "text_object_id": 7,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            248.00799560546875,
+            67.1400146484375,
+            251.343994140625,
+            80.53201293945312
+          ],
+          "char": " ",
+          "char_idx": 88,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            248.00799560546875,
+            78.0
+          ],
+          "raw_code": 32,
+          "rotation": 0.0,
+          "source_indices": [
+            88
+          ],
+          "text_object_id": 7,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            251.343994140625,
+            67.1400146484375,
+            255.50799560546875,
+            80.53201293945312
+          ],
+          "char": "r",
+          "char_idx": 89,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            251.343994140625,
+            78.0
+          ],
+          "raw_code": 114,
+          "rotation": 0.0,
+          "source_indices": [
+            89
+          ],
+          "text_object_id": 7,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            255.33999633789062,
+            67.1400146484375,
+            262.0119934082031,
+            80.53201293945312
+          ],
+          "char": "o",
+          "char_idx": 90,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            255.33999633789062,
+            78.0
+          ],
+          "raw_code": 111,
+          "rotation": 0.0,
+          "source_indices": [
+            90
+          ],
+          "text_object_id": 7,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            262.0119934082031,
+            67.1400146484375,
+            270.6759948730469,
+            80.53201293945312
+          ],
+          "char": "w",
+          "char_idx": 91,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            262.0119934082031,
+            78.0
+          ],
+          "raw_code": 119,
+          "rotation": 0.0,
+          "source_indices": [
+            91
+          ],
+          "text_object_id": 7,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            270.6759948730469,
+            67.1400146484375,
+            274.0119934082031,
+            80.53201293945312
+          ],
+          "char": " ",
+          "char_idx": 92,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            270.6759948730469,
+            78.0
+          ],
+          "raw_code": 32,
+          "rotation": 0.0,
+          "source_indices": [
+            92
+          ],
+          "text_object_id": 7,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            274.0119934082031,
+            67.1400146484375,
+            280.6839904785156,
+            80.53201293945312
+          ],
+          "char": "3",
+          "char_idx": 93,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            274.0119934082031,
+            78.0
+          ],
+          "raw_code": 51,
+          "rotation": 0.0,
+          "source_indices": [
+            93
+          ],
+          "text_object_id": 7,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            280.6839904785156,
+            78.0,
+            280.6839904785156,
+            78.0
+          ],
+          "char": "\r",
+          "char_idx": 94,
+          "font": {
+            "flags": 0,
+            "name": "",
+            "size": 1.0,
+            "weight": -1
+          },
+          "is_generated": true,
+          "origin": [
+            280.6839904785156,
+            78.0
+          ],
+          "raw_code": 13,
+          "rotation": 0.0,
+          "source_indices": [
+            94
+          ],
+          "text_object_id": null,
+          "text_render_mode": null,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            280.6839904785156,
+            78.0,
+            280.6839904785156,
+            78.0
+          ],
+          "char": "\n",
+          "char_idx": 95,
+          "font": {
+            "flags": 0,
+            "name": "",
+            "size": 1.0,
+            "weight": -1
+          },
+          "is_generated": true,
+          "origin": [
+            280.6839904785156,
+            78.0
+          ],
+          "raw_code": 10,
+          "rotation": 0.0,
+          "source_indices": [
+            95
+          ],
+          "text_object_id": null,
+          "text_render_mode": null,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            20.0,
+            83.1400146484375,
+            26.672000885009766,
+            96.53201293945312
+          ],
+          "char": "L",
+          "char_idx": 96,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            20.0,
+            94.0
+          ],
+          "raw_code": 76,
+          "rotation": 0.0,
+          "source_indices": [
+            96
+          ],
+          "text_object_id": 8,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            26.672000885009766,
+            83.1400146484375,
+            33.34400177001953,
+            96.53201293945312
+          ],
+          "char": "e",
+          "char_idx": 97,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            26.672000885009766,
+            94.0
+          ],
+          "raw_code": 101,
+          "rotation": 0.0,
+          "source_indices": [
+            97
+          ],
+          "text_object_id": 8,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            33.34400177001953,
+            83.1400146484375,
+            37.099998474121094,
+            96.53201293945312
+          ],
+          "char": "f",
+          "char_idx": 98,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            33.34400177001953,
+            94.0
+          ],
+          "raw_code": 102,
+          "rotation": 0.0,
+          "source_indices": [
+            98
+          ],
+          "text_object_id": 8,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            36.68000030517578,
+            83.1400146484375,
+            40.01599884033203,
+            96.53201293945312
+          ],
+          "char": "t",
+          "char_idx": 99,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            36.68000030517578,
+            94.0
+          ],
+          "raw_code": 116,
+          "rotation": 0.0,
+          "source_indices": [
+            99
+          ],
+          "text_object_id": 8,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            40.01599884033203,
+            83.1400146484375,
+            43.35200119018555,
+            96.53201293945312
+          ],
+          "char": " ",
+          "char_idx": 100,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            40.01599884033203,
+            94.0
+          ],
+          "raw_code": 32,
+          "rotation": 0.0,
+          "source_indices": [
+            100
+          ],
+          "text_object_id": 8,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            43.35200119018555,
+            83.1400146484375,
+            47.51599884033203,
+            96.53201293945312
+          ],
+          "char": "r",
+          "char_idx": 101,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            43.35200119018555,
+            94.0
+          ],
+          "raw_code": 114,
+          "rotation": 0.0,
+          "source_indices": [
+            101
+          ],
+          "text_object_id": 8,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            47.347999572753906,
+            83.1400146484375,
+            54.02000045776367,
+            96.53201293945312
+          ],
+          "char": "o",
+          "char_idx": 102,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            47.347999572753906,
+            94.0
+          ],
+          "raw_code": 111,
+          "rotation": 0.0,
+          "source_indices": [
+            102
+          ],
+          "text_object_id": 8,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            54.02000045776367,
+            83.1400146484375,
+            62.68400192260742,
+            96.53201293945312
+          ],
+          "char": "w",
+          "char_idx": 103,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            54.02000045776367,
+            94.0
+          ],
+          "raw_code": 119,
+          "rotation": 0.0,
+          "source_indices": [
+            103
+          ],
+          "text_object_id": 8,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            62.683998107910156,
+            83.1400146484375,
+            66.0199966430664,
+            96.53201293945312
+          ],
+          "char": " ",
+          "char_idx": 104,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            62.683998107910156,
+            94.0
+          ],
+          "raw_code": 32,
+          "rotation": 0.0,
+          "source_indices": [
+            104
+          ],
+          "text_object_id": 8,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            66.0199966430664,
+            83.1400146484375,
+            72.69200134277344,
+            96.53201293945312
+          ],
+          "char": "4",
+          "char_idx": 105,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            66.0199966430664,
+            94.0
+          ],
+          "raw_code": 52,
+          "rotation": 0.0,
+          "source_indices": [
+            105
+          ],
+          "text_object_id": 8,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            72.6919937133789,
+            94.0,
+            72.6919937133789,
+            94.0
+          ],
+          "char": " ",
+          "char_idx": 106,
+          "font": {
+            "flags": 0,
+            "name": "",
+            "size": 1.0,
+            "weight": -1
+          },
+          "is_generated": true,
+          "origin": [
+            72.6919937133789,
+            94.0
+          ],
+          "raw_code": 32,
+          "rotation": 0.0,
+          "source_indices": [
+            106
+          ],
+          "text_object_id": null,
+          "text_render_mode": null,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            220.0,
+            83.1400146484375,
+            228.66400146484375,
+            96.53201293945312
+          ],
+          "char": "R",
+          "char_idx": 107,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            220.0,
+            94.0
+          ],
+          "raw_code": 82,
+          "rotation": 0.0,
+          "source_indices": [
+            107
+          ],
+          "text_object_id": 9,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            228.66400146484375,
+            83.1400146484375,
+            231.3280029296875,
+            96.53201293945312
+          ],
+          "char": "i",
+          "char_idx": 108,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            228.66400146484375,
+            94.0
+          ],
+          "raw_code": 105,
+          "rotation": 0.0,
+          "source_indices": [
+            108
+          ],
+          "text_object_id": 9,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            231.3280029296875,
+            83.1400146484375,
+            238.0,
+            96.53201293945312
+          ],
+          "char": "g",
+          "char_idx": 109,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            231.3280029296875,
+            94.0
+          ],
+          "raw_code": 103,
+          "rotation": 0.0,
+          "source_indices": [
+            109
+          ],
+          "text_object_id": 9,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            238.0,
+            83.1400146484375,
+            244.6719970703125,
+            96.53201293945312
+          ],
+          "char": "h",
+          "char_idx": 110,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            238.0,
+            94.0
+          ],
+          "raw_code": 104,
+          "rotation": 0.0,
+          "source_indices": [
+            110
+          ],
+          "text_object_id": 9,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            244.6719970703125,
+            83.1400146484375,
+            248.00799560546875,
+            96.53201293945312
+          ],
+          "char": "t",
+          "char_idx": 111,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            244.6719970703125,
+            94.0
+          ],
+          "raw_code": 116,
+          "rotation": 0.0,
+          "source_indices": [
+            111
+          ],
+          "text_object_id": 9,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            248.00799560546875,
+            83.1400146484375,
+            251.343994140625,
+            96.53201293945312
+          ],
+          "char": " ",
+          "char_idx": 112,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            248.00799560546875,
+            94.0
+          ],
+          "raw_code": 32,
+          "rotation": 0.0,
+          "source_indices": [
+            112
+          ],
+          "text_object_id": 9,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            251.343994140625,
+            83.1400146484375,
+            255.50799560546875,
+            96.53201293945312
+          ],
+          "char": "r",
+          "char_idx": 113,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            251.343994140625,
+            94.0
+          ],
+          "raw_code": 114,
+          "rotation": 0.0,
+          "source_indices": [
+            113
+          ],
+          "text_object_id": 9,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            255.33999633789062,
+            83.1400146484375,
+            262.0119934082031,
+            96.53201293945312
+          ],
+          "char": "o",
+          "char_idx": 114,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            255.33999633789062,
+            94.0
+          ],
+          "raw_code": 111,
+          "rotation": 0.0,
+          "source_indices": [
+            114
+          ],
+          "text_object_id": 9,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            262.0119934082031,
+            83.1400146484375,
+            270.6759948730469,
+            96.53201293945312
+          ],
+          "char": "w",
+          "char_idx": 115,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            262.0119934082031,
+            94.0
+          ],
+          "raw_code": 119,
+          "rotation": 0.0,
+          "source_indices": [
+            115
+          ],
+          "text_object_id": 9,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            270.6759948730469,
+            83.1400146484375,
+            274.0119934082031,
+            96.53201293945312
+          ],
+          "char": " ",
+          "char_idx": 116,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            270.6759948730469,
+            94.0
+          ],
+          "raw_code": 32,
+          "rotation": 0.0,
+          "source_indices": [
+            116
+          ],
+          "text_object_id": 9,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            274.0119934082031,
+            83.1400146484375,
+            280.6839904785156,
+            96.53201293945312
+          ],
+          "char": "4",
+          "char_idx": 117,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            274.0119934082031,
+            94.0
+          ],
+          "raw_code": 52,
+          "rotation": 0.0,
+          "source_indices": [
+            117
+          ],
+          "text_object_id": 9,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            280.6839904785156,
+            94.0,
+            280.6839904785156,
+            94.0
+          ],
+          "char": "\r",
+          "char_idx": 118,
+          "font": {
+            "flags": 0,
+            "name": "",
+            "size": 1.0,
+            "weight": -1
+          },
+          "is_generated": true,
+          "origin": [
+            280.6839904785156,
+            94.0
+          ],
+          "raw_code": 13,
+          "rotation": 0.0,
+          "source_indices": [
+            118
+          ],
+          "text_object_id": null,
+          "text_render_mode": null,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            280.6839904785156,
+            94.0,
+            280.6839904785156,
+            94.0
+          ],
+          "char": "\n",
+          "char_idx": 119,
+          "font": {
+            "flags": 0,
+            "name": "",
+            "size": 1.0,
+            "weight": -1
+          },
+          "is_generated": true,
+          "origin": [
+            280.6839904785156,
+            94.0
+          ],
+          "raw_code": 10,
+          "rotation": 0.0,
+          "source_indices": [
+            119
+          ],
+          "text_object_id": null,
+          "text_render_mode": null,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            25.0,
+            209.13999938964844,
+            31.672000885009766,
+            222.53199768066406
+          ],
+          "char": "0",
+          "char_idx": 120,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            25.0,
+            220.0
+          ],
+          "raw_code": 48,
+          "rotation": 0.0,
+          "source_indices": [
+            120
+          ],
+          "text_object_id": 10,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            31.672000885009766,
+            209.13999938964844,
+            35.00800323486328,
+            222.53199768066406
+          ],
+          "char": ":",
+          "char_idx": 121,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            31.672000885009766,
+            220.0
+          ],
+          "raw_code": 58,
+          "rotation": 0.0,
+          "source_indices": [
+            121
+          ],
+          "text_object_id": 10,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            35.007999420166016,
+            209.13999938964844,
+            41.68000030517578,
+            222.53199768066406
+          ],
+          "char": "0",
+          "char_idx": 122,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            35.007999420166016,
+            220.0
+          ],
+          "raw_code": 48,
+          "rotation": 0.0,
+          "source_indices": [
+            122
+          ],
+          "text_object_id": 10,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            41.68000030517578,
+            220.0,
+            41.68000030517578,
+            220.0
+          ],
+          "char": " ",
+          "char_idx": 123,
+          "font": {
+            "flags": 0,
+            "name": "",
+            "size": 1.0,
+            "weight": -1
+          },
+          "is_generated": true,
+          "origin": [
+            41.68000030517578,
+            220.0
+          ],
+          "raw_code": 32,
+          "rotation": 0.0,
+          "source_indices": [
+            123
+          ],
+          "text_object_id": null,
+          "text_render_mode": null,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            105.0,
+            209.13999938964844,
+            111.6719970703125,
+            222.53199768066406
+          ],
+          "char": "0",
+          "char_idx": 124,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            105.0,
+            220.0
+          ],
+          "raw_code": 48,
+          "rotation": 0.0,
+          "source_indices": [
+            124
+          ],
+          "text_object_id": 11,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            111.6719970703125,
+            209.13999938964844,
+            115.00799560546875,
+            222.53199768066406
+          ],
+          "char": ":",
+          "char_idx": 125,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            111.6719970703125,
+            220.0
+          ],
+          "raw_code": 58,
+          "rotation": 0.0,
+          "source_indices": [
+            125
+          ],
+          "text_object_id": 11,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            115.00799560546875,
+            209.13999938964844,
+            121.67999267578125,
+            222.53199768066406
+          ],
+          "char": "1",
+          "char_idx": 126,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            115.00799560546875,
+            220.0
+          ],
+          "raw_code": 49,
+          "rotation": 0.0,
+          "source_indices": [
+            126
+          ],
+          "text_object_id": 11,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            121.67999267578125,
+            220.0,
+            121.67999267578125,
+            220.0
+          ],
+          "char": "\r",
+          "char_idx": 127,
+          "font": {
+            "flags": 0,
+            "name": "",
+            "size": 1.0,
+            "weight": -1
+          },
+          "is_generated": true,
+          "origin": [
+            121.67999267578125,
+            220.0
+          ],
+          "raw_code": 13,
+          "rotation": 0.0,
+          "source_indices": [
+            127
+          ],
+          "text_object_id": null,
+          "text_render_mode": null,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            121.67999267578125,
+            220.0,
+            121.67999267578125,
+            220.0
+          ],
+          "char": "\n",
+          "char_idx": 128,
+          "font": {
+            "flags": 0,
+            "name": "",
+            "size": 1.0,
+            "weight": -1
+          },
+          "is_generated": true,
+          "origin": [
+            121.67999267578125,
+            220.0
+          ],
+          "raw_code": 10,
+          "rotation": 0.0,
+          "source_indices": [
+            128
+          ],
+          "text_object_id": null,
+          "text_render_mode": null,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            25.0,
+            249.13999938964844,
+            31.672000885009766,
+            262.53199768066406
+          ],
+          "char": "1",
+          "char_idx": 129,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            25.0,
+            260.0
+          ],
+          "raw_code": 49,
+          "rotation": 0.0,
+          "source_indices": [
+            129
+          ],
+          "text_object_id": 12,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            31.672000885009766,
+            249.13999938964844,
+            35.00800323486328,
+            262.53199768066406
+          ],
+          "char": ":",
+          "char_idx": 130,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            31.672000885009766,
+            260.0
+          ],
+          "raw_code": 58,
+          "rotation": 0.0,
+          "source_indices": [
+            130
+          ],
+          "text_object_id": 12,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            35.007999420166016,
+            249.13999938964844,
+            41.68000030517578,
+            262.53199768066406
+          ],
+          "char": "0",
+          "char_idx": 131,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            35.007999420166016,
+            260.0
+          ],
+          "raw_code": 48,
+          "rotation": 0.0,
+          "source_indices": [
+            131
+          ],
+          "text_object_id": 12,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            41.68000030517578,
+            260.0,
+            41.68000030517578,
+            260.0
+          ],
+          "char": " ",
+          "char_idx": 132,
+          "font": {
+            "flags": 0,
+            "name": "",
+            "size": 1.0,
+            "weight": -1
+          },
+          "is_generated": true,
+          "origin": [
+            41.68000030517578,
+            260.0
+          ],
+          "raw_code": 32,
+          "rotation": 0.0,
+          "source_indices": [
+            132
+          ],
+          "text_object_id": null,
+          "text_render_mode": null,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            105.0,
+            249.13999938964844,
+            111.6719970703125,
+            262.53199768066406
+          ],
+          "char": "1",
+          "char_idx": 133,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            105.0,
+            260.0
+          ],
+          "raw_code": 49,
+          "rotation": 0.0,
+          "source_indices": [
+            133
+          ],
+          "text_object_id": 13,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            111.6719970703125,
+            249.13999938964844,
+            115.00799560546875,
+            262.53199768066406
+          ],
+          "char": ":",
+          "char_idx": 134,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            111.6719970703125,
+            260.0
+          ],
+          "raw_code": 58,
+          "rotation": 0.0,
+          "source_indices": [
+            134
+          ],
+          "text_object_id": 13,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            115.00799560546875,
+            249.13999938964844,
+            121.67999267578125,
+            262.53199768066406
+          ],
+          "char": "1",
+          "char_idx": 135,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            115.00799560546875,
+            260.0
+          ],
+          "raw_code": 49,
+          "rotation": 0.0,
+          "source_indices": [
+            135
+          ],
+          "text_object_id": 13,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            121.67999267578125,
+            260.0,
+            121.67999267578125,
+            260.0
+          ],
+          "char": "\r",
+          "char_idx": 136,
+          "font": {
+            "flags": 0,
+            "name": "",
+            "size": 1.0,
+            "weight": -1
+          },
+          "is_generated": true,
+          "origin": [
+            121.67999267578125,
+            260.0
+          ],
+          "raw_code": 13,
+          "rotation": 0.0,
+          "source_indices": [
+            136
+          ],
+          "text_object_id": null,
+          "text_render_mode": null,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            121.67999267578125,
+            260.0,
+            121.67999267578125,
+            260.0
+          ],
+          "char": "\n",
+          "char_idx": 137,
+          "font": {
+            "flags": 0,
+            "name": "",
+            "size": 1.0,
+            "weight": -1
+          },
+          "is_generated": true,
+          "origin": [
+            121.67999267578125,
+            260.0
+          ],
+          "raw_code": 10,
+          "rotation": 0.0,
+          "source_indices": [
+            137
+          ],
+          "text_object_id": null,
+          "text_render_mode": null,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            25.0,
+            289.13999938964844,
+            31.672000885009766,
+            302.53199768066406
+          ],
+          "char": "2",
+          "char_idx": 138,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            25.0,
+            300.0
+          ],
+          "raw_code": 50,
+          "rotation": 0.0,
+          "source_indices": [
+            138
+          ],
+          "text_object_id": 14,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            31.672000885009766,
+            289.13999938964844,
+            35.00800323486328,
+            302.53199768066406
+          ],
+          "char": ":",
+          "char_idx": 139,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            31.672000885009766,
+            300.0
+          ],
+          "raw_code": 58,
+          "rotation": 0.0,
+          "source_indices": [
+            139
+          ],
+          "text_object_id": 14,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            35.007999420166016,
+            289.13999938964844,
+            41.68000030517578,
+            302.53199768066406
+          ],
+          "char": "0",
+          "char_idx": 140,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            35.007999420166016,
+            300.0
+          ],
+          "raw_code": 48,
+          "rotation": 0.0,
+          "source_indices": [
+            140
+          ],
+          "text_object_id": 14,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            41.68000030517578,
+            300.0,
+            41.68000030517578,
+            300.0
+          ],
+          "char": " ",
+          "char_idx": 141,
+          "font": {
+            "flags": 0,
+            "name": "",
+            "size": 1.0,
+            "weight": -1
+          },
+          "is_generated": true,
+          "origin": [
+            41.68000030517578,
+            300.0
+          ],
+          "raw_code": 32,
+          "rotation": 0.0,
+          "source_indices": [
+            141
+          ],
+          "text_object_id": null,
+          "text_render_mode": null,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            105.0,
+            289.13999938964844,
+            111.6719970703125,
+            302.53199768066406
+          ],
+          "char": "2",
+          "char_idx": 142,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            105.0,
+            300.0
+          ],
+          "raw_code": 50,
+          "rotation": 0.0,
+          "source_indices": [
+            142
+          ],
+          "text_object_id": 15,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            111.6719970703125,
+            289.13999938964844,
+            115.00799560546875,
+            302.53199768066406
+          ],
+          "char": ":",
+          "char_idx": 143,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            111.6719970703125,
+            300.0
+          ],
+          "raw_code": 58,
+          "rotation": 0.0,
+          "source_indices": [
+            143
+          ],
+          "text_object_id": 15,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            115.00799560546875,
+            289.13999938964844,
+            121.67999267578125,
+            302.53199768066406
+          ],
+          "char": "1",
+          "char_idx": 144,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            115.00799560546875,
+            300.0
+          ],
+          "raw_code": 49,
+          "rotation": 0.0,
+          "source_indices": [
+            144
+          ],
+          "text_object_id": 15,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            121.67999267578125,
+            300.0,
+            121.67999267578125,
+            300.0
+          ],
+          "char": "\r",
+          "char_idx": 145,
+          "font": {
+            "flags": 0,
+            "name": "",
+            "size": 1.0,
+            "weight": -1
+          },
+          "is_generated": true,
+          "origin": [
+            121.67999267578125,
+            300.0
+          ],
+          "raw_code": 13,
+          "rotation": 0.0,
+          "source_indices": [
+            145
+          ],
+          "text_object_id": null,
+          "text_render_mode": null,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            121.67999267578125,
+            300.0,
+            121.67999267578125,
+            300.0
+          ],
+          "char": "\n",
+          "char_idx": 146,
+          "font": {
+            "flags": 0,
+            "name": "",
+            "size": 1.0,
+            "weight": -1
+          },
+          "is_generated": true,
+          "origin": [
+            121.67999267578125,
+            300.0
+          ],
+          "raw_code": 10,
+          "rotation": 0.0,
+          "source_indices": [
+            146
+          ],
+          "text_object_id": null,
+          "text_render_mode": null,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            341.4079895019531,
+            311.4919967651367,
+            350.0,
+            319.052001953125
+          ],
+          "char": "R",
+          "char_idx": 147,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            350.0,
+            320.0
+          ],
+          "raw_code": 82,
+          "rotation": 4.71238899230957,
+          "source_indices": [
+            147
+          ],
+          "text_object_id": 16,
+          "text_render_mode": 0,
+          "writing_angle": -1.5707963267948966
+        },
+        {
+          "bbox": [
+            343.6400146484375,
+            305.1080017089844,
+            350.1319885253906,
+            310.94000244140625
+          ],
+          "char": "o",
+          "char_idx": 148,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            350.0,
+            311.33599853515625
+          ],
+          "raw_code": 111,
+          "rotation": 4.71238899230957,
+          "source_indices": [
+            148
+          ],
+          "text_object_id": 16,
+          "text_render_mode": 0,
+          "writing_angle": -1.5707963267948966
+        },
+        {
+          "bbox": [
+            341.6000061035156,
+            301.41200256347656,
+            350.0719909667969,
+            304.447998046875
+          ],
+          "char": "t",
+          "char_idx": 149,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            350.0,
+            304.66400146484375
+          ],
+          "raw_code": 116,
+          "rotation": 4.71238899230957,
+          "source_indices": [
+            149
+          ],
+          "text_object_id": 16,
+          "text_render_mode": 0,
+          "writing_angle": -1.5707963267948966
+        },
+        {
+          "bbox": [
+            343.6400146484375,
+            295.1600036621094,
+            350.1319885253906,
+            300.89600372314453
+          ],
+          "char": "a",
+          "char_idx": 150,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            350.0,
+            301.3280029296875
+          ],
+          "raw_code": 97,
+          "rotation": 4.71238899230957,
+          "source_indices": [
+            150
+          ],
+          "text_object_id": 16,
+          "text_render_mode": 0,
+          "writing_angle": -1.5707963267948966
+        },
+        {
+          "bbox": [
+            341.6000061035156,
+            291.4039993286133,
+            350.0719909667969,
+            294.44000244140625
+          ],
+          "char": "t",
+          "char_idx": 151,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            350.0,
+            294.656005859375
+          ],
+          "raw_code": 116,
+          "rotation": 4.71238899230957,
+          "source_indices": [
+            151
+          ],
+          "text_object_id": 16,
+          "text_render_mode": 0,
+          "writing_angle": -1.5707963267948966
+        },
+        {
+          "bbox": [
+            343.6400146484375,
+            285.13999938964844,
+            350.1319885253906,
+            290.8759994506836
+          ],
+          "char": "e",
+          "char_idx": 152,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            350.0,
+            291.3199996948242
+          ],
+          "raw_code": 101,
+          "rotation": 4.71238899230957,
+          "source_indices": [
+            152
+          ],
+          "text_object_id": 16,
+          "text_render_mode": 0,
+          "writing_angle": -1.5707963267948966
+        },
+        {
+          "bbox": [
+            341.4079895019531,
+            278.84000396728516,
+            350.1319885253906,
+            284.24000549316406
+          ],
+          "char": "d",
+          "char_idx": 153,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            350.0,
+            284.6480026245117
+          ],
+          "raw_code": 100,
+          "rotation": 4.71238899230957,
+          "source_indices": [
+            153
+          ],
+          "text_object_id": 16,
+          "text_render_mode": 0,
+          "writing_angle": -1.5707963267948966
+        },
+        {
+          "bbox": [
+            349.9880065917969,
+            274.63999938964844,
+            350.0,
+            277.9759979248047
+          ],
+          "char": " ",
+          "char_idx": 154,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            350.0,
+            277.9759979248047
+          ],
+          "raw_code": 32,
+          "rotation": 4.71238899230957,
+          "source_indices": [
+            154
+          ],
+          "text_object_id": 16,
+          "text_render_mode": 0,
+          "writing_angle": -1.5707963267948966
+        },
+        {
+          "bbox": [
+            341.6000061035156,
+            271.38800048828125,
+            350.0719909667969,
+            274.4240036010742
+          ],
+          "char": "t",
+          "char_idx": 155,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            350.0,
+            274.63999938964844
+          ],
+          "raw_code": 116,
+          "rotation": 4.71238899230957,
+          "source_indices": [
+            155
+          ],
+          "text_object_id": 16,
+          "text_render_mode": 0,
+          "writing_angle": -1.5707963267948966
+        },
+        {
+          "bbox": [
+            343.6400146484375,
+            265.12400817871094,
+            350.1319885253906,
+            270.86000061035156
+          ],
+          "char": "e",
+          "char_idx": 156,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            350.0,
+            271.3040008544922
+          ],
+          "raw_code": 101,
+          "rotation": 4.71238899230957,
+          "source_indices": [
+            156
+          ],
+          "text_object_id": 16,
+          "text_render_mode": 0,
+          "writing_angle": -1.5707963267948966
+        },
+        {
+          "bbox": [
+            343.7720031738281,
+            258.71600341796875,
+            350.0,
+            264.5480041503906
+          ],
+          "char": "x",
+          "char_idx": 157,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            350.0,
+            264.6320037841797
+          ],
+          "raw_code": 120,
+          "rotation": 4.71238899230957,
+          "source_indices": [
+            157
+          ],
+          "text_object_id": 16,
+          "text_render_mode": 0,
+          "writing_angle": -1.5707963267948966
+        },
+        {
+          "bbox": [
+            341.6000061035156,
+            255.3800048828125,
+            350.0719909667969,
+            258.41600036621094
+          ],
+          "char": "t",
+          "char_idx": 158,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            350.0,
+            258.6320037841797
+          ],
+          "raw_code": 116,
+          "rotation": 4.71238899230957,
+          "source_indices": [
+            158
+          ],
+          "text_object_id": 16,
+          "text_render_mode": 0,
+          "writing_angle": -1.5707963267948966
+        }
+      ],
+      "drawing_lines": [
+        {
+          "bbox": [
+            20.0,
+            199.5,
+            180.0,
+            200.5
+          ],
+          "end": [
+            180.0,
+            200.0
+          ],
+          "orientation": "horizontal",
+          "start": [
+            20.0,
+            200.0
+          ],
+          "width": 1.0
+        },
+        {
+          "bbox": [
+            19.5,
+            200.0,
+            20.5,
+            320.0
+          ],
+          "end": [
+            20.0,
+            320.0
+          ],
+          "orientation": "vertical",
+          "start": [
+            20.0,
+            200.0
+          ],
+          "width": 1.0
+        },
+        {
+          "bbox": [
+            99.5,
+            200.0,
+            100.5,
+            320.0
+          ],
+          "end": [
+            100.0,
+            320.0
+          ],
+          "orientation": "vertical",
+          "start": [
+            100.0,
+            200.0
+          ],
+          "width": 1.0
+        },
+        {
+          "bbox": [
+            179.5,
+            200.0,
+            180.5,
+            320.0
+          ],
+          "end": [
+            180.0,
+            320.0
+          ],
+          "orientation": "vertical",
+          "start": [
+            180.0,
+            200.0
+          ],
+          "width": 1.0
+        },
+        {
+          "bbox": [
+            20.0,
+            239.5,
+            180.0,
+            240.5
+          ],
+          "end": [
+            180.0,
+            240.0
+          ],
+          "orientation": "horizontal",
+          "start": [
+            20.0,
+            240.0
+          ],
+          "width": 1.0
+        },
+        {
+          "bbox": [
+            20.0,
+            279.5,
+            180.0,
+            280.5
+          ],
+          "end": [
+            180.0,
+            280.0
+          ],
+          "orientation": "horizontal",
+          "start": [
+            20.0,
+            280.0
+          ],
+          "width": 1.0
+        },
+        {
+          "bbox": [
+            20.0,
+            319.5,
+            180.0,
+            320.5
+          ],
+          "end": [
+            180.0,
+            320.0
+          ],
+          "orientation": "horizontal",
+          "start": [
+            20.0,
+            320.0
+          ],
+          "width": 1.0
+        }
+      ],
+      "image_bboxes": [],
+      "links": [
+        {
+          "bboxes": [
+            [
+              20.0,
+              20.0,
+              150.0,
+              50.0
+            ]
+          ],
+          "source_index": 0,
+          "target": "https://example.test/"
+        }
+      ],
+      "page_index": 0,
+      "paths": [
+        {
+          "bbox": [
+            19.5,
+            199.5,
+            20.5,
+            320.5
+          ],
+          "fill_rgba": null,
+          "fill_visible": false,
+          "form_depth": 0,
+          "rectangle_bboxes": [],
+          "segment_count": 2,
+          "source_index": 0,
+          "stroke_visible": true
+        },
+        {
+          "bbox": [
+            99.5,
+            199.5,
+            100.5,
+            320.5
+          ],
+          "fill_rgba": null,
+          "fill_visible": false,
+          "form_depth": 0,
+          "rectangle_bboxes": [],
+          "segment_count": 2,
+          "source_index": 1,
+          "stroke_visible": true
+        },
+        {
+          "bbox": [
+            179.5,
+            199.5,
+            180.5,
+            320.5
+          ],
+          "fill_rgba": null,
+          "fill_visible": false,
+          "form_depth": 0,
+          "rectangle_bboxes": [],
+          "segment_count": 2,
+          "source_index": 2,
+          "stroke_visible": true
+        },
+        {
+          "bbox": [
+            19.5,
+            319.5,
+            180.5,
+            320.5
+          ],
+          "fill_rgba": null,
+          "fill_visible": false,
+          "form_depth": 0,
+          "rectangle_bboxes": [],
+          "segment_count": 2,
+          "source_index": 3,
+          "stroke_visible": true
+        },
+        {
+          "bbox": [
+            19.5,
+            279.5,
+            180.5,
+            280.5
+          ],
+          "fill_rgba": null,
+          "fill_visible": false,
+          "form_depth": 0,
+          "rectangle_bboxes": [],
+          "segment_count": 2,
+          "source_index": 4,
+          "stroke_visible": true
+        },
+        {
+          "bbox": [
+            19.5,
+            239.5,
+            180.5,
+            240.5
+          ],
+          "fill_rgba": null,
+          "fill_visible": false,
+          "form_depth": 0,
+          "rectangle_bboxes": [],
+          "segment_count": 2,
+          "source_index": 5,
+          "stroke_visible": true
+        },
+        {
+          "bbox": [
+            19.5,
+            199.5,
+            180.5,
+            200.5
+          ],
+          "fill_rgba": null,
+          "fill_visible": false,
+          "form_depth": 0,
+          "rectangle_bboxes": [],
+          "segment_count": 2,
+          "source_index": 6,
+          "stroke_visible": true
+        }
+      ]
+    },
+    {
+      "chars": [],
+      "drawing_lines": [],
+      "image_bboxes": [
+        [
+          0.0,
+          0.0,
+          400.0,
+          400.0
+        ]
+      ],
+      "links": [],
+      "page_index": 1,
+      "paths": []
+    },
+    {
+      "chars": [
+        {
+          "bbox": [
+            20.0,
+            29.1400146484375,
+            27.332000732421875,
+            42.532012939453125
+          ],
+          "char": "T",
+          "char_idx": 0,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            20.0,
+            40.0
+          ],
+          "raw_code": 84,
+          "rotation": 0.0,
+          "source_indices": [
+            0
+          ],
+          "text_object_id": 0,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            27.332000732421875,
+            29.1400146484375,
+            34.00400161743164,
+            42.532012939453125
+          ],
+          "char": "e",
+          "char_idx": 1,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            27.332000732421875,
+            40.0
+          ],
+          "raw_code": 101,
+          "rotation": 0.0,
+          "source_indices": [
+            1
+          ],
+          "text_object_id": 0,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            34.003997802734375,
+            29.1400146484375,
+            40.003997802734375,
+            42.532012939453125
+          ],
+          "char": "x",
+          "char_idx": 2,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            34.003997802734375,
+            40.0
+          ],
+          "raw_code": 120,
+          "rotation": 0.0,
+          "source_indices": [
+            2
+          ],
+          "text_object_id": 0,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            40.003997802734375,
+            29.1400146484375,
+            43.339996337890625,
+            42.532012939453125
+          ],
+          "char": "t",
+          "char_idx": 3,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            40.003997802734375,
+            40.0
+          ],
+          "raw_code": 116,
+          "rotation": 0.0,
+          "source_indices": [
+            3
+          ],
+          "text_object_id": 0,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            43.34000015258789,
+            29.1400146484375,
+            46.676002502441406,
+            42.532012939453125
+          ],
+          "char": " ",
+          "char_idx": 4,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            43.34000015258789,
+            40.0
+          ],
+          "raw_code": 32,
+          "rotation": 0.0,
+          "source_indices": [
+            4
+          ],
+          "text_object_id": 0,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            46.676002502441406,
+            29.1400146484375,
+            53.34800338745117,
+            42.532012939453125
+          ],
+          "char": "a",
+          "char_idx": 5,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            46.676002502441406,
+            40.0
+          ],
+          "raw_code": 97,
+          "rotation": 0.0,
+          "source_indices": [
+            5
+          ],
+          "text_object_id": 0,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            53.347999572753906,
+            29.1400146484375,
+            57.104000091552734,
+            42.532012939453125
+          ],
+          "char": "f",
+          "char_idx": 6,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            53.347999572753906,
+            40.0
+          ],
+          "raw_code": 102,
+          "rotation": 0.0,
+          "source_indices": [
+            6
+          ],
+          "text_object_id": 0,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            56.683998107910156,
+            29.1400146484375,
+            60.019996643066406,
+            42.532012939453125
+          ],
+          "char": "t",
+          "char_idx": 7,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            56.683998107910156,
+            40.0
+          ],
+          "raw_code": 116,
+          "rotation": 0.0,
+          "source_indices": [
+            7
+          ],
+          "text_object_id": 0,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            60.019996643066406,
+            29.1400146484375,
+            66.69200134277344,
+            42.532012939453125
+          ],
+          "char": "e",
+          "char_idx": 8,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            60.019996643066406,
+            40.0
+          ],
+          "raw_code": 101,
+          "rotation": 0.0,
+          "source_indices": [
+            8
+          ],
+          "text_object_id": 0,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            66.69200134277344,
+            29.1400146484375,
+            70.85600280761719,
+            42.532012939453125
+          ],
+          "char": "r",
+          "char_idx": 9,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            66.69200134277344,
+            40.0
+          ],
+          "raw_code": 114,
+          "rotation": 0.0,
+          "source_indices": [
+            9
+          ],
+          "text_object_id": 0,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            70.68799591064453,
+            29.1400146484375,
+            74.02399444580078,
+            42.532012939453125
+          ],
+          "char": " ",
+          "char_idx": 10,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            70.68799591064453,
+            40.0
+          ],
+          "raw_code": 32,
+          "rotation": 0.0,
+          "source_indices": [
+            10
+          ],
+          "text_object_id": 0,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            74.02399444580078,
+            29.1400146484375,
+            80.02399444580078,
+            42.532012939453125
+          ],
+          "char": "s",
+          "char_idx": 11,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            74.02399444580078,
+            40.0
+          ],
+          "raw_code": 115,
+          "rotation": 0.0,
+          "source_indices": [
+            11
+          ],
+          "text_object_id": 0,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            80.02399444580078,
+            29.1400146484375,
+            86.02399444580078,
+            42.532012939453125
+          ],
+          "char": "c",
+          "char_idx": 12,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            80.02399444580078,
+            40.0
+          ],
+          "raw_code": 99,
+          "rotation": 0.0,
+          "source_indices": [
+            12
+          ],
+          "text_object_id": 0,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            86.02399444580078,
+            29.1400146484375,
+            92.69599151611328,
+            42.532012939453125
+          ],
+          "char": "a",
+          "char_idx": 13,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            86.02399444580078,
+            40.0
+          ],
+          "raw_code": 97,
+          "rotation": 0.0,
+          "source_indices": [
+            13
+          ],
+          "text_object_id": 0,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            92.69599151611328,
+            29.1400146484375,
+            99.36798858642578,
+            42.532012939453125
+          ],
+          "char": "n",
+          "char_idx": 14,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            92.69599151611328,
+            40.0
+          ],
+          "raw_code": 110,
+          "rotation": 0.0,
+          "source_indices": [
+            14
+          ],
+          "text_object_id": 0,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            99.36798858642578,
+            29.1400146484375,
+            106.03998565673828,
+            42.532012939453125
+          ],
+          "char": "n",
+          "char_idx": 15,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            99.36798858642578,
+            40.0
+          ],
+          "raw_code": 110,
+          "rotation": 0.0,
+          "source_indices": [
+            15
+          ],
+          "text_object_id": 0,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            106.03998565673828,
+            29.1400146484375,
+            112.71198272705078,
+            42.532012939453125
+          ],
+          "char": "e",
+          "char_idx": 16,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            106.03998565673828,
+            40.0
+          ],
+          "raw_code": 101,
+          "rotation": 0.0,
+          "source_indices": [
+            16
+          ],
+          "text_object_id": 0,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            112.71198272705078,
+            29.1400146484375,
+            119.38397979736328,
+            42.532012939453125
+          ],
+          "char": "d",
+          "char_idx": 17,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            112.71198272705078,
+            40.0
+          ],
+          "raw_code": 100,
+          "rotation": 0.0,
+          "source_indices": [
+            17
+          ],
+          "text_object_id": 0,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            119.38397979736328,
+            29.1400146484375,
+            122.71997833251953,
+            42.532012939453125
+          ],
+          "char": " ",
+          "char_idx": 18,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            119.38397979736328,
+            40.0
+          ],
+          "raw_code": 32,
+          "rotation": 0.0,
+          "source_indices": [
+            18
+          ],
+          "text_object_id": 0,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            122.71997833251953,
+            29.1400146484375,
+            129.3919677734375,
+            42.532012939453125
+          ],
+          "char": "p",
+          "char_idx": 19,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            122.71997833251953,
+            40.0
+          ],
+          "raw_code": 112,
+          "rotation": 0.0,
+          "source_indices": [
+            19
+          ],
+          "text_object_id": 0,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            129.3919677734375,
+            29.1400146484375,
+            136.06396484375,
+            42.532012939453125
+          ],
+          "char": "a",
+          "char_idx": 20,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            129.3919677734375,
+            40.0
+          ],
+          "raw_code": 97,
+          "rotation": 0.0,
+          "source_indices": [
+            20
+          ],
+          "text_object_id": 0,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            136.06396484375,
+            29.1400146484375,
+            142.7359619140625,
+            42.532012939453125
+          ],
+          "char": "g",
+          "char_idx": 21,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            136.06396484375,
+            40.0
+          ],
+          "raw_code": 103,
+          "rotation": 0.0,
+          "source_indices": [
+            21
+          ],
+          "text_object_id": 0,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        },
+        {
+          "bbox": [
+            142.7359619140625,
+            29.1400146484375,
+            149.407958984375,
+            42.532012939453125
+          ],
+          "char": "e",
+          "char_idx": 22,
+          "font": {
+            "flags": 32,
+            "name": "Helvetica",
+            "size": 12.0,
+            "weight": 0
+          },
+          "is_generated": false,
+          "origin": [
+            142.7359619140625,
+            40.0
+          ],
+          "raw_code": 101,
+          "rotation": 0.0,
+          "source_indices": [
+            22
+          ],
+          "text_object_id": 0,
+          "text_render_mode": 0,
+          "writing_angle": 0.0
+        }
+      ],
+      "drawing_lines": [],
+      "image_bboxes": [],
+      "links": [],
+      "page_index": 2,
+      "paths": []
+    }
+  ]
+}

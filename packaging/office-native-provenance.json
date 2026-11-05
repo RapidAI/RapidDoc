@@ -1,0 +1,898 @@
+{
+  "status": "docx_xlsx_xls_pptx_public_delivered_local_acceptance_passed",
+  "python_behavior_references": {
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/opc.py": "33c3aba744072e707bd3a05f6a08215e120b25d8068fc3e767ff4f98db2ef310",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/legacy/ole.py": "00b991252f20cc1ff6c3ebc9fe7980c80e47a096468d38d24192c045a72eda18",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xlsx/ooxml_ole.py": "3a3a8ed6756cf3619351bd504a7f7e9194e3c51936783de09c4013a3b591a1f6",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/errors.py": "4bf02fcd2ec2b5e4824fc14e11333dbe7612d462ba3740b09b7728886286ac21",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/limits.py": "5283f267c30dc013de14668504c4604007943e524c85f8580a1eefdb82cd0dd7",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/styles.py": "e49af988f8aa270878746196ac779f3dcc870a1f54dcad830efcccae97aa6f9e",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/numbering.py": "03a8aefea90b8f970ab572c2b80744f6202597cf649142054abee0172d11af67",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/fields.py": "4183dbe7134bc31aace0f8935bea753e244154b6a8eb65481fb76aade0e25a80",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/tables.py": "bd752f68fb783295bf85069dcbf8a7e6b89f86afa19764bfc1f24a37ea2373e8",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/rich_text.py": "0fe3d0466f11568b9996e597fc008fec26c549c235c49834f96d54c57ed9586b",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/equation/omml.py": "87e12011b246a07ed481fadf4adba75990a6d9b291c275f76945054e1d709a87",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/equation/latex_dict.py": "8b843a3d2c07870501f9bc8410f50d14958c148691e8b6e769f105e88c0deeff",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/equationxml.py": "1d143fcf1b3a3dd4d9293f5f215d838cf565dd5b238ea07f134213c63d21ef34",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/resources.py": "963753562febd4812f8bd5e23a4e170200d8b2df31e9ba36a27afe4a07c291f2",
+    "rapid_doc/_vendor/docvortex_core/foundation/_hyperlink.py": "4fcf05961e1dcd618d62b133337c271226ac7775fc1bc56e88f1b343cf1a3c53",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/equation/mtef.py": "ab09dd02606298344d49332a434c6d0f72ec8ee20d895adcd7ca8065ba4ea856",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/equation/mtef_v5.py": "0245db097c6dada3355072b12d39955604494288a917b43ca13452021d7a3be0",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/equation/image.py": "ab05a980e8c04ca938d2844dea6d6be0d122bf9a73d8af691f06ae7991a10bc2",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/equation/ooxml.py": "552996956fbc6c86740f7c6939e248f96fd17939e7a07d9aba1f6cc4efb6b28e",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/image.py": "700a39dc69e041f37b6427422ac206ebf43545c47bd3da10f38a210a7279153c",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/package_normalizer.py": "62a6f93b310f8e230b6330df1b97193ed8ed3658237ba946c8241ae216f08ecc",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/docx_converter.py": "76aa20533730743ece7663b4a63cf42ee99935b9a99994c3da74029f1b54d268",
+    "rapid_doc/_vendor/docvortex_core/content/spans.py": "789dca45329dccdef910e5fb47a02d1854992d99ebaa02564d14cfc4aa524417",
+    "rapid_doc/_vendor/docvortex_core/foundation/_svg_raster.py": "32fea5c10edab2fb74e3af9433cb19c6dc4c9ab353651973f8fd2ec147e7779d",
+    "rapid_doc/_vendor/docvortex_core/foundation/_image_payload.py": "56d199820f62704ed6e59146064312d7e229ea80a8acedc801bfe85062a30628",
+    "rapid_doc/_vendor/docvortex_core/foundation/image_encoding.py": "624cb5775fd3024994f6beb3f27a29dd232e7d177a65bc6d5019a463ef20db08",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/ooxml_chart.py": "62bdd3c1019bbb2ecfa063fd7f19a11309bcd349292b4aed713510ac29217161",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/__init__.py": "f5ba0e3765998f5591a6f776459c5f0bbb0ba93d68319edafe5f0d2bc089d9dd",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/context.py": "9502ff868824a0b58c8d0b718a3e6e830fbfe90f510ff884376e9f320c462192",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/lists.py": "9680b0f6f37798759873036290a0b4766c5f939164ccc7a11d774ab982ecda9d",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/package_normalizer.py": "f6970780a047da53a89c05ef3d144b3802ff29abd64209e3192218011481013b",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/pptx_converter.py": "5f286378c52a3d20952a0a7e8ac18c1a7aec442b8ecba1447dcdee66725742d9",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/resources.py": "2c28663e1e96cd43372b25df17be8cafc6f3a7034712506e61571a6154d24ee5",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/shapes.py": "bd692401ddb9fd09b6b5e984951d4f360d3668b4fec8053d10436f3c872599e4",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/text_styles.py": "a9f68d5d0c51ebcf7095724088de4895ef13219cd04052001bf2b43055629dc3",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/titles.py": "8a84a6fce1dbf1012e772eac3559c32051fb808d17f22180e67bbf45271a631e",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/_shared/xycut.py": "58998dc43ad7958545acaf7471aa1bde5e1e146b8ebdf87e67e1edb239afd3b5",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/ppt/models.py": "bd7b834d6402d947833792ef401b58b4323f12a3ad4f34113a6f03730ca7d420",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/ppt/parser.py": "68b4ce6e347a8fa5f3b933e6f4869301fe9c2fcee39be2c1ff14ef2baa1742a5",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/ppt/ppt_converter.py": "398208c2e7498a419c3a97127429ade31d95c5d8543621ee231d71605ee348de",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/ppt/records.py": "1efb333bb18c46583007450273b1d413bafb43cfb098265d676485c2fae127a2",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/ppt/style_text.py": "900149a725696ba44a436777c79f878cedccb8c2a38dccad5e8bf3d8c349af1a",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/ppt/__init__.py": "3135ca9d33ca625762767ce3ebc093d40aca0ddefe4399e83fb7954d48b667ed"
+  },
+  "notices": [
+    "rust/rapiddoc-office/licenses/DOCVORTEX.txt",
+    "rust/rapiddoc-office/licenses/PYTHON-UNICODE.txt",
+    "rust/rapiddoc-office/licenses/CFB.txt",
+    "rust/rapiddoc-office/licenses/PYTHON-DOCX.txt",
+    "rust/rapiddoc-office/licenses/MAMMOTH.txt",
+    "rust/rapiddoc-office/licenses/PYLATEXENC.txt",
+    "rust/rapiddoc-office/licenses/METAFILE-RENDER.txt",
+    "rust/rapiddoc-office/licenses/PILLOW.txt",
+    "rust/rapiddoc-office/licenses/CLIPPER.txt",
+    "rust/rapiddoc-office/licenses/CLIPPER-SYS.txt",
+    "rust/rapiddoc-office/licenses/FREETYPE.txt",
+    "rust/rapiddoc-office/licenses/FREETYPE-SYS.txt",
+    "rust/rapiddoc-office/licenses/AILERON.txt",
+    "rust/rapiddoc-office/licenses/TURBOJPEG-BINDINGS.txt",
+    "rust/rapiddoc-office/licenses/LIBJPEG-TURBO.txt",
+    "rust/rapiddoc-office/licenses/IJG.txt",
+    "rust/rapiddoc-office/licenses/RESVG-PY.txt",
+    "rust/rapiddoc-office/licenses/OPENPYXL.txt"
+  ],
+  "casefold": {
+    "python": "3.14.5",
+    "unicode": "16.0.0",
+    "source": "CPython str.casefold",
+    "generator": "scripts/migration/generate_office_unicode.py",
+    "sha256": "53e8bd24021fff4b07206c8ac27e8bbf9e801dc4335656e4e97f4169d506981b"
+  },
+  "cfb_uppercase": {
+    "source": "cfb 0.15.0 src/internal/uppercase.txt",
+    "repository": "https://github.com/mdsteele/rust-cfb",
+    "license": "MIT",
+    "local": "rust/rapiddoc-office/src/cfb_uppercase.rs",
+    "sha256": "80cf923668b40ea692322624619b47d778075cef526fa6904f0e347a5afbd9e8",
+    "scope": "Only uppercase exceptions copied; directory compatibility logic is local. No CFB library fork."
+  },
+  "docx_defaults": {
+    "source": "python-docx 1.2.0 docx/templates/default-styles.xml",
+    "repository": "https://github.com/python-openxml/python-docx",
+    "license": "MIT",
+    "sha256": "5a78ed3992ec0a73f885849a62131f47b256e22c43c5172bdde04f23c411c7de"
+  },
+  "mammoth_symbols": {
+    "source": "mammoth 1.12.0 mammoth/docx/dingbats.py",
+    "repository": "https://github.com/mwilliamson/python-mammoth",
+    "license": "BSD-2-Clause",
+    "entries": 1061,
+    "sha256": "b3f8b2757cf0d618bfdd2216601d4a326fb4edbd1573775c11d469e3d2a441a3"
+  },
+  "unicode_decimal": {
+    "source": "Python Unicode 16.0.0 decimal and str.isdigit non-decimal ranges",
+    "generator": "scripts/migration/generate_office_unicode.py",
+    "sha256": "8d0af7c51d6afde5456136b65e99d485ae5ba924c6378c3437c897e3474e9739"
+  },
+  "mammoth_span_reference": {
+    "source": "mammoth 1.12.0 mammoth/docx/body_xml.py calculate_row_spans",
+    "license": "BSD-2-Clause",
+    "scope": "Span calculation and structural reader semantics, not complete Mammoth conversion"
+  },
+  "mammoth_table_content": {
+    "version": "1.12.0",
+    "license": "BSD-2-Clause",
+    "scope": "Selected default table reader/HTML rules, not a complete Mammoth port. Equations, vector rendering, embedded maps, notes and final safe links remain pending.",
+    "sources": {
+      "mammoth/docx/body_xml.py": "5096ea0e60f075535e45e85496e5b5f1e5c5ba68bb91454d85825487b37fb42e",
+      "mammoth/docx/numbering_xml.py": "09a31e52c913da63c173c96046144e4e8eb00bff3f3c66f8f86180f9f6a53322",
+      "mammoth/docx/styles_xml.py": "68d711b870722b2e9df701d48f7a08f05170ab79442258d9365b5d0bd1cd027a",
+      "mammoth/conversion.py": "82997665a7af48493915dc7503da8e5fe3cee9d1fef1ef1ca12743ced11ba168",
+      "mammoth/options.py": "32bbb0db2d6463314cb1c93177d9b4818ec6371a7b7302a8b38f522a5f1bfaf7",
+      "mammoth/html/__init__.py": "008513eb7ebdd1b2c0e79298137abe9977a010d202e76c7cdb7c58e9712acd51",
+      "mammoth/html_paths.py": "fb01f9cc7022e5575d68ee7484a3781e72c10e6561a11e3183b71e1150d8e444",
+      "mammoth/writers/html.py": "7d08d9a0d1c96ae54867025d67b47b9b8acce3cbb7c0004ef7cf616d5d35d591",
+      "mammoth/images.py": "0bea8065e2a897386d7d4c84db16753441a95d7f38bd1e5ac39ddaf073017e7b"
+    }
+  },
+  "omml": {
+    "source": "Local DocVortex omml.py and latex_dict.py; Python adaptation credits https://github.com/xiilei/dwml",
+    "unicode_source": "pylatexenc 2.10 default RULE_DICT plus per-scalar Unicode16 NFC changes; local math overrides precede the encoder",
+    "unicode_license": "MIT, Copyright (c) 2015-2019 Philippe Faist",
+    "runtime_python_required": false,
+    "mapping_entries": 2654,
+    "data_sha256": "57069828b95eab436d1eca9c1a11e28e2a6a23781f984d4a788d61d6455db1ad",
+    "generator": "scripts/migration/generate_office_omml_data.py",
+    "html_boundary_change": "Escape equation text on HTML output; retain original LaTeX. Original raw HTML and isolated corrected references both preserved."
+  },
+  "unicode_link_nfkc": {
+    "source": "Python Unicode16 NFKC netloc delimiter compatibility, matching urllib.parse._checknetloc",
+    "generator": "scripts/migration/generate_office_unicode.py",
+    "sha256": "b50799bd64e3f40c1a466aca4cc55e2e93b503a9eb82903457324a9f04ee160d"
+  },
+  "mtef": {
+    "source": "Local DocVortex mtef.py, mtef_v5.py, image.py and ooxml.py",
+    "license": "MIT, see DOCVORTEX.txt",
+    "runtime_python_required": false,
+    "data_generator": "scripts/migration/generate_office_mtef_data.py",
+    "data_sha256": "f5c66f785e174a38d209fe78b0dd5aac5efc29c581fde4d283a33cd54b5dfd58",
+    "scope": "v3/v5 records and LaTeX semantics, Equation Native/CFB/ObjectPool, OOXML/WMF/GIF candidate extraction, source Python resource budgets, DOCX per-part resource and preview integration. Vector raster rendering is still pending."
+  },
+  "metafile_replay": {
+    "distribution": "metafile-render",
+    "version": "0.3.0",
+    "repository": "https://github.com/myhloli/metafile-render",
+    "license": "MIT, Copyright (c) 2026 Xiaomeng Zhao (myhloli)",
+    "sources": {
+      "binary.py": "e109a0b3453182d6c85e9434afb072dfe1dc5e4b98fa611de2fd29ec92969db1",
+      "headers.py": "295317fd8b2b1a9cd5fb4a45a5c9f893f77f4624d928df4607b3ab7615be99f7",
+      "records.py": "8293f43224041e3da1e93bf4407f847a23b41fc94d5e80547625f27f0c3e783c",
+      "primitives.py": "973f781e374f9e43586f87a53dd5dc8f9464d94a286094c209348979057a2d26",
+      "geometry.py": "5fde34adb675d13ebbc3717a2bd0501c12d0b650c4e8bdbdb4ed1c412d4bf433",
+      "sizing.py": "afef3827cd1efeb3f9a6db37312d3902a43e4f6ca172ebb438d48770301272a9",
+      "limits.py": "49dfbbffa20ece4517f7d92fd5f366cace8584d03c97cb9a3fad999ada6dc41a",
+      "budget.py": "46211806019150049b16cad97a999fa81eeed72fcdf8a492fee7ebc7ca96d179",
+      "context.py": "09bd36b3b8fdfb400564619bae2f3b7ff77e1c98937d047e4cc435f22c994b61",
+      "commands.py": "9aa1c047d984f0ae65276f26377125689f1345bbbdd4fb28e9f6124db0d12684",
+      "gdi/playback.py": "5f254a9984c19057440ff939f9fb982a07a6a719034791c44f1bf65b5a510108",
+      "gdi/state.py": "be20e4e433f477dd074f87b886289538d25292fb0db34423571cef839983e11e",
+      "gdi/wmf.py": "a9872cf21276ad80840c122fa03d70b9fde66ee517744bcd18be4629baa04985",
+      "gdi/emf.py": "ae0e47ebe106259f0624e1d3865505c6337942d94d0cd7943dc138ba6cfc76c4",
+      "gdi/shapes.py": "13958aec9cec9f9e92ebf36a9492e5cc12ab6802791b546d572e9113ebc46e4c",
+      "gdi/scalars.py": "f5eeac2ac986db48258cc749a335863194f8a629ebc9ee0a717e23f6ca4f9a99",
+      "gdi/objects.py": "552f5d6e86fb8b903ed829021997e0d6bd5b56b1c1f00f78c202650f4e89df1f",
+      "emfplus/binary.py": "6b99b9e67a43ff8244a29db94598b4ca49037dc941cdcfaf6b2225852c7f816a",
+      "dib.py": "e39f2e10a1a557b7d6df0ab29d584b424d7d62a57f1d172d00dfbed07ba7da72",
+      "gdi/bitmap.py": "b5239390be932a3844403fef715f579bcf299524b11e5512594aec240e37680f",
+      "backends/bitmap.py": "30f74f83bd8c00f4a456ae5bbe9ba29900c5bcf9eb240baae46f4bacd7f3766c",
+      "backends/composite.py": "58b6bae435d06205f376581d63d5d8b338eec1d16efc2122b1e611d5ef244add",
+      "backends/session.py": "9dd6dc1421ba6836ff6c55e3f4c2fb3cd56b5f602c057120c9a65bd8466bf27e",
+      "backends/mapping.py": "c85d8f36557199a7b460c13af56b9c3f884cca5c425f0b8e01f02c7559e45c90",
+      "backends/raster.py": "481e19caf06b826cc967c5c15c76492e46e5fe9870b9a6a9e4675fb23a7d9f20",
+      "backends/paths.py": "dd89396f50bcb684f743dd542ae6800c8265098c99178739ceee50c27b14cc63",
+      "backends/svg.py": "eb3d8c4b1e1a0226ddba2f50abc80d9f40cf374235718c6ae909757e3725310b",
+      "gdi/text.py": "a2781b0d9a8c011be0373730ca077091f5f23e6bd89dd5f40f93db16dfc944e8",
+      "fonts/index.py": "d7a88581e6ba583fdbf4677e72f795cdb84b5845b17b99345aa7d1c3e15776f0",
+      "fonts/resolve.py": "202fb838e90372c65b8269176b78b80358a9f2a3589d92cd4cc4774c8f1bc855",
+      "font.py": "c70e5edf902fe23627517a569888e832dde0e866376e8155b01890d21055843e",
+      "backends/text.py": "045f78a198891961952ea26a60fb59e858cd5334ed093e988b50c73a46daf309",
+      "emfplus/objects.py": "259311b3f0739a1c6b8a2afa72ec51450682718859be575bbf8b3bc82a0ac51d",
+      "emfplus/table.py": "b64fe5ce76575340d85a21ae662e3b2b43f65bf35a9da0490256827663d65ec8",
+      "emfplus/playback.py": "beb90c816d962dd5600a14960ab78caf9988ae4ce87cc385cf92cae2f157151f",
+      "emfplus/record_types.py": "625460894915afbc936bbf51a0ddb93287b9198018d56679fcda16d7b0d2b7ec",
+      "gdi/bridge.py": "bd3f7f6052499f93b071d91034b9b5362f4fea76803d14bf231e979fa235be4e",
+      "parser.py": "17155b033c8bfc40efd368508fdb44054b864fa6eb7a7e2c6ead5938b9807b54"
+    },
+    "scope": "GDI and EMF+ Only replay, shared typed path/bitmap/text commands, PNG/SVG and DOCX table image resources; original unsupported operations remain diagnostic/partial. Public Office conversion pending; original Office-level damaged-vector placeholders now connected to DOCX tables.",
+    "runtime_python_required": false,
+    "numeric_reference_tolerance": "1e-12 * max(1, abs(expected)); not pixel or encoded byte equality",
+    "pixel_reference_scope": "432 font queries; 72 text layers; 377 file/1779 record references; 380 final raster/SVG; 39 DOCX/78 image placements; 262144 DBCS pair decodes. Exact tested pixels and metadata; no global cross-version/font/platform equivalence claim.",
+    "encoded_output_contract": "PNG encoded bytes differ; compare decoded RGBA/size/pHYs and strict non-image SVG markup. EMF+ cumulative decoded byte accounting uses actual native normalized PNG lengths, so threshold-edge trigger positions can differ.",
+    "reference_acceptance": "255 EMF+ files (212 successful, 43 errors), 424 output queries, 298 DOCX/596 placements; original 377 GDI files/1779 snapshots and prior font/codec/raster references retained."
+  },
+  "pillow_bitmap_port": {
+    "version": "12.2.0",
+    "license": "MIT-CMU",
+    "repository": "https://github.com/python-pillow/Pillow/tree/12.2.0",
+    "sources": {
+      "Geometry.c": "5ca2151823ca7b89e6cfd253d969791b276f564b34bad2bf15f1c75ce93486f1",
+      "AlphaComposite.c": "8d053c34e07b8c3b963e78f00556979146abff6cb7f6ff771757fc9a97386f97",
+      "Unpack.c": "3dbb745a7914c0fd0ba31f25385d61b7a3aed831dac930d2b7961d25ab3b3f57",
+      "Convert.c": "a3ef696c48fc5047f61ad657551cfe4f49e32382f79d53964d47ac599d2ea782",
+      "PIL/BmpImagePlugin.py": "71ac1005307f5d9a2306ddae03bb9df0f0e0b32a9ad10491a813fdb8802086c0",
+      "PIL/Image.py": "218c0bc17cb7ce1e8223dfb32c11e4818ccca141fd57b84ce65d149308dd425a",
+      "PIL/_binary.py": "ba6dc47fa221e747297ee81afcbdaef2ea9be664c7a4b51f5382563132e0b20b",
+      "Draw.c": "2e6b0fc70897372afe92c75d86c096abdb1ea0d0709aa2cbd5f815f0963f0d3b",
+      "Resample.c": "94ad3ea42e7343ad18183e4d4f0d85e34d88e482609953ead01b503b350dcad7",
+      "BoxBlur.c": "d46b0a3ec270222be2589c343a59c0ae3098a2801457e6d63108d99d7454a289",
+      "UnsharpMask.c": "bf3c95ad0c22f580e50cfc3b655b973c09b3d7b2f795b939b1f20d01079d4751",
+      "_imagingft.c": "d97681ba154067bfd9f2ec82c6560a2a06435b1e381351aad1ca4158ec57aaa0",
+      "Paste.c": "e624fc012d4b84fcffb05dbcfc8dd1c2dca68aa13610c9bcecfd1a2656393109",
+      "PIL/ImageDraw.py": "43b40ebe2a6b0ea983826db1a655d6efcf813713d1b76047a3cf419255020ec0",
+      "PIL/ImageText.py": "186eb1ea932861427e3bfb60b196c3a1c1ef7054ae6d1ea2b057a9be31d1891d",
+      "PIL/ImageFont.py": "9259953ec8b7d24a05dc6c74b13c5c88e60c1e5894f258b57d44567e451dfbba"
+    },
+    "runtime_python_required": false,
+    "scope": "BMP decode compatibility, affine nearest/bicubic and alpha conversion/compositing; no Pillow binaries linked"
+  },
+  "clipper_path_backend": {
+    "crate": "clipper-sys",
+    "crate_version": "0.8.0",
+    "core_version": "6.4.2",
+    "reference_pyclipper": "1.4.0",
+    "core_license": "BSL-1.0",
+    "wrapper_license": "ISC",
+    "header_sha256": "734eba9dc9d399089b2b467017074bd24728a1b9e64c7429e827806ed10e54cc",
+    "core_modified": false,
+    "bridge": "native/clipper_bridge.cpp: direct Clipper union/offset API and PolyTree DFS callbacks, bypass wrapper preprocessing",
+    "runtime_python_required": false,
+    "build_verified": [
+      "Windows MSVC"
+    ]
+  },
+  "metafile_fonts": {
+    "binding": "freetype-sys 0.20.1",
+    "windows_bundled_core": "2.13.2",
+    "reference_pillow_freetype": "2.14.3",
+    "reference_raqm": false,
+    "layout": "Pillow BASIC",
+    "runtime_python_required": false,
+    "system_fonts_redistributed": false,
+    "default_font": "Unchanged Pillow 12.2.0 Aileron subset, No Rights Reserved",
+    "default_font_source": "https://dotcolon.net/fonts/aileron/",
+    "binding_core_modified": false,
+    "verified_platforms": [
+      "Windows/MSVC"
+    ],
+    "unverified": "Other fonts/versions/platforms and RAQM/HarfBuzz complex layout need separate acceptance",
+    "asset_sha256": {
+      "aileron-default.ttf": "69853909b940023570964e29cffe30da95aea8de3627736b5cd15ab30143169f",
+      "ansi_singlebyte.json": "5058797d44f61ceb03ba8d6acd482c70068888e7d5d8bdb788b428b72985c724",
+      "ansi_dbcs.bin.gz": "0fc1a5dc9a9f1af99002c883f3855f074c3c3b57cd2292b84b5fc9b6e7fdde4d"
+    },
+    "generators": [
+      "scripts/migration/generate_metafile_font_data.py",
+      "scripts/migration/generate_metafile_codecs.py"
+    ]
+  },
+  "metafile_jpeg": {
+    "binding": "turbojpeg 1.5.1 / turbojpeg-sys 1.2.0",
+    "bundled_core": "libjpeg-turbo 3.1.0",
+    "reference_pillow_core": "3.1.4.1",
+    "repository": "https://github.com/honzasp/rust-turbojpeg",
+    "core_modified": false,
+    "runtime_python_required": false,
+    "linkage": "static",
+    "simd_verified": true,
+    "verified_platforms": [
+      "Windows/MSVC"
+    ],
+    "scope": "EMF+ compressed JPEG, including RGB/grayscale/CMYK, progressive and tested subsampling modes. Strict tested pixels, no global decoder/version equivalence claim. Also used for Office body JPEG decoding/encoding and JPEG compressed TIFF strips.",
+    "build_tools": "CMake and NASM; packaging/cmake/cargo-runtime.cmake matches default Cargo MSVC CRT"
+  },
+  "office_image_policy": {
+    "source": "DocVortex 0.6.8 selected office/image.py and DOCX package_normalizer.py/opc.py",
+    "runtime_python_required": false,
+    "scope": "Original vector signatures, EMU hints, standard placeholder font/layout/JPEG and Office boundary fallback; DOCX table images; streaming CRC/reachability validation, selective corrupt-member omission, missing relationships and Content Types repair via shared package overlays. Body image/SVG connected; chart and public Office API pending; covered body orchestration, textboxes and margins connected.",
+    "reference_acceptance": "35 placeholder pixel cases; 259 vector policies; 7 EMU hints; 32 packages (7 fatal); 298 DOCX / 596 placements",
+    "native_root_part_extension": "Preserves previous native support for relative part relationships when main part is at ZIP root; does not reproduce Python normalizer helper omission for that case.",
+    "verified_platforms": [
+      "Windows/MSVC BASIC"
+    ],
+    "performance_benchmark": false
+  },
+  "docx_body": {
+    "runtime_python_required": false,
+    "scope": "Native typed body paragraphs/titles/captions/equations/tables, list/TOC/anchors/sections/textboxes/margins, original mode-dependent images/SVG and OOXML charts; native Mammoth table prepass, note/comment references, embedded style-map grammar, candidate alignment and per-table fallback connected. Unified export and complete public Office API pending.",
+    "reference_acceptance": "353 complete original convert references (352 successful, 1 expected corrupt), 362 logical pages; 1120 style-map queries; 59 stage tests plus final 3 affected tests passed; see build/office-docx-resources-receipt.json",
+    "verification": "Exact complete pages for covered fixtures; exact 80-digit list starts and next counters via serialized decimal strings. Constructed plus existing examples, not global client document equivalence.",
+    "performance_benchmark": false,
+    "verified_platforms": [
+      "Windows/MSVC"
+    ]
+  },
+  "office_body_image_engines": {
+    "runtime_python_required": false,
+    "raster": "image 0.25.10 (selected features), tiff 0.11.3, shared PNG/TurboJPEG",
+    "svg": "resvg 0.48.0, usvg 0.48.1, tiny-skia 0.12.0, matching resvg_py 0.5.0 sdist lock",
+    "reference_pixels": "200 raster / 62 SVG; tested MIME/size/exact RGBA or SHA256",
+    "tiff_jpeg": "Published TurboJPEG replaces observed differing generic JPEG TIFF decode; RGB/L/CMYK and multiple strips accepted. YCbCr branch not independently accepted.",
+    "tiff_palette": "Read-only two-byte photometric metadata view; decoder compression core unmodified; source bytes not cloned",
+    "ordinary_raster_limits": "Original frozen Pillow default decompression bomb error above 178956970 pixels; not metafile 8192/16M limits",
+    "svg_fonts": "Original skip_system_fonts=True empty fontdb",
+    "svg_href_resolver": "Original usvg default resolver, no HTTP; local paths remain possible as in original binding",
+    "dependency_notices": "packaging/office-image-dependency-notices.json",
+    "reference_adapter_source_sha256": "e86d197cb11d0bd58ea4cb517a1b6765d8f7d7eb5f28125dbfe2cb79bce2e591",
+    "limitations": [
+      "rare codecs and palette BigTIFF pending",
+      "not full Pillow replacement",
+      "no cross-platform or performance acceptance"
+    ]
+  },
+  "office_charts": {
+    "runtime_python_required": false,
+    "scope": "16 original OOXML plot types; original category/date/scatter/bubble/combo/cache rules; native data_only embedded workbook cell projection; formula/cache/generic worksheet precedence; DOCX drawing and per-part cache integration",
+    "reference_acceptance": "97 specs/cache/workbook/fallback/final queries including errors; 208 serial conversions; complete DOCX integration references included in docx_body",
+    "cell_projection": "Shared/inline strings, errors, bool, arbitrary precision integers, floats, formula cached values, ISO dates/durations, original date/duration formats and epochs; not the complete XLSX converter",
+    "error_boundary": "Container-open failures allow cache fallback; worksheet-cell parse errors remain errors until the DOCX drawing boundary, leaving an empty chart block and preserving following content",
+    "algorithm_sources": [
+      "DocVortex ooxml_chart.py",
+      "openpyxl 3.1.5 read-only cells, date conversion, formats and formula ranges"
+    ],
+    "date_engine": "chrono 0.4.45 with default features disabled, std only",
+    "dependency_notices": "packaging/office-chart-dependency-notices.json",
+    "reference_generator": "scripts/migration/export_office_chart_reference.py",
+    "original_cache_point_rule": "Retains original >=100000 maximum index empty-cache behavior; no additional document workload limit",
+    "verified_platforms": [
+      "Windows/MSVC"
+    ],
+    "limitations": [
+      "Broader malformed spreadsheet and client document corpus pending",
+      "No public Office API or installed wheel update",
+      "No performance or cross-platform acceptance"
+    ],
+    "performance_benchmark": false
+  },
+  "docx_notes_and_embedded_styles": {
+    "runtime_python_required": false,
+    "original_engine_version": "1.12.0",
+    "sources": {
+      "conversion.py": "82997665a7af48493915dc7503da8e5fe3cee9d1fef1ef1ca12743ced11ba168",
+      "options.py": "32bbb0db2d6463314cb1c93177d9b4818ec6371a7b7302a8b38f522a5f1bfaf7",
+      "document_matchers.py": "0b0c89151d12cce50835190357fdb324add3f4379456eb664f4de534551c3f52",
+      "html_paths.py": "fb01f9cc7022e5575d68ee7484a3781e72c10e6561a11e3183b71e1150d8e444",
+      "html/__init__.py": "008513eb7ebdd1b2c0e79298137abe9977a010d202e76c7cdb7c58e9712acd51",
+      "docx/notes_xml.py": "c0de1cf13775d73de6ef95f24681a016bd876a5ef7d3f63299121e190c7d551d",
+      "docx/comments_xml.py": "b57f97274a4b46aa186fa5e92669efefe97509e5bae6a88d657540db15d4fd91",
+      "docx/style_map.py": "dc3cf570c9304d3aafbe9df70002184f3c31b8100b19fc5348dd39d025184abd",
+      "styles/parser/tokeniser.py": "c365c1886af0073295ae53b23e2facf8f86dc6357ba2380a15ee0e5921b3b7a8",
+      "styles/parser/document_matcher_parser.py": "75bb3b5752c8b1781f6f54802661a6f6459866a046ebfc4e12b791cfc7049bab",
+      "styles/parser/html_path_parser.py": "b49b6a517e172e940f2c38082bbca8df9471a954b59e508235449d42772d754b"
+    },
+    "scope": "Embedded style-map grammar and first-match precedence; note/comment reference ordering and local relationships; full filtered-document table prepass, signature alignment, equation injection and isolated fallback",
+    "reference_acceptance": "56 maps x 20 queries; 81 full DOCX outputs",
+    "media_evaluation": "Typed deferred XML carrier rendered after enclosing HTML ignore paths; no document JSON transfer or media byte clone",
+    "reference_state": "Moves reference history between referent readers; Arc relationship and comment-initial maps",
+    "original_error_boundary": "Table conversion errors retain diagnostics and continue body; standalone table functions still return errors",
+    "notices": [
+      "rust/rapiddoc-office/licenses/MAMMOTH.txt",
+      "rust/rapiddoc-office/licenses/DOCVORTEX.txt"
+    ],
+    "limitations": [
+      "Unified export and public Office/Python API pending",
+      "Broader malformed/client corpus and cross-platform acceptance pending",
+      "No performance benchmark or installed wheel update"
+    ],
+    "referent_container_boundaries": "Original OL/LI and DL/DT/DD/backlink structure participates in collapse and table candidate selection; note table does not merge with an adjacent body table"
+  },
+  "office_public_output": {
+    "runtime_python_office_packages_required": false,
+    "source_sha256": {
+      "rapid_doc/backend/office/model_output_to_middle_json.py": "e90cb0d885b38192b12fcfa68cf0ff077dd883410fe9bc65bcf237ed57b5cf6a",
+      "rapid_doc/backend/office/office_magic_model.py": "07fd40d9613e3f3485e719bea12ec0b4b19c8952b229f198ea6661e370f4b807",
+      "rapid_doc/backend/office/mkcontent/inline_renderer.py": "736b52ea8f55178d93185762a35160984f6a1145bb93920afc86895de8791480",
+      "rapid_doc/backend/office/mkcontent/output_builders.py": "8e8f822d4edefc4cdaee70f5d5d1bc993f82b70b194b5bcacaaa797301523329",
+      "rapid_doc/backend/utils/html_image_utils.py": "020730a488337fb67a8685265f1aa0da692b66763d6027bf08a882aab10e577a",
+      "rapid_doc/backend/utils/markdown_utils.py": "e02177c372987e379e61c7b1ba3b38f8cfc38ad690ba67e5614075ab08513787",
+      "rapid_doc/utils/magic_model_utils.py": "4709ac6917b9f4c2f2bba351eb0e7261079d121c058428b70226fd7b8100afa5"
+    },
+    "scope": "Typed DOCX model blocks -> Office middle, caption binding/section numbering/TOC anchors, mm/nlp markdown, content_list/v2, asset persistence and Python RapidDoc IO integration",
+    "reference_acceptance": "353 source documents, 352 successful full middle/four exports/assets; 1 expected corrupt. Installed 23 real/resource references plus IO contracts and PDF text smoke. Stage test details in build/office-docx-public-receipt.json",
+    "asset_comparison": "Decoded RGBA/size and normalized SVG structure/embedded pixels. PNG encoding may differ and SHA256(data URI) filenames differ; references compared via content-verified asset aliases, not byte-identical filenames",
+    "installed_environment": ".venv",
+    "build_script": "scripts/migration/build_office_wheel.ps1",
+    "unicode_generator": "scripts/migration/generate_office_output_unicode.py",
+    "unicode_license": "rust/rapiddoc-office/licenses/PYTHON-UNICODE.txt",
+    "other_formats": "DOC/XLS/XLSX/PPT/PPTX converters not yet connected",
+    "performance_benchmark": false
+  },
+  "spreadsheet_projection": {
+    "runtime_python_required": false,
+    "sources": {
+      "rapid_doc/_vendor/docvortex_core/analyzers/native/office/spreadsheet/projector.py": "2d8e7eb7bf9b0975c56aba447078e285698b3821cc2eea51fcaf9105a0f32c09",
+      "rapid_doc/_vendor/docvortex_core/analyzers/native/office/spreadsheet/region_discovery.py": "e88517d2813c3e31db4f3b7325c908aaeb3e5f4e0e71b899b84f8e8187e03f92",
+      "rapid_doc/_vendor/docvortex_core/analyzers/native/office/spreadsheet/html.py": "981b47155b7f0361830ef55f47ab358aad026ce307098fbe88914f200fe8350e",
+      "rapid_doc/_vendor/docvortex_core/analyzers/native/office/spreadsheet/models.py": "f9ac8af76b23d8f11daa1d95934b45e01eee7242fbd14594bb1c15f2e361643c"
+    },
+    "scope": "Format-neutral sparse bounds and flood fill, auto gap scoring, merged-row lookup, table materialization/default styles, semantic strict-subset filtering, nonconsecutive source selections, singleton and exact HTML output. Native typed data; Python only produces test fixtures.",
+    "reference_acceptance": "83 sheets including 20 real; 415 gap/projection queries; 80 row/column selections",
+    "full_xlsx_package_reader_connected": false,
+    "verified_platforms": [
+      "Windows/MSVC"
+    ],
+    "installed_package_updated": false
+  },
+  "docx_performance_acceptance": {
+    "result": "accepted for current local corpus",
+    "report": "build/docx-acceptance-20261031/summary.json",
+    "input_cases": 9,
+    "real_local_inputs": 8,
+    "synthetic_stress_copies": 25,
+    "independent_workers": 36,
+    "rounds": 2,
+    "warm_repeats_per_worker": 3,
+    "all_output_parity": true,
+    "nonempty_real_speedup_range": [
+      9.6,
+      19.1
+    ],
+    "stress_speedup": 49.1,
+    "memory_notes": "OS process lifetime peaks include import baseline; Python ~298 MiB and Rust ~34 MiB. Separate sampled parse phase and exact counters retained.",
+    "limitations": [
+      "One machine and local corpus; no broad/cross-platform claim",
+      "Repeated stress case benefits from resource reuse",
+      "PNG filename parity normalized only after exact image content checks"
+    ]
+  },
+  "xlsx_workbook_cells": {
+    "runtime_python_required": false,
+    "scope": "Native workbook/worksheet and shared strings, cached cell values, rich text and fonts/styles, dates/epochs, merges/links and default cells -> shared table projector. Hidden sheets, titles and cell-only full conversion connected. Resource-bearing documents remain explicitly unsupported by the internal cell-only conversion entry.",
+    "reference_acceptance": "50 workbooks / 70 worksheets; 4 original errors; 123 complete cell-only file-to-pages queries",
+    "sources": {
+      "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xlsx/xlsx_converter.py": "a1da5abb54732dab360da02ff6bf01d31b4f59d8174234866e06622a62044d12",
+      "rapid_doc/_vendor/docvortex_core/analyzers/native/office/spreadsheet/projector.py": "2d8e7eb7bf9b0975c56aba447078e285698b3821cc2eea51fcaf9105a0f32c09"
+    },
+    "openpyxl_source_version": "3.1.5",
+    "openpyxl_source_sha256": {
+      "reader/strings.py": "a06d8caba7810f4f849453b13dd1d30549ac854c5336b2b5b27b3550945a562b",
+      "reader/excel.py": "9204ad42d3b58f4bd5e7a196697c68dc6036117ba8b86b6716b45532872af046",
+      "worksheet/_reader.py": "be9fc3ef0e038800cc77236b62942096b095bd52d3f7f0ec4998a439dfbe9f67",
+      "worksheet/worksheet.py": "e09339aa3a09ba6b5ca9fb471648a6b45110af3ec4d830665e7915a3b477597f",
+      "cell/rich_text.py": "b80666181edb6035276a71c8d2f26629b7d217cae2b88612e42c25554ff7fdf3",
+      "cell/cell.py": "85526c302f64240c716ff0aca49941af00eddaacdf71c3ba6037cf1cadc10424",
+      "styles/stylesheet.py": "ee4669cf26af2eb38971d66a6739775994f233ad02a963fc8bf390d09ff5c72d",
+      "styles/fonts.py": "9e47a225480a62759a113be7e75b0ea3dcd05c988e1092870d3aafc6dd098817",
+      "workbook/child.py": "affe55f433641926198738bad8fd74667b0ee624f9d7c628a5c4dd992bed0147"
+    },
+    "license_notices": [
+      "rust/rapiddoc-office/licenses/OPENPYXL.txt",
+      "rust/rapiddoc-office/licenses/DOCVORTEX.txt"
+    ],
+    "shared_date_rules": "Reuses chart workbook date/duration classification and ISO/Excel conversion; normal cell float representation remains separate from chart normalization.",
+    "full_xlsx_public_api": false,
+    "performance_benchmark": false
+  },
+  "xlsx_resource_integration": {
+    "runtime_python_required": false,
+    "scope": "Native DrawingML images, OMML/OLE/image MTEF, DISPIMG, reference-selected spreadsheet chart tables, table resource absorption and stable final page ordering; consuming Workbook::into_pages entry.",
+    "reference_acceptance": "95 workbooks / 190 complete file-to-pages queries; exact non-image content and MIME/dimensions/RGBA or SVG content checks",
+    "sources": {
+      "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xlsx/xlsx_converter.py": "a1da5abb54732dab360da02ff6bf01d31b4f59d8174234866e06622a62044d12",
+      "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xlsx/ooxml_ole.py": "3a3a8ed6756cf3619351bd504a7f7e9194e3c51936783de09c4013a3b591a1f6",
+      "rapid_doc/_vendor/docvortex_core/analyzers/native/office/spreadsheet/projector.py": "2d8e7eb7bf9b0975c56aba447078e285698b3821cc2eea51fcaf9105a0f32c09",
+      ".venv/Lib/site-packages/openpyxl/reader/drawings.py": "8993e893c0dcfe664cc913e4fc47c35c342f65dc1f1f06d88efc5f2b6717b5a8",
+      ".venv/Lib/site-packages/openpyxl/reader/excel.py": "9204ad42d3b58f4bd5e7a196697c68dc6036117ba8b86b6716b45532872af046",
+      ".venv/Lib/site-packages/openpyxl/drawing/spreadsheet_drawing.py": "094592a48616387504a7e5123801953652df5c140e6dc19d83f459fdb8203d83",
+      ".venv/Lib/site-packages/openpyxl/chart/reader.py": "a100fedbda3148b5b6cb35ddc97361cd060d5e033ae18de455238892b3d90ae5",
+      ".venv/Lib/site-packages/openpyxl/chart/plotarea.py": "7a6ef2a2b5c5cfd4a626bbaa391e0f9feda8123d12bb8ae7cf235ce5ed0867f5",
+      ".venv/Lib/site-packages/openpyxl/utils/cell.py": "3fba20e1ce0971237ffda988b2e6c832048c950e12ac0039799d1c8e4a1795a4"
+    },
+    "license_notices": [
+      "rust/rapiddoc-office/licenses/DOCVORTEX.txt",
+      "rust/rapiddoc-office/licenses/OPENPYXL.txt"
+    ],
+    "pending": [
+      "Installed public XLSX checks and performance/memory acceptance",
+      "Broader uncommon/cross-platform malformed resource coverage"
+    ],
+    "full_xlsx_public_api": false,
+    "performance_benchmark": false
+  },
+  "xlsx_package_and_output": {
+    "runtime_python_required": false,
+    "package_normalization": "On failed conversion only; original blank shared-string underline, empty fills and row-only autoFilter fixes via ZIP overlays; one retry only when changes exist. Native worksheet part mapping avoids openpyxl OLE loading-copy failure on empty titles.",
+    "reference_acceptance": "86 package boundary cases; 231 complete Office output cases: 200 original successes, 30 original failures retained, 1 native OLE recovery verified against unbroken original output",
+    "public_entry": "parse_office_bytes; RapidDoc auto-routes DOCX/XLSX before loading PDF models",
+    "sources": {
+      "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xlsx/package_normalizer.py": "f708f76b9c8d0fd8145128c3b2ed52b5e3740c00efbf4ecde7df3565dbd98e16",
+      "rapid_doc/backend/office/model_output_to_middle_json.py": "e90cb0d885b38192b12fcfa68cf0ff077dd883410fe9bc65bcf237ed57b5cf6a",
+      "rapid_doc/backend/office/office_middle_json_mkcontent.py": "50e2e391aa77729e51e0523496608615d995320612cd72429f65c84df5d36def"
+    },
+    "benchmark_pending": false,
+    "html_clean_optimization": "Same tag/attribute regex matches via find_iter; avoid capture engine scanning long base64 attributes. 3574 exact cleaner-reference comparisons plus DOCX/XLSX full export checks. No codec or quality change."
+  },
+  "xlsx_delivery_acceptance": {
+    "receipt": "build/xlsx-delivery-receipt-20261031.json",
+    "wheel_sha256": "3c727fde07849c6135f8a9eaff8e47348bbd8a936ee0c73ee5dd8c206909afaf",
+    "installed_files_verified": 389,
+    "benchmark_directory": "build/xlsx-acceptance-optimized-20261031",
+    "corpus_parity": true,
+    "minimum_warm_speedup": 1.6819202195850853,
+    "maximum_warm_speedup": 9.760465989098842,
+    "memory_note": "Process peaks include different import baselines; not all gains are algorithmic",
+    "next": "XLS"
+  },
+  "xls_native_cells": {
+    "stage": "XLS native BIFF5/8 cells, displayed numbers, rich text, chart references, and spreadsheet projection",
+    "runtime_python_required": false,
+    "reference_counts": {
+      "numbers": 5044,
+      "texts": 310,
+      "strings": 1063,
+      "fonts": 5,
+      "records": 6,
+      "codepages": 25246,
+      "codec_pair_hashes": 16,
+      "txo": 64,
+      "charts": 720
+    },
+    "exhaustive_double_byte_cases": 1048576,
+    "workbooks": 101,
+    "worksheets": 105,
+    "full_file_to_pages": 89,
+    "original_error_cases": 11,
+    "python_source_sha256": {
+      "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/__init__.py": "c694ae356b9127e650338fa07e0eec5da0b88641943eadce8f6c43cba94458e9",
+      "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/chart.py": "b7a68375f758c9a96c97eb0df1283e4c9d9b58cde9160b12c20a07dfa9b8605a",
+      "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/embedded_chart.py": "51f3e3e24165cfac1b4861a5943bff11239cebae711ee812a256bb7558a1569a",
+      "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/models.py": "e3ed6372b4145cc877a681b18c58013a0d019e0bf521dcd1d99dce110981b566",
+      "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/number_format.py": "15274cfc7515125dac1884b00dbe597eb43becb0975899cee828795e6a3e428d",
+      "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/parser.py": "e5234311df9242f8b799bb4975aae2bdc6534ce265ccf637a2178d7b2dcf5430",
+      "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/records.py": "cdda253783f65239ed80ef1bd416c046ca1b08b418644121c0d84768e0e835ea",
+      "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/strings.py": "69c3d9c9a291e5240d65274049c8597ed3371e6b31fee99e819d4afe43084f58",
+      "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/xls_converter.py": "2e20bb71f8bc47f08ec916b20a9e4c32b4af8d74b38e6902c8fc47ff4d80fa8f"
+    },
+    "codepage_tables_sha256": {
+      "rust/rapiddoc-office/src/xls/codepages/1250.json.gz": "5ecfa235d2b93f7f0a191e3e36b7bbc0c23973ffdef1bb8d485e8fb624d82e7f",
+      "rust/rapiddoc-office/src/xls/codepages/1251.json.gz": "261d9027cf12f9e6d0ebfdcfb4b7626f262276afc7a456712332a039589b260f",
+      "rust/rapiddoc-office/src/xls/codepages/1252.json.gz": "7ddc5445d63a67b9f1c156c5077da72d794b9eee36e2221bdfe5b2029a2e7adf",
+      "rust/rapiddoc-office/src/xls/codepages/1253.json.gz": "b4bf5b8be0ffde17f2357ad2743d3aa26dbae0de709ed86e4035adf929ea4e91",
+      "rust/rapiddoc-office/src/xls/codepages/1254.json.gz": "d8ed62f3099ca332ea83c2a2238b95a315de863aa507598ea86ee0b51d5dedd3",
+      "rust/rapiddoc-office/src/xls/codepages/1255.json.gz": "e2b6fe25f2f8b31c3776ef525d731daf1612f7096ccdde8f669eb2de7ea0455a",
+      "rust/rapiddoc-office/src/xls/codepages/1256.json.gz": "8932ff5e9472dab556b584ca924d28c7a1b8cde6162190f631860ea1eaef4dd5",
+      "rust/rapiddoc-office/src/xls/codepages/1257.json.gz": "28bfce521ee08202ec317a0fe645fbfd5035440ab0210035b9b1845673554bae",
+      "rust/rapiddoc-office/src/xls/codepages/1258.json.gz": "6b0182050ca8b67d9e93328a31875213a9305ff1ed82a2b36cf83edf21227630",
+      "rust/rapiddoc-office/src/xls/codepages/874.json.gz": "5c00791b3ff063200ded37af42c838d089e341ae3aa1ea20acd7e685b9e195e7",
+      "rust/rapiddoc-office/src/xls/codepages/932.json.gz": "b0011547f96c612f8c7055dda51ee838ac76a15a380324c9d290dd7d17cdcced",
+      "rust/rapiddoc-office/src/xls/codepages/936.json.gz": "ae54048e5fc0f5eec4fd093dcdda77b719c6af31d334b4ed49f1432fa63b42a5",
+      "rust/rapiddoc-office/src/xls/codepages/949.json.gz": "aac06d8d17dbb4f4f2a483d2c9a09f7566a46ceef15fa0e2b48f7113a5b8dea0",
+      "rust/rapiddoc-office/src/xls/codepages/950.json.gz": "aa402104b5a517bbef81e7c9f4177903c40115a8e398f899182f05aba54aa0f4"
+    },
+    "pending": [],
+    "python_codec_source_version": "3.14.5",
+    "codepage_generator": "scripts/migration/export_xls_codec_tables.py",
+    "license_notices": [
+      "rust/rapiddoc-office/licenses/DOCVORTEX.txt",
+      "rust/rapiddoc-office/licenses/PYTHON-UNICODE.txt"
+    ],
+    "public_api": true,
+    "installed": true,
+    "performance_benchmark": true
+  },
+  "xls_resources_public": {
+    "runtime_python_required": false,
+    "scope": "Shared borrowed OfficeArt records/shape properties/BStore and bounded metafile inflation; OBJ/TXO text/control/image/chart binding; native and image MTEF priority; table absorption and standalone resources; native Office unified output and parse_office_bytes XLS route",
+    "reference_acceptance": "161 complete XLS cases (150 success, 11 original errors); 28 shared OfficeArt cases; 229 Office raster references",
+    "sources": {
+      "rapid_doc/_vendor/docvortex_core/analyzers/native/office/legacy/officeart.py": "1d3bd1e308b57925e4f2ddadd9497a987afe08be1ee232050c10cb960a209cbd",
+      "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/parser.py": "e5234311df9242f8b799bb4975aae2bdc6534ce265ccf637a2178d7b2dcf5430",
+      "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/xls_converter.py": "2e20bb71f8bc47f08ec916b20a9e4c32b4af8d74b38e6902c8fc47ff4d80fa8f",
+      "rapid_doc/_vendor/docvortex_core/analyzers/native/office/image.py": "700a39dc69e041f37b6427422ac206ebf43545c47bd3da10f38a210a7279153c",
+      ".venv/Lib/site-packages/PIL/PngImagePlugin.py": "76351c316e43adbc3b58d1ab83b8f62f6a8eef93c83fb7f6df5cb20b2f3ad6fe"
+    },
+    "png_compatibility": "Pillow pre-IDAT CRC validation, skipped IDAT CRC, complete deflate frame recovery with incomplete trailer/IEND only; incorrect present Adler rejected. No pixel changes or re-compression.",
+    "license_notices": [
+      "rust/rapiddoc-office/licenses/DOCVORTEX.txt",
+      "rust/rapiddoc-office/licenses/PYTHON-UNICODE.txt"
+    ],
+    "installed_acceptance_pending": false,
+    "performance_acceptance_pending": false,
+    "full_public_api": true,
+    "receipt": "build/xls-delivery-receipt-20261031.json"
+  },
+  "xls_delivery_acceptance": {
+    "receipt": "build/xls-delivery-receipt-20261031.json",
+    "wheel_sha256": "5f5e526cab5768ab933c2f7e0188fe3b246ce6eb98be926711b2f5fc46e34b97",
+    "installed_files_verified": 389,
+    "office_stage_tests": 71,
+    "installed_parity": true,
+    "local_benchmark_cases": 2,
+    "benchmark_all_parity": true,
+    "benchmark_directory": "build/xls-acceptance-20261031",
+    "next": "PPTX"
+  },
+  "pptx_context_text": {
+    "status": "internal_checkpoint_passed_not_public",
+    "fixture": "tests/fixtures/office_rust_reference_068/pptx_context.json.gz",
+    "packages": 206,
+    "geometry_queries": 240,
+    "font_queries": 2077,
+    "title_queries": 800,
+    "reference_normalized_input_cases": [
+      "tests/fixtures/pptx/handmade-altpath.pptx",
+      "tests/fixtures/pptx/handmade-order.pptx",
+      "tests/fixtures/pptx/handmade-strict.pptx"
+    ],
+    "pending_math_fallback_paragraphs": 1,
+    "tests_passed": 4,
+    "receipt": "build/pptx-context-text-receipt-20261031.json",
+    "public_api": false,
+    "pending": [
+      "fork_math_fallback",
+      "tables_and_resource_orchestration",
+      "notes_and_complete_slide_export",
+      "package_normalization_retry",
+      "public_install_and_acceptance"
+    ],
+    "superseded_by": "pptx_resources_output"
+  },
+  "pptx_resources_output": {
+    "status": "complete_internal_pages_exports_not_public",
+    "packages": 275,
+    "successes": 274,
+    "original_errors": [
+      {
+        "name": "resources/table/15",
+        "error": "ValueError"
+      }
+    ],
+    "secondary_math_queries": 1151,
+    "geometry_queries": 240,
+    "font_queries": 2077,
+    "title_queries": 800,
+    "reference_normalized_input_cases": [
+      "tests/fixtures/pptx/handmade-altpath.pptx",
+      "tests/fixtures/pptx/handmade-order.pptx",
+      "tests/fixtures/pptx/handmade-strict.pptx"
+    ],
+    "pptx_tests_passed": 6,
+    "shared_output_tests_passed": 1,
+    "receipt": "build/pptx-resources-output-receipt-20261031.json",
+    "public_api": false,
+    "installed": false,
+    "pending": [
+      "original_package_normalization_retry",
+      "additional_resource_failure_edges",
+      "public_api_install_and_acceptance"
+    ],
+    "license_notices": [
+      "rust/rapiddoc-office/licenses/DOCVORTEX.txt",
+      "rust/rapiddoc-office/licenses/PYPPTX-WITH-OXML.txt",
+      "rust/rapiddoc-office/licenses/PYTHON-UNICODE.txt"
+    ],
+    "math_fallback_source": {
+      "package": "pypptx-with-oxml",
+      "version": "1.0.3",
+      "source_file": "pptx/oxml/text.py",
+      "sha256": "112c4c364e4a1a161b6144657ed504ad09e754865ea98651c7b4b23d8ee3bc38"
+    },
+    "superseded_by": "pptx_public_delivery"
+  },
+  "pptx_public_delivery": {
+    "status": "public_delivered_local_acceptance_passed",
+    "complete_output_cases": 280,
+    "original_errors": 1,
+    "normalizer_cases": 26,
+    "secondary_math_queries": 1151,
+    "public_api": true,
+    "installed": true,
+    "pending": [],
+    "license_notices": [
+      "rust/rapiddoc-office/licenses/DOCVORTEX.txt",
+      "rust/rapiddoc-office/licenses/PYPPTX-WITH-OXML.txt"
+    ],
+    "office_stage_tests_passed": 79,
+    "final_shared_json_regressions_passed": 5,
+    "arbitrary_precision_public_numbering": true,
+    "normalizer_output_tests": true,
+    "installed_files_verified": 390,
+    "wheel_sha256": "5a96be4ec50d129ea48b8ae39f7dd19fe3fc977230f55a312734f0a5b52fb841",
+    "receipt": "build/pptx-delivery-receipt-20261031.json",
+    "benchmark_cases": 9,
+    "benchmark_workers": 36,
+    "benchmark_all_parity": true,
+    "benchmark_directory": "build/pptx-acceptance-clean-20261031",
+    "pdfium_coexistence_cases": 8,
+    "next": "PPT"
+  },
+  "ppt_binary_context": {
+    "status": "internal_checkpoint_passed_not_public",
+    "counts": {
+      "records": 320,
+      "styles": 1630,
+      "texts": 400,
+      "documents": 12,
+      "utf16": 301,
+      "prepared": 21,
+      "contexts": 3,
+      "cases": 191,
+      "properties": 320,
+      "numbering": 576
+    },
+    "affected_tests_passed": 8,
+    "public_api": false,
+    "installed": false,
+    "receipt": "build/ppt-binary-context-receipt-20261031.json",
+    "pending": [
+      "pictures_and_embedded_ole_resources",
+      "complete_slide_resource_orchestration_and_recovery",
+      "PPT_body_titles_lists_tables_and_output",
+      "public_install_and_performance_acceptance"
+    ],
+    "license_notices": [
+      "rust/rapiddoc-office/licenses/DOCVORTEX.txt",
+      "rust/rapiddoc-office/licenses/PYTHON-UNICODE.txt"
+    ]
+  },
+  "doc_compatibility_stage": {
+    "runtime_python_required": false,
+    "sources": {
+      "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/pieces.py": "03c196416d804607978fa240c6f3d057eeb4c51454a02d1e85636b52300e05fd",
+      "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/parser.py": "11e67a154797ccd86622ce4c005b07c632307a9a9e5e296f4738650e8c46ef40",
+      "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/doc_converter.py": "0124eab444aab52a08bc8af6a44bffaf2568be8cfa904dd5a68f918a3800d359"
+    },
+    "codec_baseline": {
+      "python": "3.14.5",
+      "names": [
+        "cp932",
+        "cp949",
+        "cp950"
+      ],
+      "generated_tables": {
+        "rust/rapiddoc-office/src/doc/codepages/932.json.gz": "8fca3906de4105a5dfd37b1f7b82307ea3e1c82887b77334c8fdf92e4bca381b",
+        "rust/rapiddoc-office/src/doc/codepages/949.json.gz": "37f6c9629d06a04e0ec3945f7f76d11896f96c2aad663b4601b6d83b1585e9a3",
+        "rust/rapiddoc-office/src/doc/codepages/950.json.gz": "544b96bacbc46ec043173b58a3f1f076f310c7e04fdfd8cda8db0527d9bcb1a5"
+      }
+    },
+    "acceptance": {
+      "mapped_characters": 165465,
+      "stream_and_object_cases": 15,
+      "unique_real_doc_documents": 1
+    },
+    "scope": "Far-East LID selection, exact CPython DOC byte decoding, mapped CP/FC preservation, non-complex recovery, malformed CLX rejection and ObjectPool numeric-alias precedence",
+    "limitations": [
+      "textbox_and_annotation_stories_follow_current_python_omission",
+      "public_code_blocks_follow_current_python_omission",
+      "broader_real_DOC_corpus_pending"
+    ],
+    "license_notices": [
+      "rust/rapiddoc-office/licenses/DOCVORTEX.txt",
+      "rust/rapiddoc-office/licenses/PYTHON-UNICODE.txt"
+    ]
+  },
+  "doc_completion_stage": {
+    "runtime_python_required": false,
+    "sources": {
+      "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/parser.py": "9c3c79e6f67304390d215c3e79f2081bbe8e70ceebb26792bbce62a8be006476",
+      "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/models.py": "e764c6e691dd12f2afb2ac8c64eabe96a18434f3a3030b617a3ddd9532e96188",
+      "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/stories.py": "673432c21350a1c6c91aec5cf9a97bacb7461e021522c0e842fc0e51208bd3c6",
+      "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/doc_converter.py": "22b8d6a944a8a04873cbbdd7c9f7f05aab05be9fa2b4074d18fdfb1b4a991f70",
+      "rapid_doc/backend/office/office_magic_model.py": "25362e7b328c6534979769c44354167c3cc31c06d36dde62f3d75820a6d17ebb",
+      "rapid_doc/backend/office/mkcontent/output_builders.py": "ea7e3bcc701c0b4d64d9fc44c74ce9f91ed9eedb03f8a651a6ba41e30fffd312"
+    },
+    "scope": [
+      "main/header textboxes bound by FTXBXS lid and PlcfSpa",
+      "linked textbox chains once",
+      "comment references and auxiliary text",
+      "literal code and four exports",
+      "borrowed binding metadata serialization",
+      "streamed paragraph consumption and compact text mapping"
+    ],
+    "specifications": [
+      "https://learn.microsoft.com/en-us/openspecs/office_file_formats/ms-doc/d0a81fe8-f9e8-4130-9233-84732e3d9420",
+      "https://learn.microsoft.com/en-us/openspecs/office_file_formats/ms-doc/9d82ca25-ff21-488c-bee2-dd654935c65a"
+    ],
+    "external_corpus": {
+      "source": "https://github.com/apache/poi",
+      "commit": "6327f056ba3cfdae326a0261a236460592b80f5c",
+      "cases": [
+        {
+          "name": "endingnote.doc",
+          "url": "https://raw.githubusercontent.com/apache/poi/6327f056ba3cfdae326a0261a236460592b80f5c/test-data/document/endingnote.doc",
+          "sha256": "f170880d7ff9820a56c252f14286dc99c1c658d8e157bacf0e5f0166d5a714be",
+          "bytes": 9728
+        },
+        {
+          "name": "footnote.doc",
+          "url": "https://raw.githubusercontent.com/apache/poi/6327f056ba3cfdae326a0261a236460592b80f5c/test-data/document/footnote.doc",
+          "sha256": "81a18ac63010789ca08c28de107658a308c758a3cfc667a6edf11ffe888d3e13",
+          "bytes": 9728
+        },
+        {
+          "name": "innertable.doc",
+          "url": "https://raw.githubusercontent.com/apache/poi/6327f056ba3cfdae326a0261a236460592b80f5c/test-data/document/innertable.doc",
+          "sha256": "5b085e66bad882c3c58ec49d7547b42f75141babd4a5e8efcf634b995e44bb3f",
+          "bytes": 11776
+        },
+        {
+          "name": "MarkAuthorsTable.doc",
+          "url": "https://raw.githubusercontent.com/apache/poi/6327f056ba3cfdae326a0261a236460592b80f5c/test-data/document/MarkAuthorsTable.doc",
+          "sha256": "42491fab86a86a7f67f4673c2d777a4c1eb5d8817e75da49e303a8a719b07d8d",
+          "bytes": 76800
+        },
+        {
+          "name": "simple-list.doc",
+          "url": "https://raw.githubusercontent.com/apache/poi/6327f056ba3cfdae326a0261a236460592b80f5c/test-data/document/simple-list.doc",
+          "sha256": "666f851727aeb9013d34586fe3ab5df687a36108ca3eb2ba193954cbd084be70",
+          "bytes": 19456
+        },
+        {
+          "name": "simple-table.doc",
+          "url": "https://raw.githubusercontent.com/apache/poi/6327f056ba3cfdae326a0261a236460592b80f5c/test-data/document/simple-table.doc",
+          "sha256": "67d7fe8e0555c16516354498a5935f24eeef90beb5efbf526f93a1d6c734da43",
+          "bytes": 19456
+        },
+        {
+          "name": "simple.doc",
+          "url": "https://raw.githubusercontent.com/apache/poi/6327f056ba3cfdae326a0261a236460592b80f5c/test-data/document/simple.doc",
+          "sha256": "4876e828e62d490fa188c7c4e47013e2e0dfdf02f5903dfd374bc0d2b2049ca1",
+          "bytes": 19456
+        },
+        {
+          "name": "SimpleHeadThreeColFoot.doc",
+          "url": "https://raw.githubusercontent.com/apache/poi/6327f056ba3cfdae326a0261a236460592b80f5c/test-data/document/SimpleHeadThreeColFoot.doc",
+          "sha256": "de15f6088703ef0730ee715b90dd23a5126011f4cf87900f31d91ea09927244d",
+          "bytes": 27136
+        },
+        {
+          "name": "table-merges.doc",
+          "url": "https://raw.githubusercontent.com/apache/poi/6327f056ba3cfdae326a0261a236460592b80f5c/test-data/document/table-merges.doc",
+          "sha256": "bceea684bbf492fae57da88a133c3fd7ea9abd8355a89c6b9f31b9b0e2d68d3e",
+          "bytes": 11264
+        },
+        {
+          "name": "FloatingPictures.doc",
+          "url": "https://raw.githubusercontent.com/apache/poi/6327f056ba3cfdae326a0261a236460592b80f5c/test-data/document/FloatingPictures.doc",
+          "sha256": "41cc0cd8f2d7390266f844f5bddbcd29d08ac5338abc33832d9c9a6ed5d0f85d",
+          "bytes": 335360
+        },
+        {
+          "name": "WithArtShapes.doc",
+          "url": "https://raw.githubusercontent.com/apache/poi/6327f056ba3cfdae326a0261a236460592b80f5c/test-data/document/WithArtShapes.doc",
+          "sha256": "7ea17063facd200d340f2d076727e819f557d307f506c640896e968d9bcab5c0",
+          "bytes": 53760
+        }
+      ]
+    },
+    "license_notices": [
+      "tests/fixtures/office_rust_reference_068/APACHE-POI-DOC-LICENSE.txt",
+      "tests/fixtures/office_rust_reference_068/APACHE-POI-DOC-NOTICE.txt"
+    ],
+    "limitations": [
+      "malformed or unbound textbox ranges diagnosed rather than assigned to unrelated body",
+      "comment author/date/review-state not emitted",
+      "12 unique real DOC documents are coverage, not universal fidelity guarantee"
+    ]
+  },
+  "public_delivery_20261101": {
+    "scope": [
+      "seven-format public API acceptance",
+      "slide-local PPT external text and master styles",
+      "paragraph styles, nested lists, titles, table markup and XYCut order",
+      "ExObjRefAtom field binding and BIFF/MSGraph chart data with preview",
+      "finished/sync-flushed OLE zlib validation",
+      "empty-file public format hints preserve existing Python behavior",
+      "PPT native/image equations preserve display span type and delimiters"
+    ],
+    "sources": {
+      "rust/rapiddoc-office/src/ppt/body.rs": "7ec5a5d2c3e5a5f0886a386a6675d5a6d4ed82ab1a52917735cadf4499b05dc4",
+      "rust/rapiddoc-office/src/ppt/resources.rs": "28138329459435f4a6189c724e0cf0d7f3fd6f12122ea2f55b0ee93dade343b0",
+      "rust/rapiddoc-office/src/ppt/shapes.rs": "beba5a499038c2e052488c00b73f39d7428f86e706de792c72539bc323ab0b20",
+      "bindings/python/src/office.rs": "da9e76b4bbff08e6fb9b46a3aca8ca9dc4c886c5f780a13be8141383258fb81f",
+      "bindings/python/python/rapid_doc_rust/_compat.py": "ebdabbef6712427cff3407b8620222a6c868ec6e7ebb57286a14c45186d6f968",
+      "rapid_doc/_vendor/docvortex_core/analyzers/native/office/ppt/parser.py": "68b4ce6e347a8fa5f3b933e6f4869301fe9c2fcee39be2c1ff14ef2baa1742a5",
+      "rapid_doc/_vendor/docvortex_core/analyzers/native/office/ppt/ppt_converter.py": "398208c2e7498a419c3a97127429ade31d95c5d8543621ee231d71605ee348de"
+    },
+    "fixtures": {
+      "ppt_output.json.gz": "6d8232326b878658a94151cc5402a1cbe8efd95ae262a58c81a7c1d2978df9a8",
+      "ppt_projection.json": "605341779c43715360122b767592abea8c6d10ce0c14b227198bd5b6a9994436"
+    },
+    "corpus_counts": {
+      "ppt_full_binary_cases": 21,
+      "ppt_expected_errors": 17,
+      "ppt_paragraph_projection_cases": 9,
+      "independent_real_ppt": 1
+    },
+    "limits": "Existing source resource budgets retained; no accuracy thresholds or document-name exceptions introduced",
+    "acceptance_script": "scripts/migration/accept_public_delivery.py",
+    "limitations": [
+      "PDF acceptance selects explicit page ranges, not a fresh full-corpus PDF regression",
+      "API error checks compare reject/return behavior and output, not identical exception classes or messages",
+      "one real PPT plus generated recovery/projection cases does not prove universal PPT fidelity"
+    ]
+  }
+}

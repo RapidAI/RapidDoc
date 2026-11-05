@@ -108,7 +108,8 @@ def test_weak_candidate_cannot_expand_confirmed_grid_over_prose():
     assert merged[0].line_indices == {1, 2}
 
 
-def test_table_preamble_keeps_first_copy_and_changed_values():
+def test_table_preamble_keeps_metadata_on_every_page():
+    """相邻表格前导信息属于每页正文；重复值和变化值都不能被删除。"""
     pages = []
     for value in ['A', 'A', 'B']:
         members = [
@@ -116,11 +117,12 @@ def test_table_preamble_keeps_first_copy_and_changed_values():
             _LineItem(f'Arbitrary metadata value {value}', (10, 41, 280, 49), 0, 1, effective_height=8, semantic_type='header'),
             _LineItem('Generated on some date', (400, 41, 590, 49), 0, 2, effective_height=8, semantic_type='header'),
         ]
-        pages.append(SimpleNamespace(page_size=(600, 800), table_bboxes=[(10, 51, 590, 750)], remaining_lines=members))
+        pages.append(SimpleNamespace(page_size=(600, 800), table_bboxes=[(10, 51, 590, 750)], remaining_lines=members, drawing_lines=[]))
     pipeline._restore_table_preamble_metadata(pages)
     assert all(line.semantic_type is None for line in pages[0].remaining_lines)
-    assert all(line.semantic_type == 'header' for line in pages[1].remaining_lines)
+    assert all(line.semantic_type is None for line in pages[1].remaining_lines)
     assert all(line.semantic_type is None for line in pages[2].remaining_lines)
+    assert all(line.marginal_body_context for page in pages for line in page.remaining_lines)
 
 
 @pytest.mark.parametrize('scanned', [False, True])

@@ -1,0 +1,8 @@
+{
+  "flags": "1=space,2=lower,4=digit,8=Nd,16=mark/control,32=opening,64=closing,128=alnum,256=upper,512=alpha",
+  "generator": "scripts/migration/generate_text_unicode.py",
+  "generator_sha256": "2f6626b42dcd610a8376cbc132d8cc76eb453789448f3326db6f345f0c8af777",
+  "python": "3.14.5 (tags/v3.14.5:5607950, May 10 2026, 10:43:50) [MSC v.1944 64 bit (AMD64)]",
+  "ranges": 3047,
+  "unicode": "16.0.0"
+}

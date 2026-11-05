@@ -7,10 +7,10 @@ import hashlib
 
 from loguru import logger
 
-from ..errors import LegacyOfficeImageResourceLimitError, LegacyOfficeResourceLimitError
+from ..errors import LegacyOfficeImageLimitError
 from ..legacy.binary import bounded_slice, get_u16, get_u32
 from ..limits import MAX_ASSET_TOTAL_BYTES
-from ..legacy.officeart import OfficeImagePayload, decode_bstore, extract_word_shapes, first_blip, record_at
+from ..legacy.officeart import OfficeImageBudget, OfficeImagePayload, decode_bstore, extract_word_shapes, first_blip, record_at
 from ..equation.image import OfficeImageEquationDecoder
 
 from .models import DocImage, DocImagePayload
@@ -23,42 +23,43 @@ _PLACEABLE_WMF_MAGIC = b"\xd7\xcd\xc6\x9a"
 class ImageStore:
     """按内容去重并限制 DOC 图片累计字节数。"""
 
-    total: int = 0
     cache: dict[tuple[bytes, tuple[int, int] | None], DocImagePayload] = field(default_factory=dict)
-    accounted_digests: set[bytes] = field(default_factory=set)
-    equation_cache: dict[bytes, str | None] = field(default_factory=dict)
     equation_decoder: OfficeImageEquationDecoder = field(default_factory=OfficeImageEquationDecoder)
+    image_budget: OfficeImageBudget = field(init=False)
+
+    def __post_init__(self) -> None:
+        """让内联图片和浮动 BStore 共享本次文档的预算及探测缓存。"""
+        self.image_budget = OfficeImageBudget(max_bytes=MAX_ASSET_TOTAL_BYTES, check_image=self.equation_decoder.check_limit)
+
+    @property
+    def total(self) -> int:
+        """返回本次文档已接受的唯一原图字节总量。"""
+        return self.image_budget.total
 
     def add(self, payload: OfficeImagePayload) -> DocImagePayload:
         """计入一张唯一图片并返回内部载荷。"""
 
-        digest = hashlib.sha256(payload.data).digest()
+        payload = self.image_budget.admit(payload, source=f"DOC image.{payload.extension}")
+        digest = payload.source_digest or hashlib.sha256(payload.data).digest()
         cache_key = digest, payload.render_size_emu
         cached = self.cache.get(cache_key)
         if cached is not None:
             return cached
-        is_new_payload = digest not in self.accounted_digests
-        if is_new_payload and self.total + len(payload.data) > MAX_ASSET_TOTAL_BYTES:
-            raise LegacyOfficeResourceLimitError(f"embedded assets exceed max_asset_total_bytes={MAX_ASSET_TOTAL_BYTES}")
-        if digest in self.equation_cache:
-            equation_latex = self.equation_cache[digest]
-        else:
-            equation_latex = self.equation_decoder.decode(
+        equation_latex = None
+        if payload.limit_reason is None:
+            equation_latex = self.equation_decoder.probe(
                 payload.data,
                 part_name=f"image.{payload.extension}",
                 content_type=payload.content_type,
-            )
+            ).latex
         converted = DocImagePayload(
             payload.data,
             payload.extension,
             payload.content_type,
             equation_latex,
             render_size_emu=payload.render_size_emu,
+            limit_reason=payload.limit_reason,
         )
-        if is_new_payload:
-            self.total += len(payload.data)
-            self.accounted_digests.add(digest)
-        self.equation_cache[digest] = equation_latex
         self.cache[cache_key] = converted
         return converted
 
@@ -83,9 +84,15 @@ def inline_picture(
     art = picf[min(header_length, len(picf)) :]
     try:
         decoded = first_blip(art, charge=budget.charge)
-    except LegacyOfficeImageResourceLimitError as exc:
-        logger.warning("DOC_IMAGE_SKIPPED: Data offset {}: {}", offset, exc)
-        return None
+    except LegacyOfficeImageLimitError as exc:
+        # 超限图片不能再次通过下面的原始签名扫描恢复。
+        return store.add(
+            store.image_budget.reject(
+                OfficeImagePayload(art, "bin", "application/octet-stream"),
+                str(exc),
+                source=f"DOC Data offset {offset}",
+            )
+        )
     if decoded is None:
         # 少量旧文件把原始位图直接放在 PICF 尾部，按 magic 尽力保留。
         signatures = (
@@ -129,6 +136,7 @@ def floating_pictures(
         drawing,
         charge=budget.charge,
         delay_stream=word_document,
+        image_budget=store.image_budget,
     )
     shapes = {}
     first = record_at(drawing, 0, charge=budget.charge)

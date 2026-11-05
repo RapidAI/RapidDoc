@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>io.github.rapidai</groupId>
+  <artifactId>rapid-doc-ort</artifactId>
+  <version>1.23.2</version>
+  <packaging>pom</packaging>
+  <name>RapidDoc ONNX Runtime distribution</name>
+  <description>Versioned CPU/CUDA native ORT libraries with platform dependency notices</description>
+  <url>https://github.com/RapidAI/RapidDoc</url>
+  <scm>
+    <url>https://github.com/RapidAI/RapidDoc</url>
+    <connection>scm:git:https://github.com/RapidAI/RapidDoc.git</connection>
+  </scm>
+  <developers>
+    <developer>
+      <id>rapidai</id>
+      <name>RapidAI contributors</name>
+      <url>https://github.com/RapidAI</url>
+    </developer>
+  </developers>
+  <licenses>
+    <license>
+      <name>MIT License (ONNX Runtime)</name>
+      <url>https://github.com/microsoft/onnxruntime/blob/main/LICENSE</url>
+    </license>
+    <license>
+      <name>Microsoft Visual C++ Runtime redistribution terms (Windows private CRT)</name>
+      <url>https://learn.microsoft.com/en-us/cpp/windows/redistributing-visual-cpp-files</url>
+    </license>
+  </licenses>
+</project>

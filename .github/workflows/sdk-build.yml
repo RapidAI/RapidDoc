@@ -1,0 +1,152 @@
+name: Build native SDK packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: SDK version already present in manifests
+        required: true
+        default: '0.1.0'
+        type: string
+      include_cuda:
+        description: Also use configured self-hosted CUDA packaging runners
+        default: false
+        type: boolean
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+      include_cuda:
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    runs-on: ubuntu-22.04
+    outputs:
+      matrix: ${{ steps.matrix.outputs.value }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check versions
+        env:
+          SDK_VERSION: ${{ inputs.version }}
+        run: python scripts/release/common.py "$SDK_VERSION"
+      - name: Offline release helper checks
+        run: |
+          python -m pip install pytest
+          python -m pytest tests/release/test_release_helpers.py -q
+      - id: matrix
+        env:
+          INCLUDE_CUDA: ${{ inputs.include_cuda }}
+        shell: python
+        run: |
+          import json, os
+          rows = [
+            dict(platform='linux-x86_64', runner=['ubuntu-22.04'], cuda=False),
+            dict(platform='windows-x86_64', runner=['windows-2025'], cuda=False),
+          ]
+          if os.environ['INCLUDE_CUDA'] == 'true':
+            rows += [
+              dict(platform='linux-x86_64-cuda', runner=['self-hosted', 'Linux', 'X64', 'rapiddoc-cuda'], cuda=True),
+              dict(platform='windows-x86_64-cuda', runner=['self-hosted', 'Windows', 'X64', 'rapiddoc-cuda'], cuda=True),
+            ]
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+            print('value=' + json.dumps({'include': rows}), file=f)
+
+  packages:
+    needs: plan
+    name: Package ${{ matrix.platform }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 90
+    env:
+      CARGO_BUILD_JOBS: '2'
+      CARGO_INCREMENTAL: '0'
+      CGO_ENABLED: '1'
+      SDK_VERSION: ${{ inputs.version }}
+      SDK_CUDA: ${{ matrix.cuda }}
+      # CUDA operator bundles must have a platform + SHA256 files manifest.
+      RAPIDDOC_OPERATOR_BUNDLE: ${{ startsWith(matrix.platform, 'windows-') && vars.CUDA_OPERATORS_WINDOWS || vars.CUDA_OPERATORS_LINUX }}
+      RAPIDDOC_CRT_REDIST_DIR: ${{ vars.WINDOWS_CRT_REDIST_DIR }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.20.5'
+          cache: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: '1.92.0'
+      - uses: ilammy/msvc-dev-cmd@v1
+        if: runner.os == 'Windows'
+        with:
+          arch: x64
+      - name: Linux native build prerequisites
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y build-essential cmake ninja-build nasm patchelf
+      - name: Windows NASM and Go C compiler
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          if (-not (Get-Command nasm -ErrorAction SilentlyContinue)) { choco install nasm --no-progress -y }
+          "C:\Program Files\NASM" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
+          if (Test-Path 'C:\msys64\mingw64\bin\gcc.exe') {
+            'C:\msys64\mingw64\bin' | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
+          } else { throw 'Install an x64 GCC toolchain for Go cgo on this runner' }
+      - name: Build-time Python tools and pinned runtime distributors
+        run: python -m pip install "maturin>=1.8,<2" "twine>=6,<7" "fonttools>=4.60,<5" "pypdfium2==5.10.1" "shapely==2.1.2"
+      - name: Linux wheel repair tools
+        if: runner.os == 'Linux'
+        run: python -m pip install "auditwheel>=6,<7" "patchelf>=0.17"
+      - name: Node platform loader and progress checks
+        run: node --test bindings/node/test/platform.test.js bindings/node/test/progress.test.js
+      - name: Build packages and run seven-format installation checks
+        shell: python
+        run: |
+          import os, subprocess, sys
+          command = [sys.executable, 'scripts/release/build.py', '--version', os.environ['SDK_VERSION']]
+          if os.environ['SDK_CUDA'] == 'true': command.append('--cuda')
+          subprocess.run(command, check=True)
+      - name: Keep verified distributables
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdk-${{ matrix.platform }}
+          if-no-files-found: error
+          retention-days: 14
+          path: |
+            build/release/${{ matrix.platform }}/python/*.whl
+            build/release/${{ matrix.platform }}/npm/*.tgz
+            build/release/${{ matrix.platform }}/java/*.jar
+            build/release/${{ matrix.platform }}/java/*.pom
+            build/release/${{ matrix.platform }}/reports/*.json
+            build/release/${{ matrix.platform }}/rapiddoc-native-*.zip
+            build/release/${{ matrix.platform }}/checksums.json
+      - name: Preserve diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdk-diagnostics-${{ matrix.platform }}
+          retention-days: 7
+          path: |
+            build/release/${{ matrix.platform }}/reports/
+            bindings/java/target/surefire-reports/
+

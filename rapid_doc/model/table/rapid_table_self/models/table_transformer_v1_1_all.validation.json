@@ -1,0 +1,41 @@
+{
+  "model": "microsoft/table-transformer-structure-recognition-v1.1-all",
+  "revision": "7587a7ef111d9dcbf8ac695f1376ab7014340a0c",
+  "source_revision": "16d124f616109746b7785f03085100f1f6247575",
+  "weights_sha256": "9df416575a3a36ebd0129342d4f597f14d6e5170268f3d52d28584ab4466a501",
+  "onnx_sha256": "2c361306169b92b8fdf1ae677b0bbcc5111503729b598c388e5ef20237dc9085",
+  "validation": [
+    {
+      "image": "D:\\CodeProjects\\doc\\RapidAI\\latest\\RapidDoc\\demo\\tables\\img_table.png",
+      "max_errors": [
+        2.6702880859375e-05,
+        2.9802322387695312e-06
+      ],
+      "preprocess_exact": true,
+      "upstream_cells_equal": true,
+      "cells": 301
+    },
+    {
+      "image": "D:\\CodeProjects\\doc\\RapidAI\\latest\\RapidDoc\\demo\\images\\table_10.png",
+      "max_errors": [
+        0.00010151416063308716,
+        1.633167266845703e-05
+      ],
+      "preprocess_exact": true,
+      "upstream_cells_equal": true,
+      "cells": 91
+    },
+    {
+      "image": "D:\\CodeProjects\\doc\\RapidAI\\latest\\RapidDoc\\demo\\images\\4fadb5592ba7013701010e0955317984dacbf3f0cf81886c7796ee88e86b6647.png",
+      "max_errors": [
+        3.4332275390625e-05,
+        5.185604095458984e-06
+      ],
+      "preprocess_exact": true,
+      "upstream_cells_equal": true,
+      "cells": 144
+    }
+  ],
+  "torch": "2.7.0+cpu",
+  "onnxruntime": "1.22.0"
+}

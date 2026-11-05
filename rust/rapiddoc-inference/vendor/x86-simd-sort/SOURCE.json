@@ -1,0 +1,30 @@
+{
+  "repository": "https://github.com/intel/x86-simd-sort",
+  "revision": "5adb33411f3cea8bdbafa9d91bd75bc4bf19c7dd",
+  "numpy": "2.4.6",
+  "files": {
+    "src/x86simdsort-static-incl.h": "a5783cf3198c3091d74ee88aa2e1ab04f86f7240eaf56e042d300341d5e4d9cc",
+    "src/avx2-64bit-qsort.hpp": "b8a9bed1d9cfbfc72891433e8f0b65877f3f502056ecdddbd00b56408a93c7bc",
+    "src/avx2-emu-funcs.hpp": "44c2bf91ef4fc4724ddee486a48f7fd69d9ebc05e59f06ab87ef91ad9ecb19c0",
+    "src/avx2-32bit-qsort.hpp": "d761b47bd5bf530efc884fbb94c9c86c020d2dc8607d07fa67cadd242735e651",
+    "src/avx2-32bit-half.hpp": "146cbe08de1ced007c7448ed31cfc56f63bff2493d7ffcd20706b6ea851d772d",
+    "src/avx512fp16-16bit-qsort.hpp": "9b1120e1cc73d786286ac1afeca80d2fad93a0cc1764e147abec9397ff3fd55f",
+    "src/avx512-16bit-common.h": "09d17df4f6796f42c672be436ac4285e7232b534178580762b646a09d6a8f04b",
+    "src/avx512-16bit-qsort.hpp": "feb612575b835bf7dfb5670c922fc0db3c8746908e427a21d32a9f482fedc254",
+    "src/avx512-64bit-argsort.hpp": "d7ff66b0844f9cecb1f3e6d4ba9add3dd193f0ecbb71861221ed3abfb9862bc9",
+    "src/xss-common-argsort.h": "a9fb313c3d0d101b5333073d2754f103eb4e098b9fab9b16831c6fbef9b4f990",
+    "src/xss-network-keyvaluesort.hpp": "8397a50ceae4c581742282f481496c7cb304ae93c9c1629503eb53bdb24f998c",
+    "src/xss-common-includes.h": "02bf51c63b3f87009234b81a5487db6e38719f309cd0f36c1f3dc31b5a4aa185",
+    "src/xss-custom-float.h": "50a1223d7fb7f3469099856010e08152b710458fc3cbe73103ba0bbf9f8a92fe",
+    "src/avx512-64bit-common.h": "4d30b83bf384f98a4caf93ec6cd34c423774cbd798b001c236fc9167fe502b17",
+    "src/avx512-64bit-qsort.hpp": "f72b7156119128424bcc34311653bf62f418de917dece78c644503fc257e3bdd",
+    "src/avx512-32bit-qsort.hpp": "7ff85a3145b1c30c8bb1f8f42ebc564048414c33a4b919c53e62e0d860989417",
+    "src/xss-common-keyvaluesort.hpp": "960d6e991da292e32e49cf77feb51938b24bf6745614adc59adb361972dde715",
+    "src/xss-common-qsort.h": "56a33fae870d952ba4e1429fabdcb9f4570d7aab1736602529e408a9d5e6355f",
+    "src/xss-reg-networks.hpp": "b00982b00d35aedf44950706ef8da539e29b75cd11cd93059dfb0d66dc81c2b2",
+    "src/xss-common-comparators.hpp": "2132ed20cc5839352f86126fc31e6a7e407f7f3df18b54738cd8f980bc41fe26",
+    "src/xss-network-qsort.hpp": "55fafc872d417284d7b6e39b0ac0bbdd337eeb6747df0630c6061eab17722c72",
+    "src/xss-optimal-networks.hpp": "44bd6cd148ed35f41d50bdac1cb13ad2879b0ab6fccb95fd5757cdfab433e464",
+    "src/xss-pivot-selection.hpp": "eda5bc0d9c12eb15ad9df9fa961882d01573253583d5ffe7948dbe86ced3c97c"
+  }
+}

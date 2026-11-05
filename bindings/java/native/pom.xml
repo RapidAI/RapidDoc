@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>io.github.rapidai</groupId>
+  <artifactId>rapid-doc-native</artifactId>
+  <version>0.1.0</version>
+  <packaging>pom</packaging>
+  <name>RapidDoc native runtime</name>
+  <description>Platform-specific JNI and document runtimes</description>
+  <url>https://github.com/RapidAI/RapidDoc</url>
+  <scm>
+    <url>https://github.com/RapidAI/RapidDoc</url>
+    <connection>scm:git:https://github.com/RapidAI/RapidDoc.git</connection>
+  </scm>
+  <developers>
+    <developer>
+      <id>rapidai</id>
+      <name>RapidAI contributors</name>
+      <url>https://github.com/RapidAI</url>
+    </developer>
+  </developers>
+  <licenses>
+    <license>
+      <name>Apache License 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+    </license>
+  </licenses>
+</project>

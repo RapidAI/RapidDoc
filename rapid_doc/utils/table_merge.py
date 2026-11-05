@@ -3,11 +3,11 @@ from copy import deepcopy
 from dataclasses import dataclass
 from typing import Any
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, NavigableString, Tag
 
-from rapid_doc.backend.pipeline.pipeline_middle_json_mkcontent import merge_para_with_text
 from rapid_doc.utils.char_utils import full_to_half
 from rapid_doc.utils.enum_class import BlockType, SplitFlag
+from rapid_doc._vendor.docvortex_core.foundation._text import is_hyphen_at_line_end, resolve_text_line_boundary
 
 
 CONTINUATION_END_MARKERS = [
@@ -196,6 +196,8 @@ def _find_table_body_span(table_block):
 
 def _is_continuation_caption(caption_block) -> bool:
     """判断 caption 文本是否带有续表标记。"""
+    from rapid_doc.backend.pipeline.pipeline_middle_json_mkcontent import merge_para_with_text
+
     caption_text = full_to_half(merge_para_with_text(caption_block).strip()).lower()
     return (
         any(caption_text.endswith(marker.lower()) for marker in CONTINUATION_END_MARKERS)
@@ -306,6 +308,9 @@ def build_table_state_from_html(
 def _build_table_state(table_block, max_header_rows: int = MAX_HEADER_ROWS) -> TableMergeState | None:
     body_span = _find_table_body_span(table_block)
     if body_span is None:
+        return None
+
+    if body_span.get('text_fallback'):
         return None
 
     html = body_span.get("html", "")
@@ -779,6 +784,49 @@ def _row_has_semantic_content(row) -> bool:
     return any(_cell_has_semantic_content(cell) for cell in row.find_all(["td", "th"]))
 
 
+_CELL_TEXT_INLINE_TAGS = frozenset({
+    "a", "abbr", "b", "bdi", "bdo", "big", "cite", "del", "em", "font",
+    "i", "ins", "mark", "s", "small", "span", "strike", "strong", "sub", "sup", "u",
+})
+
+
+def _cell_boundary_text(cell, *, from_end: bool) -> tuple[str, NavigableString | None]:
+    """读取单元格接缝处连续行内文字，保留结构节点边界。"""
+    if cell is None or cell.get("data-block-type") in {"equation", "code", "code_body", "algorithm", "algorithm_body"}:
+        return "", None
+    nodes = []
+    children = reversed(cell.contents) if from_end else iter(cell.contents)
+    for child in children:
+        if type(child) is NavigableString:
+            if child:
+                nodes.append(child)
+        elif isinstance(child, Tag) and child.name in _CELL_TEXT_INLINE_TAGS:
+            text, node = _cell_boundary_text(child, from_end=from_end)
+            if not node:
+                break
+            nodes.append(node)
+        else:
+            break
+    if not nodes:
+        return "", None
+    if from_end:
+        nodes.reverse()
+    return "".join(str(node) for node in nodes), nodes[-1] if from_end else nodes[0]
+
+
+def _append_merged_cell_content(target, source) -> None:
+    previous, last_node = _cell_boundary_text(target, from_end=True)
+    current, _ = _cell_boundary_text(source, from_end=False)
+    if previous and current and not previous[-1].isspace() and not current[0].isspace():
+        processed, separator = resolve_text_line_boundary(previous, next_content=current)
+        if last_node is not None and processed == previous[:-1] and is_hyphen_at_line_end(previous):
+            last_node.replace_with(NavigableString(str(last_node)[:-1]))
+        if separator:
+            target.append(NavigableString(separator))
+    for child in list(source.children):
+        target.append(child.extract())
+
+
 def _insert_cell_before_visual_column(rows, target_row_index: int, start_vcol: int, cell) -> None:
     """将单元格插入到目标行中对应视觉列之前。"""
     target_row = rows[target_row_index]
@@ -877,8 +925,7 @@ def _apply_cell_merge(
             if ci1 is not None and ci2 is not None:
                 pair = (ci1, ci2)
                 if pair not in transferred_pairs:
-                    for child in list(cells2[ci2].children):
-                        cells1[ci1].append(child.extract())
+                    _append_merged_cell_content(cells1[ci1], cells2[ci2])
                     transferred_pairs.add(pair)
 
     # 只清空确实成功转移过的源单元格

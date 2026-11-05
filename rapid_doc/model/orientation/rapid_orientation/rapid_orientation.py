@@ -41,6 +41,11 @@ class RapidOrientation():
         self.preprocess_ops = create_operators(config["PreProcess"])
 
     def __call__(self, images):
+        label, _, _, elapsed = self.predict_scores(images)
+        return label, elapsed
+
+    def predict_scores(self, images):
+        """Expose the winning score and runner-up margin without a second run."""
         s = time.time()
         for ops in self.preprocess_ops:
             images = ops(images)
@@ -52,7 +57,9 @@ class RapidOrientation():
         pred_idx = np.argmax(pred_output)
         pred_txt = self.labels[pred_idx]
         elapse = time.time() - s
-        return pred_txt, elapse
+        score = float(pred_output[pred_idx])
+        margin = float(pred_output[pred_idx] - np.max(np.delete(pred_output, pred_idx)))
+        return pred_txt, score, margin, elapse
 
     @staticmethod
     def read_yaml(yaml_path):

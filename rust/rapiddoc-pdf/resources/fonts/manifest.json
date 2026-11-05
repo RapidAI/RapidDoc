@@ -1,0 +1,9 @@
+{
+  "policy": "droid-cjk-v1",
+  "font_name": "Droid Sans Fallback Full",
+  "file": "DroidSansFallbackFull.ttf",
+  "sha256": "8a4dea0899424438af25a6f1f6eb61e5d111d85367eece0a5d30170861ae6b2e",
+  "source_commit": "398b9126136fae6ffa78fb40bc768f2ebfdc4fa4",
+  "source_url": "https://raw.githubusercontent.com/ArtifexSoftware/mupdf/398b9126136fae6ffa78fb40bc768f2ebfdc4fa4/resources/fonts/droid/DroidSansFallbackFull.ttf",
+  "license": "Apache-2.0"
+}

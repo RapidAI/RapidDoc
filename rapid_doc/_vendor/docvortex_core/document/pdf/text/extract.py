@@ -141,6 +141,7 @@ def get_chars(
     *,
     include_geometry: bool = False,
     visibility_by_object: dict[int, tuple[bool, tuple[float, float, float, float] | None]] | None = None,
+    unicode_fallback=None,
 ) -> list[Char]:
     """普通页面使用同库字符批量读取，特殊运行时保留完整 ctypes 参考路径。"""
     if (
@@ -154,14 +155,31 @@ def get_chars(
     ):
         result = _get_chars_native(textpage, page_bbox, page_rotation, include_geometry, visibility_by_object)
         if result is not None:
-            return result
-    return _get_chars_python(
+            return _recover_null_chars(result, unicode_fallback)
+    result = _get_chars_python(
         textpage,
         page_bbox,
         page_rotation,
         include_geometry=include_geometry,
         visibility_by_object=visibility_by_object,
     )
+    return _recover_null_chars(result, unicode_fallback)
+
+
+def _recover_null_chars(chars, resolver):
+    indices = [char["char_idx"] for char in chars if char["raw_code"] == 0]
+    if resolver is not None and indices:
+        replacements = resolver(indices)
+        if not isinstance(replacements, dict) or any(
+            type(index) is not int or index not in indices or type(code) is not int
+            or not 0 < code <= 0x10ffff or 0xd800 <= code <= 0xdfff
+            for index, code in replacements.items()
+        ):
+            raise ValueError("Unicode fallback must only replace requested NUL indices with valid scalars")
+        for char in chars:
+            if char["raw_code"] == 0 and char["char_idx"] in replacements:
+                char["char"] = chr(replacements[char["char_idx"]])
+    return chars
 
 
 def _get_chars_native(textpage, page_bbox, page_rotation, include_geometry, visibility_by_object):

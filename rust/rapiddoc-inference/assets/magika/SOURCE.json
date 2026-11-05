@@ -1,0 +1,11 @@
+{
+  "source": "rapid_doc/model/magika/models/standard_v3_3",
+  "upstream": "https://github.com/google/magika",
+  "license": "Apache-2.0",
+  "files": {
+    "model.onnx": "fe2d2eb49c5f88a9e0a6c048e15d6ffdf86235519c2afc535044de433169ec8c",
+    "config.min.json": "991a6fb760c0431e5c0350a487ba4bd89dee43b74d53b77cc88106469d99617a",
+    "README.md": "355816f847dba572cc673a6afa6c4ded31118965ab41566b817a678df16b0777",
+    "LICENSE": "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd"
+  }
+}

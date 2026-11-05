@@ -1,0 +1,551 @@
+{
+  "status": "preparation_only_no_conversion_parity_claim",
+  "office_modules": 78,
+  "office_lines": 25234,
+  "direct_external_roots": {
+    "PIL": {
+      "distribution": "pillow",
+      "version": "12.2.0",
+      "license_expression": "MIT-CMU",
+      "project_urls": [
+        "Release notes, https://pillow.readthedocs.io/en/stable/releasenotes/index.html",
+        "Changelog, https://github.com/python-pillow/Pillow/releases",
+        "Documentation, https://pillow.readthedocs.io",
+        "Funding, https://tidelift.com/subscription/pkg/pypi-pillow?utm_source=pypi-pillow&utm_medium=pypi",
+        "Homepage, https://python-pillow.github.io",
+        "Mastodon, https://fosstodon.org/@pillow",
+        "Source, https://github.com/python-pillow/Pillow"
+      ],
+      "requirements": [
+        "furo; extra == \"docs\"",
+        "olefile; extra == \"docs\"",
+        "sphinx>=8.2; extra == \"docs\"",
+        "sphinx-autobuild; extra == \"docs\"",
+        "sphinx-copybutton; extra == \"docs\"",
+        "sphinx-inline-tabs; extra == \"docs\"",
+        "sphinxext-opengraph; extra == \"docs\"",
+        "olefile; extra == \"fpx\"",
+        "olefile; extra == \"mic\"",
+        "arro3-compute; extra == \"test-arrow\"",
+        "arro3-core; extra == \"test-arrow\"",
+        "nanoarrow; extra == \"test-arrow\"",
+        "pyarrow; extra == \"test-arrow\"",
+        "check-manifest; extra == \"tests\"",
+        "coverage>=7.4.2; extra == \"tests\"",
+        "defusedxml; extra == \"tests\"",
+        "markdown2; extra == \"tests\"",
+        "olefile; extra == \"tests\"",
+        "packaging; extra == \"tests\"",
+        "pyroma>=5; extra == \"tests\"",
+        "pytest; extra == \"tests\"",
+        "pytest-cov; extra == \"tests\"",
+        "pytest-timeout; extra == \"tests\"",
+        "pytest-xdist; extra == \"tests\"",
+        "trove-classifiers>=2024.10.12; extra == \"tests\"",
+        "defusedxml; extra == \"xmp\""
+      ],
+      "sources": [
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/image.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xlsx/xlsx_converter.py",
+        "rapid_doc/_vendor/docvortex_core/foundation/_svg_raster.py"
+      ]
+    },
+    "bs4": {
+      "distribution": "beautifulsoup4",
+      "version": "4.14.3",
+      "license_expression": null,
+      "project_urls": [
+        "Download, https://www.crummy.com/software/BeautifulSoup/bs4/download/",
+        "Homepage, https://www.crummy.com/software/BeautifulSoup/bs4/"
+      ],
+      "requirements": [
+        "soupsieve>=1.6.1",
+        "typing-extensions>=4.0.0",
+        "cchardet; extra == 'cchardet'",
+        "chardet; extra == 'chardet'",
+        "charset-normalizer; extra == 'charset-normalizer'",
+        "html5lib; extra == 'html5lib'",
+        "lxml; extra == 'lxml'"
+      ],
+      "sources": [
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/tables.py"
+      ]
+    },
+    "docx": {
+      "distribution": "python-docx",
+      "version": "1.2.0",
+      "license_expression": null,
+      "project_urls": [
+        "Changelog, https://github.com/python-openxml/python-docx/blob/master/HISTORY.rst",
+        "Documentation, https://python-docx.readthedocs.org/en/latest/",
+        "Homepage, https://github.com/python-openxml/python-docx",
+        "Repository, https://github.com/python-openxml/python-docx"
+      ],
+      "requirements": [
+        "lxml>=3.1.0",
+        "typing_extensions>=4.9.0"
+      ],
+      "sources": [
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/docx_converter.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/fields.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/numbering.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/resources.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/styles.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/tables.py"
+      ]
+    },
+    "loguru": {
+      "distribution": "loguru",
+      "version": "0.7.3",
+      "license_expression": null,
+      "project_urls": [
+        "Changelog, https://github.com/Delgan/loguru/blob/master/CHANGELOG.rst",
+        "Documentation, https://loguru.readthedocs.io/en/stable/index.html",
+        "Homepage, https://github.com/Delgan/loguru"
+      ],
+      "requirements": [
+        "colorama>=0.3.4 ; sys_platform=='win32'",
+        "aiocontextvars>=0.2.0 ; python_version<'3.7'",
+        "win32-setctime>=1.0.0 ; sys_platform=='win32'",
+        "pre-commit==4.0.1  ; extra == \"dev\" and ( python_version>='3.9')",
+        "tox==3.27.1  ; extra == \"dev\" and ( python_version<'3.8')",
+        "tox==4.23.2  ; extra == \"dev\" and ( python_version>='3.8')",
+        "pytest==6.1.2  ; extra == \"dev\" and ( python_version<'3.8')",
+        "pytest==8.3.2  ; extra == \"dev\" and ( python_version>='3.8')",
+        "pytest-cov==2.12.1  ; extra == \"dev\" and ( python_version<'3.8')",
+        "pytest-cov==5.0.0  ; extra == \"dev\" and ( python_version>='3.8' and python_version<'3.9')",
+        "pytest-cov==6.0.0  ; extra == \"dev\" and ( python_version>='3.9')",
+        "pytest-mypy-plugins==1.9.3  ; extra == \"dev\" and ( python_version>='3.6' and python_version<'3.8')",
+        "pytest-mypy-plugins==3.1.0  ; extra == \"dev\" and ( python_version>='3.8')",
+        "colorama==0.4.5  ; extra == \"dev\" and ( python_version<'3.8')",
+        "colorama==0.4.6  ; extra == \"dev\" and ( python_version>='3.8')",
+        "freezegun==1.1.0  ; extra == \"dev\" and ( python_version<'3.8')",
+        "freezegun==1.5.0  ; extra == \"dev\" and ( python_version>='3.8')",
+        "exceptiongroup==1.1.3  ; extra == \"dev\" and ( python_version>='3.7' and python_version<'3.11')",
+        "mypy==v0.910  ; extra == \"dev\" and ( python_version<'3.6')",
+        "mypy==v0.971  ; extra == \"dev\" and ( python_version>='3.6' and python_version<'3.7')",
+        "mypy==v1.4.1  ; extra == \"dev\" and ( python_version>='3.7' and python_version<'3.8')",
+        "mypy==v1.13.0  ; extra == \"dev\" and ( python_version>='3.8')",
+        "Sphinx==8.1.3  ; extra == \"dev\" and ( python_version>='3.11')",
+        "sphinx-rtd-theme==3.0.2  ; extra == \"dev\" and ( python_version>='3.11')",
+        "myst-parser==4.0.0  ; extra == \"dev\" and ( python_version>='3.11')",
+        "build==1.2.2  ; extra == \"dev\" and ( python_version>='3.11')",
+        "twine==6.0.1  ; extra == \"dev\" and ( python_version>='3.11')"
+      ],
+      "sources": [
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/fields.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/formatting.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/images.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/parser.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/styles.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/docx_converter.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/fields.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/numbering.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/package_normalizer.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/resources.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/tables.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/equation/image.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/equation/mtef.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/equation/omml.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/image.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/legacy/officeart.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/ppt/parser.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/package_normalizer.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/pptx_converter.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/resources.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/shapes.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/text_styles.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/spreadsheet/projector.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/embedded_chart.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/parser.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/records.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/xls_converter.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xlsx/ooxml_ole.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xlsx/xlsx_converter.py",
+        "rapid_doc/_vendor/docvortex_core/foundation/_svg_raster.py"
+      ]
+    },
+    "lxml": {
+      "distribution": "lxml",
+      "version": "6.1.1",
+      "license_expression": null,
+      "project_urls": [
+        "Source, https://github.com/lxml/lxml",
+        "Bug Tracker, https://bugs.launchpad.net/lxml"
+      ],
+      "requirements": [
+        "cssselect>=0.7; extra == \"cssselect\"",
+        "html5lib; extra == \"html5\"",
+        "BeautifulSoup4; extra == \"htmlsoup\"",
+        "lxml_html_clean; extra == \"html-clean\""
+      ],
+      "sources": [
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/docx_converter.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/equationxml.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/package_normalizer.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/equation/omml.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/ooxml_chart.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/opc.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/lists.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/package_normalizer.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/text_styles.py"
+      ]
+    },
+    "mammoth": {
+      "distribution": "mammoth",
+      "version": "1.12.0",
+      "license_expression": null,
+      "project_urls": [],
+      "requirements": [
+        "cobble<0.2,>=0.1.3"
+      ],
+      "sources": [
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/office_xml.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/tables.py"
+      ]
+    },
+    "metafile_render": {
+      "distribution": "metafile-render",
+      "version": "0.3.0",
+      "license_expression": "MIT",
+      "project_urls": [
+        "Repository, https://github.com/myhloli/metafile-render",
+        "Issues, https://github.com/myhloli/metafile-render/issues"
+      ],
+      "requirements": [
+        "pillow>=11.0.0; python_version < \"3.14\"",
+        "pillow>=12.0.0; python_version >= \"3.14\"",
+        "pyclipper<2,>=1.3.0; python_version < \"3.14\"",
+        "pyclipper<2,>=1.4.0; python_version >= \"3.14\"",
+        "pytest>=8; extra == \"test\"",
+        "pypptx-with-oxml<2,>=1.0.3; extra == \"test\"",
+        "metafile-render[test]; extra == \"dev\"",
+        "ruff; extra == \"dev\"",
+        "build; extra == \"dev\"",
+        "twine; extra == \"dev\"",
+        "mypy; extra == \"dev\""
+      ],
+      "sources": [
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/image.py"
+      ]
+    },
+    "olefile": {
+      "distribution": "olefile",
+      "version": "0.47",
+      "license_expression": null,
+      "project_urls": [],
+      "requirements": [
+        "pytest ; extra == 'tests'",
+        "pytest-cov ; extra == 'tests'"
+      ],
+      "sources": [
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/legacy/ole.py"
+      ]
+    },
+    "openpyxl": {
+      "distribution": "openpyxl",
+      "version": "3.1.5",
+      "license_expression": null,
+      "project_urls": [
+        "Documentation, https://openpyxl.readthedocs.io/en/stable/",
+        "Source, https://foss.heptapod.net/openpyxl/openpyxl",
+        "Tracker, https://foss.heptapod.net/openpyxl/openpyxl/-/issues"
+      ],
+      "requirements": [
+        "et-xmlfile"
+      ],
+      "sources": [
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/ooxml_chart.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/spreadsheet/projector.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/xls_converter.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xlsx/xlsx_converter.py"
+      ]
+    },
+    "pptx": {
+      "distribution": "pypptx-with-oxml",
+      "version": "1.0.3",
+      "license_expression": null,
+      "project_urls": [
+        "Homepage, https://github.com/Sidney233/python-pptx"
+      ],
+      "requirements": [
+        "Pillow>=3.3.2",
+        "XlsxWriter>=0.5.7",
+        "lxml>=3.1.0",
+        "typing_extensions>=4.9.0"
+      ],
+      "sources": [
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/context.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/lists.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/pptx_converter.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/resources.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/shapes.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/text_styles.py"
+      ]
+    },
+    "pydantic": {
+      "distribution": "pydantic",
+      "version": "2.13.4",
+      "license_expression": "MIT",
+      "project_urls": [
+        "Homepage, https://github.com/pydantic/pydantic",
+        "Documentation, https://docs.pydantic.dev",
+        "Funding, https://github.com/sponsors/samuelcolvin",
+        "Source, https://github.com/pydantic/pydantic",
+        "Changelog, https://docs.pydantic.dev/latest/changelog/"
+      ],
+      "requirements": [
+        "annotated-types>=0.6.0",
+        "pydantic-core==2.46.4",
+        "typing-extensions>=4.14.1",
+        "typing-inspection>=0.4.2",
+        "email-validator>=2.0.0; extra == 'email'",
+        "tzdata; (python_version >= '3.9' and platform_system == 'Windows') and extra == 'timezone'"
+      ],
+      "sources": [
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/context.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/formatting_types.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/styles.py",
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/spreadsheet/models.py"
+      ]
+    },
+    "pylatexenc": {
+      "distribution": "pylatexenc",
+      "version": "2.10",
+      "license_expression": null,
+      "project_urls": [],
+      "requirements": [],
+      "sources": [
+        "rapid_doc/_vendor/docvortex_core/analyzers/native/office/equation/omml.py"
+      ]
+    },
+    "resvg_py": {
+      "distribution": "resvg_py",
+      "version": "0.5.0",
+      "license_expression": null,
+      "project_urls": [
+        "Documentation, https://resvg-py.readthedocs.io/",
+        "Issues, https://github.com/baseplate-admin/resvg-py/issues",
+        "Source Code, https://github.com/baseplate-admin/resvg-py"
+      ],
+      "requirements": [],
+      "sources": [
+        "rapid_doc/_vendor/docvortex_core/foundation/_svg_raster.py"
+      ]
+    }
+  },
+  "sources_sha256": {
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/__init__.py": "77d32d32552566440981ceab4b391eee79102ec7f040a050013407a6898afb37",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/__init__.py": "2dda563afb8d0a155fa2faa1c9ec919011466761280201134558daf2b5031130",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/bookmarks.py": "1778a9c56fffd8c5081fadac0dd4500823723f141948a5f45c559d75cde71c73",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/doc_converter.py": "0124eab444aab52a08bc8af6a44bffaf2568be8cfa904dd5a68f918a3800d359",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/fib.py": "5c8fb199b47775f48fdeb1feba1846e85f2ce002fb8bed064c603c605b47c203",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/fields.py": "3cd5c3f3718779cf9bad817edf857f09bbfde02cadc4c5ab4d113da56c179b7f",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/formatting.py": "8389f3685640c80187e8aedb9ddf7c8ae991a4adf5d5dcf4238485cebea4d877",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/images.py": "638ed7152014ba62212e377ba7e7ecadc935b8c29c6d459c9ce5995e1d6573c8",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/lists.py": "9a7f2631dd10796550252d0d24c59e1bee27568e9015f661d2dfccb3553eb730",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/models.py": "cca32e12209141f54a6b7e2bec25e73b36287755588a465091707e6c1bd75f57",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/parser.py": "11e67a154797ccd86622ce4c005b07c632307a9a9e5e296f4738650e8c46ef40",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/pieces.py": "03c196416d804607978fa240c6f3d057eeb4c51454a02d1e85636b52300e05fd",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/records.py": "0291d1955c87884236c858481aa97433f82d74f7d3cacafd3f94018c963d794f",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/sprm.py": "d665265d72813f9f274a5b1a9ab156ead62174a02a925d58b7659f8505445384",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/styles.py": "b91ed30269d05e9be59f2b00840caf59a7911fa5278fe8a4240b0e07700e2514",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/__init__.py": "069b59ec4ee5420f3e8f583612b6864df90d83340eee9edd9002f19eaf4d1fcc",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/context.py": "bd256e05f28057a4e1037a7c0bec8128a48fc8c47ac56d7f6127bbc9c03f5c3b",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/docx_converter.py": "76aa20533730743ece7663b4a63cf42ee99935b9a99994c3da74029f1b54d268",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/equationxml.py": "1d143fcf1b3a3dd4d9293f5f215d838cf565dd5b238ea07f134213c63d21ef34",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/fields.py": "4183dbe7134bc31aace0f8935bea753e244154b6a8eb65481fb76aade0e25a80",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/formatting_types.py": "0ca66d01495fcc58603a5eca53a690ea1661996b99898668a945b3e30cfbe258",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/numbering.py": "03a8aefea90b8f970ab572c2b80744f6202597cf649142054abee0172d11af67",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/office_xml.py": "cd6616acacfa8d7c43528f947cd3156ff5d552dbd2c3bbf8a3170419edfaab81",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/package_normalizer.py": "62a6f93b310f8e230b6330df1b97193ed8ed3658237ba946c8241ae216f08ecc",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/resources.py": "963753562febd4812f8bd5e23a4e170200d8b2df31e9ba36a27afe4a07c291f2",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/styles.py": "e49af988f8aa270878746196ac779f3dcc870a1f54dcad830efcccae97aa6f9e",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/tables.py": "bd752f68fb783295bf85069dcbf8a7e6b89f86afa19764bfc1f24a37ea2373e8",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/equation/__init__.py": "f56d2d659aa35d5c9ef91481d346bc36eeb1baa8ad40dc973fb823ebccc11f93",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/equation/image.py": "ab05a980e8c04ca938d2844dea6d6be0d122bf9a73d8af691f06ae7991a10bc2",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/equation/latex_dict.py": "8b843a3d2c07870501f9bc8410f50d14958c148691e8b6e769f105e88c0deeff",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/equation/mtef.py": "ab09dd02606298344d49332a434c6d0f72ec8ee20d895adcd7ca8065ba4ea856",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/equation/mtef_v5.py": "0245db097c6dada3355072b12d39955604494288a917b43ca13452021d7a3be0",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/equation/omml.py": "87e12011b246a07ed481fadf4adba75990a6d9b291c275f76945054e1d709a87",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/equation/ooxml.py": "552996956fbc6c86740f7c6939e248f96fd17939e7a07d9aba1f6cc4efb6b28e",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/errors.py": "4bf02fcd2ec2b5e4824fc14e11333dbe7612d462ba3740b09b7728886286ac21",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/image.py": "700a39dc69e041f37b6427422ac206ebf43545c47bd3da10f38a210a7279153c",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/legacy/__init__.py": "c815f7bb9ffaa544ba7f1be6cee411f8e824483c4065ab90f52631a9dd24fa1b",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/legacy/binary.py": "fbec139d76fcdd92e76074ad115d284dbbc3a9899f7553f2a13d86036a18cb89",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/legacy/officeart.py": "1d3bd1e308b57925e4f2ddadd9497a987afe08be1ee232050c10cb960a209cbd",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/legacy/ole.py": "00b991252f20cc1ff6c3ebc9fe7980c80e47a096468d38d24192c045a72eda18",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/limits.py": "5283f267c30dc013de14668504c4604007943e524c85f8580a1eefdb82cd0dd7",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/ooxml_chart.py": "62bdd3c1019bbb2ecfa063fd7f19a11309bcd349292b4aed713510ac29217161",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/opc.py": "33c3aba744072e707bd3a05f6a08215e120b25d8068fc3e767ff4f98db2ef310",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/ppt/__init__.py": "3135ca9d33ca625762767ce3ebc093d40aca0ddefe4399e83fb7954d48b667ed",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/ppt/models.py": "bd7b834d6402d947833792ef401b58b4323f12a3ad4f34113a6f03730ca7d420",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/ppt/parser.py": "68b4ce6e347a8fa5f3b933e6f4869301fe9c2fcee39be2c1ff14ef2baa1742a5",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/ppt/ppt_converter.py": "398208c2e7498a419c3a97127429ade31d95c5d8543621ee231d71605ee348de",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/ppt/records.py": "1efb333bb18c46583007450273b1d413bafb43cfb098265d676485c2fae127a2",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/ppt/style_text.py": "900149a725696ba44a436777c79f878cedccb8c2a38dccad5e8bf3d8c349af1a",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/__init__.py": "f5ba0e3765998f5591a6f776459c5f0bbb0ba93d68319edafe5f0d2bc089d9dd",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/context.py": "9502ff868824a0b58c8d0b718a3e6e830fbfe90f510ff884376e9f320c462192",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/lists.py": "9680b0f6f37798759873036290a0b4766c5f939164ccc7a11d774ab982ecda9d",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/package_normalizer.py": "f6970780a047da53a89c05ef3d144b3802ff29abd64209e3192218011481013b",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/pptx_converter.py": "5f286378c52a3d20952a0a7e8ac18c1a7aec442b8ecba1447dcdee66725742d9",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/resources.py": "2c28663e1e96cd43372b25df17be8cafc6f3a7034712506e61571a6154d24ee5",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/shapes.py": "bd692401ddb9fd09b6b5e984951d4f360d3668b4fec8053d10436f3c872599e4",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/text_styles.py": "a9f68d5d0c51ebcf7095724088de4895ef13219cd04052001bf2b43055629dc3",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/titles.py": "8a84a6fce1dbf1012e772eac3559c32051fb808d17f22180e67bbf45271a631e",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/rich_text.py": "0fe3d0466f11568b9996e597fc008fec26c549c235c49834f96d54c57ed9586b",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/spreadsheet/__init__.py": "59d5e4a067efe7996c247fe5daa89f70dd3ebb8674e38af690e4a38f4f53f6f6",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/spreadsheet/html.py": "981b47155b7f0361830ef55f47ab358aad026ce307098fbe88914f200fe8350e",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/spreadsheet/models.py": "f9ac8af76b23d8f11daa1d95934b45e01eee7242fbd14594bb1c15f2e361643c",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/spreadsheet/projector.py": "2d8e7eb7bf9b0975c56aba447078e285698b3821cc2eea51fcaf9105a0f32c09",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/spreadsheet/region_discovery.py": "e88517d2813c3e31db4f3b7325c908aaeb3e5f4e0e71b899b84f8e8187e03f92",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/streams.py": "0960063fd2871b86531facbc8694aa9e1f92b1ac22e6267ba8a34edb6c340de3",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/__init__.py": "c694ae356b9127e650338fa07e0eec5da0b88641943eadce8f6c43cba94458e9",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/chart.py": "b7a68375f758c9a96c97eb0df1283e4c9d9b58cde9160b12c20a07dfa9b8605a",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/embedded_chart.py": "51f3e3e24165cfac1b4861a5943bff11239cebae711ee812a256bb7558a1569a",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/models.py": "e3ed6372b4145cc877a681b18c58013a0d019e0bf521dcd1d99dce110981b566",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/number_format.py": "15274cfc7515125dac1884b00dbe597eb43becb0975899cee828795e6a3e428d",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/parser.py": "e5234311df9242f8b799bb4975aae2bdc6534ce265ccf637a2178d7b2dcf5430",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/records.py": "cdda253783f65239ed80ef1bd416c046ca1b08b418644121c0d84768e0e835ea",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/strings.py": "69c3d9c9a291e5240d65274049c8597ed3371e6b31fee99e819d4afe43084f58",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/xls_converter.py": "2e20bb71f8bc47f08ec916b20a9e4c32b4af8d74b38e6902c8fc47ff4d80fa8f",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xlsx/__init__.py": "87d66e4713f56842800f864038cc01a35b0d2727f9ed85ac7591a7a977048423",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xlsx/ooxml_ole.py": "3a3a8ed6756cf3619351bd504a7f7e9194e3c51936783de09c4013a3b591a1f6",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xlsx/package_normalizer.py": "f708f76b9c8d0fd8145128c3b2ed52b5e3740c00efbf4ecde7df3565dbd98e16",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xlsx/xlsx_converter.py": "a1da5abb54732dab360da02ff6bf01d31b4f59d8174234866e06622a62044d12",
+    "rapid_doc/_vendor/docvortex_core/foundation/_svg_raster.py": "32fea5c10edab2fb74e3af9433cb19c6dc4c9ab353651973f8fd2ec147e7779d"
+  },
+  "fixtures": [
+    {
+      "path": "tests/fixtures/docvortex_migration/docx_01.doc",
+      "bytes": 1863680,
+      "sha256": "6aae60b01f0e020c59d2299f217dbd5904df08182a31384db40953937f322fd1"
+    },
+    {
+      "path": "tests/fixtures/docvortex_migration/docx_01.docx",
+      "bytes": 186225,
+      "sha256": "86393df4b91412b946c7331e27e762440889b916a0d2ec9331700913f06a7a1b"
+    },
+    {
+      "path": "tests/fixtures/docvortex_migration/pptx_01.ppt",
+      "bytes": 812032,
+      "sha256": "2215ba7ee3d845ad745714a6b35ca8d652ec0c2f373e15f56dd520570b0eab6a"
+    },
+    {
+      "path": "tests/fixtures/docvortex_migration/pptx_01.pptx",
+      "bytes": 574065,
+      "sha256": "77eec640e70e927d0d5dda6b69dc4317596cb01c220a58b83d9933a58ff0ecc2"
+    },
+    {
+      "path": "tests/fixtures/docvortex_migration/xlsx_01.xls",
+      "bytes": 204800,
+      "sha256": "733225d6eb2659b1503abccc3cf46483dbe15b028cb2b0898cb57ec81c4d3cc0"
+    },
+    {
+      "path": "tests/fixtures/docvortex_migration/xlsx_01.xlsx",
+      "bytes": 494212,
+      "sha256": "fe3e77a6c16bca8eeccb970e7d788cb7f3a3e4f3ac9c793589892ac190e6b874"
+    },
+    {
+      "path": "tests/fixtures/docx/handmade-altpath.docx",
+      "bytes": 1998,
+      "sha256": "fb77751c25853f876f9cda0b819819f690c4baadf080c1170ad06ffc98e52545"
+    },
+    {
+      "path": "tests/fixtures/docx/handmade-strict.docx",
+      "bytes": 1635,
+      "sha256": "f65da59839848f8bbe0b72ddc03f8765bf06662994ae980f22095eb85cb0096a"
+    },
+    {
+      "path": "tests/fixtures/pptx/handmade-altpath.pptx",
+      "bytes": 1643,
+      "sha256": "1f364b417eb31799d7fdfabe00af8e15a689a535fb2ec40dd1aadd38654bbfdf"
+    },
+    {
+      "path": "tests/fixtures/pptx/handmade-inherit.pptx",
+      "bytes": 3535,
+      "sha256": "4bbab27a28b2532eaa3ad93b86d2667e454f6d40bbf4b178524de3f0a0d0bfe3"
+    },
+    {
+      "path": "tests/fixtures/pptx/handmade-links.pptx",
+      "bytes": 2508,
+      "sha256": "32cc7652099218a1f15190615607697583afb5a76c9fffc2d2dea23b29c66533"
+    },
+    {
+      "path": "tests/fixtures/pptx/handmade-math.pptx",
+      "bytes": 2681,
+      "sha256": "b95ba383c185208fd171a86f38f0a9ee01e00e5fc72dcdace82c46f844753d4c"
+    },
+    {
+      "path": "tests/fixtures/pptx/handmade-order.pptx",
+      "bytes": 2376,
+      "sha256": "b05bc15dd2b901373e566e938d988fa387aa27d9f03c0fc5918097fef1652a07"
+    },
+    {
+      "path": "tests/fixtures/pptx/handmade-strict.pptx",
+      "bytes": 1709,
+      "sha256": "8890634f199ede31676cc86ad08db97240fe31eefa3fcf49012466aaa8c53d4b"
+    },
+    {
+      "path": "tests/migration/inputs/synthetic.doc",
+      "bytes": 9728,
+      "sha256": "8220ef40d11940cd0c5a52a5cbdd10ea9d14ec8525d2ac5ed989f0f5a5906576"
+    },
+    {
+      "path": "tests/migration/inputs/synthetic.docx",
+      "bytes": 35959,
+      "sha256": "8fa3c5d3f10b2fe30dbe339a098df4e01283f815671da93eab71678623cf36c7"
+    },
+    {
+      "path": "tests/migration/inputs/synthetic.ppt",
+      "bytes": 9728,
+      "sha256": "a73a3ec85cba14e7b9adac569bb324dca8b6efc061a5ead677cb17c37999f2fe"
+    },
+    {
+      "path": "tests/migration/inputs/synthetic.pptx",
+      "bytes": 28746,
+      "sha256": "aba7f3a463dfb04a842744b7a94eb3c95d2c5295c7795fb8fc1fa9183ebcc670"
+    },
+    {
+      "path": "tests/migration/inputs/synthetic.xls",
+      "bytes": 5632,
+      "sha256": "4c307b2a72ab8ee3b6608a63f6c95c0a0ba4a543d6ed69158fa85809b066f347"
+    },
+    {
+      "path": "tests/migration/inputs/synthetic.xlsx",
+      "bytes": 4909,
+      "sha256": "698a1af94f60a20629d29ce1201134f15788025b6ea1395ea0ba60d04d5872eb"
+    },
+    {
+      "path": "demo/ms_office_docs/docx_01.doc",
+      "bytes": 1863680,
+      "sha256": "6aae60b01f0e020c59d2299f217dbd5904df08182a31384db40953937f322fd1"
+    },
+    {
+      "path": "demo/ms_office_docs/docx_01.docx",
+      "bytes": 186225,
+      "sha256": "86393df4b91412b946c7331e27e762440889b916a0d2ec9331700913f06a7a1b"
+    },
+    {
+      "path": "demo/ms_office_docs/pptx_01.ppt",
+      "bytes": 812032,
+      "sha256": "2215ba7ee3d845ad745714a6b35ca8d652ec0c2f373e15f56dd520570b0eab6a"
+    },
+    {
+      "path": "demo/ms_office_docs/pptx_01.pptx",
+      "bytes": 574065,
+      "sha256": "77eec640e70e927d0d5dda6b69dc4317596cb01c220a58b83d9933a58ff0ecc2"
+    },
+    {
+      "path": "demo/ms_office_docs/xlsx_01.xls",
+      "bytes": 204800,
+      "sha256": "733225d6eb2659b1503abccc3cf46483dbe15b028cb2b0898cb57ec81c4d3cc0"
+    },
+    {
+      "path": "demo/ms_office_docs/xlsx_01.xlsx",
+      "bytes": 494212,
+      "sha256": "fe3e77a6c16bca8eeccb970e7d788cb7f3a3e4f3ac9c793589892ac190e6b874"
+    }
+  ],
+  "scope": "Static imports in Office plus SVG helper; requirements list exposes transitive dependencies, not a complete dynamically observed dependency graph."
+}

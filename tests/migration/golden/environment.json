@@ -1,0 +1,16 @@
+{
+  "git_status": "AM todo.md\n?? docs/plans/2026-10-22-rust-feasibility.md\n?? docs/plans/2026-10-22-rust-migration-plan.md\n?? scripts/\n?? tests/migration/\n",
+  "head": "d0e98fb550f741a3b979bf79217f7f8e180f8812",
+  "packages": {
+    "numpy": "2.4.6",
+    "onnxruntime": "1.26.0",
+    "onnxruntime-gpu": null,
+    "openpyxl": "3.1.5",
+    "pypdfium2": "5.10.1",
+    "python-docx": "1.2.0",
+    "python-pptx": null,
+    "reportlab": "4.5.1"
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.5 (tags/v3.14.5:5607950, May 10 2026, 10:43:50) [MSC v.1944 64 bit (AMD64)]"
+}

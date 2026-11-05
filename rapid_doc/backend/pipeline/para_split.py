@@ -1,4 +1,6 @@
 import copy
+import re
+from statistics import median
 from rapid_doc.utils.enum_class import ContentType, BlockType, SplitFlag
 from rapid_doc.utils.text_boundary import uses_unspaced_script
 
@@ -269,7 +271,58 @@ def __is_list_or_index_block(block):
         return BlockType.TEXT
 
 
-def __merge_2_text_blocks(block1, block2):
+# DocVortex 0.6.12 policy adapted to RapidDoc lines/spans; freeze before reverse merging.
+_LIST_START = re.compile(r"^(?:[-*+•●○▪▫◦‣⁃–—](?:\s|$)|[（(]?(?:\d+|[A-Za-z]|[IVXLCDMivxlcdm]+)[.．、)）]|[\[［]\d+[\]］]|[一二三四五六七八九十百]+[、.．)）]|[①-⑳])")
+
+def _body_lines(block):
+    return [line['bbox'] for line in block.get('lines', [])]
+
+def _body_content(block):
+    return ''.join(str(span.get('content', '')) for line in block.get('lines', []) for span in line.get('spans', [])).strip()
+
+def _vertical_lines(lines):
+    return bool(lines) and sum((b[3]-b[1]) / max(b[2]-b[0], 1e-12) > 2 for b in lines) / len(lines) > .8
+
+def _indented_body(block):
+    lines = _body_lines(block)
+    text = _body_content(block)
+    if block.get('type') != 'text' or block.get('_reference_start') is not None or not text or _LIST_START.match(text) or len(lines) < 2 or _vertical_lines(lines):
+        return False
+    first = lines[0]
+    height = first[3]-first[1]
+    left = min(b[0] for b in lines[1:])
+    return height > 0 and max(b[2] for b in lines)-first[2] < height and first[0]-left >= height/2 and all(abs(b[0]-left) < (b[3]-b[1])/2 for b in lines[1:])
+
+def _uppercase_continuations(blocks):
+    evidence = {block['page_num'] for block in blocks if _indented_body(block)}
+    allowed = set()
+    for index, current in enumerate(blocks):
+        if not index or current['page_num'] not in evidence:
+            continue
+        previous = blocks[index-1]
+        if any(b.get('type') != 'text' or b.get('_reference_start') is not None or _LIST_START.match(_body_content(b)) for b in (current,previous)):
+            continue
+        lines, prior = _body_lines(current), _body_lines(previous)
+        if not lines or not prior or _vertical_lines(lines) or _vertical_lines(prior):
+            continue
+        if current['page_num'] == previous['page_num'] and not (min(b[0] for b in lines) >= max(b[2] for b in prior) and lines[0][3] < prior[-1][1]):
+            continue
+        if len(lines) == 1:
+            following=[]
+            for block in blocks[index+1:]:
+                if block['page_num'] != current['page_num'] or block.get('type') != 'text' or _vertical_lines(_body_lines(block)):
+                    break
+                following.extend(_body_lines(block))
+                if len(following) >= 5:
+                    break
+            h=lines[0][3]-lines[0][1]
+            aligned=[b for b in following[:5] if min(h,b[3]-b[1]) > 0 and max(h,b[3]-b[1])/min(h,b[3]-b[1]) <= 1.5 and abs(b[0]-lines[0][0]) <= max(h,b[3]-b[1])]
+            if len(aligned) < 3 or abs(lines[0][0]-median(b[0] for b in aligned)) >= h/2:
+                continue
+        allowed.add(id(current))
+    return allowed
+
+def __merge_2_text_blocks(block1, block2, *, allow_uppercase_start=False):
     if len(block1['lines']) > 0 and len(block2['lines']) > 0:
         first_line = block1['lines'][0]
         line_height = first_line['bbox'][3] - first_line['bbox'][1]
@@ -296,7 +349,7 @@ def __merge_2_text_blocks(block1, block2):
                             # 下一个block的第一个字符是数字
                             and not span_start_with_num
                             # 下一个block的第一个字符是大写字母
-                            and not span_start_with_big_char
+                            and (not span_start_with_big_char or allow_uppercase_start)
                             # 下一个块的y0要比上一个块的y1小
                             and block1['bbox'][1] < block2['bbox'][3]
                             # 两个块任意一个块需要大于1行
@@ -334,6 +387,7 @@ def __is_list_group(text_blocks_group):
     return True
 
 def __para_merge_page(blocks):
+    uppercase_continuations = _uppercase_continuations(blocks)
     page_text_blocks_groups = __process_blocks(blocks)
 
     for group in page_text_blocks_groups:
@@ -361,7 +415,7 @@ def __para_merge_page(blocks):
                         and prev_block["type"] == "text"
                         and not is_list_group
                     ):
-                        __merge_2_text_blocks(current_block, prev_block)
+                        __merge_2_text_blocks(current_block, prev_block, allow_uppercase_start=id(current_block) in uppercase_continuations)
 
                     elif (
                         (current_block["type"] == BlockType.LIST and prev_block["type"] == BlockType.LIST)

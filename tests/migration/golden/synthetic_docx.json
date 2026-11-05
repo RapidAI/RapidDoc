@@ -1,0 +1,102 @@
+{
+  "assets": {
+    "784c03ba38540d8843dc22fc2cf6eb10ccfd98e9dc55e9f8ec04862fdd533eea.jpg": {
+      "base64": "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAQABADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDxyiiiv3E8w//Z",
+      "sha256": "6235cdb3f43680868b6fb7a5e440612abf117170e57a2d560bc9f6317e5ed97a",
+      "size": 633
+    }
+  },
+  "content_list_json": [
+    {
+      "page_idx": 0,
+      "text": "中文 English  spacing **bold**",
+      "type": "text"
+    },
+    {
+      "page_idx": 0,
+      "table_body": "<table><tr><td><p>0</p></td><td><p>1</p></td></tr><tr><td><p>2</p></td><td><p>3</p></td></tr></table>",
+      "table_caption": [],
+      "type": "table"
+    },
+    {
+      "image_caption": [],
+      "img_path": "images/784c03ba38540d8843dc22fc2cf6eb10ccfd98e9dc55e9f8ec04862fdd533eea.jpg",
+      "page_idx": 0,
+      "type": "image"
+    }
+  ],
+  "markdown": "中文 English  spacing **bold**\n\n<table><tr><td><p>0</p></td><td><p>1</p></td></tr><tr><td><p>2</p></td><td><p>3</p></td></tr></table>\n\n![](images/784c03ba38540d8843dc22fc2cf6eb10ccfd98e9dc55e9f8ec04862fdd533eea.jpg)",
+  "middle_json": {
+    "_backend": "office",
+    "_version_name": "0.9.11",
+    "pdf_info": [
+      {
+        "discarded_blocks": [],
+        "page_idx": 0,
+        "para_blocks": [
+          {
+            "index": 0,
+            "lines": [
+              {
+                "spans": [
+                  {
+                    "content": "中文 English  spacing",
+                    "type": "text"
+                  },
+                  {
+                    "content": " bold",
+                    "style": [
+                      "bold"
+                    ],
+                    "type": "text"
+                  }
+                ]
+              }
+            ],
+            "type": "text"
+          },
+          {
+            "blocks": [
+              {
+                "index": 1,
+                "lines": [
+                  {
+                    "spans": [
+                      {
+                        "html": "<table><tr><td><p>0</p></td><td><p>1</p></td></tr><tr><td><p>2</p></td><td><p>3</p></td></tr></table>",
+                        "type": "table"
+                      }
+                    ]
+                  }
+                ],
+                "type": "table_body"
+              }
+            ],
+            "index": 1,
+            "type": "table"
+          },
+          {
+            "blocks": [
+              {
+                "index": 2,
+                "lines": [
+                  {
+                    "spans": [
+                      {
+                        "image_path": "784c03ba38540d8843dc22fc2cf6eb10ccfd98e9dc55e9f8ec04862fdd533eea.jpg",
+                        "type": "image"
+                      }
+                    ]
+                  }
+                ],
+                "type": "image_body"
+              }
+            ],
+            "index": 2,
+            "type": "image"
+          }
+        ]
+      }
+    ]
+  }
+}

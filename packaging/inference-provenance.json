@@ -1,0 +1,103 @@
+{
+  "caveat": "IPP arithmetic independently calibrated from numerical probes; no IPP/OpenCV binary linked; other backends/platforms unverified",
+  "compatibility_profile": {
+    "ipp": "ippIP AVX2 (l9) 2026.0.0 (-) Mar 27 2026",
+    "ipp_enabled": true,
+    "opencv": "5.0.0",
+    "pillow": "12.2.0"
+  },
+  "models_bundled": false,
+  "notices": "bindings/python/python/rapid_doc_rust/notices",
+  "opencv_sources": {
+    "opencv-drawing.cpp": {
+      "sha256": "dcc74b12baf0bfe1c94e31f52f7dcba6871d1bfe8ace9053afdbefa388cdaf45",
+      "url": "https://raw.githubusercontent.com/opencv/opencv/5.0.0/modules/imgproc/src/drawing.cpp"
+    },
+    "opencv-imgwarp.cpp": {
+      "sha256": "f1c72130bbd23635e08176b8936339713372e115ffd3d30800aa81f13415329f",
+      "url": "https://raw.githubusercontent.com/opencv/opencv/5.0.0/modules/imgproc/src/imgwarp.cpp"
+    },
+    "opencv-resize.cpp": {
+      "sha256": "e4610736015ab8e7395bde854a60337d1281b972566bb4806db04f1868f6e36c",
+      "url": "https://raw.githubusercontent.com/opencv/opencv/5.0.0/modules/imgproc/src/resize.cpp"
+    },
+    "opencv-rotcalipers.cpp": {
+      "sha256": "663cb3b99e12a8be133987580d81819aa409b29d3f64e8aee7bd986fc3315c42",
+      "url": "https://raw.githubusercontent.com/opencv/opencv/5.0.0/modules/geometry/src/rotcalipers.cpp"
+    },
+    "opencv-types.cpp": {
+      "sha256": "e8be4d24de29aa64a5e021dae5a5992929a144f42a60af4464b50652966ecd7c",
+      "url": "https://raw.githubusercontent.com/opencv/opencv/5.0.0/modules/core/src/types.cpp"
+    },
+    "opencv-warp-common-scalar.hpp": {
+      "sha256": "ff53aef9fb5efb9406baa98e61e1f52074cebd743be8492fb252fe5540b96865",
+      "url": "https://raw.githubusercontent.com/opencv/opencv/5.0.0/modules/imgproc/src/warp_common.scalar.hpp"
+    },
+    "opencv-warp-common-vector.hpp": {
+      "sha256": "cbcd579a794b6cae6351e7082e573986cf20ef8764e467faac07857ec52d77cd",
+      "url": "https://raw.githubusercontent.com/opencv/opencv/5.0.0/modules/imgproc/src/warp_common.vector.hpp"
+    },
+    "opencv-warp-common.hpp": {
+      "sha256": "488214ac6757687782a5bb6d188bc237551aaef285d7c0671813298c803c901f",
+      "url": "https://raw.githubusercontent.com/opencv/opencv/5.0.0/modules/imgproc/src/warp_common.hpp"
+    },
+    "opencv-warp-kernels.hpp": {
+      "sha256": "c309d7f941ae6cdb232597787f71ab4f014f6371b2caf94aba49d04b61ed690e",
+      "url": "https://raw.githubusercontent.com/opencv/opencv/5.0.0/modules/imgproc/src/warp_kernels.simd.hpp"
+    }
+  },
+  "pillow_sources": {
+    "PILLOW-LICENSE.txt": {
+      "sha256": "15181e7363dca9aed78b79bebebc7fde7f1814b8bd311ea3b87ae8ccadfc185b",
+      "url": "https://raw.githubusercontent.com/python-pillow/Pillow/12.2.0/LICENSE"
+    },
+    "pillow-Resample.c": {
+      "sha256": "94ad3ea42e7343ad18183e4d4f0d85e34d88e482609953ead01b503b350dcad7",
+      "url": "https://raw.githubusercontent.com/python-pillow/Pillow/12.2.0/src/libImaging/Resample.c"
+    }
+  },
+  "python_sources": {
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/pdf/local_lists.py": "d33945c6de09414ff657d52221b3fe6df8ba3c59dccb155b7e51903951c9b500",
+    "rapid_doc/_vendor/docvortex_core/foundation/_text.py": "b02faec880dc37c071a3560730981a458801f869f78958ec11e7ba7276b06420",
+    "rapid_doc/backend/pipeline/analyze_utils.py": "6c11f0216d0da0afeb9591b0d1c3d68e0e46f4d10bc2665fc24d451712e24cd6",
+    "rapid_doc/backend/pipeline/batch_analyze.py": "82f037e3c318e09debe89ded72f82c8a0f73b0145aa32bf78ba2d606eb820409",
+    "rapid_doc/backend/pipeline/model_json_to_middle_json.py": "f364d9d4966463fd94218aec03e80a067b7496f188684f0ec96adf2f648001d7",
+    "rapid_doc/backend/pipeline/para_split.py": "3b7b911c47d893cdbd6af5dd5b745bc91825c3d61ba62a1e589a07b44cdfc613",
+    "rapid_doc/backend/pipeline/pipeline_magic_model.py": "61f30f8b8ffb9eb4ebac668bbb449479ea40d82a7aaac53b6d66cb074598d45e",
+    "rapid_doc/backend/pipeline/pipeline_middle_json_mkcontent.py": "a65ccbbe74f125dadd2269b1a39bff8ea91313dc3d4fb8ccb054f87b7052d859",
+    "rapid_doc/model/docvortex_adapter.py": "ff13bc1c20a1a6bf3d499caa4ceec51f9fa7e6b60ef07a9f72027db93ad9c7d8",
+    "rapid_doc/model/layout/rapid_layout.py": "0ed6c3e5438fff565542e1d46ed0db3967001f9c2d06f0507bae12baf90a7f24",
+    "rapid_doc/model/layout/rapid_layout_self/model_handler/pp_doclayout/post_process.py": "59c93a27adf651b10103b8178dfbc50356f1b30a5df93c852284bf7d84e036b8",
+    "rapid_doc/model/layout/rapid_layout_self/model_handler/pp_doclayout/pre_process.py": "f9efd32c42ab9736f99a9df99644f20f61de1d9726cb0723f2c5b556848d1a77",
+    "rapid_doc/model/layout/rapid_layout_self/utils/typings.py": "b9893cd4280904063b94701907362b97f2a90aed996a0e020c2b53a7709cac03",
+    "rapid_doc/model/ocr/ocr_patch.py": "b99bb3e8e20ec1fa339a30347c4fad95d1f3eb3422e631ec74ee416b09df8894",
+    "rapid_doc/model/ocr/rapid_ocr.py": "d3a234f78a889a287b092bd9f8d32f2a966091a167fb9eccc041509e5f7f5b6c",
+    "rapid_doc/model/orientation/rapid_orientation/rapid_orientation.py": "b44ec43d8944a84baac5ab3a3dd5e10634e0b2e327a3a9d873278377ec06c547",
+    "rapid_doc/model/orientation/rapid_orientation/utils.py": "a3efcf464f54125eeaadf42c0fad81c9a7f597441ee17435bd505b36b9c8b34b",
+    "rapid_doc/model/table/rapid_table.py": "752229b0a262b3a14c2c63f9e5f2717627a1e2d9679a6c2f2004b00098f32a67",
+    "rapid_doc/model/table/rapid_table_self/inference_engine/onnxruntime/optimization.py": "0eb710d4896fcb9bbd7d5fc609ebaa535af5384c83c2a7ae0725ac77870eeff2",
+    "rapid_doc/model/table/rapid_table_self/table_cls/main.py": "56238a65b6460401cba90a2dfbd6169799e62be51e114e950cb5108013294920",
+    "rapid_doc/model/table/rapid_table_self/table_matcher/main.py": "46afb562994761f50e488a37b38b89cac160c49761e87e2a062ac8ed98b103b7",
+    "rapid_doc/model/table/rapid_table_self/table_structure/pp_structure/post_process.py": "c48dad7a78d071b419f54b44e7bcc5004b1c3f64880febbfc1406bb71cd2c81a",
+    "rapid_doc/model/table/rapid_table_self/table_structure/pp_structure/pre_process.py": "2ad927377ff645113cbcdfe07a0f80cde66c102599ed5b6a9be22997d91cd0de",
+    "rapid_doc/model/table/rapid_table_self/table_structure/unet/main.py": "494cdaacd1734613135feae3048a90a99bcfc72c2a12cc02ea2e19df143d6252",
+    "rapid_doc/model/table/rapid_table_self/table_structure/unet/table_recover.py": "f241bcfab0c174926a6be91e8c93155c353ee9d923ec96ad38b728ea3b41fa4f",
+    "rapid_doc/model/table/rapid_table_self/table_structure/unet/unet_table_rec.py": "7dcd651201b9c09cd4b7638d83e0a3f8d2866d88dfa0ce470ece2d6f70a9c5c9",
+    "rapid_doc/model/table/rapid_table_self/table_structure/unet/utils/utils.py": "64222e8e81a3da4c0877e5c3458da4bd082fd841dc8ce3175ae020f385b1517f",
+    "rapid_doc/model/table/rapid_table_self/table_structure/unet/utils/utils_table_line_rec.py": "567c577f87c1d588f925cef1292cef05353f25d1c49fa4e554de1ccdbdb5188d",
+    "rapid_doc/model/table/rapid_table_self/table_structure/unet/utils/utils_table_recover.py": "bf7db138f2ff6cf1b8159ae58453fe7ca15cd7d7756a7fcfa1081775d66bcafa",
+    "rapid_doc/model/table/rule_table.py": "b699707cf9db49283f67e7284d765ee03f25ab2c0326ac53ec19fbc0a86114c3",
+    "rapid_doc/model/table/utils.py": "ed9a7b18ca12cea75179aeebc21ff7da12526a649084801257229051c19afd92",
+    "rapid_doc/utils/bbox_utils.py": "ce4a0c831a971463f52f8e671167ac0553304440759bdd550a4de5d137915f6f",
+    "rapid_doc/utils/block_pre_proc.py": "f8707d4c1fdb57155571d018ad0ae0a70f79a7601efc77fcbae8f4b6942ed210",
+    "rapid_doc/utils/block_sort.py": "963ce585b871084a188b9f623d88f397c690551de9dd527da4086a18b2f0a4a1",
+    "rapid_doc/utils/magic_model_utils.py": "4709ac6917b9f4c2f2bba351eb0e7261079d121c058428b70226fd7b8100afa5",
+    "rapid_doc/utils/model_utils.py": "481887664b3d502481adc4cd532a6b29f971aad9b096a8399e14c302c3fcceb8",
+    "rapid_doc/utils/pdf_image_tools.py": "b7f7fc992ee9ec800d97877d51cc593bf7c15d49f9f81f4211f8aea8ee69e5ca",
+    "rapid_doc/utils/span_block_fix.py": "b284dece9cf562685238593dbb0c4a5f324bd2bd08ca14fde72e7a380b9f06e6",
+    "rapid_doc/utils/span_pre_proc.py": "261d1324d71c1fff1781611c2db041699d146a241a7177abacf81cbbb26111ba",
+    "rapid_doc/utils/text_boundary.py": "7381d82ce92ceb3cad3bd3ccdaff8709ebcac923f004c4c82e03d1eae4265780"
+  },
+  "source_commit": "d0e98fb550f741a3b979bf79217f7f8e180f8812",
+  "text_unicode_profile": "packaging/text-unicode-provenance.json"
+}

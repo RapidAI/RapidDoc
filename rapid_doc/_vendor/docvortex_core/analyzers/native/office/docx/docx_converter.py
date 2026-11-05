@@ -153,10 +153,11 @@ class DocxConverter(_DocxConstants, _DocxResources, _DocxStyles, _DocxNumbering,
         file_bytes = self._sanitize_missing_internal_relationships(file_stream.read())
         self._fallback_docx_bytes = file_bytes
         try:
+            # 正文和表格对齐共享本次转换的文档，避免重复解压并构建同一棵 OOXML 树。
+            self.docx_obj = Document(BytesIO(file_bytes))
             # 使用完整 DOCX 上下文预解析顶层表格，避免转换非表格正文带来的资源浪费
             self._mammoth_tables_html = self._preparse_tables_with_mammoth(file_bytes)
             self._mammoth_table_idx = 0
-            self.docx_obj = Document(BytesIO(file_bytes))
             self.toc_anchor_set = self._collect_toc_anchor_set()
             self.toc_anchor_aliases = self._collect_toc_anchor_aliases(
                 self.toc_anchor_set,

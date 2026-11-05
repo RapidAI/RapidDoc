@@ -1,0 +1,18 @@
+{
+  "project": "Clipper 6.4.2 as distributed by pyclipper",
+  "revision": "f998920369565dca56d346bb30c5741e273f0b9b",
+  "files": {
+    "clipper.cpp": {
+      "url": "https://raw.githubusercontent.com/fonttools/pyclipper/f998920369565dca56d346bb30c5741e273f0b9b/src/clipper.cpp",
+      "sha256": "5c642a3668311701f72572443aa42c1a981edb037298efc015166d9d90be0755",
+      "bytes": 142184
+    },
+    "clipper.hpp": {
+      "url": "https://raw.githubusercontent.com/fonttools/pyclipper/f998920369565dca56d346bb30c5741e273f0b9b/src/clipper.hpp",
+      "sha256": "734eba9dc9d399089b2b467017074bd24728a1b9e64c7429e827806ed10e54cc",
+      "bytes": 15423
+    }
+  },
+  "license": "BSL-1.0",
+  "modifications": "Unmodified upstream library; separate bounded C ABI wrapper"
+}

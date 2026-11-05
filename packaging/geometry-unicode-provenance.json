@@ -1,0 +1,6 @@
+{
+  "generator": "scripts/migration/generate_geometry_unicode.py",
+  "python": "3.14.5 (tags/v3.14.5:5607950, May 10 2026, 10:43:50) [MSC v.1944 64 bit (AMD64)]",
+  "sha256": "bcc6d56975a6b9d7d1948a1d7728c0ee56a6a7f128deb741c845281fe477fc35",
+  "unicode": "16.0.0"
+}

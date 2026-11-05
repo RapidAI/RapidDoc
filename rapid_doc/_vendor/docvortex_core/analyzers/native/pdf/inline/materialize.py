@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from typing import Any, Sequence
+from typing import Any, Iterable, Sequence
 
 from .....content.spans import (
     append_equation_span,
@@ -27,6 +27,7 @@ from .matching import (
     _merge_style_ranges,
     _project_content_chars,
     _raw_link_intervals,
+    _resolve_script_matches,
 )
 from .types import (
     _NATIVE_SCRIPT_TAG_RE,
@@ -41,6 +42,7 @@ from .types import (
     PDFTextStyleLine,
     PDFTextStyleRange,
     _NativeScriptMarkup,
+    _MatchedStyleRange,
     _ProjectedChar,
     _RawStyleInterval,
 )
@@ -206,58 +208,101 @@ def _script_range_hits_late_formula_region(
     return any(region[0] <= center_x <= region[2] and region[1] <= center_y <= region[3] for region in regions)
 
 
+def _resolve_inline_styles(styles: Iterable[str], native_scripts: Iterable[str] = ()) -> tuple[PDFTextStyle, ...]:
+    """原生标签优先确定脚本方向；无来源的双重脚本同时移除，保留其它样式。"""
+    selected = set(styles)
+    native = set(native_scripts)
+    scripts = {"superscript", "subscript"}
+    if native:
+        selected.difference_update(scripts)
+        selected.update(native)
+    if scripts <= selected:
+        selected.difference_update(scripts)
+    return _canonical_styles(selected)
+
+
+def _effective_script_intervals(
+    content: str,
+    intervals: Sequence[_RawStyleInterval],
+    native: _NativeScriptMarkup | None,
+) -> list[_RawStyleInterval]:
+    """按最终 Span 的同一互斥规则计算诊断可认领的原文区间，排除标签与公式。"""
+    script_intervals = native.style_intervals if native is not None else ()
+    excluded = list(native.marker_ranges if native is not None else ())
+    excluded.extend(match.span() for match in re.finditer(r"\\\(.*?\\\)", content, re.DOTALL))
+    boundaries = {0, len(content)}
+    for interval in intervals:
+        boundaries.update((interval.start, interval.end))
+    for start, end, _style in script_intervals:
+        boundaries.update((start, end))
+    for start, end in excluded:
+        boundaries.update((start, end))
+    ordered = sorted(value for value in boundaries if 0 <= value <= len(content))
+    output: list[_RawStyleInterval] = []
+    for start, end in zip(ordered, ordered[1:]):
+        if any(left <= start and end <= right for left, right in excluded):
+            continue
+        styles = _resolve_inline_styles(
+            (style for interval in intervals if interval.start <= start and end <= interval.end for style in interval.styles),
+            (style for left, right, style in script_intervals if left <= start and end <= right),
+        )
+        scripts = tuple(style for style in styles if style in {"superscript", "subscript"})
+        if scripts:
+            output.append(_RawStyleInterval(start, end, scripts))
+    return _merge_raw_style_intervals(content, output)
+
+
 def _record_materialized_script_ranges(
     content: str,
     projected: Sequence[_ProjectedChar],
-    combined_ranges: Sequence[PDFTextStyleRange],
+    matches: Sequence[_MatchedStyleRange],
+    effective_intervals: Sequence[_RawStyleInterval],
     block_index: int,
     line: PDFTextScriptLine,
     script_ranges: Sequence[PDFTextScriptRange],
     output: list[dict[str, Any]],
 ) -> None:
-    """记录真正通过文本投影的私有上下标区间，供审阅产物精确回溯。"""
+    """仅记录胜出证据实际输出的子区间，源偏移随冲突裁剪同步更新。"""
     for script_range in script_ranges:
-        evidence_line = PDFTextStyleLine(
-            bbox=line.bbox,
-            text=line.text,
-            style_ranges=(
-                PDFTextStyleRange(
-                    script_range.start,
-                    script_range.end,
-                    (script_range.style,),
-                ),
-            ),
-            source_index=line.source_index,
-        )
-        matched = _match_script_line_ranges(projected, evidence_line)
-        if len(matched) != 1:
-            continue
-        mapped = matched[0]
-        if not any(
-            mapped.start >= combined.start and mapped.end <= combined.end and script_range.style in combined.styles
-            for combined in combined_ranges
-        ):
-            continue
-        raw_intervals = _raw_style_intervals(content, projected, [mapped])
-        if len(raw_intervals) != 1:
-            continue
-        raw_interval = raw_intervals[0]
-        output.append(
-            {
-                "block_index": block_index,
-                "raw_start": raw_interval.start,
-                "raw_end": raw_interval.end,
-                "source_index": line.source_index,
-                "range_start": script_range.start,
-                "range_end": script_range.end,
-                "role": script_range.style,
-                "text": line.text[script_range.start : script_range.end],
-                "bbox": script_range.bbox,
-                "angle": line.angle,
-                "formula_region": script_range.formula_region,
-                "stable_body_count": script_range.stable_body_count,
-            }
-        )
+        for match in matches:
+            if (
+                match.line.source_index != line.source_index
+                or match.line.bbox != line.bbox
+                or match.line.text != line.text
+                or match.source_range.start < script_range.start
+                or match.source_range.end > script_range.end
+                or script_range.style not in match.source_range.styles
+            ):
+                continue
+            for interval in effective_intervals:
+                if script_range.style not in interval.styles:
+                    continue
+                indices = [
+                    index
+                    for index in range(match.start, match.end)
+                    if interval.start <= projected[index].raw_start and projected[index].raw_end <= interval.end
+                ]
+                if not indices:
+                    continue
+                raw_start, raw_end = projected[indices[0]].raw_start, projected[indices[-1]].raw_end
+                source_start = match.source_range.start + indices[0] - match.start
+                source_end = match.source_range.start + indices[-1] - match.start + 1
+                record = {
+                    "block_index": block_index,
+                    "raw_start": raw_start,
+                    "raw_end": raw_end,
+                    "source_index": line.source_index,
+                    "range_start": source_start,
+                    "range_end": source_end,
+                    "role": script_range.style,
+                    "text": line.text[source_start:source_end],
+                    "bbox": script_range.bbox,
+                    "angle": line.angle,
+                    "formula_region": script_range.formula_region,
+                    "stable_body_count": script_range.stable_body_count,
+                }
+                if record not in output:
+                    output.append(record)
 
 
 def apply_pdf_text_scripts(
@@ -304,33 +349,30 @@ def apply_pdf_text_scripts(
                 )
             )
         projected_lines = _filter_line_styles_for_block(projected_lines, block.get("type"))
+        projected_lines.sort(
+            key=lambda line: (
+                line.source_index,
+                line.bbox[1],
+                line.bbox[0],
+                line.text,
+                tuple((item.start, item.end, item.styles) for item in line.style_ranges),
+            )
+        )
         content = block.get("content")
         if not isinstance(content, str) or not content:
             continue
         projected = (
             projection_cache.project(block, content) if projection_cache is not None else _project_content_chars(content)
         )
+        matches: list[_MatchedStyleRange] = []
+        _match_style_ranges(projected, projected_lines, matches=matches)
+        for line_index, projected_line in enumerate(projected_lines):
+            next_line = projected_lines[line_index + 1] if line_index + 1 < len(projected_lines) else None
+            _match_script_line_ranges(projected, projected_line, matches=matches, next_line=next_line)
+        retained_matches = _resolve_script_matches(matches)
         combined_ranges = _merge_style_ranges(
-            [
-                *_match_style_ranges(projected, projected_lines),
-                *(
-                    matched_range
-                    for projected_line in projected_lines
-                    for matched_range in _match_script_line_ranges(projected, projected_line)
-                ),
-            ]
+            [PDFTextStyleRange(match.start, match.end, match.source_range.styles) for match in retained_matches]
         )
-        if materialized_diagnostics is not None:
-            for line in block_lines:
-                _record_materialized_script_ranges(
-                    content,
-                    projected,
-                    combined_ranges,
-                    block_index,
-                    line,
-                    eligible_ranges.get(id(line), ()),
-                    materialized_diagnostics,
-                )
         intervals = _raw_style_intervals(content, projected, combined_ranges)
         if intervals:
             existing = block.get(_PDF_STYLE_INTERVALS_KEY, [])
@@ -341,6 +383,20 @@ def apply_pdf_text_scripts(
                     *intervals,
                 ],
             )
+        if materialized_diagnostics is not None:
+            native = _parse_native_script_markup(content) if block.get(PDF_NATIVE_SCRIPT_MARKUP_KEY) is True else None
+            effective_intervals = _effective_script_intervals(content, block.get(_PDF_STYLE_INTERVALS_KEY, []), native)
+            for line in block_lines:
+                _record_materialized_script_ranges(
+                    content,
+                    projected,
+                    retained_matches,
+                    effective_intervals,
+                    block_index,
+                    line,
+                    eligible_ranges.get(id(line), ()),
+                    materialized_diagnostics,
+                )
     for block in blocks:
         block.pop("_inline_math_regions", None)
 
@@ -421,7 +477,7 @@ def materialize_pdf_inline_spans(blocks: list[dict[str, Any]]) -> None:
                 for interval_start, interval_end, style in script_intervals
                 if interval_start <= start and end <= interval_end
             )
-            combined_styles = tuple(dict.fromkeys((*styles, *script_styles)))
+            combined_styles = _resolve_inline_styles(styles, script_styles)
             link = next(
                 (interval for interval in link_intervals if interval.start <= start and end <= interval.end),
                 None,

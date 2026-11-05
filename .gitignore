@@ -1,56 +1,75 @@
-*.tar
-*.tar.gz
-*.zip
-*venv*/
+# Python environments, caches and packaging output
+.venv/
+.venv-*/
+venv/
 envs/
-slurm_logs/
-
-sync1.sh
-data_preprocess_pj1
-data-preparation1
-__pycache__
-build/
+__pycache__/
+*.py[cod]
 *.egg-info/
-*.log
-*.pyc
-.vscode
-debug/
-*.ipynb
-.idea
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+/coverage.xml
+/build/
+/native/onnx_ops/build/
+/dist/
+/raw-dist/
 
-# vscode history
-.history
+# Cargo/Maven output and generated Python runtime bundle
+target/
+/bindings/python/python/rapid_doc_rust/runtime/
 
+# JavaScript dependencies and generated packages
+node_modules/
+/bindings/node/dist/
+/projects/web/dist/
+
+# Local editor state and secrets (example configuration remains visible)
+.vscode/
+.idea/
+.history/
 .DS_Store
 .env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+/source.dev.env
 
-bad_words/
-bak/
-
-app/tests/*
-temp/
-tmp/
-ocr_demo
-.coveragerc
-/app/common/__init__.py
-/magic_pdf/config/__init__.py
-source.dev.env
-
-projects/web/node_modules
-projects/web/dist
-
-projects/web_demo/web_demo/static/
-cli_debug/
-debug_utils/
-
-# sphinx docs
+# Logs, temporary files and generated documentation
+*.log
+/slurm_logs/
+/temp/
+/tmp/
+/bak/
 _build/
-native/onnx_ops/build/
-docs/evidence
-docs/migrations/
-tests/others
-docs/others
-tools/
-output*/
 
-**/rapid_*_self/**/models/*
+# Parser results: anchor these to avoid hiding source directories named output.
+/output*/
+/demo/output*/
+/.github/output-file/
+
+# Downloaded model weights only; keep licenses, configuration and verification.
+**/rapid_*_self/**/models/**/*.onnx
+**/rapid_*_self/**/models/**/*.onnx.data
+**/rapid_*_self/**/models/**/*.onnx_data
+**/rapid_*_self/**/models/**/*.safetensors
+**/rapid_*_self/**/models/**/*.pdparams
+**/rapid_*_self/**/models/**/*.pth
+**/rapid_*_self/**/models/**/*.pt
+
+# Existing local scratch inputs and generated demo assets
+/sync1.sh
+/data_preprocess_pj1/
+/data-preparation1/
+/bad_words/
+/ocr_demo/
+/debug/
+/cli_debug/
+/debug_utils/
+/projects/web_demo/web_demo/static/

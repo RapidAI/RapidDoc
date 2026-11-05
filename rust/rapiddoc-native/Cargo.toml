@@ -1,0 +1,27 @@
+[package]
+repository = "https://github.com/RapidAI/RapidDoc"
+description = "Native layout and document analysis for RapidDoc."
+include = [
+    "src/**",
+    "build.rs",
+    "build/**",
+    "native/**",
+    "vendor/**",
+    "assets/**",
+    "resources/**",
+    "models.json",
+    "licenses/**",
+    "Cargo.toml",
+    "LICENSE",
+    "README.md",
+]
+name = "rapiddoc-native"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+docvortex-core = { package = "rapiddoc-docvortex-core", version = "=0.1.0", path = "../vendor/docvortex-core" }
+rapiddoc-core = { version = "=0.1.0", path = "../rapiddoc-core" }
+serde.workspace = true
+serde_json.workspace = true

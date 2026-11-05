@@ -1,0 +1,25 @@
+{
+  "allocator": "mimalloc",
+  "rust_wrapper_version": "0.1.52",
+  "sys_crate_version": "0.1.49",
+  "source": "https://github.com/purpleprotocol/mimalloc_rust",
+  "upstream": "https://github.com/microsoft/mimalloc",
+  "crt_override": false,
+  "python_default": true,
+  "cli_default": true,
+  "library_allocator_selected_by_consumer": true,
+  "license_sources": [
+    {
+      "source": "mimalloc-0.1.52/LICENSE.txt",
+      "sha256": "a08554fab028af3af047e8588d32d019662c1b1bf07959a195a2f75fe340726b"
+    },
+    {
+      "source": "libmimalloc-sys-0.1.49/LICENSE.txt",
+      "sha256": "a08554fab028af3af047e8588d32d019662c1b1bf07959a195a2f75fe340726b"
+    },
+    {
+      "source": "libmimalloc-sys-0.1.49/c_src/mimalloc/v3/LICENSE",
+      "sha256": "82ade5d7d9b029044b5fbbc326207fc47c2d44ee4dd71e8a559c36d728217de9"
+    }
+  ]
+}

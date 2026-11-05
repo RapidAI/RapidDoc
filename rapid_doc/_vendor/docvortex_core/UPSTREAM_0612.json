@@ -1,0 +1,160 @@
+{
+  "repository": "https://github.com/myhloli/DocVortex",
+  "target_tag": "v0.6.12",
+  "target_commit": "21b4848e46b528011146c017334d3bbde7c934f9",
+  "base": "Selective 0.6.8 update on local 0.5.16 fork; historical manifests retained",
+  "scope": [
+    "pdf",
+    "doc",
+    "docx",
+    "xls",
+    "xlsx",
+    "ppt",
+    "pptx"
+  ],
+  "commits": [
+    "a4f6e7a",
+    "6bdee78",
+    "014411d",
+    "b5502a2",
+    "826f86f"
+  ],
+  "files": [
+    {
+      "path": "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/doc_converter.py",
+      "upstream": "src/docvortex/analyzers/native/office/doc/doc_converter.py",
+      "upstream_sha256": "d94fd5163af112a7fe3d05efa99177b8fe65420f2324351d4a078ec3a07c3eb1",
+      "installed_sha256": "3e7f25b4aa0d02c4295210367ed6b6cd2507a260dd4cf6537588d220e4a036e4"
+    },
+    {
+      "path": "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/images.py",
+      "upstream": "src/docvortex/analyzers/native/office/doc/images.py",
+      "upstream_sha256": "4b0d1d77da9ae09a23c8042a032d16b9d7582f458d3c0ba74dfff88dd15532aa",
+      "installed_sha256": "7ef321cf02fc1f3585680c20584ddb37c0d9c7bcef907198490473fb37e2b173"
+    },
+    {
+      "path": "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/models.py",
+      "upstream": "src/docvortex/analyzers/native/office/doc/models.py",
+      "upstream_sha256": "d498d3e7a330ed5ce4074d9dc88eef6e1e41ec3e0908c2d246525dbc739d6955",
+      "installed_sha256": "1045b5ff29a620749ab45a36681734cec076945c9e32cbb3139c6cf138258a5c"
+    },
+    {
+      "path": "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/resources.py",
+      "upstream": "src/docvortex/analyzers/native/office/docx/resources.py",
+      "upstream_sha256": "993973b99263e7ea9ad76a957645f5eebce5036f8b71a95ec5d2b69445960462",
+      "installed_sha256": "ad4a88f399582f1ceae3d5feff3ec5c34682bf3e4aa273d02bdc81f486fed001"
+    },
+    {
+      "path": "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/tables.py",
+      "upstream": "src/docvortex/analyzers/native/office/docx/tables.py",
+      "upstream_sha256": "baf5b75bd1502c681325126bc21d08eccce1216feca6391603aeef61d463f36b",
+      "installed_sha256": "fcfc83c3b32c1b5b6e31323e823dc624608512f07d4f94d5606737aec3c1c9ec"
+    },
+    {
+      "path": "rapid_doc/_vendor/docvortex_core/analyzers/native/office/equation/image.py",
+      "upstream": "src/docvortex/analyzers/native/office/equation/image.py",
+      "upstream_sha256": "89a5b3bed22f0ccc16fdbd567a9b34d180b114381f43a92f9afdaf8cb6690cf5",
+      "installed_sha256": "bf84ec0f498cbd0207e6e0bdfd355f2bd45ea96e38bb8e7b445cf5fc1bd4e3de"
+    },
+    {
+      "path": "rapid_doc/_vendor/docvortex_core/analyzers/native/office/image.py",
+      "upstream": "src/docvortex/analyzers/native/office/image.py",
+      "upstream_sha256": "afb49ec049c6453f10d1689ed8ea92494b21f8c1cfc860b711a4e7000ae9d3fb",
+      "installed_sha256": "35ce93184928287a9ba7f5d52e9c46118cbdc8a6117134abd8e35b84be30e99c"
+    },
+    {
+      "path": "rapid_doc/_vendor/docvortex_core/analyzers/native/office/legacy/officeart.py",
+      "upstream": "src/docvortex/analyzers/native/office/legacy/officeart.py",
+      "upstream_sha256": "3003af852b5889b75d03544f9e3a46993a42cb7358ec221902134b2421d43973",
+      "installed_sha256": "a44a0a0a7f29b73e490e479a549f1fbc39ccc496325e00608f5bcf34fe051254"
+    },
+    {
+      "path": "rapid_doc/_vendor/docvortex_core/analyzers/native/office/ppt/parser.py",
+      "upstream": "src/docvortex/analyzers/native/office/ppt/parser.py",
+      "upstream_sha256": "6f692d7d3639020ace372d7ccc4bfe8e745c9dfaf8d695ac83f7100943b017fd",
+      "installed_sha256": "65675174d7c748dcc2c4c2eb20f423606dab72711859434d514300924296601c"
+    },
+    {
+      "path": "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/resources.py",
+      "upstream": "src/docvortex/analyzers/native/office/pptx/resources.py",
+      "upstream_sha256": "2b131898047df43eb7e347e04c2ebbe4805ac117cc4d1e5153caa5d3d2ad586f",
+      "installed_sha256": "a45bf6c869c65cec25f3e961fd8a1c3492b299748252b84ef6f8ba0d11fde7f5"
+    },
+    {
+      "path": "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/parser.py",
+      "upstream": "src/docvortex/analyzers/native/office/xls/parser.py",
+      "upstream_sha256": "0ee4c553ee5117e0d8ac00076101bb8e49dfa09b7de6e89d479738187ddbfe33",
+      "installed_sha256": "a8aaa773b46b72aa856cc5c260f22ab2e8a70cb87580ae9426bb20c95a90ba12"
+    },
+    {
+      "path": "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xlsx/ooxml_ole.py",
+      "upstream": "src/docvortex/analyzers/native/office/xlsx/ooxml_ole.py",
+      "upstream_sha256": "9477fbaaf616db64a35ccd4bb997d9866958a9547045ea80405994ecebfe5ac2",
+      "installed_sha256": "feb4bcabebe61db151400d306c9a6e36f564a921c4444d2c6142432e33633ecd"
+    },
+    {
+      "path": "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xlsx/xlsx_converter.py",
+      "upstream": "src/docvortex/analyzers/native/office/xlsx/xlsx_converter.py",
+      "upstream_sha256": "c1c941d71130d53af2e0a9f8da5c1f0b807ef8181c3d533f3efc402f1b17e2ea",
+      "installed_sha256": "3831b1a59d06b9f5909cfaedadcf7f088f6e44f0c7a123ae6532b810e2393ca2"
+    },
+    {
+      "path": "rapid_doc/_vendor/docvortex_core/analyzers/native/pdf/_table_recovery/banded_rowspan.py",
+      "upstream": "src/docvortex/analyzers/native/pdf/_table_recovery/banded_rowspan.py",
+      "upstream_sha256": "1a9ca978d798ae3a541ea194d0a301f5f55961fdc7b8808ecd974ecee1903849",
+      "installed_sha256": "0829fe921bf7a08c147ba38329902b4224aa555eb6534467e86e4046f3379dc5"
+    },
+    {
+      "path": "rapid_doc/_vendor/docvortex_core/analyzers/native/pdf/_table_recovery/engine.py",
+      "upstream": "src/docvortex/analyzers/native/pdf/_table_recovery/engine.py",
+      "upstream_sha256": "bd5ff9dbc41c544880729b9ea0e5478baee606eec31365eae6456393db7f6d98",
+      "installed_sha256": "16b32ebc5f8f6cbe83f876c6ba58b54f83d44d334d00411f5ef7c4f62c5fc7b6"
+    },
+    {
+      "path": "rapid_doc/_vendor/docvortex_core/document/pdf/_document.py",
+      "upstream": "src/docvortex/document/pdf/_document.py",
+      "upstream_sha256": "274155e80f1b01f9b6b5ea120859f08bceca3b7f02573a6751e15ae56b878924",
+      "installed_sha256": "a2086515896323ac014bf03e90c2cf6539a8fe9085fe67e066079f37adb8315c"
+    },
+    {
+      "path": "rapid_doc/_vendor/docvortex_core/document/pdf/native_text_geometry.py",
+      "upstream": "src/docvortex/document/pdf/native_text_geometry.py",
+      "upstream_sha256": "816bcd4ef5043327c69ba9ba13ff45d7cef2c23ba5e684e68e04673ff12fcc67",
+      "installed_sha256": "b2b9c2bcbefb31ab30c8081c5425e7e13ff1ee275099ca72c97aee42c9f23bae"
+    },
+    {
+      "path": "rapid_doc/_vendor/docvortex_core/document/pdf/snapshot_bridge.py",
+      "upstream": "src/docvortex/document/pdf/snapshot_bridge.py",
+      "upstream_sha256": "df5fed4ae60db34f2c97d45225400466f6f041577972e9a2c531b9873113a300",
+      "installed_sha256": "d08c152f44f0f13099242be2be968d85111cb0388754e67e1c6cef8cbd5480e0"
+    },
+    {
+      "path": "rapid_doc/_vendor/docvortex_core/document/pdf/text/_pdfium_bridge.py",
+      "upstream": "src/docvortex/document/pdf/text/_pdfium_bridge.py",
+      "upstream_sha256": "85eff4ed17128d5a4c6e89357755b917931465aa3a91857b6b71df16692aeb94",
+      "installed_sha256": "2c2f69e3b3f7b8848e2cf2e304da7358f982b123dcb7d0a20f1ef232dee1ca5b"
+    },
+    {
+      "path": "rapid_doc/_vendor/docvortex_core/document/pdf/text/extract.py",
+      "upstream": "src/docvortex/document/pdf/text/extract.py",
+      "upstream_sha256": "e33a13b64e9646982ca2edccdd60b4f10ad1b9ca2c00826fc9ffa50f589e7b94",
+      "installed_sha256": "7e578a68ccadda9eea152a6dd9a7fcac345235c3ee7832f1089bf21eeb12017d"
+    },
+    {
+      "path": "rapid_doc/_vendor/docvortex_core/document/pdf/unicode_fallback.py",
+      "upstream": "src/docvortex/document/pdf/unicode_fallback.py",
+      "upstream_sha256": "22d6c06131f70f814ff644d1736823da1bb241df2b273a7a9ebc86b215ee0731",
+      "installed_sha256": "382f4fb1e64e20e19e89133e0bdee68bb982a8dffa0582162761e7d708468426"
+    }
+  ],
+  "adaptations": {
+    "paragraphs": "RapidDoc backend/pipeline/para_split.py and Rust legacy_paragraphs; use lines/spans and physical merge semantics, preserve existing barriers",
+    "unicode": "Python ctypes fallback remains independent of Rust; native temporary view validates all scalar changes and geometry",
+    "office": "Rust image-local resource errors become fixed placeholders; low-level strict decoders retained"
+  },
+  "excluded": [
+    "RTF and other unsupported document formats",
+    "Upstream review tools and release metadata",
+    "Whole upstream Rust/Python binding replacement"
+  ]
+}

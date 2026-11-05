@@ -1,0 +1,16 @@
+include = [
+    "Cargo.toml",
+    "pyproject.toml",
+    "rust/**/Cargo.toml",
+    "bindings/**/Cargo.toml",
+    "bindings/python/pyproject.toml",
+    "bindings/python/ruff.toml",
+    ".rustfmt.toml",
+    ".taplo.toml",
+]
+exclude = ["rust/vendor/**", "**/target/**"]
+
+[formatting]
+column_width = 100
+indent_string = "    "
+reorder_keys = false

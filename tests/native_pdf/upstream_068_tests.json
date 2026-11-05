@@ -1,0 +1,55 @@
+{
+  "repository": "https://github.com/myhloli/DocVortex",
+  "commit": "2de5f42b1884495313d9df63868e6a2f3d85fea0",
+  "files": [
+    {
+      "source": "tests/unittest/test_native_pdf_table_text_quality.py",
+      "target": "tests\\native_pdf\\test_upstream_068_native_pdf_table_text_quality.py",
+      "sha256": "4563fa5b3ce00da2dc7b3a15dc4cb2bf5edc8fdb1f7c6f5314c19db1dbc09c68"
+    },
+    {
+      "source": "tests/fixtures/native_pdf_table_text_quality.json",
+      "target": "tests\\fixtures\\native_pdf_table_text_quality.json",
+      "sha256": "825d199fd91c02e63c39db814d25545ad2ee5867d321ddff55dd204ac01326c8"
+    },
+    {
+      "source": "tests/unittest/test_native_pdf_table_issue5669.py",
+      "target": "tests\\native_pdf\\test_upstream_068_native_pdf_table_issue5669.py",
+      "sha256": "409452f06f11ec45d4aa598cd449412a6349dc411654d5b36599d2fbd466111a"
+    },
+    {
+      "source": "tests/fixtures/native_pdf_table_issue5669.json",
+      "target": "tests\\fixtures\\native_pdf_table_issue5669.json",
+      "sha256": "3132712ee43cc3193af70bf11d6b726804a4ddd90241f24246b96d62c7b423de"
+    },
+    {
+      "source": "tests/unittest/test_native_pdf_table_rotated_headers.py",
+      "target": "tests\\native_pdf\\test_upstream_068_native_pdf_table_rotated_headers.py",
+      "sha256": "61bc6072bb8d586fdedfaf0dd397f8f6f8939d82f4e2faf3d257e87eed4f4c17"
+    },
+    {
+      "source": "tests/fixtures/native_pdf_table_rotated_headers.json",
+      "target": "tests\\fixtures\\native_pdf_table_rotated_headers.json",
+      "sha256": "5c93e8887ed016869efcc6b5f117b89246525ac76d49842b432602433422ffc8"
+    },
+    {
+      "source": "tests/unittest/test_pdf_script_conflicts.py",
+      "target": "tests\\native_pdf\\test_upstream_068_script_conflicts.py",
+      "sha256": "21244e12938984ebf60b5ce79c3b05b4b9670635c1ba06f932d6fbd2d5a098aa",
+      "adaptation": "Use RapidDoc inline renderer instead of trimmed upstream document renderers; all native span/diagnostic/schema assertions retained."
+    },
+    {
+      "source": "tests/unittest/pdfs/flash_layout/deep_structure_catalog.pdf",
+      "target": "tests/fixtures/upstream_068/deep_structure_catalog.pdf",
+      "sha256": "6e0eccd9bbcbf0a91715a212477e133151e13bdeacf6f15df70461d9211a2042"
+    }
+  ],
+  "generated_reference": {
+    "path": "tests/fixtures/upstream_068/pdf_reference.json.gz",
+    "generator": "scripts/migration/export_upstream_pdf_reference.py",
+    "tables": 64,
+    "inline": 21,
+    "styled_tables": 47,
+    "comparison": "Full evaluation, diagnostics, source ownership, cell HTML, inline spans and materialized diagnostics; JSON integer/float representations compare by equal numeric value."
+  }
+}

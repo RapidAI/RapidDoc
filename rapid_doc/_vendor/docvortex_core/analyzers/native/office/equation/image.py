@@ -436,6 +436,14 @@ def _format_hint(
     return None
 
 
+@dataclass(frozen=True, slots=True)
+class OfficeImageProbe:
+    """图片探测结果；超限状态必须阻止原图继续渲染。"""
+
+    latex: str | None = None
+    limit_reason: str | None = None
+
+
 @dataclass(slots=True)
 class OfficeImageEquationDecoder:
     """按共享资源上限缓存并解码 WMF/GIF 图片中的 MTEF。"""
@@ -443,6 +451,41 @@ class OfficeImageEquationDecoder:
     total_bytes: int = 0
     _cache: dict[tuple[str, bytes], str | None] = field(default_factory=dict)
     _warned: set[tuple[str, bytes]] = field(default_factory=set)
+    _probes: dict[tuple[str, bytes], OfficeImageProbe] = field(default_factory=dict)
+
+    def check_limit(self, image_data: bytes, part_name: str, content_type: str) -> str | None:
+        """向通用图片预算提供检查回调，避免二进制层反向依赖公式实现。"""
+        return self.probe(image_data, part_name=part_name, content_type=content_type).limit_reason
+
+    def probe(
+        self,
+        image_data: object | None,
+        *,
+        part_name: object | None = None,
+        content_type: str | None = None,
+    ) -> OfficeImageProbe:
+        """在单张图片边界隔离资源错误，缓存拒绝结果且不保留原始载荷。"""
+        if not isinstance(image_data, bytes):
+            return OfficeImageProbe()
+        image_format = _format_hint(image_data, part_name, content_type)
+        if image_format is None:
+            return OfficeImageProbe()
+        digest = hashlib.sha256(image_data).digest()
+        key = (image_format, digest)
+        if key not in self._probes:
+            try:
+                result = OfficeImageProbe(self.decode(image_data, part_name=part_name, content_type=content_type))
+            except LegacyOfficeResourceLimitError as exc:
+                result = OfficeImageProbe(limit_reason=str(exc))
+                logger.warning(
+                    "OFFICE_IMAGE_LIMIT: part={!r}, format={}, payload_sha256={}: {}. Using placeholder.",
+                    str(part_name or ""),
+                    image_format,
+                    digest.hex()[:16],
+                    exc,
+                )
+            self._probes[key] = result
+        return self._probes[key]
 
     @property
     def candidate_total_bytes(self) -> int:

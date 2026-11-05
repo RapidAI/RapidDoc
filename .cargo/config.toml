@@ -1,0 +1,4 @@
+[env]
+# Match Cargo's default dynamic MSVC CRT when libjpeg-turbo builds statically.
+# CMake remains free to choose the compiler and the target platform.
+CMAKE_TOOLCHAIN_FILE = { value = "packaging/cmake/cargo-runtime.cmake", relative = true }

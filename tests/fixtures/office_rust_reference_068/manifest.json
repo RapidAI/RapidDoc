@@ -1,0 +1,360 @@
+{
+  "status": "python_reference_only_rust_conversion_not_implemented",
+  "cases": [
+    {
+      "id": "synthetic_doc",
+      "format": "doc",
+      "input": "tests/migration/inputs/synthetic.doc",
+      "input_sha256": "8220ef40d11940cd0c5a52a5cbdd10ea9d14ec8525d2ac5ed989f0f5a5906576",
+      "license": "Repository-generated fixture; no external document content",
+      "config": {},
+      "reference": "synthetic_doc.json.gz",
+      "reference_sha256": "53064c21f41402956f0ccc2219f4fbdb2906be36470ed452de35e671aa0c2f30",
+      "gzip_sha256": "8f6a2c440736e56da3c77caeef08f3b2752adc73539a77939695dacb1f7e4f09"
+    },
+    {
+      "id": "synthetic_docx",
+      "format": "docx",
+      "input": "tests/migration/inputs/synthetic.docx",
+      "input_sha256": "8fa3c5d3f10b2fe30dbe339a098df4e01283f815671da93eab71678623cf36c7",
+      "license": "Repository-generated fixture; no external document content",
+      "config": {},
+      "reference": "synthetic_docx.json.gz",
+      "reference_sha256": "27a6eb82d0a4c0387397cdf41f9189ca22b0d6c5be5684e530eb3cf94de45132",
+      "gzip_sha256": "a4ccb4dd59521bddb10a5e47eb2b2e5a86c926a1352651687aa92d727039bf27"
+    },
+    {
+      "id": "synthetic_ppt",
+      "format": "ppt",
+      "input": "tests/migration/inputs/synthetic.ppt",
+      "input_sha256": "a73a3ec85cba14e7b9adac569bb324dca8b6efc061a5ead677cb17c37999f2fe",
+      "license": "Repository-generated fixture; no external document content",
+      "config": {},
+      "reference": "synthetic_ppt.json.gz",
+      "reference_sha256": "9c1b3c1f9f6f7df4c09623f0af455941a4a6994b7e7888b56286bb1ad77f12d4",
+      "gzip_sha256": "01f3833a10fdc0ef9d1313b36653491c8f783ffa1f3de82e4d2dd1d088c1043a"
+    },
+    {
+      "id": "synthetic_pptx",
+      "format": "pptx",
+      "input": "tests/migration/inputs/synthetic.pptx",
+      "input_sha256": "aba7f3a463dfb04a842744b7a94eb3c95d2c5295c7795fb8fc1fa9183ebcc670",
+      "license": "Repository-generated fixture; no external document content",
+      "config": {},
+      "reference": "synthetic_pptx.json.gz",
+      "reference_sha256": "c3bb387455da0a8d4f488178f1d6ef1071d8a95d7f1488b3d0a36a730baf3e8e",
+      "gzip_sha256": "5734508663df6ed9645e453c25c045593f7d03b73ede505156656623c843add5"
+    },
+    {
+      "id": "synthetic_xls",
+      "format": "xls",
+      "input": "tests/migration/inputs/synthetic.xls",
+      "input_sha256": "4c307b2a72ab8ee3b6608a63f6c95c0a0ba4a543d6ed69158fa85809b066f347",
+      "license": "Repository-generated fixture; no external document content",
+      "config": {},
+      "reference": "synthetic_xls.json.gz",
+      "reference_sha256": "a5694836df25e4d27325cab160765ac23e745023adbde0e8a6a00dd3d91bba16",
+      "gzip_sha256": "842464a6b3425b78d657220f96253780c8a44f4deeaae38806c205315d5aaf06"
+    },
+    {
+      "id": "synthetic_xlsx",
+      "format": "xlsx",
+      "input": "tests/migration/inputs/synthetic.xlsx",
+      "input_sha256": "698a1af94f60a20629d29ce1201134f15788025b6ea1395ea0ba60d04d5872eb",
+      "license": "Repository-generated fixture; no external document content",
+      "config": {},
+      "reference": "synthetic_xlsx.json.gz",
+      "reference_sha256": "81b011743328c797f79e699d0075692496d0fee3b4b823635706588e8968ef65",
+      "gzip_sha256": "af706542072a9df4fc4e1480bcdf7e3eac63360322aa81f213e79a13bf84ca84"
+    },
+    {
+      "id": "restored_handmade_altpath_docx",
+      "format": "docx",
+      "input": "tests/fixtures/docx/handmade-altpath.docx",
+      "input_sha256": "fb77751c25853f876f9cda0b819819f690c4baadf080c1170ad06ffc98e52545",
+      "license": "See tests/fixtures/DOCVORTEX-LICENSE.md and provenance.json",
+      "config": {},
+      "reference": "restored_handmade_altpath_docx.json.gz",
+      "reference_sha256": "330299bf0dd78a308b6935dee391cdf7dfa97589342ec00741f6c312bf6cc2ee",
+      "gzip_sha256": "0499d648ec6863be018245c390b10971d70a840a9ea2fb243a8e28231e3ad7e6"
+    },
+    {
+      "id": "restored_handmade_strict_docx",
+      "format": "docx",
+      "input": "tests/fixtures/docx/handmade-strict.docx",
+      "input_sha256": "f65da59839848f8bbe0b72ddc03f8765bf06662994ae980f22095eb85cb0096a",
+      "license": "See tests/fixtures/DOCVORTEX-LICENSE.md and provenance.json",
+      "config": {},
+      "reference": "restored_handmade_strict_docx.json.gz",
+      "reference_sha256": "0128fd08d2a1f32488ddb461220f58bd0dba044c32f4c661f1320fcd5ad35595",
+      "gzip_sha256": "c56f5b8ae93519d9ea383e5494998aca7dbc8b6f49af6953d48b92fa15e414ea"
+    },
+    {
+      "id": "restored_handmade_altpath_pptx",
+      "format": "pptx",
+      "input": "tests/fixtures/pptx/handmade-altpath.pptx",
+      "input_sha256": "1f364b417eb31799d7fdfabe00af8e15a689a535fb2ec40dd1aadd38654bbfdf",
+      "license": "See tests/fixtures/DOCVORTEX-LICENSE.md and provenance.json",
+      "config": {},
+      "reference": "restored_handmade_altpath_pptx.json.gz",
+      "reference_sha256": "5b89364614448d80c945d7037629a84c15b4c5982e5b1395afaf18a45714c3d1",
+      "gzip_sha256": "0ecfb0a7cc305cee9a5a1e976f95d90bd4a8c872d7b3fa00a82fd811d24e81a7"
+    },
+    {
+      "id": "restored_handmade_inherit_pptx",
+      "format": "pptx",
+      "input": "tests/fixtures/pptx/handmade-inherit.pptx",
+      "input_sha256": "4bbab27a28b2532eaa3ad93b86d2667e454f6d40bbf4b178524de3f0a0d0bfe3",
+      "license": "See tests/fixtures/DOCVORTEX-LICENSE.md and provenance.json",
+      "config": {},
+      "reference": "restored_handmade_inherit_pptx.json.gz",
+      "reference_sha256": "31b1649eec7fbc6f5818a57dd1884a2ba0ad3c927c0d34dc09b407ecbe15abbd",
+      "gzip_sha256": "26b03c8100aaa3c65db4182c7e24893d6253b3b8261400098c6969815760f13f"
+    },
+    {
+      "id": "restored_handmade_links_pptx",
+      "format": "pptx",
+      "input": "tests/fixtures/pptx/handmade-links.pptx",
+      "input_sha256": "32cc7652099218a1f15190615607697583afb5a76c9fffc2d2dea23b29c66533",
+      "license": "See tests/fixtures/DOCVORTEX-LICENSE.md and provenance.json",
+      "config": {},
+      "reference": "restored_handmade_links_pptx.json.gz",
+      "reference_sha256": "a2ba4069f0697acb1b50ad2becfe44a0631b9e3b7a8e179cd6d6395985a3aa2b",
+      "gzip_sha256": "a6517d370fee96abb610edc6c90292923071545d19dbd6ef0a322356407927c0"
+    },
+    {
+      "id": "restored_handmade_math_pptx",
+      "format": "pptx",
+      "input": "tests/fixtures/pptx/handmade-math.pptx",
+      "input_sha256": "b95ba383c185208fd171a86f38f0a9ee01e00e5fc72dcdace82c46f844753d4c",
+      "license": "See tests/fixtures/DOCVORTEX-LICENSE.md and provenance.json",
+      "config": {},
+      "reference": "restored_handmade_math_pptx.json.gz",
+      "reference_sha256": "65b69b1f2619bfcb9fb4fb07dab436a045f9fe0253d636a2e405135fb77a7200",
+      "gzip_sha256": "175b0d2259f3bc37c583db707f6ed95068f59608cf2c783b4e92a478b279024b"
+    },
+    {
+      "id": "restored_handmade_order_pptx",
+      "format": "pptx",
+      "input": "tests/fixtures/pptx/handmade-order.pptx",
+      "input_sha256": "b05bc15dd2b901373e566e938d988fa387aa27d9f03c0fc5918097fef1652a07",
+      "license": "See tests/fixtures/DOCVORTEX-LICENSE.md and provenance.json",
+      "config": {},
+      "reference": "restored_handmade_order_pptx.json.gz",
+      "reference_sha256": "00851bcf4fc8c3b7f90f25d652023073925b5e8bc6d3e6b3ce26f419972e2d93",
+      "gzip_sha256": "060a16a7246b3dc086a8dd1a3bdb90c60c8f6d483530a11de7648b3907c649f7"
+    },
+    {
+      "id": "restored_handmade_strict_pptx",
+      "format": "pptx",
+      "input": "tests/fixtures/pptx/handmade-strict.pptx",
+      "input_sha256": "8890634f199ede31676cc86ad08db97240fe31eefa3fcf49012466aaa8c53d4b",
+      "license": "See tests/fixtures/DOCVORTEX-LICENSE.md and provenance.json",
+      "config": {},
+      "reference": "restored_handmade_strict_pptx.json.gz",
+      "reference_sha256": "6b012eed4b8d5187372e110a69fb6eb41a335c505afd84b4a4e30c6c87b052e9",
+      "gzip_sha256": "c6042e4e7a3d038d70e477715ed847f6a5efed486a5c7be5f7358345325237bb"
+    },
+    {
+      "id": "restored_docx_01_doc",
+      "format": "doc",
+      "input": "tests/fixtures/docvortex_migration/docx_01.doc",
+      "input_sha256": "6aae60b01f0e020c59d2299f217dbd5904df08182a31384db40953937f322fd1",
+      "license": "See tests/fixtures/DOCVORTEX-LICENSE.md and provenance.json",
+      "config": {},
+      "reference": "restored_docx_01_doc.json.gz",
+      "reference_sha256": "da31a716e7c69a0a41c4d8c0f7b35dbf5b171a7a621149961d4f198edcf1433a",
+      "gzip_sha256": "f045089cf3ddbcb8611075ce222a0ac1d78c280d4b8fe98104bd87e79171f0c6"
+    },
+    {
+      "id": "restored_docx_01_docx",
+      "format": "docx",
+      "input": "tests/fixtures/docvortex_migration/docx_01.docx",
+      "input_sha256": "86393df4b91412b946c7331e27e762440889b916a0d2ec9331700913f06a7a1b",
+      "license": "See tests/fixtures/DOCVORTEX-LICENSE.md and provenance.json",
+      "config": {},
+      "reference": "restored_docx_01_docx.json.gz",
+      "reference_sha256": "028c2484dcb10699f026621ba2d90bcc34056b54c9c40b4583268aef052cbaf6",
+      "gzip_sha256": "4a20f7b5c8b31b3e2d5ab7c18856913922a290dfb3f8cc30db9346682d3100ee"
+    },
+    {
+      "id": "restored_pptx_01_ppt",
+      "format": "ppt",
+      "input": "tests/fixtures/docvortex_migration/pptx_01.ppt",
+      "input_sha256": "2215ba7ee3d845ad745714a6b35ca8d652ec0c2f373e15f56dd520570b0eab6a",
+      "license": "See tests/fixtures/DOCVORTEX-LICENSE.md and provenance.json",
+      "config": {},
+      "reference": "restored_pptx_01_ppt.json.gz",
+      "reference_sha256": "c855c608961e60fc1d94ee2d1e0638a9cd039b1ce4779f27ec922aeab0b2e59a",
+      "gzip_sha256": "e42df7d941852a2889579a0d92d9d2456ad5982b4e4a66937701b3f8ab7c1f30"
+    },
+    {
+      "id": "restored_pptx_01_pptx",
+      "format": "pptx",
+      "input": "tests/fixtures/docvortex_migration/pptx_01.pptx",
+      "input_sha256": "77eec640e70e927d0d5dda6b69dc4317596cb01c220a58b83d9933a58ff0ecc2",
+      "license": "See tests/fixtures/DOCVORTEX-LICENSE.md and provenance.json",
+      "config": {},
+      "reference": "restored_pptx_01_pptx.json.gz",
+      "reference_sha256": "15ce817cf7f6090aedb5fb1534cd07852ef7739c8f73c943ed638e64ea1577a1",
+      "gzip_sha256": "54c891a3c9ea3ba668cc8521efaaad3ade2899ebd7d5f6c378f83ff9ab7f8b79"
+    },
+    {
+      "id": "restored_xlsx_01_xls",
+      "format": "xls",
+      "input": "tests/fixtures/docvortex_migration/xlsx_01.xls",
+      "input_sha256": "733225d6eb2659b1503abccc3cf46483dbe15b028cb2b0898cb57ec81c4d3cc0",
+      "license": "See tests/fixtures/DOCVORTEX-LICENSE.md and provenance.json",
+      "config": {},
+      "reference": "restored_xlsx_01_xls.json.gz",
+      "reference_sha256": "27c8a3eedbf46fd3d6aead0a904d4b37232ff0365c26a76d485a1e6560a1b411",
+      "gzip_sha256": "93dbc47ffe57384eda3f1ddc9806dde6a4d81dc6fce938545d6c93e8f57f2929"
+    },
+    {
+      "id": "restored_xlsx_01_xlsx",
+      "format": "xlsx",
+      "input": "tests/fixtures/docvortex_migration/xlsx_01.xlsx",
+      "input_sha256": "fe3e77a6c16bca8eeccb970e7d788cb7f3a3e4f3ac9c793589892ac190e6b874",
+      "license": "See tests/fixtures/DOCVORTEX-LICENSE.md and provenance.json",
+      "config": {},
+      "reference": "restored_xlsx_01_xlsx.json.gz",
+      "reference_sha256": "ebdc32fcebceb8c9c53eda9c6ac8243bc8c19a9ceddc563e7e31cc75bb5efa04",
+      "gzip_sha256": "c771d4b926f8061250616eaa4eafd8e626b9aaca82246f54154060b3b40218aa"
+    }
+  ],
+  "python_source_sha256": {
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/__init__.py": "77d32d32552566440981ceab4b391eee79102ec7f040a050013407a6898afb37",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/__init__.py": "2dda563afb8d0a155fa2faa1c9ec919011466761280201134558daf2b5031130",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/bookmarks.py": "1778a9c56fffd8c5081fadac0dd4500823723f141948a5f45c559d75cde71c73",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/doc_converter.py": "0124eab444aab52a08bc8af6a44bffaf2568be8cfa904dd5a68f918a3800d359",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/fib.py": "5c8fb199b47775f48fdeb1feba1846e85f2ce002fb8bed064c603c605b47c203",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/fields.py": "3cd5c3f3718779cf9bad817edf857f09bbfde02cadc4c5ab4d113da56c179b7f",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/formatting.py": "8389f3685640c80187e8aedb9ddf7c8ae991a4adf5d5dcf4238485cebea4d877",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/images.py": "638ed7152014ba62212e377ba7e7ecadc935b8c29c6d459c9ce5995e1d6573c8",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/lists.py": "9a7f2631dd10796550252d0d24c59e1bee27568e9015f661d2dfccb3553eb730",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/models.py": "cca32e12209141f54a6b7e2bec25e73b36287755588a465091707e6c1bd75f57",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/parser.py": "11e67a154797ccd86622ce4c005b07c632307a9a9e5e296f4738650e8c46ef40",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/pieces.py": "03c196416d804607978fa240c6f3d057eeb4c51454a02d1e85636b52300e05fd",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/records.py": "0291d1955c87884236c858481aa97433f82d74f7d3cacafd3f94018c963d794f",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/sprm.py": "d665265d72813f9f274a5b1a9ab156ead62174a02a925d58b7659f8505445384",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/doc/styles.py": "b91ed30269d05e9be59f2b00840caf59a7911fa5278fe8a4240b0e07700e2514",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/__init__.py": "069b59ec4ee5420f3e8f583612b6864df90d83340eee9edd9002f19eaf4d1fcc",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/context.py": "bd256e05f28057a4e1037a7c0bec8128a48fc8c47ac56d7f6127bbc9c03f5c3b",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/docx_converter.py": "76aa20533730743ece7663b4a63cf42ee99935b9a99994c3da74029f1b54d268",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/equationxml.py": "1d143fcf1b3a3dd4d9293f5f215d838cf565dd5b238ea07f134213c63d21ef34",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/fields.py": "4183dbe7134bc31aace0f8935bea753e244154b6a8eb65481fb76aade0e25a80",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/formatting_types.py": "0ca66d01495fcc58603a5eca53a690ea1661996b99898668a945b3e30cfbe258",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/numbering.py": "03a8aefea90b8f970ab572c2b80744f6202597cf649142054abee0172d11af67",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/office_xml.py": "cd6616acacfa8d7c43528f947cd3156ff5d552dbd2c3bbf8a3170419edfaab81",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/package_normalizer.py": "62a6f93b310f8e230b6330df1b97193ed8ed3658237ba946c8241ae216f08ecc",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/resources.py": "963753562febd4812f8bd5e23a4e170200d8b2df31e9ba36a27afe4a07c291f2",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/styles.py": "e49af988f8aa270878746196ac779f3dcc870a1f54dcad830efcccae97aa6f9e",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/docx/tables.py": "bd752f68fb783295bf85069dcbf8a7e6b89f86afa19764bfc1f24a37ea2373e8",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/equation/__init__.py": "f56d2d659aa35d5c9ef91481d346bc36eeb1baa8ad40dc973fb823ebccc11f93",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/equation/image.py": "ab05a980e8c04ca938d2844dea6d6be0d122bf9a73d8af691f06ae7991a10bc2",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/equation/latex_dict.py": "8b843a3d2c07870501f9bc8410f50d14958c148691e8b6e769f105e88c0deeff",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/equation/mtef.py": "ab09dd02606298344d49332a434c6d0f72ec8ee20d895adcd7ca8065ba4ea856",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/equation/mtef_v5.py": "0245db097c6dada3355072b12d39955604494288a917b43ca13452021d7a3be0",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/equation/omml.py": "87e12011b246a07ed481fadf4adba75990a6d9b291c275f76945054e1d709a87",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/equation/ooxml.py": "552996956fbc6c86740f7c6939e248f96fd17939e7a07d9aba1f6cc4efb6b28e",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/errors.py": "4bf02fcd2ec2b5e4824fc14e11333dbe7612d462ba3740b09b7728886286ac21",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/image.py": "700a39dc69e041f37b6427422ac206ebf43545c47bd3da10f38a210a7279153c",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/legacy/__init__.py": "c815f7bb9ffaa544ba7f1be6cee411f8e824483c4065ab90f52631a9dd24fa1b",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/legacy/binary.py": "fbec139d76fcdd92e76074ad115d284dbbc3a9899f7553f2a13d86036a18cb89",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/legacy/officeart.py": "1d3bd1e308b57925e4f2ddadd9497a987afe08be1ee232050c10cb960a209cbd",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/legacy/ole.py": "00b991252f20cc1ff6c3ebc9fe7980c80e47a096468d38d24192c045a72eda18",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/limits.py": "5283f267c30dc013de14668504c4604007943e524c85f8580a1eefdb82cd0dd7",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/ooxml_chart.py": "62bdd3c1019bbb2ecfa063fd7f19a11309bcd349292b4aed713510ac29217161",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/opc.py": "33c3aba744072e707bd3a05f6a08215e120b25d8068fc3e767ff4f98db2ef310",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/ppt/__init__.py": "3135ca9d33ca625762767ce3ebc093d40aca0ddefe4399e83fb7954d48b667ed",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/ppt/models.py": "bd7b834d6402d947833792ef401b58b4323f12a3ad4f34113a6f03730ca7d420",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/ppt/parser.py": "68b4ce6e347a8fa5f3b933e6f4869301fe9c2fcee39be2c1ff14ef2baa1742a5",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/ppt/ppt_converter.py": "398208c2e7498a419c3a97127429ade31d95c5d8543621ee231d71605ee348de",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/ppt/records.py": "1efb333bb18c46583007450273b1d413bafb43cfb098265d676485c2fae127a2",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/ppt/style_text.py": "900149a725696ba44a436777c79f878cedccb8c2a38dccad5e8bf3d8c349af1a",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/__init__.py": "f5ba0e3765998f5591a6f776459c5f0bbb0ba93d68319edafe5f0d2bc089d9dd",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/context.py": "9502ff868824a0b58c8d0b718a3e6e830fbfe90f510ff884376e9f320c462192",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/lists.py": "9680b0f6f37798759873036290a0b4766c5f939164ccc7a11d774ab982ecda9d",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/package_normalizer.py": "f6970780a047da53a89c05ef3d144b3802ff29abd64209e3192218011481013b",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/pptx_converter.py": "5f286378c52a3d20952a0a7e8ac18c1a7aec442b8ecba1447dcdee66725742d9",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/resources.py": "2c28663e1e96cd43372b25df17be8cafc6f3a7034712506e61571a6154d24ee5",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/shapes.py": "bd692401ddb9fd09b6b5e984951d4f360d3668b4fec8053d10436f3c872599e4",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/text_styles.py": "a9f68d5d0c51ebcf7095724088de4895ef13219cd04052001bf2b43055629dc3",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/pptx/titles.py": "8a84a6fce1dbf1012e772eac3559c32051fb808d17f22180e67bbf45271a631e",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/rich_text.py": "0fe3d0466f11568b9996e597fc008fec26c549c235c49834f96d54c57ed9586b",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/spreadsheet/__init__.py": "59d5e4a067efe7996c247fe5daa89f70dd3ebb8674e38af690e4a38f4f53f6f6",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/spreadsheet/html.py": "981b47155b7f0361830ef55f47ab358aad026ce307098fbe88914f200fe8350e",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/spreadsheet/models.py": "f9ac8af76b23d8f11daa1d95934b45e01eee7242fbd14594bb1c15f2e361643c",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/spreadsheet/projector.py": "2d8e7eb7bf9b0975c56aba447078e285698b3821cc2eea51fcaf9105a0f32c09",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/spreadsheet/region_discovery.py": "e88517d2813c3e31db4f3b7325c908aaeb3e5f4e0e71b899b84f8e8187e03f92",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/streams.py": "0960063fd2871b86531facbc8694aa9e1f92b1ac22e6267ba8a34edb6c340de3",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/__init__.py": "c694ae356b9127e650338fa07e0eec5da0b88641943eadce8f6c43cba94458e9",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/chart.py": "b7a68375f758c9a96c97eb0df1283e4c9d9b58cde9160b12c20a07dfa9b8605a",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/embedded_chart.py": "51f3e3e24165cfac1b4861a5943bff11239cebae711ee812a256bb7558a1569a",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/models.py": "e3ed6372b4145cc877a681b18c58013a0d019e0bf521dcd1d99dce110981b566",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/number_format.py": "15274cfc7515125dac1884b00dbe597eb43becb0975899cee828795e6a3e428d",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/parser.py": "e5234311df9242f8b799bb4975aae2bdc6534ce265ccf637a2178d7b2dcf5430",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/records.py": "cdda253783f65239ed80ef1bd416c046ca1b08b418644121c0d84768e0e835ea",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/strings.py": "69c3d9c9a291e5240d65274049c8597ed3371e6b31fee99e819d4afe43084f58",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xls/xls_converter.py": "2e20bb71f8bc47f08ec916b20a9e4c32b4af8d74b38e6902c8fc47ff4d80fa8f",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xlsx/__init__.py": "87d66e4713f56842800f864038cc01a35b0d2727f9ed85ac7591a7a977048423",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xlsx/ooxml_ole.py": "3a3a8ed6756cf3619351bd504a7f7e9194e3c51936783de09c4013a3b591a1f6",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xlsx/package_normalizer.py": "f708f76b9c8d0fd8145128c3b2ed52b5e3740c00efbf4ecde7df3565dbd98e16",
+    "rapid_doc/_vendor/docvortex_core/analyzers/native/office/xlsx/xlsx_converter.py": "a1da5abb54732dab360da02ff6bf01d31b4f59d8174234866e06622a62044d12",
+    "rapid_doc/_vendor/docvortex_core/foundation/_svg_raster.py": "32fea5c10edab2fb74e3af9433cb19c6dc4c9ab353651973f8fd2ec147e7779d"
+  },
+  "packages": {
+    "PIL": {
+      "distribution": "pillow",
+      "version": "12.2.0"
+    },
+    "bs4": {
+      "distribution": "beautifulsoup4",
+      "version": "4.14.3"
+    },
+    "docx": {
+      "distribution": "python-docx",
+      "version": "1.2.0"
+    },
+    "loguru": {
+      "distribution": "loguru",
+      "version": "0.7.3"
+    },
+    "lxml": {
+      "distribution": "lxml",
+      "version": "6.1.1"
+    },
+    "mammoth": {
+      "distribution": "mammoth",
+      "version": "1.12.0"
+    },
+    "metafile_render": {
+      "distribution": "metafile-render",
+      "version": "0.3.0"
+    },
+    "olefile": {
+      "distribution": "olefile",
+      "version": "0.47"
+    },
+    "openpyxl": {
+      "distribution": "openpyxl",
+      "version": "3.1.5"
+    },
+    "pptx": {
+      "distribution": "pypptx-with-oxml",
+      "version": "1.0.3"
+    },
+    "pydantic": {
+      "distribution": "pydantic",
+      "version": "2.13.4"
+    },
+    "pylatexenc": {
+      "distribution": "pylatexenc",
+      "version": "2.10"
+    },
+    "resvg_py": {
+      "distribution": "resvg_py",
+      "version": "0.5.0"
+    }
+  }
+}

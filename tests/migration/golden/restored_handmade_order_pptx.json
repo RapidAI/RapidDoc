@@ -1,0 +1,78 @@
+{
+  "assets": {},
+  "content_list_json": [
+    {
+      "page_idx": 0,
+      "text": "Kicker before the title",
+      "type": "text"
+    },
+    {
+      "page_idx": 0,
+      "text": "Title placed second",
+      "text_level": 2,
+      "type": "text"
+    },
+    {
+      "page_idx": 0,
+      "text": "Body after the title",
+      "type": "text"
+    }
+  ],
+  "markdown": "Kicker before the title\n\n## Title placed second\n\nBody after the title",
+  "middle_json": {
+    "_backend": "office",
+    "_version_name": "0.9.11",
+    "pdf_info": [
+      {
+        "discarded_blocks": [],
+        "page_idx": 0,
+        "para_blocks": [
+          {
+            "index": 0,
+            "lines": [
+              {
+                "spans": [
+                  {
+                    "content": "Kicker before the title",
+                    "type": "text"
+                  }
+                ]
+              }
+            ],
+            "type": "text"
+          },
+          {
+            "index": 1,
+            "is_numbered_style": false,
+            "level": 2,
+            "lines": [
+              {
+                "spans": [
+                  {
+                    "content": "Title placed second",
+                    "type": "text"
+                  }
+                ]
+              }
+            ],
+            "type": "title"
+          },
+          {
+            "index": 2,
+            "lines": [
+              {
+                "spans": [
+                  {
+                    "content": "Body after the title",
+                    "type": "text"
+                  }
+                ]
+              }
+            ],
+            "type": "text"
+          }
+        ]
+      }
+    ]
+  }
+}
