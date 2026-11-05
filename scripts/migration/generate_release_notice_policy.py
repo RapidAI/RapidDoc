@@ -77,7 +77,9 @@ def main():
     end=next(i+1 for i,line in enumerate(lines[start:],start) if 'SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.' in line)
     generated['fonttools-glyph-data/ADOBE-AGL.txt']=('\n'.join(line[2:] if line.startswith('# ') else line.removeprefix('#') for line in lines[start:end])+'\n').encode()
     # The reviewed source archive contains third-party attribution only.
-    migration=(ROOT/'licenses/MIGRATION-NOTICES.txt').read_bytes()
+    # Git stores this reviewed archive with LF. Normalize a Windows working
+    # tree before applying the byte offsets recorded in migration-notices.json.
+    migration=(ROOT/'licenses/MIGRATION-NOTICES.txt').read_bytes().replace(b'\r\n', b'\n')
     migration_index=json.loads((ROOT/'licenses/migration-notices.json').read_text('utf8'))
     retained_migration=[]
     for entry in migration_index['entries']:

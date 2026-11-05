@@ -3,9 +3,9 @@
   "entries": [
     {
       "name": "CHARACTER-DEDUP-NOTICE.txt",
-      "sha256": "0cc847e0227701cdf9d11ffcc9c5b905ec34f89c2030d5360db955da92a1f6e5",
+      "sha256": "a80d509c4de66399b3b1a263036a7fb14b6d545ab294e50b7077ced0076da51e",
       "start": 85,
-      "end": 846,
+      "end": 841,
       "original_paths": [
         "bindings/python/python/rapid_doc_rust/licenses/CHARACTER-DEDUP-NOTICE.txt",
         "rust/rapiddoc-pdf/licenses/CHARACTER-DEDUP-NOTICE.txt"
@@ -13,18 +13,18 @@
     },
     {
       "name": "DOCVORTEX-PDFIUM-PATHS-NOTICE.txt",
-      "sha256": "90404e30740a8dcab79166c12c57803f27762f2b3a3d0d3e94b2f365ce2445e1",
-      "start": 889,
-      "end": 1238,
+      "sha256": "f069e3ab9e3ed8b6bd2dbb1e3e5c82706b6b4e2feb4124102c11f4baff2e030f",
+      "start": 884,
+      "end": 1231,
       "original_paths": [
         "bindings/python/python/rapid_doc_rust/licenses/DOCVORTEX-PDFIUM-PATHS-NOTICE.txt"
       ]
     },
     {
       "name": "DROID-FONT-NOTICE.txt",
-      "sha256": "51d8f4d0ad492381dbe33a874f89eff51ee8b96b701ede2ada4e2dfc2985b624",
-      "start": 1269,
-      "end": 12154,
+      "sha256": "38751245389e1e23f73e6f5384b5cbe7fa972cc4410c5adc9c04b082a0b9561a",
+      "start": 1262,
+      "end": 11957,
       "original_paths": [
         "bindings/python/python/rapid_doc_rust/licenses/DROID-FONT-NOTICE.txt",
         "licenses/DROID-FONT-NOTICE.txt"
@@ -33,8 +33,8 @@
     {
       "name": "FORMULA-DECODE-NOTICE.txt",
       "sha256": "81347e278c7294fa7a4a4aeb797df77596632734983021bb8f8506310536d3df",
-      "start": 12189,
-      "end": 12812,
+      "start": 11992,
+      "end": 12615,
       "original_paths": [
         "rust/rapiddoc-inference/licenses/FORMULA-DECODE-NOTICE.txt"
       ]
@@ -42,8 +42,8 @@
     {
       "name": "NATIVE-FIXED-CJK-FONT-NOTICE.txt",
       "sha256": "f053de0cc588ebcd7e1bd6407df302ee176a948c4c2a46132e315bed4e221386",
-      "start": 12854,
-      "end": 13768,
+      "start": 12657,
+      "end": 13571,
       "original_paths": [
         "bindings/python/python/rapid_doc_rust/licenses/NATIVE-FIXED-CJK-FONT-NOTICE.txt",
         "licenses/NATIVE-FIXED-CJK-FONT-NOTICE.txt"
@@ -51,9 +51,9 @@
     },
     {
       "name": "NUMPY-SORT-NOTICE.txt",
-      "sha256": "630fd5cdc6e2a943414698d3f34e0406b9d5551c17fc33397725d2c404c4dc6a",
-      "start": 13799,
-      "end": 17214,
+      "sha256": "1b6bc8c7f1bd61ef5b146a0ab441cb57f5634e437a8323aeb887057fa02bc744",
+      "start": 13602,
+      "end": 16952,
       "original_paths": [
         "bindings/python/python/rapid_doc_rust/licenses/NUMPY-SORT-NOTICE.txt",
         "licenses/NUMPY-SORT-NOTICE.txt"
@@ -62,17 +62,17 @@
     {
       "name": "PDFTEXT-NOTICE.txt",
       "sha256": "6ff3f3a8ece01803dd7cfccacd6d31e328d0ba4a37599981617e96e08f4d921a",
-      "start": 17242,
-      "end": 17554,
+      "start": 16980,
+      "end": 17292,
       "original_paths": [
         "rust/rapiddoc-pdf/licenses/PDFTEXT-NOTICE.txt"
       ]
     },
     {
       "name": "PDFTEXT-NOTICE.txt",
-      "sha256": "cd2679480aa72601a979e07e8256da4f910e6c8af643dce5880991ca1c1b8acb",
-      "start": 17582,
-      "end": 18190,
+      "sha256": "732ea6cbf73ce35ca974f6d11c9e85e216b7b7308c070b7d9ea0b9a4fc9f5827",
+      "start": 17320,
+      "end": 17921,
       "original_paths": [
         "bindings/python/python/rapid_doc_rust/licenses/PDFTEXT-NOTICE.txt"
       ]
@@ -80,8 +80,8 @@
     {
       "name": "PYPDFIUM2-NOTICE.txt",
       "sha256": "91af523961869d9e404199c1ffd3509f0ea355b63a50ea7b792108fcf32b6126",
-      "start": 18220,
-      "end": 18624,
+      "start": 17951,
+      "end": 18355,
       "original_paths": [
         "bindings/python/python/rapid_doc_rust/licenses/PYPDFIUM2-NOTICE.txt",
         "rust/rapiddoc-pdf/licenses/PYPDFIUM2-NOTICE.txt"
@@ -89,9 +89,9 @@
     },
     {
       "name": "PYTHON-MATH-NOTICE.txt",
-      "sha256": "b2f40c5b69f1457c63d386984b59a813490a66d4ccb72c9a3ef351848b37cf40",
-      "start": 18656,
-      "end": 19129,
+      "sha256": "d4f1eab876c5dbf77519a18ce341943c84ce2b03014a606657105e1ec2545828",
+      "start": 18387,
+      "end": 18856,
       "original_paths": [
         "bindings/python/python/rapid_doc_rust/licenses/PYTHON-MATH-NOTICE.txt",
         "rust/rapiddoc-pdf/licenses/PYTHON-MATH-NOTICE.txt"
@@ -99,9 +99,9 @@
     },
     {
       "name": "PYTHON-SET-NOTICE.txt",
-      "sha256": "b54847cbb974cbca9042bc68edf735b245c4a72d6185424a01fb775a230634d4",
-      "start": 19160,
-      "end": 19811,
+      "sha256": "5609e4401c538b8e001b8076799591f13a34fc904f0d1cf91378eff6a2989919",
+      "start": 18887,
+      "end": 19534,
       "original_paths": [
         "bindings/python/python/rapid_doc_rust/licenses/PYTHON-SET-NOTICE.txt",
         "rust/rapiddoc/licenses/PYTHON-SET-NOTICE.txt"
