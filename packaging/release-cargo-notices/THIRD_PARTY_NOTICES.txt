@@ -811,7 +811,7 @@ OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-=== Components: migration/CHARACTER-DEDUP-NOTICE.txt/0cc847e02277.txt ===
+=== Components: migration/CHARACTER-DEDUP-NOTICE.txt/a80d509c4de6.txt ===
 DocVortex character deduplication compatibility
 The adapter reuses unchanged docvortex-core text_snapshot.rs and dedup.rs (MIT); DOCVORTEX-PDFIUM-PATHS.txt contains the upstream DocVortex license.
 Unicode 16.0.0 whitespace/Han policy was exported from CPython 3.14 unicodedata. NFKC uses unicode-normalization 0.1.24 (Unicode 16.0.0), checked against all 4964 nonidentity single-scalar CPython mappings.
@@ -819,12 +819,12 @@ Radicals use only U+2E80..U+2FDF of EquivalentUnifiedIdeograph-17.0.0.txt, copyr
 The policy applies only to same-glyph mapping groups and hidden-copy comparison, preserving the legacy output characters elsewhere.
 
 
-=== Components: migration/DOCVORTEX-PDFIUM-PATHS-NOTICE.txt/90404e30740a.txt ===
+=== Components: migration/DOCVORTEX-PDFIUM-PATHS-NOTICE.txt/f069e3ab9e3e.txt ===
 DocVortex PDFium paths subset, commit b2ef8d025aed2b1041da6ec6e766e9d317f716ce.
 Unchanged objects.rs, paths.rs and path_evidence.rs from local DocVortex/rust/docvortex-pdfium. MIT license: DOCVORTEX-PDFIUM-PATHS.txt. Standalone Rust adapter uses existing initialized PDFium runtime under its global lock. No upstream character/font code included.
 
 
-=== Components: migration/DROID-FONT-NOTICE.txt/51d8f4d0ad49.txt ===
+=== Components: migration/DROID-FONT-NOTICE.txt/38751245389e.txt ===
 
    Copyright (c) 2005-2008, The Android Open Source Project
 
@@ -875,7 +875,7 @@ Pinned font SHA256: 8a4dea0899424438af25a6f1f6eb61e5d111d85367eece0a5d30170861ae
 No claim of document-wide parity, quality improvement, or performance improvement.
 
 
-=== Components: migration/NUMPY-SORT-NOTICE.txt/630fd5cdc6e2.txt ===
+=== Components: migration/NUMPY-SORT-NOTICE.txt/1b6bc8c7f1bd.txt ===
 Original NumPy-compatible native OCR sorting backend
 Source: https://github.com/intel/x86-simd-sort/tree/5adb33411f3cea8bdbafa9d91bd75bc4bf19c7dd
 Used by NumPy 2.4.6. Headers are unmodified; native ABI adapter is in rapiddoc-inference.
@@ -951,7 +951,7 @@ RapidDoc adjacent-offset deduplication and default thresholds are retained.
 Full license: PDFTEXT.txt.
 
 
-=== Components: migration/PDFTEXT-NOTICE.txt/cd2679480aa7.txt ===
+=== Components: migration/PDFTEXT-NOTICE.txt/732ea6cbf73c.txt ===
 This Rust port adapts pdftext 0.7.1 pdf/chars.py and pdf/pages.py
 by Vik Paruchuri (https://github.com/VikParuchuri/pdftext), Apache-2.0.
 Modified: native Rust ownership, bounded resources, serde JSON output;
@@ -971,14 +971,14 @@ Modified: Rust ownership, bounded resources, raw PNG output and error diagnostic
 Full Apache-2.0 license: PYPDFIUM2.txt.
 
 
-=== Components: migration/PYTHON-MATH-NOTICE.txt/b2f40c5b69f1.txt ===
+=== Components: migration/PYTHON-MATH-NOTICE.txt/d4f1eab876c5.txt ===
 CPython 3.14 accurate two-dimensional hypot compatibility
 Source: https://github.com/python/cpython/blob/v3.14.0/Modules/mathmodule.c
 Copyright Python Software Foundation and contributors. PSF License (PYTHON-MATH.txt).
 legacy_vectors.rs adapts vector_norm, dl_fast_sum and dl_mul to Rust f64 arithmetic for old DocVortex stroke-width fidelity. Limited to two coordinates; tested against the independent CPython baseline. Uses f64::mul_add for the compensated product.
 
 
-=== Components: migration/PYTHON-SET-NOTICE.txt/b54847cbb974.txt ===
+=== Components: migration/PYTHON-SET-NOTICE.txt/5609e4401c53.txt ===
 CPython 3.14 integer set iteration compatibility
 Source: https://github.com/python/cpython/blob/v3.14.0/Objects/setobject.c
 Copyright Python Software Foundation and contributors. PSF License (PYTHON-SET.txt).

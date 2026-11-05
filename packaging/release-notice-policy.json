@@ -1,12 +1,12 @@
 {
   "schema": 1,
-  "cargo_lock_sha256": "beb39c56e40c1abcc03462b248a08b4ac7682a52fbd130de3af09667bb4e4336",
+  "cargo_lock_sha256": "80d22668999127fb5d1878af374817f234f80f36d37d0bb0950447a39ed2ff4b",
   "manifest_hashes": {
     "bindings/python/Cargo.toml": "4aed14d7fcfb6e16aebb9bdb53cda5cda21ad11d5b1dd3623aa2eba0ec112a73",
     "Cargo.toml": "b825bddd825e515e8ebd0c1a9e78a6076139dfb2b9de500097458d6e9d3f3de0",
-    "licenses/migration-notices.json": "fd4799e9114c815d7e117e4e2146f60d0afa3cb8e9ddc542f2da12a4b749b125",
+    "licenses/migration-notices.json": "3833befc14c0921baf3cf967a2e1de76e04e09e9d1d756e2105477931df167c5",
     "licenses/MIGRATION-NOTICES.txt": "a9be0ae796b185d3f80065b767ff0382dcfcfe3c08e203e9012b21e581a76c7f",
-    "rust/rapiddoc/Cargo.toml": "5f596d9a67dd03cc60ae3f5fb81debea3558edbd4a824c55155f04a9508ed97b",
+    "rust/rapiddoc/Cargo.toml": "ffa16667cc0554bdd6e98289cf2567cea01bf67db6793252b7c2434cd47182e3",
     "rust/rapiddoc-core/Cargo.toml": "835a8409f68621199118a788751779e35f1c4072d2e4a67a89fcfec7699231ed",
     "rust/rapiddoc-inference/Cargo.toml": "b3b8600f8968d9af3c0ddf835dcd4c5f5b5da587c47396b2ae7bef00add07e9c",
     "rust/rapiddoc-native/Cargo.toml": "9ffa371049bf26efce83c9e10257659723ce8670907b073617bdfd05cc7843ee",
@@ -786,15 +786,15 @@
       "component": "percent-encoding 2.3.2",
       "selected": true
     },
+    "cargo-runtime/ring-0.17.14/LICENSE-other-bits": {
+      "component": "ring 0.17.14",
+      "selected": true
+    },
     "cargo-runtime/ring-0.17.14/LICENSE-BoringSSL": {
       "component": "ring 0.17.14",
       "selected": true
     },
     "cargo-runtime/ring-0.17.14/LICENSE": {
-      "component": "ring 0.17.14",
-      "selected": true
-    },
-    "cargo-runtime/ring-0.17.14/LICENSE-other-bits": {
       "component": "ring 0.17.14",
       "selected": true
     },
@@ -806,11 +806,11 @@
       "component": "rustls-webpki 0.103.16",
       "selected": true
     },
-    "cargo-runtime/rustls-0.23.46/LICENSE-ISC": {
+    "cargo-runtime/rustls-0.23.46/LICENSE-MIT": {
       "component": "rustls 0.23.46",
       "selected": true
     },
-    "cargo-runtime/rustls-0.23.46/LICENSE-MIT": {
+    "cargo-runtime/rustls-0.23.46/LICENSE-ISC": {
       "component": "rustls 0.23.46",
       "selected": true
     },
@@ -858,11 +858,11 @@
       "component": "webpki-roots 1.0.11",
       "selected": true
     },
-    "cargo-runtime/windows-link-0.2.1/license-mit": {
+    "cargo-runtime/windows-link-0.2.1/license-apache-2.0": {
       "component": "windows-link 0.2.1",
       "selected": true
     },
-    "cargo-runtime/windows-link-0.2.1/license-apache-2.0": {
+    "cargo-runtime/windows-link-0.2.1/license-mit": {
       "component": "windows-link 0.2.1",
       "selected": true
     },
@@ -2681,17 +2681,17 @@
     }
   },
   "retained_migration": [
-    "migration/CHARACTER-DEDUP-NOTICE.txt/0cc847e02277.txt",
-    "migration/DOCVORTEX-PDFIUM-PATHS-NOTICE.txt/90404e30740a.txt",
-    "migration/DROID-FONT-NOTICE.txt/51d8f4d0ad49.txt",
+    "migration/CHARACTER-DEDUP-NOTICE.txt/a80d509c4de6.txt",
+    "migration/DOCVORTEX-PDFIUM-PATHS-NOTICE.txt/f069e3ab9e3e.txt",
+    "migration/DROID-FONT-NOTICE.txt/38751245389e.txt",
     "migration/FORMULA-DECODE-NOTICE.txt/81347e278c72.txt",
     "migration/NATIVE-FIXED-CJK-FONT-NOTICE.txt/f053de0cc588.txt",
-    "migration/NUMPY-SORT-NOTICE.txt/630fd5cdc6e2.txt",
+    "migration/NUMPY-SORT-NOTICE.txt/1b6bc8c7f1bd.txt",
     "migration/PDFTEXT-NOTICE.txt/6ff3f3a8ece0.txt",
-    "migration/PDFTEXT-NOTICE.txt/cd2679480aa7.txt",
+    "migration/PDFTEXT-NOTICE.txt/732ea6cbf73c.txt",
     "migration/PYPDFIUM2-NOTICE.txt/91af52396186.txt",
-    "migration/PYTHON-MATH-NOTICE.txt/b2f40c5b69f1.txt",
-    "migration/PYTHON-SET-NOTICE.txt/b54847cbb974.txt"
+    "migration/PYTHON-MATH-NOTICE.txt/d4f1eab876c5.txt",
+    "migration/PYTHON-SET-NOTICE.txt/5609e4401c53.txt"
   ],
   "scope": "Windows MSVC and Linux glibc runtime (CPU and CUDA); normal edges excluding proc-macro/build/dev",
   "source_audit_records": "Development provenance and migration records remain in source; Cargo license alternatives are read from locked registry sources"

@@ -11,8 +11,9 @@ from release_notice_policy import ROOT, POLICY, CARGO_NOTICES
 
 def selected_files(package):
     source=Path(package['manifest_path']).parent
-    files={path.name:path.read_bytes() for pattern in ('LICENSE*','COPYING*','NOTICE*','COPYRIGHT*')
-           for path in source.glob(pattern) if path.is_file()}
+    prefixes=('LICENSE','COPYING','NOTICE','COPYRIGHT')
+    files={path.name:path.read_bytes() for path in source.iterdir()
+           if path.is_file() and path.name.upper().startswith(prefixes)}
     expression=package.get('license') or ''
     alternatives=expression.split(' OR ')
     simple='MIT' in alternatives and all(re.fullmatch(r'[A-Za-z0-9.+-]+',item) for item in alternatives)
