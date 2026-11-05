@@ -260,9 +260,9 @@ def smoke(output, native, standalone, mvn):
         str(consumer) + os.pathsep + classpath,
         "io.github.rapidai.rapiddoc.Smoke",
     )
-    expected = json.loads((reports / "python.json").read_text())
+    expected = json.loads((reports / "python.json").read_text(encoding="utf8"))
     for language in ["go", "node", "java"]:
-        if json.loads((reports / f"{language}.json").read_text()) != expected:
+        if json.loads((reports / f"{language}.json").read_text(encoding="utf8")) != expected:
             raise ValueError(
                 f"Same-platform seven-format binding output differs: {language}; see {reports}"
             )
