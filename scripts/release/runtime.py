@@ -70,7 +70,15 @@ def stage(cuda=False):
     library = "pdfium.dll" if windows else "libpdfium.so"
     target = "rapiddoc_pdfium.dll" if windows else "librapiddoc_pdfium.so"
     shutil.copy2(raw / library, runtime / target)
-    shutil.copytree(raw / "licenses", runtime / "licenses")
+    licenses = raw / "licenses"
+    if not licenses.is_dir():
+        distribution_root = Path(metadata.distribution("pypdfium2").locate_file("."))
+        candidates = sorted(distribution_root.glob("pypdfium2-*.dist-info/licenses"))
+        if candidates:
+            licenses = candidates[0]
+    if not licenses.is_dir():
+        raise FileNotFoundError("pypdfium2 license directory is missing")
+    shutil.copytree(licenses, runtime / "licenses")
     compact(runtime / "licenses")
     (runtime / "manifest.json").write_text(
         json.dumps(
