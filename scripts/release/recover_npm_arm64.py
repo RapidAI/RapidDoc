@@ -6,10 +6,27 @@ from pathlib import Path
 import shutil
 import subprocess
 import tarfile
+import time
 
 from common import ROOT, checked_files, run, version
 from npm_packages import root_package
 from publish_npm import integrity, packages
+
+
+def wait_visible(name, release, path):
+    """A successful PUT can remain in npm's processing queue before public GETs work."""
+    for _ in range(60):
+        result = subprocess.run(["npm", "view", f"{name}@{release}", "dist.integrity", "--json"],
+                                capture_output=True, text=True, cwd=ROOT)
+        if result.returncode == 0:
+            if json.loads(result.stdout) != integrity(path):
+                raise ValueError(f"Existing package bytes differ: {name}@{release}")
+            return
+        if "E404" not in result.stdout + result.stderr:
+            raise RuntimeError("Cannot check npm processing status: " + name)
+        print("Waiting for npm processing:", name, flush=True)
+        time.sleep(10)
+    raise RuntimeError("npm has not made the submitted version public yet: " + name)
 
 
 def main():
@@ -42,6 +59,9 @@ def main():
         path.unlink()
     run("npm", "pack", "--ignore-scripts", cwd=root)
     selected = [(scoped, replacement) if name == old else (name, path) for name, path in selected]
+    # Submit the new names first; the first four names were accepted by the
+    # original run and may still be undergoing registry processing.
+    selected.sort(key=lambda item: (item[0] == "rapid-doc", not item[0].startswith("@hzkitty/")))
     for name, path in selected:
         result = subprocess.run(["npm", "view", f"{name}@{release}", "dist.integrity", "--json"],
                                 capture_output=True, text=True, cwd=ROOT)
@@ -52,6 +72,10 @@ def main():
             continue
         if "E404" not in result.stdout + result.stderr:
             raise RuntimeError("Cannot check existing npm version: " + name)
+        if name in {"rapid-doc-linux-arm64-gnu", "rapid-doc-linux-x64-gnu",
+                    "rapid-doc-darwin-arm64", "rapid-doc-darwin-x64"}:
+            wait_visible(name, release, path)
+            continue
         if name == "rapid-doc":
             # Exercise the real npm registry alias before publishing the loader.
             consumer = ROOT / "build/release/npm-alias-consumer"
@@ -65,6 +89,7 @@ def main():
                 cwd=consumer, env={**os.environ, "RAPIDDOC_NODE_LIBRARY": ""})
             checked_files(consumer / "node_modules" / old / "runtime", manifest["files"])
         run("npm", "publish", path, "--access", "public", "--provenance", "--tag", "latest")
+        wait_visible(name, release, path)
 
 
 if __name__ == "__main__":
