@@ -1,4 +1,4 @@
-"""Build CPU or CUDA preview artifacts on a clean Windows/Linux runner."""
+"""Build CPU or CUDA artifacts on a clean Windows, Linux, or macOS runner."""
 
 import argparse
 import json
@@ -17,6 +17,10 @@ def main():
     p.add_argument("--cuda", action="store_true")
     a = p.parse_args()
     check_version(a.version)
+    if sys.platform == "darwin":
+        # Use freetype-sys's bundled static build. Homebrew's FreeType links
+        # machine-local dylibs and can require a newer macOS than our target.
+        os.environ["FREETYPE2_NO_PKG_CONFIG"] = "1"
     if a.cuda and not os.environ.get("RAPIDDOC_OPERATOR_BUNDLE"):
         raise ValueError(
             "Set the platform CUDA_OPERATORS_* variable before requesting CUDA packaging"
