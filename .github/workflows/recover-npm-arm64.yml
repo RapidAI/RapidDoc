@@ -1,0 +1,46 @@
+name: Finish npm 0.1.1 ARM64 scoped publication
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+  id-token: write
+
+concurrency:
+  group: sdk-publish-0.1.1-npm
+  cancel-in-progress: false
+
+jobs:
+  npm:
+    runs-on: ubuntu-22.04
+    environment: sdk-npm
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          registry-url: https://registry.npmjs.org
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify the successful release build
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          test "$(git rev-parse sdk-v0.1.1)" = 617f99fc9977b6440b735e2540da4f7a95d29f25
+          gh api repos/RapidAI/RapidDoc/actions/runs/42180244292 --jq '[.conclusion, .head_sha] | join(" ")' | grep -Fx 'success 617f99fc9977b6440b735e2540da4f7a95d29f25'
+          python scripts/release/common.py 0.1.1
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: sdk-*
+          path: artifacts
+          github-token: ${{ github.token }}
+          run-id: '42180244292'
+      - name: Reuse verified platform payloads and publish the package alias
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: python scripts/release/recover_npm_arm64.py
