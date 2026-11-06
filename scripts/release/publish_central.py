@@ -22,13 +22,16 @@ def assemble(artifacts, destination):
     for p in artifacts.glob("*/java/*"):
         if p.suffix not in [".jar", ".pom"]:
             continue
-        if p.name in files and files[p.name] != p.read_bytes():
+        data = p.read_bytes()
+        if p.suffix == ".pom":
+            data = data.replace(b"\r\n", b"\n")
+        if p.name in files and files[p.name] != data:
             # Main JVM JARs include build timestamps; publish one platform's JVM
             # build. Native classifier artifacts must never collide.
             if p.name.startswith(f"rapid-doc-{version()}") and p.suffix == ".jar":
                 continue
             raise ValueError("Conflicting Maven artifact: " + p.name)
-        files[p.name] = p.read_bytes()
+        files[p.name] = data
     required = [
         f"rapid-doc-{version()}.jar",
         f"rapid-doc-{version()}-sources.jar",

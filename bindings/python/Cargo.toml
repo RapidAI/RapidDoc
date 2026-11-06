@@ -26,3 +26,6 @@ cuda = ["rapiddoc/cuda"]
 mimalloc-allocator = ["dep:mimalloc"]
 # Source-tree differential checkpoints, intentionally absent in release wheels.
 migration-tools = []
+
+[build-dependencies]
+pyo3-build-config = "=0.28.2"

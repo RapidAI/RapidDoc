@@ -1,8 +1,8 @@
 {
   "schema": 1,
-  "cargo_lock_sha256": "80d22668999127fb5d1878af374817f234f80f36d37d0bb0950447a39ed2ff4b",
+  "cargo_lock_sha256": "14a32623a09bef2331ef3e73efdabb51abed69ee96722d7fd9aa9e0458823743",
   "manifest_hashes": {
-    "bindings/python/Cargo.toml": "4aed14d7fcfb6e16aebb9bdb53cda5cda21ad11d5b1dd3623aa2eba0ec112a73",
+    "bindings/python/Cargo.toml": "cd2f6bb5293aa46d1a16904dd01d013e6d03eb2a8319496c18f93a19cc28902c",
     "Cargo.toml": "b825bddd825e515e8ebd0c1a9e78a6076139dfb2b9de500097458d6e9d3f3de0",
     "licenses/migration-notices.json": "b689a6706abbd2abf2d24792b6fffa92543c13d06dce2ad1da247b0746178fb4",
     "licenses/MIGRATION-NOTICES.txt": "a9be0ae796b185d3f80065b767ff0382dcfcfe3c08e203e9012b21e581a76c7f",

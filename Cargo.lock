@@ -2691,6 +2691,7 @@ version = "0.1.0"
 dependencies = [
  "mimalloc",
  "pyo3",
+ "pyo3-build-config",
  "rapiddoc",
  "rapiddoc-core",
  "rapiddoc-inference",

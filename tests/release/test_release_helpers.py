@@ -176,3 +176,14 @@ def test_central_rejects_incomplete_or_conflicting_artifacts(tmp_path):
         ).write_bytes(content)
     with pytest.raises(ValueError, match="Conflicting"):
         publish_central.assemble(artifacts, tmp_path / "central")
+
+
+def test_central_merges_common_poms_with_platform_line_endings(tmp_path):
+    artifacts = tmp_path / "artifacts"
+    for platform, text in [("windows", b"<project>\r\n</project>\r\n"),
+                           ("macos", b"<project>\n</project>\n")]:
+        directory = artifacts / platform / "java"
+        directory.mkdir(parents=True)
+        (directory / f"rapid-doc-{VERSION}.pom").write_bytes(text)
+    with pytest.raises(ValueError, match="Incomplete"):
+        publish_central.assemble(artifacts, tmp_path / "central")
