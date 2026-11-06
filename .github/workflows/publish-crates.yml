@@ -73,10 +73,16 @@ jobs:
             if not os.environ.get('CARGO_REGISTRY_TOKEN'): raise ValueError('Configure CARGO_REGISTRY_TOKEN')
             for name in crates.ORDER[crates.ORDER.index(start) if start else 0:]:
               command = ['cargo', 'publish', '--locked', '--no-default-features', '-p', name]
+              network_retries = 0
               while True:
                 result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
                 print(result.stdout, flush=True)
                 if result.returncode == 0: break
+                if any(message in result.stdout for message in ('Connection reset by peer', 'SSL connect error', 'Connection timed out')) and network_retries < 3:
+                  network_retries += 1
+                  print('Transient registry connection failure; retry', network_retries, flush=True)
+                  time.sleep(30)
+                  continue
                 retry = re.search(r'Please try again after (.+? GMT)', result.stdout)
                 if '429 Too Many Requests' not in result.stdout or not retry:
                   raise subprocess.CalledProcessError(result.returncode, command)
