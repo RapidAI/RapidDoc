@@ -1,38 +1,34 @@
 # 原生 SDK 发布
 
-本次准备发布 SDK `0.1.1`，上一公开版本为 `0.1.0`。原 Python `rapid-doc` 保持独立版本及现有
-`publish_whl.yml`，本页仅描述 Rust 和语言绑定。
+SDK `0.1.1` 已完成六平台验证，并已发布 Python、Java、Go/GitHub 和 Rust 渠道。
+原 Python `rapid-doc` 保持独立版本 `0.9.12` 及现有 `publish_whl.yml`。
 
 ## 当前发布状态（2026-11-06）
 
-| 渠道 | `0.1.0` 状态 | 使用入口 |
+| 渠道 | `0.1.1` 状态 | 使用入口 |
 | --- | --- | --- |
-| Python / PyPI | 四个平台的 CPU wheel 已发布 | `pip install "rapid-doc-rust[cpu]==0.1.0"` |
-| Java / Maven Central | 主包、四个平台 JNI 和 ORT 1.23.2 CPU JAR 已发布 | `io.github.rapidai:rapid-doc:0.1.0` |
-| Go / GitHub | 模块标签和四个平台 CPU 原生库 ZIP 已发布 | `go get github.com/RapidAI/RapidDoc/bindings/go@v0.1.0` |
-| Rust / crates.io | 11 个 crate 均已发布，包括主包与 CLI | `cargo add rapiddoc@0.1.0` |
-| Node.js / npm | Linux x64、macOS Intel/ARM64 平台包已发布；Windows 包等待 npm 审核，主包暂未发布 | 当前使用本地构建的 standalone `.tgz` |
+| Python / PyPI | 六个平台 CPU wheel 已发布，包含项目描述 | `pip install "rapid-doc-rust[cpu]==0.1.1"` |
+| Java / Maven Central | 主包、六个平台 JNI 和 ORT CPU JAR 已发布 | `io.github.rapidai:rapid-doc:0.1.1` |
+| Go / GitHub | 模块标签及六个平台 CPU 原生库 ZIP 已发布 | `go get github.com/RapidAI/RapidDoc/bindings/go@v0.1.1` |
+| Rust / crates.io | 本次八个 crate 更新至 0.1.1，三个未修改 fork 保持原版本，全部已发布 | `cargo add rapiddoc@0.1.1` |
+| Node.js / npm | Linux/macOS 平台包已上传；Windows ARM64 改用个人 scope 补发，主包等待依赖就绪 | 尚未完成上架 |
 
-四个平台构建、安装、CPU ONNX 推理及七格式跨绑定一致性均通过，见[验证任务](https://github.com/RapidAI/RapidDoc/actions/runs/42139545416)。
-[SDK Release](https://github.com/RapidAI/RapidDoc/releases/tag/sdk-v0.1.0) 已公开，Go 模块代理可读取 `v0.1.0`。
-Maven 首次发布任务曾等待超时，但服务端随后完成发布，公共仓库已可下载；不要因此重复上传。
-CUDA 产物和实机验收不包含在本次四平台 CPU 发布中。
+六个平台的编译、安装、CPU ONNX 推理与七格式跨绑定一致性均通过，见[验证任务](https://github.com/RapidAI/RapidDoc/actions/runs/42180244292)。
+[SDK Release](https://github.com/RapidAI/RapidDoc/releases/tag/sdk-v0.1.1) 已公开，Go 模块代理可读取 `v0.1.1`。
+公开 PyPI Windows x64 wheel 另在隔离环境安装并通过 CPU ONNX 和七格式检查。
 
-## 下一版本 ARM64 适配（尚未发布）
+## 六平台及瘦身变更
 
-已在源码和构建流程中补充 Linux ARM64（glibc）与 Windows ARM64 CPU 目标，
-覆盖 Python、Java、Go、Node.js 及 Rust 运行库下载。加上现有四个平台，共六个 CPU 组合。
-这两个新增目标仍需提交后在 GitHub ARM64 runner 上完成编译、安装、ONNX 推理和七格式一致性验收。
-Windows ARM64 使用原生 MSVC 构建 Rust/GEOS，Go cgo 单独使用 LLVM-MinGW；不提供 ARM64 CUDA 包。
-Windows ARM64 的私有 CRT 接受 runner 自带的 VS 2022 14.44 或指定的 14.51，实际版本写入产物来源记录，兼容性仍待上述原生验收。
-当前已发布的 `0.1.0` 平台范围保持上表所述。
+CPU 包覆盖 Windows / Linux glibc / macOS 的 x64 和 ARM64。
+Windows ARM64 使用 MSVC 构建 Rust/GEOS，Go cgo 单独使用 LLVM-MinGW；不提供 ARM64 CUDA 包。
+Windows ARM64 私有 CRT 识别官方 ARM64X 混合库，实际版本写入产物来源记录，已通过原生 runner 验收。
 
-下一版本的 Unix ORT 打包只提取上游真实库文件，避免把软链接展开成重复库；
-Java、Go、Node 打包也会过滤旧目录中内容完全相同的 ORT 别名，保留 provider 和许可证。
+Unix ORT 打包只提取上游真实库文件，避免把软链接展开成重复库；
+Java、Go、Node 打包也过滤内容完全相同的 ORT 别名，保留 provider 和许可证。
 本地 Linux x64 已验证单库加载、测试/OCR 检测/OCR 识别模型输出、七格式 Python/Node 输出一致性，
 以及 npm 离线安装与自动平台加载。Linux Node 平台包实测从 61.9 MB 降到 45.3 MB（约 27%）。
-macOS 已检查官方归档的真实文件提取，动态加载及新增 ARM64 整包仍需原生 CI 验收。
-Java 瘦身包使用新的 Maven 打包版本 `1.23.2-rapiddoc.1`，依赖已同步更新；其中原生 ORT 仍为 `1.23.2`，已发布的旧 Maven 坐标不覆盖上传。
+Java ORT 的 Maven 打包版本为 `1.23.2-rapiddoc.1`，原生 ORT 仍为 `1.23.2`，不覆盖旧坐标。
+CUDA、Alpine/musl 和浏览器 WASM 不包含在本次六平台 CPU 发布中。
 
 ## 工作流入口
 
@@ -46,7 +42,7 @@ Java 瘦身包使用新的 Maven 打包版本 `1.23.2-rapiddoc.1`，依赖已同
 不需要注册发布账号。工作流读取仓库文件，不会使用开发机 `build/` 和 `.venv`。
 构建成功后产物保存在 Actions Artifacts，保留 14 天。
 
-正式发布必须同时满足：所有版本一致、工作流运行的 Git ref 为 `sdk-v0.1.0`、
+正式发布必须同时满足：所有版本一致、工作流运行的 Git ref 为 `sdk-vVERSION`、
 选择一个发布渠道，并明确勾选 `publish`。`sdk-v*` 与原 Python 的 `v*` 标签分离，
 不会触发现有 Python 发布流程。此处没有自动创建版本标签，也没有 push/PR 发布触发器。
 
@@ -56,7 +52,7 @@ Java 瘦身包使用新的 Maven 打包版本 `1.23.2-rapiddoc.1`，依赖已同
 
 `publish-sdk.yml` 的 `source_run_id` 可复用成功的 `sdk-build.yml` 产物；留空才重新构建。
 所选任务必须包含完整、未过期的平台产物，发布源码必须与构建源码一致（仅允许发布工作流自身不同）。
-首次 CPU 产物对应任务 `42139545416`；过期后需重新构建。
+本次六平台 CPU 产物对应任务 `42180244292`；过期后需重新构建。
 
 `publish-crates.yml` 始终检出所选版本的 `sdk-vVERSION` 标签，工作流自身可从 `main` 运行。
 `start_at` 可指定第一个尚未成功的 crate，避免重传已发布版本。
@@ -87,14 +83,14 @@ Maven 还需在 Central Portal 验证 `io.github.rapidai` 命名空间，并公�
 
 ## 平台和运行库
 
-默认构建 Windows x64 / Linux glibc x64 / macOS Intel x64 和 Apple Silicon ARM64 CPU 包，macOS 最低目标为 14。原生代码保留 CUDA 能力，但
+默认构建 Windows / Linux glibc / macOS 的 x64 和 ARM64 CPU 包，macOS 最低目标为 14。原生代码保留 CUDA 能力，但
 CPU 产物不携带 GPU ORT 和自定义 CUDA 算子，不能当作完整 GPU 部署包。
 Python wheel 不捆绑 ORT，仍由 `[cpu]`、`[gpu]` 或显式运行库提供；构建安装检查
 只通过隔离运行库目录供给 ORT，不依赖 Python `onnxruntime` 模块。
 
 ORT 固定为 1.23.2，下载官方归档并校验已记录 SHA256；PDFium 来自
 `pypdfium2==5.10.1`，GEOS 来自 `shapely==2.1.2`，保留原始许可与匹配源码。
-Linux wheel 使用 auditwheel 根据实际依赖确定兼容标签；本次为 `manylinux_2_35_x86_64`（glibc 2.35+）。
+Linux wheel 使用 auditwheel 根据实际依赖确定兼容标签；本次为 `manylinux_2_35_x86_64`（glibc 2.35+）和 `manylinux_2_38_aarch64`（glibc 2.38+）。
 macOS wheel 使用 delocate 检查和修复依赖，发布标签为 `macosx_14_0_x86_64` / `macosx_14_0_arm64`；实际安装验证在 macOS 15 runner 上运行。
 不能仅修改文件名降低运行库的系统要求。
 
@@ -137,7 +133,7 @@ Windows 对应 DLL 名为 `onnxruntime_ops.dll`。本工作流校验、复制算
   包含自定义算子的版本，不把两个同名 wheel 同时上传。PyPI 不上传当前缺少
   独立构建运行库准备流程的 sdist。
 - **npm**：公开入口仍是 `rapid-doc`；CPU 包作为精确版本的 optionalDependencies：
-  `@hzkitty/rapid-doc-win32-x64`、`rapid-doc-linux-x64-gnu`、`rapid-doc-darwin-x64`、`rapid-doc-darwin-arm64`、`rapid-doc-win32-arm64`、`rapid-doc-linux-arm64-gnu`。Windows x64/Linux x64 CUDA 包分别增加 `-cuda` 后缀（Windows x64 保留 `@hzkitty/` scope），
+  `@hzkitty/rapid-doc-win32-x64`、`rapid-doc-linux-x64-gnu`、`rapid-doc-darwin-x64`、`rapid-doc-darwin-arm64`、`rapid-doc-win32-arm64`（npm alias 指向 `@hzkitty/rapid-doc-win32-arm64`）、`rapid-doc-linux-arm64-gnu`。Windows x64/Linux x64 CUDA 包分别增加 `-cuda` 后缀（Windows x64 保留 `@hzkitty/` scope），
   用户显式安装并通过 `config.device='cuda'` 选择，不给所有 CPU 用户下载 GPU 库。
   standalone tarball 的原有 `runtime/` 查找方式保留。发布平台包后才发布入口包，
   正式版本 npm dist-tag 使用 `latest`；包名所有权需发布前确认。
@@ -145,8 +141,8 @@ Windows 对应 DLL 名为 `onnxruntime_ops.dll`。本工作流校验、复制算
   生成 sources/javadoc、签名及校验文件后，按 Maven 仓库目录结构一次提交 Central。
   如果超时，先查看 receipt 中的 deployment ID，避免重复提交相同版本。
 - **Go / C ABI**：工作流创建 GitHub draft prerelease，携带平台原生 SDK ZIP，并创建
-  `bindings/go/v0.1.0` 标签。Go 源码版本可被模块代理读取；使用者仍需按 Go README
-  提供对应原生库。确认资产和说明后发布该草稿；`0.1.0` 已完成此步骤。Go 包不会自动下载原生库。
+  `bindings/go/v0.1.1` 标签。Go 源码版本可被模块代理读取；使用者仍需按 Go README
+  提供对应原生库。确认资产和说明后发布该草稿；`0.1.1` 已完成此步骤。Go 包不会自动下载原生库。
 - **Rust crates**：11 个包按依赖顺序发布，包括独立命名的
   `rapiddoc-docvortex-core`、`rapiddoc-docvortex-pdfium-paths`、`rapiddoc-lopdf`。
   本地修改仍保留，不替换成未修改的上游实现。内部依赖同时声明路径和精确版本，
@@ -160,7 +156,7 @@ Windows 对应 DLL 名为 `onnxruntime_ops.dll`。本工作流校验、复制算
 
 ## 验证范围
 
-本机 helper 测试及工作流语法检查通过；GitHub Actions 已完成四个平台的实际构建与安装验证。
+本机 helper 测试及工作流语法检查通过；GitHub Actions 已完成六个平台的实际构建与安装验证。
 Python、Maven、Go/GitHub、Rust 已公开发布，npm 的部分发布状态见本页顶部。
 CI 七格式检查比较同平台 Python/Java/Go/Node 的 Markdown、middle JSON、
 content list 和图片哈希，避免把 Windows/Linux 渲染差异误判为绑定差异。
