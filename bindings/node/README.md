@@ -8,15 +8,12 @@ Node.js / TypeScript 绑定调用共享 Rust 解析引擎，支持 PDF、DOC、D
 
 平台包包含原生扩展和 CPU 运行库，使用者不需要安装 Python、Java、Rust 或 C 编译器。模型由共享 Rust SDK 自动定位或下载。
 
-`0.1.0` 发布状态（2026-11-06）：Linux x64、macOS Intel/ARM64 的 npm 平台包已发布；Windows 包 `rapid-doc-win32-x64` 被 npm 包名反垃圾检测拦截，正在等待审核。`rapid-doc` 主包暂未发布，因此目前不能直接使用 `npm install rapid-doc` 安装该版本。
+本页对应 SDK `0.1.1`，各渠道上架状态见[发布说明](../../docs/publishing.md)。主包继续使用 `rapid-doc`，正式发布前可按下文从源码构建 standalone 包。
 
-下一次构建将 Windows x64 平台包改为 `@hzkitty/rapid-doc-win32-x64`，对应 CUDA 包为 `@hzkitty/rapid-doc-win32-x64-cuda`。
-主包继续使用 `rapid-doc`，其他平台包保持原名；Windows 平台包由主包自动选择，用户调用方式不变。
-scoped 包尚未发布，发布 Token 需具有对应包的写入权限；使用 scope 不保证免于 npm 反垃圾审核。
+Windows x64 平台包为 `@hzkitty/rapid-doc-win32-x64`，对应 CUDA 包为 `@hzkitty/rapid-doc-win32-x64-cuda`。其他平台包保持原名，由主包自动选择，用户调用方式不变。
+发布 Token 需具有对应包的写入权限；使用 scope 不保证免于 npm 反垃圾审核。
 
-当前可按下方说明构建 standalone 包，再通过 `npm install /path/package.tgz` 安装。安装后统一使用 `require('rapid-doc')`，调用方式如下。
-
-要求 Node.js 20+。CPU 平台包覆盖 Windows/Linux x64，以及 macOS 14+ Intel x64 / Apple Silicon ARM64。加载器根据运行 Node.js 的系统和架构选择平台包。Windows/Linux CUDA 仍需单独实机验收。
+要求 Node.js 20+。CPU 平台包覆盖 Windows/Linux x64 与 ARM64，以及 macOS 14+ Intel x64 / Apple Silicon ARM64。加载器根据运行 Node.js 的系统和架构选择平台包。Windows/Linux CUDA 仍需单独实机验收。
 
 ## 快速开始
 

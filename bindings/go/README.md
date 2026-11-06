@@ -1,18 +1,18 @@
 # RapidDoc Go SDK
 
-Go 调用共享 Rust SDK，支持 PDF、DOC、DOCX、XLS、XLSX、PPT、PPTX，不需要 Python、Java 或 PyTorch。Windows/Linux x64、macOS Intel/Apple Silicon（CPU）统一使用 **C ABI + cgo**，模块没有第三方 Go 依赖。
+Go 调用共享 Rust SDK，支持 PDF、DOC、DOCX、XLS、XLSX、PPT、PPTX，不需要 Python、Java 或 PyTorch。Windows/Linux x64/ARM64、macOS Intel/Apple Silicon（CPU）统一使用 **C ABI + cgo**，模块没有第三方 Go 依赖。
 
-Go 模块 `v0.1.0` 和[四个平台的 CPU 原生运行库](https://github.com/RapidAI/RapidDoc/releases/tag/sdk-v0.1.0)已发布，均通过七格式跨绑定检查；GPU 仍需单独实机验收。
+本页对应 SDK `0.1.1`，提供六个平台的 CPU 原生运行库；上架和验收状态见[发布说明](../../docs/publishing.md)。发布后的下载入口是 [SDK Release](https://github.com/RapidAI/RapidDoc/releases/tag/sdk-v0.1.1)，GPU 仍需单独实机验收。
 
 ## 安装
 
 在自己的 Go 项目中执行：
 
 ```bash
-go get github.com/RapidAI/RapidDoc/bindings/go@v0.1.0
+go get github.com/RapidAI/RapidDoc/bindings/go@v0.1.1
 ```
 
-从上述 Release 下载对应平台的 `rapiddoc-native-0.1.0-<platform>.zip`，解压到应用的 `runtime` 目录，并保留所有子目录。Go 模块不会自动下载原生库。
+从上述 Release 下载对应平台的 `rapiddoc-native-0.1.1-<platform>.zip`，解压到应用的 `runtime` 目录，并保留所有子目录。Go 模块不会自动下载原生库。
 
 ## 编译准备
 

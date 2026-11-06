@@ -4,21 +4,20 @@
 
 直接使用共享 `rapiddoc` crate。Python、Java、Go、Node.js 绑定均调用这套 SDK，共享模型策略和解析算法。
 
-发布状态（2026-11-06）：11 个 crate 已全部发布到 crates.io，包括主包 `rapiddoc` 和 `rapiddoc-cli`。可直接使用下方的版本依赖。
-
-Windows/Linux x64、macOS 14+ Intel/ARM64 的 CPU 运行库 ZIP 已在 [SDK Release](https://github.com/RapidAI/RapidDoc/releases/tag/sdk-v0.1.0) 提供。各渠道最新发布状态见[发布说明](../../docs/publishing.md)。
+本页对应 SDK `0.1.1`，各渠道上架和六平台 CPU 验收状态见[发布说明](../../docs/publishing.md)。
+发布后可通过 crates.io 使用下方版本依赖，并从 [SDK Release](https://github.com/RapidAI/RapidDoc/releases/tag/sdk-v0.1.1) 下载配套原生运行库。
 
 ## 安装 ONNX Runtime
 
-Rust 应用可开启 `download-runtime` 功能，在 Cargo 构建时下载并校验官方 ORT 1.23.2 归档，覆盖 Windows MSVC x64、Linux glibc x64、macOS Intel 和 Apple Silicon CPU：
+Rust 应用可开启 `download-runtime` 功能，在 Cargo 构建时下载并校验官方 ORT 1.23.2 归档，覆盖 Windows MSVC x64/ARM64、Linux glibc x64/ARM64、macOS Intel 和 Apple Silicon CPU：
 
 ```toml
 [dependencies]
-rapiddoc = { version = "0.1.0", features = ["download-runtime"] }
+rapiddoc = { version = "0.1.1", features = ["download-runtime"] }
 # For GPU use features = ["download-runtime", "cuda"] instead.
 ```
 
-也可执行 `cargo add rapiddoc@0.1.0 --features download-runtime`。源码开发时可将版本依赖换成 `path = "../RapidDoc/rust/rapiddoc"`。该功能需要显式启用；各语言绑定自行提供运行库，不会触发此下载。运行时不需要 Python。
+也可执行 `cargo add rapiddoc@0.1.1 --features download-runtime`。源码开发时可将版本依赖换成 `path = "../RapidDoc/rust/rapiddoc"`。该功能需要显式启用；各语言绑定自行提供运行库，不会触发此下载。运行时不需要 Python。
 
 启用 `download-runtime` 和 `cuda` 时会下载 GPU ORT，但机器仍需提前安装 NVIDIA 驱动及匹配的 CUDA/cuDNN。默认构建使用 CPU，明确请求 CUDA 时不会静默回退为 CPU。
 

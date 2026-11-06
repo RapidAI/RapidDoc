@@ -5,21 +5,20 @@
 Use the shared `rapiddoc` crate directly. The same SDK backs the Python, Java,
 Go and Node.js bindings without copying model policy or parsing algorithms.
 
-Release status (2026-11-06): all 11 crates, including `rapiddoc` and
-`rapiddoc-cli`, are published on crates.io. Use the version dependency below. CPU runtime ZIPs for Windows/Linux x64 and
-macOS 14+ Intel/ARM64 are available in the [SDK Release](https://github.com/RapidAI/RapidDoc/releases/tag/sdk-v0.1.0).
+This guide covers SDK `0.1.1`. See the [publishing guide](../../docs/publishing.md) for registry availability and six-platform CPU acceptance status.
+After publication, use the crates.io dependency below and download native runtime bundles from the [SDK Release](https://github.com/RapidAI/RapidDoc/releases/tag/sdk-v0.1.1).
 
 ## ORT installation
 
-For a Rust application, enable `download-runtime` to download and verify the official ORT 1.23.2 archive during Cargo build (Windows MSVC x64 / Linux glibc x64 / macOS Intel and Apple Silicon CPU):
+For a Rust application, enable `download-runtime` to download and verify the official ORT 1.23.2 archive during Cargo build (Windows MSVC x64/ARM64 / Linux glibc x64/ARM64 / macOS Intel and Apple Silicon CPU):
 
 ```toml
 [dependencies]
-rapiddoc = { version = "0.1.0", features = ["download-runtime"] }
+rapiddoc = { version = "0.1.1", features = ["download-runtime"] }
 # For GPU use features = ["download-runtime", "cuda"] instead.
 ```
 
-You can also run `cargo add rapiddoc@0.1.0 --features download-runtime`. For source development, replace the version with `path = "../RapidDoc/rust/rapiddoc"`. The feature remains opt-in: language bindings provide their own runtime distribution and do not trigger this download. No Python installation is needed. GPU downloads contain GPU ORT, but NVIDIA drivers and compatible CUDA/cuDNN must already be available.
+You can also run `cargo add rapiddoc@0.1.1 --features download-runtime`. For source development, replace the version with `path = "../RapidDoc/rust/rapiddoc"`. The feature remains opt-in: language bindings provide their own runtime distribution and do not trigger this download. No Python installation is needed. GPU downloads contain GPU ORT, but NVIDIA drivers and compatible CUDA/cuDNN must already be available.
 
 Downloads are cached in Cargo build output and verified against pinned upstream SHA-256 digests. For offline builds, set `RAPIDDOC_ORT_ARCHIVE` to the same official release archive; its checksum is still verified. Explicit external library paths override bundled discovery. The installed bundle, including provider libraries and required notices, is copied to `target/<profile>/runtime` (also next to examples/tests). Ship that `runtime` directory alongside the executable; a build-machine absolute path is not a deployment substitute. Cleaning Cargo output removes this cache. This feature installs ORT only; PDFium/GEOS and optional CUDA custom operators still come from RapidDoc's platform runtime bundle.
 

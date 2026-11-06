@@ -25,22 +25,11 @@ The platform package contains the native addon and CPU runtime libraries.
 Users do not need Python, Java, Rust or a C compiler. Models are automatically
 resolved/downloaded by the shared Rust SDK.
 
-Release status (2026-11-06): the `0.1.0` Linux x64 and macOS Intel/ARM64 npm
-platform packages have been published. The Windows package
-`rapid-doc-win32-x64` awaits npm review following a spam-detection rejection;
-the `rapid-doc` root package is not yet published. `npm install rapid-doc` is
-therefore not an available installation path for this release yet.
-For now, build the standalone package using the instructions below and install
-its `.tgz` with `npm install /path/package.tgz`. It provides the same
-`require('rapid-doc')` API shown above.
+This guide covers SDK `0.1.1`. See the [publishing guide](../../docs/publishing.md) for registry availability. The entry point remains `rapid-doc`; before publication, build and install the standalone package as described below.
 
-The next build uses `@hzkitty/rapid-doc-win32-x64` for Windows x64 CPU and
-`@hzkitty/rapid-doc-win32-x64-cuda` for its CUDA variant. These scoped packages
-are not published yet. The `rapid-doc` entry point and other platform names
-stay the same. The publishing token needs write access to the scoped packages;
-using a scope does not guarantee exemption from npm spam detection.
+The Windows x64 platform package is `@hzkitty/rapid-doc-win32-x64`, with `@hzkitty/rapid-doc-win32-x64-cuda` for CUDA. Other platform names stay the same, and the loader selects the package automatically. The publishing token needs write access to the scoped packages; using a scope does not guarantee exemption from npm spam detection.
 
-Node.js 20+ is required. CPU platform packages cover Windows/Linux x64 and
+Node.js 20+ is required. CPU platform packages cover Windows/Linux x64 and ARM64, and
 macOS 14+ on Intel x64 / Apple Silicon ARM64. The loader selects the package
 matching the running Node.js architecture. CUDA requires separate Windows/Linux acceptance testing.
 

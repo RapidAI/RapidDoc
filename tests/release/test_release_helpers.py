@@ -209,6 +209,40 @@ def test_central_merges_common_poms_with_platform_line_endings(tmp_path):
         publish_central.assemble(artifacts, tmp_path / "central")
 
 
+def test_central_keeps_runtime_packaging_version_independent_of_sdk(tmp_path):
+    runtime_version = common.ort_package_version()
+    assert runtime_version != "1.23.2"  # A repack cannot overwrite the initial runtime release.
+    directory = tmp_path / "artifacts/sdk-linux/java"
+    directory.mkdir(parents=True)
+    for artifact, release in [("rapid-doc", VERSION), ("rapid-doc-native", VERSION),
+                              ("rapid-doc-ort", runtime_version)]:
+        (directory / f"{artifact}-{release}.pom").write_text(
+            '<project xmlns="http://maven.apache.org/POM/4.0.0">'
+            f'<groupId>io.github.rapidai</groupId><artifactId>{artifact}</artifactId>'
+            f'<version>{release}</version></project>'
+        )
+    for suffix in ["", "-sources", "-javadoc"]:
+        (directory / f"rapid-doc-{VERSION}{suffix}.jar").write_bytes(b"java")
+    for platform in ["windows-x86_64", "linux-x86_64", "macos-x86_64", "macos-aarch64",
+                     "linux-aarch64", "windows-aarch64"]:
+        (directory / f"rapid-doc-native-{VERSION}-{platform}.jar").write_bytes(b"jni")
+        (directory / f"rapid-doc-ort-{runtime_version}-{platform}.jar").write_bytes(b"ort")
+    output = tmp_path / "central"
+    publish_central.assemble(tmp_path / "artifacts", output)
+    runtime = output / "io/github/rapidai/rapid-doc-ort" / runtime_version
+    assert len(list(runtime.glob("*.jar"))) == 6
+    assert not (output / "io/github/rapidai/rapid-doc-ort/1.23.2").exists()
+
+
+def test_crate_resume_skips_only_the_exact_published_version(monkeypatch):
+    import io
+    monkeypatch.setattr(crates.urllib.request, "urlopen", lambda *a, **k: io.BytesIO(b'{"vers":"0.1.0"}\n'))
+    monkeypatch.setattr(crates, "package_version", lambda name: "0.1.0")
+    assert crates.published("rapiddoc-office")
+    monkeypatch.setattr(crates, "package_version", lambda name: "0.1.1")
+    assert not crates.published("rapiddoc-office")
+
+
 @pytest.mark.parametrize("architecture,machine", [("x86_64", 0x8664), ("aarch64", 0xAA64), ("aarch64", 0xA64E)])
 def test_windows_crt_payload_rejects_wrong_architecture(tmp_path, architecture, machine):
     import struct
