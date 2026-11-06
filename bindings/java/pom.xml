@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.rapidai</groupId>
   <artifactId>rapid-doc</artifactId>
-  <version>0.1.0</version>
+  <version>0.1.1</version>
   <name>RapidDoc Java SDK</name>
   <description>Native Rust document parsing with Java 8 bytecode compatibility</description>
   <url>https://github.com/RapidAI/RapidDoc</url>
@@ -28,7 +28,7 @@
   <properties>
     <maven.compiler.release>8</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <rapid-doc.ort.version>1.23.2</rapid-doc.ort.version>
+    <rapid-doc.ort.version>1.23.2-rapiddoc.1</rapid-doc.ort.version>
   </properties>
   <dependencies>
     <dependency>
@@ -129,6 +129,62 @@
       </dependencies>
     </profile>
     <profile>
+      <id>windows-aarch64</id>
+      <activation>
+        <os>
+          <family>Windows</family>
+          <arch>aarch64</arch>
+        </os>
+      </activation>
+      <properties>
+        <rapid-doc.native.classifier>windows-aarch64</rapid-doc.native.classifier>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>io.github.rapidai</groupId>
+          <artifactId>rapid-doc-native</artifactId>
+          <version>${project.version}</version>
+          <classifier>${rapid-doc.native.classifier}</classifier>
+          <scope>runtime</scope>
+        </dependency>
+        <dependency>
+          <groupId>io.github.rapidai</groupId>
+          <artifactId>rapid-doc-ort</artifactId>
+          <version>${rapid-doc.ort.version}</version>
+          <classifier>${rapid-doc.native.classifier}</classifier>
+          <scope>runtime</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>windows-arm64</id>
+      <activation>
+        <os>
+          <family>Windows</family>
+          <arch>arm64</arch>
+        </os>
+      </activation>
+      <properties>
+        <rapid-doc.native.classifier>windows-aarch64</rapid-doc.native.classifier>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>io.github.rapidai</groupId>
+          <artifactId>rapid-doc-native</artifactId>
+          <version>${project.version}</version>
+          <classifier>${rapid-doc.native.classifier}</classifier>
+          <scope>runtime</scope>
+        </dependency>
+        <dependency>
+          <groupId>io.github.rapidai</groupId>
+          <artifactId>rapid-doc-ort</artifactId>
+          <version>${rapid-doc.ort.version}</version>
+          <classifier>${rapid-doc.native.classifier}</classifier>
+          <scope>runtime</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
       <id>linux-x86_64</id>
       <activation>
         <os>
@@ -138,6 +194,62 @@
       </activation>
       <properties>
         <rapid-doc.native.classifier>linux-x86_64</rapid-doc.native.classifier>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>io.github.rapidai</groupId>
+          <artifactId>rapid-doc-native</artifactId>
+          <version>${project.version}</version>
+          <classifier>${rapid-doc.native.classifier}</classifier>
+          <scope>runtime</scope>
+        </dependency>
+        <dependency>
+          <groupId>io.github.rapidai</groupId>
+          <artifactId>rapid-doc-ort</artifactId>
+          <version>${rapid-doc.ort.version}</version>
+          <classifier>${rapid-doc.native.classifier}</classifier>
+          <scope>runtime</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>linux-aarch64</id>
+      <activation>
+        <os>
+          <name>Linux</name>
+          <arch>aarch64</arch>
+        </os>
+      </activation>
+      <properties>
+        <rapid-doc.native.classifier>linux-aarch64</rapid-doc.native.classifier>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>io.github.rapidai</groupId>
+          <artifactId>rapid-doc-native</artifactId>
+          <version>${project.version}</version>
+          <classifier>${rapid-doc.native.classifier}</classifier>
+          <scope>runtime</scope>
+        </dependency>
+        <dependency>
+          <groupId>io.github.rapidai</groupId>
+          <artifactId>rapid-doc-ort</artifactId>
+          <version>${rapid-doc.ort.version}</version>
+          <classifier>${rapid-doc.native.classifier}</classifier>
+          <scope>runtime</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>linux-arm64</id>
+      <activation>
+        <os>
+          <name>Linux</name>
+          <arch>arm64</arch>
+        </os>
+      </activation>
+      <properties>
+        <rapid-doc.native.classifier>linux-aarch64</rapid-doc.native.classifier>
       </properties>
       <dependencies>
         <dependency>

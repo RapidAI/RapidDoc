@@ -2475,7 +2475,7 @@ checksum = "a611d15b50743feb4c76b7d03edcb0e64f399c26961e4efe6975bc398be6aa3d"
 
 [[package]]
 name = "rapiddoc"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "base64 0.13.1",
  "flate2",
@@ -2502,7 +2502,7 @@ dependencies = [
 
 [[package]]
 name = "rapiddoc-c"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "mimalloc",
  "rapiddoc",
@@ -2512,7 +2512,7 @@ dependencies = [
 
 [[package]]
 name = "rapiddoc-cli"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "mimalloc",
  "rapiddoc",
@@ -2522,7 +2522,7 @@ dependencies = [
 
 [[package]]
 name = "rapiddoc-core"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "serde",
  "serde_json",
@@ -2538,7 +2538,7 @@ version = "0.1.0"
 
 [[package]]
 name = "rapiddoc-inference"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "cc",
  "fancy-regex",
@@ -2558,7 +2558,7 @@ dependencies = [
 
 [[package]]
 name = "rapiddoc-java"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "jni",
  "mimalloc",
@@ -2607,7 +2607,7 @@ dependencies = [
 
 [[package]]
 name = "rapiddoc-native"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "rapiddoc-core",
  "rapiddoc-docvortex-core",
@@ -2617,7 +2617,7 @@ dependencies = [
 
 [[package]]
 name = "rapiddoc-node"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "napi",
  "napi-build",
@@ -2630,7 +2630,7 @@ dependencies = [
 
 [[package]]
 name = "rapiddoc-office"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "base64 0.13.1",
  "cc",
@@ -2658,7 +2658,7 @@ dependencies = [
 
 [[package]]
 name = "rapiddoc-onnx-probe"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "ort",
  "rapiddoc-inference",
@@ -2668,7 +2668,7 @@ dependencies = [
 
 [[package]]
 name = "rapiddoc-pdf"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "image",
  "libloading",
@@ -2687,7 +2687,7 @@ dependencies = [
 
 [[package]]
 name = "rapiddoc-python"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "mimalloc",
  "pyo3",
@@ -2704,7 +2704,7 @@ dependencies = [
 
 [[package]]
 name = "rapiddoc-render"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "rapiddoc-core",
  "rapiddoc-native",
@@ -2713,7 +2713,7 @@ dependencies = [
 
 [[package]]
 name = "rapiddoc-runtime-probe"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "pdfium-render",
  "rapiddoc-core",

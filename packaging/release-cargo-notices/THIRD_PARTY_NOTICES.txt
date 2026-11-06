@@ -709,7 +709,7 @@ of Data, including for example machine learning models and models'
 insights.
 
 
-=== Components: cargo-runtime/windows-link-0.2.1/license-apache-2.0 ===
+=== Components: cargo-runtime/windows-link-0.2.1/license-apache-2.0, cargo-runtime/windows-sys-0.52.0/license-apache-2.0, cargo-runtime/windows-targets-0.52.6/license-apache-2.0, cargo-runtime/windows_aarch64_msvc-0.52.6/license-apache-2.0 ===
                                  Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
@@ -744,7 +744,7 @@ insights.
    limitations under the License.
 
 
-=== Components: cargo-runtime/windows-link-0.2.1/license-mit ===
+=== Components: cargo-runtime/windows-link-0.2.1/license-mit, cargo-runtime/windows-sys-0.52.0/license-mit, cargo-runtime/windows-targets-0.52.6/license-mit, cargo-runtime/windows_aarch64_msvc-0.52.6/license-mit ===
     MIT License
 
     Copyright (c) Microsoft Corporation.

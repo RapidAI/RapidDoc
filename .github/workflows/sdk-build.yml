@@ -6,7 +6,7 @@ on:
       version:
         description: SDK version already present in manifests
         required: true
-        default: '0.1.0'
+        default: '0.1.1'
         type: string
       include_cuda:
         description: Also use configured self-hosted CUDA packaging runners
@@ -41,7 +41,7 @@ jobs:
       - name: Offline release helper checks
         run: |
           python -m pip install pytest
-          python -m pytest tests/release/test_release_helpers.py -q
+          python -m pytest tests/release -q
       - id: matrix
         env:
           INCLUDE_CUDA: ${{ inputs.include_cuda }}
@@ -53,6 +53,8 @@ jobs:
             dict(platform='windows-x86_64', runner=['windows-2025'], cuda=False),
             dict(platform='macos-x86_64', runner=['macos-15-intel'], cuda=False),
             dict(platform='macos-aarch64', runner=['macos-15'], cuda=False),
+            dict(platform='linux-aarch64', runner=['ubuntu-24.04-arm'], cuda=False),
+            dict(platform='windows-aarch64', runner=['windows-11-arm'], cuda=False),
           ]
           if os.environ['INCLUDE_CUDA'] == 'true':
             rows += [
@@ -83,25 +85,27 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: ${{ matrix.platform == 'windows-aarch64' && '3.13' || '3.11' }}
+          architecture: ${{ endsWith(matrix.platform, '-aarch64') && 'arm64' || 'x64' }}
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.20.5'
+          go-version: ${{ matrix.platform == 'windows-aarch64' && '1.24.5' || '1.20.5' }}
           cache: false
       - uses: actions/setup-java@v4
         with:
-          distribution: temurin
-          java-version: '17'
+          distribution: ${{ matrix.platform == 'windows-aarch64' && 'microsoft' || 'temurin' }}
+          java-version: ${{ matrix.platform == 'windows-aarch64' && '21' || '17' }}
+          architecture: ${{ endsWith(matrix.platform, '-aarch64') && 'aarch64' || 'x64' }}
       - uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: '1.92.0'
+          toolchain: ${{ matrix.platform == 'windows-aarch64' && '1.92.0-aarch64-pc-windows-msvc' || '1.92.0' }}
       - uses: ilammy/msvc-dev-cmd@v1
         if: runner.os == 'Windows'
         with:
-          arch: x64
+          arch: ${{ matrix.platform == 'windows-aarch64' && 'arm64' || 'x64' }}
       - name: Linux native build prerequisites
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y build-essential cmake ninja-build nasm patchelf
@@ -111,7 +115,7 @@ jobs:
           brew install nasm
           echo "MACOSX_DEPLOYMENT_TARGET=14.0" >> "$GITHUB_ENV"
       - name: Windows NASM and Go C compiler
-        if: runner.os == 'Windows'
+        if: runner.os == 'Windows' && matrix.platform != 'windows-aarch64'
         shell: pwsh
         run: |
           if (-not (Get-Command nasm -ErrorAction SilentlyContinue)) { choco install nasm --no-progress -y }
@@ -126,8 +130,33 @@ jobs:
           } else {
             throw 'Install an x64 GCC toolchain for Go cgo on this runner'
           }
+      - name: Windows ARM64 Go C compiler
+        if: matrix.platform == 'windows-aarch64'
+        env:
+          ARM64_CRT_DIR: ${{ vars.WINDOWS_ARM64_CRT_REDIST_DIR }}
+        shell: pwsh
+        run: |
+          "RAPIDDOC_CRT_REDIST_DIR=$env:ARM64_CRT_DIR" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          $archive = Join-Path $env:RUNNER_TEMP 'llvm-mingw-arm64.zip'
+          Invoke-WebRequest 'https://github.com/mstorsjo/llvm-mingw/releases/download/20261104/llvm-mingw-20261104-ucrt-aarch64.zip' -OutFile $archive
+          if ((Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLower() -ne '7d7f8387a8706639b0b47a629d6e23f8b3ef9acce67e9832b8cd4c5bb2816eab') { throw 'LLVM-MinGW archive checksum differs' }
+          Expand-Archive -LiteralPath $archive -DestinationPath $env:RUNNER_TEMP
+          $bin = Join-Path $env:RUNNER_TEMP 'llvm-mingw-20261104-ucrt-aarch64/bin'
+          $bin | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
+          "RAPIDDOC_GO_CC=$bin/aarch64-w64-mingw32-gcc.exe" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+      - name: Verify native ARM64 toolchains
+        if: endsWith(matrix.platform, '-aarch64')
+        shell: python
+        run: |
+          import platform, subprocess
+          assert platform.machine().lower() in ('aarch64', 'arm64'), platform.machine()
+          assert subprocess.check_output(['node', '-p', 'process.arch'], text=True).strip() == 'arm64'
+          assert subprocess.check_output(['go', 'env', 'GOARCH'], text=True).strip() == 'arm64'
       - name: Build-time Python tools and pinned runtime distributors
-        run: python -m pip install "maturin>=1.8,<2" "twine>=6,<7" "fonttools>=4.60,<5" "pypdfium2==5.10.1" "shapely==2.1.2"
+        run: python -m pip install "maturin>=1.8,<2" "twine>=6,<7" "fonttools>=4.60,<5" "pypdfium2==5.10.1"
+      - name: Pinned GEOS distributor
+        if: matrix.platform != 'windows-aarch64'
+        run: python -m pip install "shapely==2.1.2"
       - name: Linux wheel repair tools
         if: runner.os == 'Linux'
         run: python -m pip install "auditwheel>=6.8.2,<7" "patchelf>=0.17"

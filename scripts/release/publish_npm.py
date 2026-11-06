@@ -22,9 +22,11 @@ def packages():
     found = {}
     allowed = {
         "rapid-doc",
-        "rapid-doc-win32-x64",
+        "rapid-doc-linux-arm64-gnu",
+        "rapid-doc-win32-arm64",
+        "@hzkitty/rapid-doc-win32-x64",
         "rapid-doc-linux-x64-gnu",
-        "rapid-doc-win32-x64-cuda",
+        "@hzkitty/rapid-doc-win32-x64-cuda",
         "rapid-doc-linux-x64-gnu-cuda",
         "rapid-doc-darwin-x64",
         "rapid-doc-darwin-arm64",
@@ -37,11 +39,12 @@ def packages():
             raise ValueError("Unexpected, duplicate or mismatched npm package: " + name)
         found[name] = p
     if (
-        not {"rapid-doc", "rapid-doc-win32-x64", "rapid-doc-linux-x64-gnu",
-             "rapid-doc-darwin-x64", "rapid-doc-darwin-arm64"}
+        not {"rapid-doc", "@hzkitty/rapid-doc-win32-x64", "rapid-doc-linux-x64-gnu",
+             "rapid-doc-darwin-x64", "rapid-doc-darwin-arm64",
+             "rapid-doc-linux-arm64-gnu", "rapid-doc-win32-arm64"}
         <= found.keys()
     ):
-        raise ValueError("The loader and all four CPU platform packages must be present")
+        raise ValueError("The loader and all six CPU platform packages must be present")
     return [(name, p) for name, p in found.items() if name != "rapid-doc"] + [
         ("rapid-doc", found["rapid-doc"])
     ]

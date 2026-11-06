@@ -12,7 +12,9 @@ function resolveAddon(
   const bundled = path.join(__dirname, "runtime", "rapid_doc_node.node");
   if (fs.existsSync(bundled)) return bundled; // Existing standalone SDK archives.
   const names = {
-    "win32-x64": "rapid-doc-win32-x64",
+    "win32-arm64": "rapid-doc-win32-arm64",
+    "linux-arm64": "rapid-doc-linux-arm64-gnu",
+    "win32-x64": "@hzkitty/rapid-doc-win32-x64",
     "linux-x64": "rapid-doc-linux-x64-gnu",
     "darwin-x64": "rapid-doc-darwin-x64",
     "darwin-arm64": "rapid-doc-darwin-arm64",

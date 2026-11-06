@@ -29,7 +29,7 @@ RapidDoc 提供原 Python 实现和共享 Rust 引擎。原 Python 包继续使�
 | Go | `github.com/RapidAI/RapidDoc/bindings/go` | [Go SDK](bindings/go/README.md) |
 | Node.js / TypeScript | `rapid-doc`（npm） | [Node.js SDK](bindings/node/README.md) |
 
-**发布状态：新 Rust SDK 及各语言绑定当前为 `0.1.0` 发布候选，尚未发布到公共包仓库。** 版本变更记录见 [CHANGELOG.md](CHANGELOG.md)，发布构建与验证流程见[发布说明](docs/publishing.md)。
+**SDK `0.1.0` 发布状态（2026-11-06）：** Python 已上架 [PyPI](https://pypi.org/project/rapid-doc-rust/0.1.0/)，Java 已上架 Maven Central，Go `v0.1.0` 和[四个平台的原生运行库](https://github.com/RapidAI/RapidDoc/releases/tag/sdk-v0.1.0)已发布。Rust 的 11 个 crate（含 `rapiddoc` 和 `rapiddoc-cli`）已全部发布；npm 的 Linux/macOS 平台包已发布，Windows 包等待 npm 审核，`rapid-doc` 主包暂未发布。当前安装方法见各 SDK 文档，版本变更见 [CHANGELOG.md](CHANGELOG.md)，发布进度和流程见[发布说明](docs/publishing.md)。
 
 Rust SDK 的 CPU 平台包覆盖 Windows/Linux x64，以及 macOS 14+ Intel x64 / Apple Silicon ARM64。
 
@@ -87,7 +87,7 @@ pip install "rapid-doc[cpu]"
 # CUDA 环境选择：pip install "rapid-doc[gpu]"
 ```
 
-源码来源、变更和验收记录见 [迁移记录](docs/migrations/docvortex-baseline.md)。
+源码来源、变更和验收记录见 [迁移记录](rapid_doc/_vendor/docvortex_core/UPSTREAM.md)。
 
 ```python
 from rapid_doc import RapidDoc

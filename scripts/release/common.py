@@ -29,6 +29,10 @@ def version():
     ]["version"]
 
 
+def ort_package_version():
+    return ET.parse(ROOT / "bindings/java/ort/pom.xml").getroot().findtext("m:version", namespaces=NS)
+
+
 def check_version(value, publishing=False):
     if not re.fullmatch(r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)", value):
         raise ValueError("Use an SDK release version such as 0.1.0")
@@ -49,6 +53,11 @@ def check_version(value, publishing=False):
         raise ValueError(
             f"SDK versions differ: requested={value}, manifests={versions}"
         )
+    configured_ort = ET.parse(ROOT / "bindings/java/pom.xml").getroot().findtext(
+        "m:properties/m:rapid-doc.ort.version", namespaces=NS
+    )
+    if configured_ort != ort_package_version():
+        raise ValueError("Java ORT dependency and runtime artifact versions differ")
     if publishing and os.environ.get("GITHUB_REF") != f"refs/tags/sdk-v{value}":
         raise ValueError(
             "Publishing requires running the workflow on the matching sdk-vVERSION tag"

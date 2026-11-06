@@ -19,8 +19,10 @@ def stage():
     manifest = PACKAGE / 'runtime/manifest.json'
     platform=json.loads(manifest.read_text('utf8')).get('platform') if manifest.is_file() else None
     import platform as host
-    mac_profile='macos-aarch64' if host.machine().lower() in ('arm64','aarch64') else 'macos-x86_64'
-    profile={'win32':'windows','linux':'linux','darwin':mac_profile}.get(platform,'all')
+    arm=host.machine().lower() in ('arm64','aarch64')
+    profile={'win32':'windows-aarch64' if arm else 'windows',
+             'linux':'linux-aarch64' if arm else 'linux',
+             'darwin':'macos-aarch64' if arm else 'macos-x86_64'}.get(platform,'all')
     if manifest.is_file() and 'musl' in str(json.loads(manifest.read_text('utf8')).get('version',{}).get('origin','')).lower():
         profile='all'  # Do not apply a glibc exclusion to an unknown/musl binary.
     for relative in ('licenses', 'runtime/licenses', 'runtime/onnx_ops/licenses'):
@@ -48,7 +50,8 @@ def repack(source, destination):
         original = {name: wheel.read(name) for name in wheel.namelist() if not name.endswith('/')}
     record = next(name for name in original if name.endswith('.dist-info/RECORD'))
     files = {name: data for name, data in original.items() if name != record}
-    profile=('windows' if 'win_amd64' in source.name else 'linux' if 'manylinux' in source.name
+    profile=('windows-aarch64' if 'win_arm64' in source.name else 'linux-aarch64' if 'manylinux' in source.name and 'aarch64' in source.name
+             else 'windows' if 'win_amd64' in source.name else 'linux' if 'manylinux' in source.name
              else 'macos-aarch64' if 'macosx' in source.name and 'arm64' in source.name
              else 'macos-x86_64' if 'macosx' in source.name and 'x86_64' in source.name else 'all')
     decisions=[]

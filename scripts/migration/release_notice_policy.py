@@ -55,9 +55,9 @@ def filter_entries(entries, kind, profile='all', *, policy=None, generated=None,
                     elif not rule['selected']:
                         reason = 'alternative license not selected; retained license satisfies the SPDX expression'
         elif kind == 'pdfium':
-            if name.startswith('BUILD_LICENSES/android/') and profile in ('windows', 'linux', 'all'):
+            if name.startswith('BUILD_LICENSES/android/') and profile in ('windows', 'linux', 'windows-aarch64', 'linux-aarch64', 'all'):
                 reason = 'Android-only build component, not a desktop release target'
-            elif name.startswith(('BUILD_LICENSES/pdfium-binaries_musl/', 'BUILD_LICENSES/cibw_musl/')) and profile in ('windows', 'linux'):
+            elif name.startswith(('BUILD_LICENSES/pdfium-binaries_musl/', 'BUILD_LICENSES/cibw_musl/')) and profile in ('windows', 'linux', 'windows-aarch64', 'linux-aarch64'):
                 reason = 'musl-only component; release is Windows MSVC or Linux glibc/manylinux'
         if reason:
             removed.append(dict(path=name, sha256=sha(data), bytes=len(data), reason=reason))

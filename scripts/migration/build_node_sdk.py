@@ -9,7 +9,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
-from native_platform import shared_library, host_platform
+from native_platform import shared_library, host_platform, rust_target, ort_library_files
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -123,10 +123,13 @@ def main():
     shutil.copy2(ROOT / "LICENSE", output / "LICENSE")
     metadata = json.loads((output / "package.json").read_text())
     metadata["os"] = [sys.platform]
-    metadata["cpu"] = ["arm64" if manifest["platform"] == "macos-aarch64" else "x64"]
+    metadata["cpu"] = ["arm64" if manifest["platform"].endswith("-aarch64") else "x64"]
     (output / "package.json").write_text(json.dumps(metadata, indent=2) + "\n")
     destination = output / "runtime"
+    selected_ort = {p.name for p in ort_library_files(runtime)}
     for name in manifest["files"]:
+        if name in ("libonnxruntime.so", "libonnxruntime.so.1", "libonnxruntime.dylib") and name not in selected_ort:
+            continue
         # The shared bundle may also expose a C ABI. Node uses its own N-API addon.
         if name.startswith("include/") or Path(name).name in (
             "rapid_doc_c.dll",
@@ -138,9 +141,7 @@ def main():
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(runtime / name, target)
     shutil.copy2(native, destination / "rapid_doc_node.node")
-    target = {"macos-aarch64": "aarch64-apple-darwin", "macos-x86_64": "x86_64-apple-darwin"}.get(
-        host_platform(), "x86_64-pc-windows-msvc" if windows else "x86_64-unknown-linux-gnu"
-    )
+    target = rust_target()
     add_node_notices(destination, target)
     files = {
         p.relative_to(destination).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()

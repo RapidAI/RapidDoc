@@ -11,6 +11,14 @@ from common import ROOT, OUT, check_version, run, sha, shared_library
 from runtime import stage
 
 
+def go_environment():
+    env = dict(os.environ)
+    # cgo needs GCC on Windows Arm; Rust and GEOS must retain MSVC's compiler.
+    if env.get("RAPIDDOC_GO_CC"):
+        env["CC"] = env["RAPIDDOC_GO_CC"]
+    return env
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--version", required=True)
@@ -50,7 +58,7 @@ def main():
         "--features",
         (
             "pyo3/extension-module"
-            if sys.platform == "darwin"
+            if sys.platform == "darwin" or platform.endswith("-aarch64")
             else "rapiddoc-python/cuda,pyo3/extension-module"
         ),
     )
@@ -127,7 +135,7 @@ def main():
         "--locked",
         "--manifest-path",
         "bindings/python/Cargo.toml",
-        *([] if sys.platform == "darwin" else ["--features", "cuda"]),
+        *([] if sys.platform == "darwin" or platform.endswith("-aarch64") else ["--features", "cuda"]),
         "--out",
         raw,
         *(
@@ -167,7 +175,7 @@ def main():
         "test",
         "./...",
         cwd=ROOT / "bindings/go",
-        env={**os.environ, "RAPIDDOC_TEST_ROOT": ""},
+        env={**go_environment(), "RAPIDDOC_TEST_ROOT": ""},
     )
     run(
         mvn,
@@ -223,7 +231,8 @@ def smoke(output, native, standalone, mvn):
     )
     os.environ["RAPIDDOC_SMOKE_REPORT"] = str(reports / "go.json")
     run(
-        "go", "run", ROOT / "scripts/release/smoke_go/main.go", cwd=ROOT / "bindings/go"
+        "go", "run", ROOT / "scripts/release/smoke_go/main.go", cwd=ROOT / "bindings/go",
+        env=go_environment(),
     )
     npm = "npm.cmd" if os.name == "nt" else "npm"
     node = consumer / "node"

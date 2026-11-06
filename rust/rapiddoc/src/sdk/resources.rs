@@ -125,7 +125,7 @@ fn matches_library(kind: Resource, name: &str) -> bool {
         }
     } else if cfg!(target_os = "macos") {
         match kind {
-            Resource::Ort => name.starts_with("libonnxruntime") && name.ends_with(".dylib"),
+            Resource::Ort => name.starts_with("libonnxruntime.") && name.ends_with(".dylib"),
             Resource::Pdfium => name == "librapiddoc_pdfium.dylib",
             Resource::Geos => name.starts_with("libgeos_c") && name.ends_with(".dylib"),
             Resource::Operators => name == "libonnxruntime_ops.dylib",

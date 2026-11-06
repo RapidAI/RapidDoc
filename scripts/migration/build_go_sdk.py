@@ -8,7 +8,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import zipfile
-from native_platform import host_platform, shared_library, is_shared_library
+from native_platform import host_platform, shared_library, is_shared_library, ort_library_files
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -49,9 +49,8 @@ def main():
 
         files.update(bundle_files(ort))
     else:
-        for path in ort.iterdir():
-            if path.is_file() and shared(path):
-                files[path.name] = path.read_bytes()
+        for path in ort_library_files(ort):
+            files[path.name] = path.read_bytes()
     for notice in ("LICENSE", "ThirdPartyNotices.txt"):
         files["licenses/ort/" + notice] = (ort / notice).read_bytes()
     runtime = args.runtime_dir.resolve(strict=True)

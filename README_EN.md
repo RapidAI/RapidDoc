@@ -27,7 +27,7 @@ RapidDoc provides the original Python implementation and a shared Rust engine. T
 | Go | `github.com/RapidAI/RapidDoc/bindings/go` | [Go SDK](bindings/go/README.md) |
 | Node.js / TypeScript | `rapid-doc` on npm | [Node.js SDK](bindings/node/README.md) |
 
-**Release status: the Rust SDK and its language bindings are development previews at version `0.1.0`, not yet published to public package registries.** These are the intended package names. Follow the individual SDK guides for source builds or local artifacts; future registry installation examples are not available releases yet. See the [publishing guide](docs/publishing.md) for build and validation workflows.
+**SDK `0.1.0` release status (2026-11-06):** Python is available on [PyPI](https://pypi.org/project/rapid-doc-rust/0.1.0/), Java on Maven Central, and Go at `v0.1.0`. [Native CPU runtime archives](https://github.com/RapidAI/RapidDoc/releases/tag/sdk-v0.1.0) are available for Windows/Linux x64 and macOS 14+ Intel x64 / Apple Silicon ARM64. All 11 Rust crates, including `rapiddoc` and `rapiddoc-cli`, are available on crates.io. The npm Linux/macOS packages are available; the Windows package awaits npm review, so the `rapid-doc` npm root package is not yet published. Follow the individual SDK installation guides and the [publishing guide](docs/publishing.md) for status and workflows.
 
 The Rust engine supports PDF, DOC, DOCX, XLS, XLSX, PPT and PPTX, with native Office parsing and ONNX Runtime for PDF model inference. Delivery of PDFium, ORT, GEOS and CUDA operators depends on the language and platform package; deploying a single shared library is insufficient. Missing models can be downloaded automatically or supplied through an existing model directory; see [model configuration](docs/rust-models.md).
 
@@ -162,4 +162,4 @@ This project is released under the [Apache 2.0 license](LICENSE).
 
 ## Built-in native parsing
 
-PDF rule layout and tables use the bundled DocVortex core. DOC/DOCX, XLS/XLSX and PPT/PPTX use native parsers without LibreOffice conversion. The core uses Python kernels and no fasttext language model. Install `rapid-doc[cpu]` or `rapid-doc[gpu]` for the inference runtime; the GPU extra does not install the CPU runtime distribution. See [migration notes](docs/migrations/docvortex-baseline.md).
+PDF rule layout and tables use the bundled DocVortex core. DOC/DOCX, XLS/XLSX and PPT/PPTX use native parsers without LibreOffice conversion. The core uses Python kernels and no fasttext language model. Install `rapid-doc[cpu]` or `rapid-doc[gpu]` for the inference runtime; the GPU extra does not install the CPU runtime distribution. See [migration notes](rapid_doc/_vendor/docvortex_core/UPSTREAM.md).

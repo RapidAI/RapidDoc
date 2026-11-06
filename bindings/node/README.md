@@ -1,7 +1,24 @@
-# RapidDoc Node.js
+# RapidDoc Node.js SDK
 
-Node.js / TypeScript bindings for the shared Rust parser. Supports PDF, DOC,
-DOCX, XLS, XLSX, PPT and PPTX. Browser execution is not supported.
+[English](README_EN.md) | [中文](README.md)
+
+Node.js / TypeScript 绑定调用共享 Rust 解析引擎，支持 PDF、DOC、DOCX、XLS、XLSX、PPT、PPTX，不支持浏览器运行。
+
+## 安装与发布状态
+
+平台包包含原生扩展和 CPU 运行库，使用者不需要安装 Python、Java、Rust 或 C 编译器。模型由共享 Rust SDK 自动定位或下载。
+
+`0.1.0` 发布状态（2026-11-06）：Linux x64、macOS Intel/ARM64 的 npm 平台包已发布；Windows 包 `rapid-doc-win32-x64` 被 npm 包名反垃圾检测拦截，正在等待审核。`rapid-doc` 主包暂未发布，因此目前不能直接使用 `npm install rapid-doc` 安装该版本。
+
+下一次构建将 Windows x64 平台包改为 `@hzkitty/rapid-doc-win32-x64`，对应 CUDA 包为 `@hzkitty/rapid-doc-win32-x64-cuda`。
+主包继续使用 `rapid-doc`，其他平台包保持原名；Windows 平台包由主包自动选择，用户调用方式不变。
+scoped 包尚未发布，发布 Token 需具有对应包的写入权限；使用 scope 不保证免于 npm 反垃圾审核。
+
+当前可按下方说明构建 standalone 包，再通过 `npm install /path/package.tgz` 安装。安装后统一使用 `require('rapid-doc')`，调用方式如下。
+
+要求 Node.js 20+。CPU 平台包覆盖 Windows/Linux x64，以及 macOS 14+ Intel x64 / Apple Silicon ARM64。加载器根据运行 Node.js 的系统和架构选择平台包。Windows/Linux CUDA 仍需单独实机验收。
+
+## 快速开始
 
 ```js
 const { RapidDoc } = require('rapid-doc');
@@ -19,20 +36,11 @@ async function main() {
 main().catch(console.error);
 ```
 
-The platform package contains the native addon and CPU runtime libraries.
-Users do not need Python, Java, Rust or a C compiler. Models are automatically
-resolved/downloaded by the shared Rust SDK. This source preview is not published
-to npm yet; install the locally built `.tgz` with `npm install /path/package.tgz`.
-Node.js 20+ is required. CPU platform packages cover Windows/Linux x64 and
-macOS 14+ on Intel x64 / Apple Silicon ARM64. The loader selects the package
-matching the running Node.js architecture. CUDA requires separate Windows/Linux acceptance testing.
+## 输入与结果
 
-## Inputs and results
+`parse` 支持本地路径、HTTP/HTTPS 字符串或 URL 对象、file URL、Buffer、Uint8Array，以及输入数组。HTTP/HTTPS 输入由共享 Rust SDK 下载；直接传入 URL，不要使用 `path.resolve()` 转换。
 
-`parse` accepts a local path, HTTP/HTTPS string or URL object, file URL, Buffer, Uint8Array or array of inputs. HTTP input is downloaded by the shared Rust SDK; pass the URL directly without `path.resolve()`.
-Arrays / `parseAll` process files sequentially, reusing models. `parseReader`
-accepts a binary Node readable or async iterable; it buffers the full input.
-No HTTP fetch is performed for input documents.
+数组输入和 `parseAll()` 按顺序处理文档并复用模型。`parseReader()` 接收 Node 二进制可读流或异步可迭代对象，当前会将输入完整缓存在内存中。
 
 ```js
 const results = await engine.parse(['a.pdf', 'b.docx']);
@@ -42,19 +50,15 @@ const result = await engine.parse(bytes, {
 });
 ```
 
-Results expose `markdown`, `middleJSON`, `contentListJSON`, `metadata`,
-`diagnostics`, `sourcePageCount`, `images` and `drawings`. Assets are Node Buffers
-and remain valid after the engine closes. `writeTo(outputRoot)` saves under
-`outputRoot/<sourceName>/<auto|txt|ocr|office>/`, with names such as
-`input.md`, `input_middle.json`, `input_content_list.json`, `input_layout.pdf`
-and `input_span.pdf`. Images remain in their configured directory so Markdown
-links stay valid. `outputDirectory(outputRoot)` returns the final directory.
-Binary/stream inputs use `document` as their source name. Structured Markdown
-uses `<sourceName>_markdown.json` instead of a Markdown file.
+结果包含 `markdown`、`middleJSON`、`contentListJSON`、`metadata`、`diagnostics`、`sourcePageCount`、`images` 和 `drawings`。图片和绘图使用 Node Buffer，关闭引擎后结果仍然有效。
 
-## Configuration, progress and cancellation
+`writeTo(outputRoot)` 将结果保存到 `outputRoot/<sourceName>/<auto|txt|ocr|office>/`，文件包括 `input.md`、`input_middle.json`、`input_content_list.json`、`input_layout.pdf` 和 `input_span.pdf`。图片保存在配置的目录中，保持 Markdown 引用有效；`outputDirectory(outputRoot)` 返回最终输出目录。
 
-Shared Rust configuration uses its existing field names and defaults:
+二进制或流输入默认使用 `document` 作为名称。结构化 Markdown 输出使用 `<sourceName>_markdown.json`，而不是 Markdown 文件。
+
+## 配置、进度与取消
+
+配置沿用共享 Rust SDK 的字段名和默认值：
 
 ```js
 const engine = new RapidDoc({
@@ -69,36 +73,24 @@ const controller = new AbortController();
 const result = await engine.parse('input.pdf', {}, null, controller.signal);
 ```
 
-Default progress uses the same stage labels and active processing seconds as
-the Java/Go SDK. Bars refresh on stderr in terminals; redirected output uses
-plain lines. Status and download messages go to stdout. Set
-`progressLogging: false` to hide parsing progress, or supply an optional async
-progress callback as the third parse argument. Download messages remain visible.
-`RAPIDDOC_PROGRESS_MODE=bar` can force carriage-return bars in IDE consoles.
+默认进度使用与 Java/Go SDK 相同的阶段名称和有效处理耗时。终端中进度条在 stderr 刷新，重定向输出时改为普通文本行；状态和下载消息输出到 stdout。
 
-Each engine starts one worker and reuses additional workers on demand for
-concurrent calls. Native model sessions are shared through the process cache;
-parsing and inference do not block the main Node event loop. Await `close()` to
-cancel active calls and stop every owned worker. Callback exceptions are returned
-to the caller unchanged; callback reentry into the same engine is rejected. An
-AbortSignal cancels cooperatively at the next shared SDK progress event; a
-running model inference is not interrupted in the middle of a kernel.
+设置 `progressLogging: false` 可关闭解析进度，也可在 `parse` 的第三个参数传入异步进度回调。下载消息仍会显示。环境变量 `RAPIDDOC_PROGRESS_MODE=bar` 可在 IDE 控制台强制使用回车刷新进度条。
 
-Advanced deployments can set `libraryPath` (or `RAPIDDOC_NODE_LIBRARY`) and
-`runtimeDirectory`, or explicit paths under `resources`. These are unnecessary
-with the prepared platform package. CUDA requires a matching GPU runtime bundle
-and its CUDA/cuDNN prerequisites; the CPU preview does not install them.
+每个引擎先启动一个工作线程，并按并发需求创建、复用更多线程。原生模型会话通过进程缓存共享，解析和推理不会阻塞 Node 主事件循环。Office 请求独立执行；PDF 保留 PDFium 和各模型会话的锁。`parseAll()` 保持顺序执行，不会默认并行展开大量文档。
 
-## Build and verify locally
+调用 `await engine.close()` 会取消活动请求并关闭该实例的全部工作线程。进度回调抛出的异常原样返回调用方；不允许在回调中同步重入同一引擎。并发写出时应使用不同输出路径。
 
-Build a shared runtime first using `scripts/migration/build_go_sdk.py` (the
-runtime libraries are shared across bindings), then:
+`AbortSignal` 在下一个共享 SDK 进度事件处协作取消；已经执行中的模型推理不会在算子运行中途被强行中断。
+
+高级部署可设置 `libraryPath`（或 `RAPIDDOC_NODE_LIBRARY`）、`runtimeDirectory`，也可通过 `resources` 显式指定运行库路径。使用完整平台包时通常无须设置。CUDA 还需匹配的 GPU 运行库包及 CUDA/cuDNN，已发布的 CPU 包不提供这些依赖。
+
+## 本地构建与验证
+
+先使用 `scripts/migration/build_go_sdk.py` 构建共享运行库目录，各绑定复用这套运行库，然后执行：
 
 ```powershell
 .venv/Scripts/python.exe scripts/migration/build_node_sdk.py --runtime-dir build/go-sdk/windows-x86_64-cgo --output build/node-sdk/windows-x86_64
 ```
 
-Native acceptance tests use `RAPIDDOC_TEST_ROOT`, `RAPIDDOC_NODE_LIBRARY`, and
-`RAPIDDOC_NODE_RUNTIME`; run `node --test bindings/node/test/*.test.js`.
-
-同一实例支持并发 `parse()`：按需创建并复用工作线程，原生模型会话通过进程内缓存共享。Office 独立执行；PDF 保留 PDFium 与模型会话锁。`parseAll()` 仍按输入顺序逐个执行，避免默认展开大量文档。进度回调中禁止同步重入同一实例；并发写出请使用不同输出路径。`close()` 会取消并关闭该实例的全部工作线程。
+原生验收测试使用 `RAPIDDOC_TEST_ROOT`、`RAPIDDOC_NODE_LIBRARY` 和 `RAPIDDOC_NODE_RUNTIME`；运行 `node --test bindings/node/test/*.test.js` 执行测试。

@@ -20,6 +20,14 @@ from native_platform import is_shared_library, relocate_dylibs
 
 ORT_VERSION = "1.23.2"
 ORT = {
+    "linux-aarch64": (
+        "onnxruntime-linux-aarch64-1.23.2.tgz",
+        "7c63c73560ed76b1fac6cff8204ffe34fe180e70d6582b5332ec094810241e5c",
+    ),
+    "windows-aarch64": (
+        "onnxruntime-win-arm64-1.23.2.zip",
+        "1cfe88b6435df3b5fb0e9f6bd7d6f5df1e887b6174de7f6e2a47bab956f3f168",
+    ),
     "macos-aarch64": (
         "onnxruntime-osx-arm64-1.23.2.tgz",
         "b4d513ab2b26f088c66891dbbc1408166708773d7cc4163de7bdca0e9bbb7856",
@@ -64,6 +72,62 @@ def download(url, destination, digest):
         raise ValueError("Cached archive checksum differs: " + str(destination))
 
 
+def build_windows_arm_geos(archive, destination, output):
+    """Shapely 2.1.2 has no Windows ARM64 wheel; build its pinned GEOS instead."""
+    source = output / "geos-source"
+    source.mkdir(parents=True)
+    with tarfile.open(archive) as package:
+        package.extractall(source, filter="data")
+    source = source / "geos-3.13.1"
+    build = output / "geos-build"
+    install = output / "geos-install"
+    run("cmake", "-S", source, "-B", build, "-G", "Ninja",
+        "-DCMAKE_C_COMPILER=cl", "-DCMAKE_CXX_COMPILER=cl",
+        "-DCMAKE_BUILD_TYPE=Release", "-DBUILD_SHARED_LIBS=ON",
+        "-DBUILD_TESTING=OFF", "-DBUILD_BENCHMARKS=OFF",
+        "-DBUILD_DOCUMENTATION=OFF", f"-DCMAKE_INSTALL_PREFIX={install}")
+    run("cmake", "--build", build, "--parallel", "2")
+    run("cmake", "--install", build)
+    for library in (install / "bin").glob("*.dll"):
+        shutil.copy2(library, destination / library.name)
+    if not (destination / "geos_c.dll").is_file():
+        raise FileNotFoundError("GEOS ARM64 build did not install geos_c.dll")
+    notices = destination / "licenses"
+    notices.mkdir()
+    for name in ("COPYING", "COPYING.LESSER", "AUTHORS"):
+        file = source / name
+        if file.is_file():
+            shutil.copy2(file, notices / name)
+            shutil.copy2(file, destination / ("LICENSE_" + name))
+    if not (notices / "COPYING").is_file():
+        raise FileNotFoundError("GEOS source license is missing")
+
+
+def extract_ort(archive, destination):
+    """Extract real libraries and notices; loaders accept versioned ORT names.
+
+    The upstream Unix aliases are symlinks, not additional runtime binaries.
+    Keeping only regular members avoids expanding them into duplicate payloads.
+    """
+    def selected(name):
+        parts = Path(name).parts
+        base = Path(name).name
+        return (
+            len(parts) == 3 and parts[-2] == "lib" and is_shared_library(base)
+        ) or (len(parts) == 2 and base in ["LICENSE", "ThirdPartyNotices.txt"])
+
+    if archive.suffix == ".zip":
+        with zipfile.ZipFile(archive) as package:
+            for entry in package.infolist():
+                if not entry.is_dir() and selected(entry.filename):
+                    (destination / Path(entry.filename).name).write_bytes(package.read(entry))
+    else:
+        with tarfile.open(archive) as package:
+            for entry in package:
+                if entry.isfile() and selected(entry.name):
+                    (destination / Path(entry.name).name).write_bytes(package.extractfile(entry).read())
+
+
 def stage(cuda=False):
     windows = os.name == "nt"
     platform = host_platform(cuda)
@@ -104,27 +168,28 @@ def stage(cuda=False):
             indent=2,
         )
     )
-    distribution = metadata.distribution("shapely")
-    geos = Path(distribution.locate_file("shapely/.dylibs" if sys.platform == "darwin" else "shapely.libs"))
-    notices = Path(distribution._path) / "licenses"
     dest = runtime / "geos"
     dest.mkdir()
-    for p in geos.iterdir():
-        if p.is_file() and is_shared_library(p):
-            shutil.copy2(p, dest / p.name)
-    if not list(dest.glob("*geos_c*")):
-        raise ValueError("Paired Shapely GEOS distribution missing")
-    shutil.copytree(notices, dest / "licenses")
-    # Existing native packagers retain LICENSE* entries in this directory.
-    for i, p in enumerate(sorted(notices.rglob("*"))):
-        if p.is_file():
-            shutil.copy2(p, dest / f"LICENSE_{i}_{p.name}")
     source = OUT / "downloads/geos-3.13.1.tar.bz2"
     download(
-        "https://download.osgeo.org/geos/geos-3.13.1.tar.bz2",
-        source,
+        "https://download.osgeo.org/geos/geos-3.13.1.tar.bz2", source,
         "df2c50503295f325e7c8d7b783aca8ba4773919cde984193850cf9e361dfd28c",
     )
+    if platform == "windows-aarch64":
+        build_windows_arm_geos(source, dest, OUT / platform)
+    else:
+        distribution = metadata.distribution("shapely")
+        geos = Path(distribution.locate_file("shapely/.dylibs" if sys.platform == "darwin" else "shapely.libs"))
+        notices = Path(distribution._path) / "licenses"
+        for p in geos.iterdir():
+            if p.is_file() and is_shared_library(p):
+                shutil.copy2(p, dest / p.name)
+        if not list(dest.glob("*geos_c*")):
+            raise ValueError("Paired Shapely GEOS distribution missing")
+        shutil.copytree(notices, dest / "licenses")
+        for i, p in enumerate(sorted(notices.rglob("*"))):
+            if p.is_file():
+                shutil.copy2(p, dest / f"LICENSE_{i}_{p.name}")
     shutil.copy2(source, dest / source.name)
     if sys.platform == "darwin":
         relocate_dylibs(dest)
@@ -141,25 +206,7 @@ def stage(cuda=False):
     ort = OUT / platform / "ort"
     ort.mkdir(parents=True)
 
-    def selected(name):
-        parts = Path(name).parts
-        base = Path(name).name
-        return (
-            len(parts) == 3
-            and parts[-2] == "lib"
-            and is_shared_library(base)
-        ) or (len(parts) == 2 and base in ["LICENSE", "ThirdPartyNotices.txt"])
-
-    if archive.suffix == ".zip":
-        with zipfile.ZipFile(archive) as z:
-            for info in z.infolist():
-                if not info.is_dir() and selected(info.filename):
-                    (ort / Path(info.filename).name).write_bytes(z.read(info))
-    else:
-        with tarfile.open(archive) as z:
-            for info in z:
-                if (info.isfile() or info.issym()) and selected(info.name):
-                    (ort / Path(info.name).name).write_bytes(z.extractfile(info).read())
+    extract_ort(archive, ort)
     if sys.platform == "darwin":
         relocate_dylibs(ort)
     if cuda:

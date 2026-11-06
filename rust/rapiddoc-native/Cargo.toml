@@ -22,6 +22,6 @@ license.workspace = true
 
 [dependencies]
 docvortex-core = { package = "rapiddoc-docvortex-core", version = "=0.1.0", path = "../vendor/docvortex-core" }
-rapiddoc-core = { version = "=0.1.0", path = "../rapiddoc-core" }
+rapiddoc-core = { version = "=0.1.1", path = "../rapiddoc-core" }
 serde.workspace = true
 serde_json.workspace = true

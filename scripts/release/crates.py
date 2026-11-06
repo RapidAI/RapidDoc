@@ -4,6 +4,8 @@ import argparse
 import json
 import os
 import tomllib
+import urllib.request
+import urllib.error
 from common import ROOT, OUT, check_version, run, sha, version
 
 # Dependencies must be available in the registry before their consumers upload.
@@ -29,6 +31,24 @@ FORKS = {
 
 def package_root(name):
     return ROOT / "rust" / ("vendor/" + FORKS[name] if name in FORKS else name)
+
+
+def package_version(name):
+    value = tomllib.loads((package_root(name) / "Cargo.toml").read_text("utf8"))["package"]["version"]
+    return version() if isinstance(value, dict) else value
+
+
+def published(name):
+    # All release names are longer than three characters and use this sparse path.
+    url = f"https://index.crates.io/{name[:2]}/{name[2:4]}/{name}"
+    expected = package_version(name)
+    try:
+        with urllib.request.urlopen(url, timeout=45) as response:
+            return any(json.loads(line)["vers"] == expected for line in response if line.strip())
+    except urllib.error.HTTPError as error:
+        if error.code == 404:
+            return False
+        raise
 
 
 def readiness():
@@ -122,6 +142,9 @@ def main():
     report_path.write_text(json.dumps(report, indent=2) + "\n", "utf8")
     if args.publish:
         for name in ORDER:
+            if published(name):
+                print("Already published:", name, package_version(name))
+                continue
             run("cargo", "publish", "--locked", "--no-default-features", "-p", name)
 
 

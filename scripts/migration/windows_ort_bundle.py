@@ -10,6 +10,7 @@ from ctypes import wintypes
 import hashlib
 import json
 import os
+from native_platform import host_architecture
 from pathlib import Path
 import shutil
 import struct
@@ -71,11 +72,14 @@ def remove_private_manifest(path):
 PRIVATE = "RapidDoc.Runtime.PrivateCRT"
 
 
-def require_x64(path):
+def require_architecture(path, architecture):
     data = path.read_bytes()
     pe = struct.unpack_from("<I", data, 0x3C)[0]
-    if data[pe : pe + 4] != b"PE\0\0" or struct.unpack_from("<H", data, pe + 4)[0] != 0x8664:
-        raise RuntimeError("Expected Windows x64 PE: " + str(path))
+    machine = struct.unpack_from("<H", data, pe + 4)[0]
+    # ARM64X CRT files include native ARM64 code and may be redistributed on Arm.
+    expected = {"x86_64": (0x8664,), "aarch64": (0xAA64, 0xA64E)}[architecture]
+    if data[pe : pe + 4] != b"PE\0\0" or machine not in expected:
+        raise RuntimeError(f"Expected Windows {architecture} PE: {path}")
 
 
 def sha(path):
@@ -109,7 +113,8 @@ def file_version(path):
     return (words[2] >> 16, words[2] & 65535, words[3] >> 16, words[3] & 65535)
 
 
-def find_crt():
+def find_crt(architecture):
+    redist_arch = "arm64" if architecture == "aarch64" else "x64"
     explicit = os.environ.get("RAPIDDOC_CRT_REDIST_DIR")
     if explicit:
         return Path(explicit).resolve(strict=True)
@@ -120,11 +125,11 @@ def find_crt():
     candidates = [
         path
         for installation in installations
-        for path in (Path(installation) / "VC/Redist/MSVC").glob("*/x64/Microsoft.VC*.CRT")
+        for path in (Path(installation) / "VC/Redist/MSVC").glob(f"*/{redist_arch}/Microsoft.VC*.CRT")
         if (path / "msvcp140.dll").is_file()
     ]
     if not candidates:
-        raise RuntimeError("Set RAPIDDOC_CRT_REDIST_DIR to a licensed VS x64 CRT redist directory")
+        raise RuntimeError(f"Set RAPIDDOC_CRT_REDIST_DIR to a licensed VS {redist_arch} CRT redist directory")
     return max(candidates, key=lambda p: file_version(p / "msvcp140.dll"))
 
 
@@ -135,25 +140,37 @@ def bundle_files(ort_directory, crt_directory=None, signer=None):
     Inputs are never modified. No persistent DLL cache or runtime network access.
     """
     if os.name != "nt" or ctypes.sizeof(ctypes.c_void_p) != 8:
-        raise RuntimeError("Private CRT packaging requires Windows x64")
+        raise RuntimeError("Private CRT packaging requires 64-bit Windows")
     source = ort_directory.resolve(strict=True) / "onnxruntime.dll"
-    require_x64(source)
+    architecture = host_architecture()
+    require_architecture(source, architecture)
     library = ctypes.WinDLL(str(source))
     library.OrtGetApiBase.restype = ctypes.POINTER(ctypes.c_void_p)
     version_function = ctypes.WINFUNCTYPE(ctypes.c_char_p)(library.OrtGetApiBase()[1])
     version = version_function().decode("ascii")
     if version not in {"1.23.0", "1.23.2"}:
         raise RuntimeError(f"Private CRT supports validated ORT 1.23.0/1.23.2 only, got {version}")
-    crt = (crt_directory or find_crt()).resolve(strict=True)
+    crt = (crt_directory or find_crt(architecture)).resolve(strict=True)
     if "system32" in (part.lower() for part in crt.parts):
         raise RuntimeError("Use the Visual Studio redistributable source, not System32")
     crt_version = file_version(crt / "msvcp140.dll")
-    if crt_version[:2] != (14, 51):
-        raise RuntimeError(f"Private CRT currently validated only for 14.51, got {crt_version}")
+    # The Windows Arm runner ships VS 2022 (14.44); x64 retains its tested 14.51
+    # baseline. Native installation/inference checks run before keeping artifacts.
+    supported_crt = {(14, 44), (14, 51)} if architecture == "aarch64" else {(14, 51)}
+    if crt_version[:2] not in supported_crt:
+        raise RuntimeError(f"Unsupported private CRT version for {architecture}: {crt_version}")
     files = {}
-    for name in LIBRARIES:
+    # Arm redists have architecture-specific helpers (for example the threads
+    # runtime). Retain the complete redistributable DLL set rather than the x64 list.
+    libraries = LIBRARIES if architecture == "x86_64" else tuple(
+        sorted(path.name for path in crt.glob("*.dll"))
+    )
+    for required in ("msvcp140.dll", "vcruntime140.dll"):
+        if required not in libraries:
+            raise RuntimeError("Required CRT library missing: " + required)
+    for name in libraries:
         path = crt / name
-        require_x64(path)
+        require_architecture(path, architecture)
         if file_version(path) != crt_version:
             raise RuntimeError("Mixed CRT versions: " + str(path))
         files[name] = path.read_bytes()
@@ -174,9 +191,10 @@ def bundle_files(ort_directory, crt_directory=None, signer=None):
     # Providers stay beside the main ORT DLL, including CUDA's shared provider.
     for path in ort_directory.glob("onnxruntime_providers*.dll"):
         files[path.name] = path.read_bytes()
+    manifest_arch = "arm64" if architecture == "aarch64" else "amd64"
     identity = (
         'type="win32" name="RapidDoc.Runtime.PrivateCRT" '
-        'version="1.0.0.0" processorArchitecture="amd64"'
+        f'version="1.0.0.0" processorArchitecture="{manifest_arch}"'
     )
     header = (
         '<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -194,10 +212,11 @@ def bundle_files(ort_directory, crt_directory=None, signer=None):
     ).encode()
     receipt = dict(
         schema=1,
+        architecture=architecture,
         ort_version=version,
         crt_version=list(crt_version),
         source_ort_sha256=source_hash,
-        source_crt_sha256={name: sha(crt / name) for name in LIBRARIES},
+        source_crt_sha256={name: sha(crt / name) for name in libraries},
         derived_ort_sha256=hashlib.sha256(files["onnxruntime.dll"]).hexdigest(),
         ort_text_sha256=text_hash(source),
         modified_resource="RT_MANIFEST/2/1033 removed from ORT copy",
@@ -206,7 +225,7 @@ def bundle_files(ort_directory, crt_directory=None, signer=None):
     )
     files["provenance.json"] = (json.dumps(receipt, indent=2) + "\n").encode()
     files["NOTICE.txt"] = (
-        "Microsoft Visual C++ 14.51 x64 runtime files are redistributed unchanged from "
+        f"Microsoft Visual C++ {'.'.join(map(str, crt_version))} {architecture} runtime files are redistributed unchanged from "
         "the Visual Studio REDIST directory under the publisher's Visual Studio license.\n"
         "https://learn.microsoft.com/en-us/cpp/windows/redistributing-visual-cpp-files\n"
         f"ORT is a derived {version} binary: only its embedded activation manifest was removed; "

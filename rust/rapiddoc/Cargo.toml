@@ -26,12 +26,12 @@ cuda = ["rapiddoc-inference/cuda"]
 download-runtime = ["dep:ureq", "dep:zip", "dep:tar", "dep:flate2", "dep:sha2"]
 
 [dependencies]
-rapiddoc-core = { version = "=0.1.0", path = "../rapiddoc-core" }
-rapiddoc-pdf = { version = "=0.1.0", path = "../rapiddoc-pdf" }
-rapiddoc-native = { version = "=0.1.0", path = "../rapiddoc-native" }
-rapiddoc-render = { version = "=0.1.0", path = "../rapiddoc-render" }
-rapiddoc-inference = { version = "=0.1.0", path = "../rapiddoc-inference" }
-rapiddoc-office = { version = "=0.1.0", path = "../rapiddoc-office" }
+rapiddoc-core = { version = "=0.1.1", path = "../rapiddoc-core" }
+rapiddoc-pdf = { version = "=0.1.1", path = "../rapiddoc-pdf" }
+rapiddoc-native = { version = "=0.1.1", path = "../rapiddoc-native" }
+rapiddoc-render = { version = "=0.1.1", path = "../rapiddoc-render" }
+rapiddoc-inference = { version = "=0.1.1", path = "../rapiddoc-inference" }
+rapiddoc-office = { version = "=0.1.1", path = "../rapiddoc-office" }
 serde.workspace = true
 serde_json.workspace = true
 image = { version = "0.25", default-features = false, features = ["png"] }

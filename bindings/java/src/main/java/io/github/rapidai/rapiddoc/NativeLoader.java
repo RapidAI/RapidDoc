@@ -150,6 +150,10 @@ final class NativeLoader {
             if (arch.equals("aarch64") || arch.equals("arm64")) return "macos-aarch64";
             if (arch.equals("x86_64") || arch.equals("amd64")) return "macos-x86_64";
         }
+        if (arch.equals("aarch64") || arch.equals("arm64")) {
+            if (os.startsWith("windows")) return "windows-aarch64";
+            if (os.startsWith("linux")) return "linux-aarch64";
+        }
         if (!arch.equals("amd64") && !arch.equals("x86_64"))
             throw new RapidDocException(
                     "unsupported", "No bundled native runtime for architecture " + arch);

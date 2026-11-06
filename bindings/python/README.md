@@ -4,21 +4,23 @@ RapidDoc 的 Python 绑定，调用共享 Rust 引擎，在本地将文档解析
 
 包名为 `rapid-doc-rust`，导入名为 `rapid_doc_rust`。要求 Python 3.10 或以上，无须安装原 Python RapidDoc 或 PyTorch。
 
-正常解析及已公开的底层 API 均包含在默认包中。迁移差分检查点属于源码开发工具，使用方式见[绑定整理说明](../../docs/plans/2026-11-04-python-binding-cleanup.md)。
+正常解析及已公开的底层 API 均包含在默认包中。迁移差分检查点属于源码开发工具，使用方式见[绑定整理说明](https://github.com/RapidAI/RapidDoc/blob/main/docs/plans/2026-11-04-python-binding-cleanup.md)。
 
 ## 安装
 
-当前为预览包，尚未发布到 PyPI。获取对应平台的 wheel 后安装，例如 Windows x64：
+`0.1.0` 已发布到 [PyPI](https://pypi.org/project/rapid-doc-rust/0.1.0/)，CPU 环境直接安装：
 
 ```bash
-python -m pip install "./rapid_doc_rust-0.1.0-cp310-abi3-win_amd64.whl[cpu]"
+python -m pip install "rapid-doc-rust[cpu]==0.1.0"
 ```
+
+仅解析 Office 或自行提供 ONNX Runtime 时，可安装 `rapid-doc-rust==0.1.0`。离线环境也可下载对应平台的 wheel 后本地安装。
 
 平台包覆盖 Windows/Linux x64，以及 macOS 14+ 的 Intel x64 / Apple Silicon ARM64（CPU）。其他平台使用对应文件名；CUDA 环境须选择匹配的 GPU 构建及运行库。
 
 基础包不强制安装 ORT。安装 `[cpu]` 使用 `onnxruntime`；GPU 构建安装 `[gpu]` 使用 `onnxruntime-gpu`（也能执行 CPU 推理），两者不要同时安装。已有合适运行库时直接安装 wheel 即可；Rust 自动定位其动态库，也支持显式设置 `RAPIDDOC_ONNXRUNTIME_LIBRARY`。Office 解析不需要 ORT。
 
-发布到 PyPI 后对应命令为 `pip install "rapid-doc-rust[cpu]"` 或 `pip install "rapid-doc-rust[gpu]"`。GPU 运行还需要匹配的 NVIDIA 驱动及 CUDA/cuDNN；extras 不会把 CPU Rust 构建变成 CUDA 构建。
+本次 PyPI 发布的是四个平台的 CPU wheel。`[gpu]` 仅提供 Python GPU ORT 依赖，不代表已提供完整的 CUDA SDK 包；GPU 部署仍需匹配的 CUDA 构建、自定义算子、NVIDIA 驱动及 CUDA/cuDNN。extras 不会把 CPU Rust 构建变成 CUDA 构建。
 
 ### ORT 版本与原 Python 包的区别
 
@@ -150,5 +152,5 @@ os.environ["USE_DOC_ORIENTATION_CLASSIFY"] = "true"
 
 ## 开发文档
 
-- [共享 Rust SDK 与原生调用示例](../../rust/rapiddoc/README.md)
-- [Python 绑定历史迁移记录](../../docs/archive/python-binding-migration.md)（仅供追溯，不作为当前用法）
+- [共享 Rust SDK 与原生调用示例](https://github.com/RapidAI/RapidDoc/blob/main/rust/rapiddoc/README.md)
+- [Python 绑定历史迁移记录](https://github.com/RapidAI/RapidDoc/blob/main/docs/archive/python-binding-migration.md)（仅供追溯，不作为当前用法）

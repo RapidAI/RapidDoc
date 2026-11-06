@@ -4,15 +4,7 @@ Java 8 语法、API 和字节码兼容，直接调用共享 Rust 引擎，支持
 
 ## 安装
 
-当前尚未发布到 Maven Central。本地构建和安装：
-
-```powershell
-.venv/Scripts/python.exe scripts/migration/build_java_sdk.py --ort-dir target/release/runtime
-```
-
-构建工具需要 Rust、JDK、Maven 和已准备的 RapidDoc PDFium/GEOS 运行库。脚本默认复用本项目的运行库目录；也可使用 `--runtime-dir` 指定独立目录。构建脚本使用 Python，最终 Java 应用不需要 Python。没有 ORT 时先通过 Rust 的 `download-runtime` 功能构建获取，或提供已有 ORT 目录。
-
-安装到本地 Maven 仓库后，在项目中添加：
+`0.1.0` 已发布到 Maven Central，直接在项目中添加依赖，无须先从源码构建或安装到本地 Maven 仓库：
 
 ```xml
 <dependency>
@@ -22,7 +14,7 @@ Java 8 语法、API 和字节码兼容，直接调用共享 Rust 引擎，支持
 </dependency>
 ```
 
-Maven 根据系统自动引入 Windows/Linux x64、macOS Intel/Apple Silicon CPU 的引擎包 `rapid-doc-native` 和默认 CPU 运行库包 `rapid-doc-ort`。两者独立校验和提取，更换 ORT 不需要重编译 Rust。原生库首次使用时提取并校验至 `~/.cache/rapid_doc/native`，模型由 Rust 自动下载到共享模型目录。Java 字节码目标为 8。全部源码已用本机 Oracle JDK 8u421 编译，Oracle 8u421 / Corretto 8u422 已通过 DOCX 解析；Windows CPU 完整集成回归使用 Microsoft JDK 21 验证。Linux/CUDA 构建入口已提供，尚待独立验证。
+Maven 根据系统自动引入 Windows/Linux x64、macOS Intel/Apple Silicon CPU 的引擎包 `rapid-doc-native` 和默认 CPU 运行库包 `rapid-doc-ort`。两者独立校验和提取，更换 ORT 不需要重编译 Rust。原生库首次使用时提取并校验至 `~/.cache/rapid_doc/native`，模型由 Rust 自动下载到共享模型目录。Java 字节码目标为 8。全部源码已用本机 Oracle JDK 8u421 编译，Oracle 8u421 / Corretto 8u422 已通过 DOCX 解析；Windows CPU 完整集成回归使用 Microsoft JDK 21 验证。Windows/Linux x64、macOS Intel/Apple Silicon CPU 平台包已通过 GitHub Actions JDK 17 安装、CPU ONNX 推理和七格式跨绑定检查；CUDA 仍需实机验收。
 
 部分旧 Windows JDK 自带的 MSVC 运行库会遮蔽系统新版本，导致 ORT 报 `LoadLibraryExW failed`。Windows 平台包现在默认携带私有 CRT 14.51，由共享 Rust 加载层在 ORT 初始化和创建会话时自动隔离使用，不改动 JDK、不安装系统运行库，也不在运行时下载 CRT。该机制目前验证 ORT 1.23.0/1.23.2 CPU；Windows CUDA 尚需实际显卡环境验收。详见[运行库排查报告](../../docs/plans/2026-11-04-windows-ort-runtime-compatibility.md)。
 
@@ -57,7 +49,7 @@ public class RapidDocConfiguration {
 }
 ```
 
-在服务中注入该实例，并串行调用。以下服务通过同步方法管理单例的解析请求：
+在服务中注入该实例，可并发解析请求：
 
 ```java
 @Service
@@ -148,6 +140,9 @@ List<DocumentResult> documents = engine.parse(Arrays.asList(
 
 当前默认构建下载的 CPU/GPU 原生 ORT 基线为 **1.23.2**。共享 Rust 引擎使用 C API 23，外部 ORT 最低为 **1.23.0**；最低版本不等于全部后续版本都经过验证。构建脚本的 `--ort-dir` 可以传入其他兼容版本，因此自行构建时实际版本以提供的动态库为准。Rust `ort` crate 的 `2.0.0-rc.15` 是绑定版本，与 ORT 运行库版本不同。
 
+SDK `0.1.1` 的 ORT 去重包使用 Maven 打包版本 `1.23.2-rapiddoc.1`，原生 ORT 版本仍是 `1.23.2`。
+自行构建可用 `--ort-package-version` 指定 Maven 打包版本，`--ort-version` 继续用于校验原生库版本，两者独立。
+
 只有自行构建发布包的人需要准备 ORT。使用默认官方 1.23.2 CPU 运行库时，可先执行：
 
 ```powershell
@@ -198,7 +193,7 @@ CPU 使用 `windows-x86_64`，GPU 使用 `windows-x86_64-cuda`；Linux 对应 `l
 
 只切换相同 classifier 的 ORT 版本，也可用应用的 `dependencyManagement` 覆盖该依赖。仅定义一个同名 POM 属性不会修改依赖 SDK 内部的属性；上例的属性由应用自己的直接依赖使用，因此会生效。classifiers 不同的依赖不会相互替换，选择 GPU 时必须排除默认 CPU 包；同时出现多个 ORT 包会明确报错。
 
-只能选择仓库实际提供的 `rapid-doc-ort` 版本，不会自动转换任意官方 ORT 下载。目前尚未发布到 Maven Central；本地已构建 1.23.0 CPU、1.23.2 CPU/CUDA。其他版本仍需发布者打包和验证，最低要求为 ORT 1.23。
+只能选择仓库实际提供的 `rapid-doc-ort` 版本，不会自动转换任意官方 ORT 下载。Maven Central 已提供四个平台的 `1.23.2` CPU 运行库；本地另有 1.23.0 CPU、1.23.2 CPU/CUDA 构建，不代表它们均已公开发布。其他版本仍需发布者打包和验证，最低要求为 ORT 1.23。
 
 修改依赖后重新启动应用；同一进程不支持热切换 ORT 版本。
 
@@ -215,3 +210,13 @@ GPU 运行库加 `--cuda`。包的 Maven 版本会与动态库实际版本核对
 Windows CUDA 包已在无 GPU 的本机完成包校验和 CPU OCR 验证；明确请求 CUDA 时会返回 `device_unavailable` 并说明缺失依赖，不会静默改用 CPU。实际 Windows GPU 推理、自定义算子及其 CRT 共存仍待显卡环境验收。
 
 `parse(String)` 自动识别 HTTP/HTTPS 地址并由 Rust 下载：`engine.parse("https://example.com/report.pdf")`。请直接传字符串，勿使用 `Paths.get(url)`。带查询参数的下载地址也支持；输出名称优先使用 `filename` 查询参数，或 URL 路径末段。URL 内容在内存中读取，不创建下载缓存；网络连接/响应/读取超时为 60 秒。
+
+## 从源码构建（开发可选）
+
+使用已发布版本不需要此步骤。构建工具需要 Rust、JDK、Maven、Python 和已准备的 PDFium/GEOS/ORT 运行库：
+
+```powershell
+.venv/Scripts/python.exe scripts/migration/build_java_sdk.py --ort-dir target/release/runtime
+```
+
+可用 `--runtime-dir` 指定 PDFium/GEOS 目录。Python 仅用于构建脚本，最终 Java 应用不需要 Python。

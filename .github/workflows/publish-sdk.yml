@@ -5,7 +5,7 @@ on:
     inputs:
       version:
         description: Run on matching sdk-vVERSION tag; original Python uses separate vVERSION tags
-        default: '0.1.0'
+        default: '0.1.1'
         required: true
         type: string
       source_run_id:
@@ -72,7 +72,7 @@ jobs:
               raise ValueError('Source build must contain exactly the release code; only publisher workflow changes are allowed')
             artifacts = get('/actions/runs/' + source + '/artifacts?per_page=100')['artifacts']
             names = {a['name'] for a in artifacts if not a['expired']}
-            expected = {'sdk-windows-x86_64', 'sdk-linux-x86_64', 'sdk-macos-x86_64', 'sdk-macos-aarch64'}
+            expected = {'sdk-windows-x86_64', 'sdk-linux-x86_64', 'sdk-macos-x86_64', 'sdk-macos-aarch64', 'sdk-linux-aarch64', 'sdk-windows-aarch64'}
             if os.environ['INCLUDE_CUDA'] == 'true':
               expected |= {'sdk-windows-x86_64-cuda', 'sdk-linux-x86_64-cuda'}
             if not expected <= names: raise ValueError('Verified build artifacts are missing or expired')
@@ -119,7 +119,7 @@ jobs:
           from pathlib import Path
           import shutil
           destination = Path('dist'); destination.mkdir()
-          for os_name in ['windows', 'linux', 'macos-x86_64', 'macos-aarch64']:
+          for os_name in ['windows-x86_64', 'linux-x86_64', 'macos-x86_64', 'macos-aarch64', 'linux-aarch64', 'windows-aarch64']:
             paths = sorted(Path('artifacts').glob('sdk-' + os_name + '*/python/*.whl'))
             cuda = [p for p in paths if p.parent.parent.name.endswith('-cuda')]
             selected = cuda or paths

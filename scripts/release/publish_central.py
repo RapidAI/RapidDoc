@@ -14,7 +14,7 @@ import uuid
 import zipfile
 import xml.etree.ElementTree as ET
 
-from common import NS, OUT, check_version, run, version
+from common import NS, OUT, check_version, run, version, ort_package_version
 
 
 def assemble(artifacts, destination):
@@ -38,12 +38,12 @@ def assemble(artifacts, destination):
         f"rapid-doc-{version()}-javadoc.jar",
         f"rapid-doc-{version()}.pom",
         f"rapid-doc-native-{version()}.pom",
-        "rapid-doc-ort-1.23.2.pom",
+        f"rapid-doc-ort-{ort_package_version()}.pom",
     ]
-    for platform in ["windows-x86_64", "linux-x86_64", "macos-x86_64", "macos-aarch64"]:
+    for platform in ["windows-x86_64", "linux-x86_64", "macos-x86_64", "macos-aarch64", "linux-aarch64", "windows-aarch64"]:
         required += [
             f"rapid-doc-native-{version()}-{platform}.jar",
-            f"rapid-doc-ort-1.23.2-{platform}.jar",
+            f"rapid-doc-ort-{ort_package_version()}-{platform}.jar",
         ]
     if any(name not in files for name in required):
         raise ValueError("Incomplete Maven release; required: " + ", ".join(required))

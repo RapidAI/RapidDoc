@@ -33,7 +33,8 @@ def main():
     nodes={n['id']:n for n in meta['resolve']['nodes']}
     profiles={}
     for label,target in [('windows','x86_64-pc-windows-msvc'),('linux','x86_64-unknown-linux-gnu'),
-                         ('macos-x86_64','x86_64-apple-darwin'),('macos-aarch64','aarch64-apple-darwin')]:
+                         ('macos-x86_64','x86_64-apple-darwin'),('macos-aarch64','aarch64-apple-darwin'),
+                         ('linux-aarch64','aarch64-unknown-linux-gnu'),('windows-aarch64','aarch64-pc-windows-msvc')]:
         text=subprocess.check_output(['cargo','tree','--locked','--offline','-p','rapiddoc-python','--features','cuda',
             '--edges','normal,no-proc-macro','--target',target,'--prefix','none','--format','{p}'],cwd=ROOT,text=True)
         profiles[label]=sorted({m[1]+' '+m[2] for line in text.splitlines() if (m:=re.match(r'^(\S+) v(\S+)',line))})

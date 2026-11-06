@@ -1,22 +1,30 @@
 """Platform names and shared-library conventions used by SDK packagers."""
 
 import platform
+import hashlib
+import re
 from pathlib import Path
 import subprocess
 import sys
 
 
+def host_architecture():
+    return {"amd64": "x86_64", "x86_64": "x86_64",
+            "arm64": "aarch64", "aarch64": "aarch64"}[platform.machine().lower()]
+
+
 def host_platform(cuda=False):
-    if sys.platform == "darwin":
-        arch = {"arm64": "aarch64", "aarch64": "aarch64", "x86_64": "x86_64"}[
-            platform.machine().lower()
-        ]
-        if cuda:
-            raise ValueError("macOS SDK packages use CPU execution")
-        return "macos-" + arch
-    return ("windows-x86_64" if sys.platform == "win32" else "linux-x86_64") + (
-        "-cuda" if cuda else ""
-    )
+    arch = host_architecture()
+    system = {"win32": "windows", "linux": "linux", "darwin": "macos"}[sys.platform]
+    if cuda and (system == "macos" or arch == "aarch64"):
+        raise ValueError("macOS and ARM64 SDK packages use CPU execution")
+    return system + "-" + arch + ("-cuda" if cuda else "")
+
+
+def rust_target():
+    arch = host_architecture()
+    return arch + {"win32": "-pc-windows-msvc", "linux": "-unknown-linux-gnu",
+                   "darwin": "-apple-darwin"}[sys.platform]
 
 
 def shared_library(stem):
@@ -28,6 +36,33 @@ def shared_library(stem):
 def is_shared_library(path):
     path = Path(path)
     return path.suffix in (".dll", ".dylib") or ".so" in path.name
+
+
+def ort_library_files(directory):
+    """Keep the real versioned ORT library and distinct provider libraries.
+
+    Older staging directories may contain expanded symlinks. Only omit their
+    aliases when the bytes match, leaving custom or differently signed files intact.
+    """
+    files = sorted(p for p in Path(directory).iterdir() if p.is_file() and is_shared_library(p))
+    versioned = [p for p in files if re.fullmatch(
+        r"libonnxruntime(?:\.so(?:\.\d+)+|(?:\.\d+)+\.dylib)", p.name
+    )]
+    aliases = {"libonnxruntime.so", "libonnxruntime.so.1", "libonnxruntime.dylib"}
+    # .so.1 can itself be the only real SONAME library in an external bundle.
+    real = [p for p in versioned if p.name != "libonnxruntime.so.1"]
+    if len(real) != 1 or not any(p.name in aliases for p in files):
+        return files
+
+    def digest(path):
+        checksum = hashlib.sha256()
+        with path.open("rb") as stream:
+            for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                checksum.update(chunk)
+        return checksum.digest()
+
+    expected = digest(real[0])
+    return [p for p in files if p.name not in aliases or digest(p) != expected]
 
 
 def relocate_dylibs(directory):

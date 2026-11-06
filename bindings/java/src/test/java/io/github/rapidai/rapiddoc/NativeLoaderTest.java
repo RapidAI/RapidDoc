@@ -19,7 +19,7 @@ class NativeLoaderTest {
     @TempDir Path temporary;
 
     @Test
-    void detectsBothMacArchitectures() {
+    void detectsSupportedHostArchitectures() {
         String os = System.getProperty("os.name"), arch = System.getProperty("os.arch");
         try {
             System.setProperty("os.name", "Mac OS X");
@@ -30,6 +30,18 @@ class NativeLoaderTest {
             for (String value : new String[] {"x86_64", "amd64"}) {
                 System.setProperty("os.arch", value);
                 assertEquals("macos-x86_64", NativeLoader.platform());
+            }
+            for (String system : new String[] {"Windows 11", "Linux"}) {
+                System.setProperty("os.name", system);
+                String prefix = system.startsWith("Windows") ? "windows-" : "linux-";
+                for (String value : new String[] {"aarch64", "arm64"}) {
+                    System.setProperty("os.arch", value);
+                    assertEquals(prefix + "aarch64", NativeLoader.platform());
+                }
+                for (String value : new String[] {"x86_64", "amd64"}) {
+                    System.setProperty("os.arch", value);
+                    assertEquals(prefix + "x86_64", NativeLoader.platform());
+                }
             }
         } finally {
             System.setProperty("os.name", os);

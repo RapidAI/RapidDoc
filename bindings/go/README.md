@@ -1,21 +1,31 @@
-# RapidDoc Go preview
+# RapidDoc Go SDK
 
 Go 调用共享 Rust SDK，支持 PDF、DOC、DOCX、XLS、XLSX、PPT、PPTX，不需要 Python、Java 或 PyTorch。Windows/Linux x64、macOS Intel/Apple Silicon（CPU）统一使用 **C ABI + cgo**，模块没有第三方 Go 依赖。
 
-当前为源码预览，尚未发布 Go 模块标签和原生运行库。Linux 调用层已提供，实际 Linux 原生包及 GPU 推理仍需单独验收。
+Go 模块 `v0.1.0` 和[四个平台的 CPU 原生运行库](https://github.com/RapidAI/RapidDoc/releases/tag/sdk-v0.1.0)已发布，均通过七格式跨绑定检查；GPU 仍需单独实机验收。
+
+## 安装
+
+在自己的 Go 项目中执行：
+
+```bash
+go get github.com/RapidAI/RapidDoc/bindings/go@v0.1.0
+```
+
+从上述 Release 下载对应平台的 `rapiddoc-native-0.1.0-<platform>.zip`，解压到应用的 `runtime` 目录，并保留所有子目录。Go 模块不会自动下载原生库。
 
 ## 编译准备
 
 Go 1.20+、`CGO_ENABLED=1` 和可用 C 编译器。Windows 使用 MinGW-w64 GCC（如 MSYS2 UCRT64），Linux 使用 GCC，macOS 使用 Xcode Command Line Tools 提供的 Clang。只有编译 Go 应用的机器需要编译器；部署编译好的应用不需要 Go、GCC 或 Rust，但需要携带原生运行库包。
 
-本机已准备便携 GCC，不改系统 PATH，在项目根目录的 PowerShell 中可设置：
+Windows 开发环境如果使用自行准备的便携 GCC，可按实际路径设置，例如：
 
 ```powershell
 $env:CC = "$PWD/build/tools/w64devkit/bin/gcc.exe"
 $env:CGO_ENABLED = "1"
 ```
 
-发布者从根目录构建原生包：
+从源码构建原生包（开发可选；使用 Release ZIP 可跳过）：
 
 ```powershell
 .venv/Scripts/python.exe scripts/migration/build_go_sdk.py --output build/go-sdk/windows-x86_64-cgo
@@ -23,17 +33,11 @@ $env:CGO_ENABLED = "1"
 
 输出目录必须是新目录；工具不自动删除旧构建。Python 仅用于源码构建脚本，Go 应用运行时不需要 Python。
 
-当前本机已生成 `build/go-sdk/windows-x86_64-cgo.zip`。解压整个目录并保留子目录结构，用 `Config.LibraryPath` 或 `RAPIDDOC_NATIVE_LIBRARY` 指定其中 `rapid_doc_c.dll`（Linux 为 `librapid_doc_c.so`，macOS 为 `librapid_doc_c.dylib`）。ORT、PDFium、GEOS 和私有 CRT 从同一运行库目录自动发现；显式 `Resources` 路径仍优先。不会自动下载原生运行库。
+使用 Release ZIP 或自行构建的 ZIP，解压整个目录并保留子目录结构，用 `Config.LibraryPath` 或 `RAPIDDOC_NATIVE_LIBRARY` 指定其中 `rapid_doc_c.dll`（Linux 为 `librapid_doc_c.so`，macOS 为 `librapid_doc_c.dylib`）。ORT、PDFium、GEOS 和私有 CRT 从同一运行库目录自动发现；显式 `Resources` 路径仍优先。不会自动下载原生运行库。
 
-## 独立项目本地引入
+## 调用
 
-在调用项目的 `go.mod` 中添加（Windows 路径使用正斜杠）：
-
-```go
-require github.com/RapidAI/RapidDoc/bindings/go v0.0.0
-
-replace github.com/RapidAI/RapidDoc/bindings/go => D:/CodeProjects/doc/RapidAI/RapidDoc/bindings/go
-```
+使用已发布的模块和解压后的原生库，例如 Windows：
 
 ```go
 package main
@@ -46,7 +50,7 @@ import (
 
 func main() {
     engine, err := rapiddoc.New(rapiddoc.Config{
-        LibraryPath: "D:/CodeProjects/doc/RapidAI/RapidDoc/build/go-sdk/windows-x86_64-cgo/rapid_doc_c.dll",
+        LibraryPath: "runtime/rapid_doc_c.dll",
     })
     if err != nil { log.Fatal(err) }
     defer engine.Close()

@@ -26,7 +26,7 @@ cuda = ["ort/cuda"]
 
 [dependencies]
 ort.workspace = true
-rapiddoc-core = { version = "=0.1.0", path = "../rapiddoc-core" }
+rapiddoc-core = { version = "=0.1.1", path = "../rapiddoc-core" }
 serde.workspace = true
 serde_json.workspace = true
 sha2 = "0.10"

@@ -21,7 +21,7 @@ edition.workspace = true
 license.workspace = true
 
 [dependencies]
-rapiddoc-core = { version = "=0.1.0", path = "../rapiddoc-core" }
+rapiddoc-core = { version = "=0.1.1", path = "../rapiddoc-core" }
 zip = { version = "=9.1.3", default-features = false, features = ["deflate"] }
 quick-xml = "=0.42.0"
 roxmltree = "=0.21.2"

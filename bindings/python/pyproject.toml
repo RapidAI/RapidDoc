@@ -4,10 +4,18 @@ build-backend = "maturin"
 
 [project]
 name = "rapid-doc-rust"
-version = "0.1.0"
+version = "0.1.1"
 requires-python = ">=3.10"
-description = "RapidDoc native Rust PDF, DOC, DOCX, XLS, XLSX, PPT and PPTX engine with a Python-compatible preview API"
+description = "RapidDoc Rust document parser with Python bindings for PDF, DOC, DOCX, XLS, XLSX, PPT and PPTX"
+readme = "README.md"
 dependencies = ["loguru>=0.6.0", "python-dotenv>=1", "Pillow>=11,<13"]
+
+[project.urls]
+Homepage = "https://github.com/RapidAI/RapidDoc"
+Documentation = "https://github.com/RapidAI/RapidDoc/blob/main/bindings/python/README.md"
+Repository = "https://github.com/RapidAI/RapidDoc"
+Issues = "https://github.com/RapidAI/RapidDoc/issues"
+Changelog = "https://github.com/RapidAI/RapidDoc/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 # Shared Rust engine uses ORT C API 23: runtimes older than 1.23 cannot be used.

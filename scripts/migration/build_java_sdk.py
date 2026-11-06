@@ -10,7 +10,8 @@ from pathlib import Path
 import shutil
 import subprocess
 import zipfile
-from native_platform import host_platform, shared_library, is_shared_library
+import xml.etree.ElementTree as ET
+from native_platform import host_platform, shared_library, is_shared_library, ort_library_files
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -53,8 +54,9 @@ def main():
     )
     parser.add_argument("--cuda", action="store_true")
     parser.add_argument(
-        "--ort-version", default="1.23.2", help="Independent rapid-doc-ort artifact version"
+        "--ort-version", default="1.23.2", help="Native ONNX Runtime version to validate"
     )
+    parser.add_argument("--ort-package-version", help="Maven runtime artifact version, independent of the native ORT version")
     parser.add_argument(
         "--ort-only", action="store_true", help="Package/install only ORT; no Rust or Java rebuild"
     )
@@ -108,7 +110,7 @@ def main():
             raise SystemExit("Supply --ort-dir with CPU/GPU ORT shared libraries")
     ort = ort.resolve()
     shared = is_shared_library
-    ort_files = [p for p in ort.iterdir() if p.is_file() and shared(p)]
+    ort_files = ort_library_files(ort)
     if not any(p.name.startswith(("onnxruntime.", "libonnxruntime.")) for p in ort_files):
         raise SystemExit("ORT main library missing")
     if args.cuda and not any("providers_cuda" in p.name for p in ort_files):
@@ -158,10 +160,13 @@ def main():
                 ort_payload["onnx_ops/" + p.relative_to(operators).as_posix()] = p.read_bytes()
     output = ROOT / "build/java-sdk"
     output.mkdir(parents=True, exist_ok=True)
+    pom_template = (ROOT / "bindings/java/ort/pom.xml").read_text()
+    template_version = ET.fromstring(pom_template).findtext("{http://maven.apache.org/POM/4.0.0}version")
+    package_version = args.ort_package_version or (template_version if args.ort_version == "1.23.2" else args.ort_version)
     ort_jar = write_bundle(
         output,
         "rapid-doc-ort",
-        args.ort_version,
+        package_version,
         classifier,
         platform,
         ort_payload,
@@ -169,11 +174,9 @@ def main():
         runtime_version=actual_version,
         device="cuda" if args.cuda else "cpu",
     )
-    runtime_pom = output / f"rapid-doc-ort-{args.ort_version}.pom"
+    runtime_pom = output / f"rapid-doc-ort-{package_version}.pom"
     runtime_pom.write_text(
-        (ROOT / "bindings/java/ort/pom.xml")
-        .read_text()
-        .replace("<version>1.23.2</version>", f"<version>{args.ort_version}</version>"),
+        pom_template.replace(f"<version>{template_version}</version>", f"<version>{package_version}</version>", 1),
         encoding="utf-8",
     )
     mvn = shutil.which("mvn.cmd" if windows else "mvn")
@@ -277,7 +280,6 @@ def main():
     text, index = pack_shared(notices)
     files["licenses/jni/THIRD_PARTY_NOTICES.txt"] = text
     files["licenses/jni/third-party-notices.json"] = index
-    import xml.etree.ElementTree as ET
     version = ET.parse(ROOT / "bindings/java/pom.xml").getroot().findtext(
         "{http://maven.apache.org/POM/4.0.0}version"
     )
@@ -288,7 +290,7 @@ def main():
         "bindings/java/pom.xml",
         "install",
         "-Drapid-doc.native.classifier=" + classifier,
-        "-Drapid-doc.ort.version=" + args.ort_version,
+        "-Drapid-doc.ort.version=" + package_version,
     ]
     if args.skip_tests:
         command += ["-DskipTests"]

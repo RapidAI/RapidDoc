@@ -21,8 +21,8 @@ edition.workspace = true
 license.workspace = true
 
 [dependencies]
-rapiddoc = { version = "=0.1.0", path = "../rapiddoc" }
-rapiddoc-core = { version = "=0.1.0", path = "../rapiddoc-core" }
+rapiddoc = { version = "=0.1.1", path = "../rapiddoc" }
+rapiddoc-core = { version = "=0.1.1", path = "../rapiddoc-core" }
 serde_json.workspace = true
 mimalloc = { version = "=0.1.52", optional = true, default-features = false }
 
