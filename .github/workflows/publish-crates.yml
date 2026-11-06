@@ -7,6 +7,10 @@ on:
         default: '0.1.0'
         required: true
         type: string
+      start_at:
+        description: Resume from this crate; empty starts from the first crate
+        default: ''
+        type: string
       publish:
         description: Upload after verifying all extracted crate packages
         default: false
@@ -28,6 +32,8 @@ jobs:
       CARGO_INCREMENTAL: '0'
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: sdk-v${{ inputs.version }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -43,12 +49,41 @@ jobs:
       - name: Check packages or publish in dependency order
         env:
           PUBLISH: ${{ inputs.publish }}
+          START_AT: ${{ inputs.start_at }}
+          RELEASE_VERSION: ${{ inputs.version }}
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
         shell: python
         run: |
-          import os, subprocess, sys
-          subprocess.run([sys.executable, 'scripts/release/crates.py'] +
-                         (['--publish'] if os.environ['PUBLISH'] == 'true' else []), check=True)
+          import datetime, email.utils, os, re, subprocess, sys, time
+          sys.path.insert(0, 'scripts/release')
+          import crates
+          from common import check_version
+          publish = os.environ['PUBLISH'] == 'true'
+          start = os.environ['START_AT']
+          if start and start not in crates.ORDER: raise ValueError('Unknown resume crate: ' + start)
+          # checkout above always selects the canonical SDK release tag, even
+          # when this updated publishing workflow is dispatched from main.
+          expected = subprocess.check_output(['git', 'rev-parse', 'sdk-v' + os.environ['RELEASE_VERSION'] + '^{commit}'], text=True).strip()
+          actual = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
+          if actual != expected: raise ValueError('Checkout differs from SDK release tag')
+          os.environ['GITHUB_REF'] = 'refs/tags/sdk-v' + os.environ['RELEASE_VERSION']
+          check_version(os.environ['RELEASE_VERSION'], publishing=publish)
+          subprocess.run([sys.executable, 'scripts/release/crates.py'], check=True)
+          if publish:
+            if not os.environ.get('CARGO_REGISTRY_TOKEN'): raise ValueError('Configure CARGO_REGISTRY_TOKEN')
+            for name in crates.ORDER[crates.ORDER.index(start) if start else 0:]:
+              command = ['cargo', 'publish', '--locked', '--no-default-features', '-p', name]
+              while True:
+                result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+                print(result.stdout, flush=True)
+                if result.returncode == 0: break
+                retry = re.search(r'Please try again after (.+? GMT)', result.stdout)
+                if '429 Too Many Requests' not in result.stdout or not retry:
+                  raise subprocess.CalledProcessError(result.returncode, command)
+                until = email.utils.parsedate_to_datetime(retry[1])
+                delay = max(1, (until - datetime.datetime.now(datetime.timezone.utc)).total_seconds() + 5)
+                print('crates.io rate limit; waiting until', until.isoformat(), flush=True)
+                time.sleep(delay)
       - uses: actions/upload-artifact@v4
         if: always()
         with:
