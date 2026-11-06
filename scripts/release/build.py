@@ -7,7 +7,7 @@ import shutil
 import sys
 import venv
 
-from common import ROOT, OUT, check_version, run, sha
+from common import ROOT, OUT, check_version, run, sha, shared_library
 from runtime import stage
 
 
@@ -44,7 +44,11 @@ def main():
         "-p",
         "rapiddoc-node",
         "--features",
-        "rapiddoc-python/cuda,pyo3/extension-module",
+        (
+            "pyo3/extension-module"
+            if sys.platform == "darwin"
+            else "rapiddoc-python/cuda,pyo3/extension-module"
+        ),
     )
     migration = ROOT / "scripts/migration"
     native = output / "native"
@@ -119,13 +123,12 @@ def main():
         "--locked",
         "--manifest-path",
         "bindings/python/Cargo.toml",
-        "--features",
-        "cuda",
+        *([] if sys.platform == "darwin" else ["--features", "cuda"]),
         "--out",
         raw,
         *(
             ["--compatibility", "linux", "--auditwheel", "skip"]
-            if os.name != "nt"
+            if sys.platform.startswith("linux")
             else []
         ),
     )
@@ -134,6 +137,12 @@ def main():
     for f in raw.glob("*.whl"):
         if os.name == "nt":
             shutil.copy2(f, wheels / f.name)
+        elif sys.platform == "darwin":
+            run(
+                "delocate-wheel", "--require-archs",
+                "arm64" if platform == "macos-aarch64" else "x86_64",
+                "--wheel-dir", wheels, f,
+            )
         else:
             run(
                 "auditwheel",
@@ -161,7 +170,7 @@ def main():
         "-B",
         "-f",
         "bindings/java/pom.xml",
-        "-Dtest=InputOverloadsTest",
+        "-Dtest=InputOverloadsTest,NativeLoaderTest",
         "-Drapid-doc.native.classifier=" + platform,
         "test",
     )
@@ -206,7 +215,7 @@ def smoke(output, native, standalone, mvn):
     run(python, "-I", ROOT / "scripts/release/smoke_python.py", cwd=consumer)
     run(python, "-I", ROOT / "bindings/python/tests/lifecycle_install.py", ROOT, cwd=consumer)
     os.environ["RAPIDDOC_NATIVE_LIBRARY"] = str(
-        native / ("rapid_doc_c.dll" if os.name == "nt" else "librapid_doc_c.so")
+        native / shared_library("rapid_doc_c")
     )
     os.environ["RAPIDDOC_SMOKE_REPORT"] = str(reports / "go.json")
     run(

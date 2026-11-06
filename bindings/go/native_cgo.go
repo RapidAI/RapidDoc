@@ -1,4 +1,4 @@
-//go:build (windows || linux) && cgo
+//go:build (windows || linux || darwin) && cgo
 
 package rapiddoc
 

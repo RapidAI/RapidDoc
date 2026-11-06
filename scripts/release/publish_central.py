@@ -37,7 +37,7 @@ def assemble(artifacts, destination):
         f"rapid-doc-native-{version()}.pom",
         "rapid-doc-ort-1.23.2.pom",
     ]
-    for platform in ["windows-x86_64", "linux-x86_64"]:
+    for platform in ["windows-x86_64", "linux-x86_64", "macos-x86_64", "macos-aarch64"]:
         required += [
             f"rapid-doc-native-{version()}-{platform}.jar",
             f"rapid-doc-ort-1.23.2-{platform}.jar",

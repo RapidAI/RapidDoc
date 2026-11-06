@@ -23,8 +23,9 @@ The platform package contains the native addon and CPU runtime libraries.
 Users do not need Python, Java, Rust or a C compiler. Models are automatically
 resolved/downloaded by the shared Rust SDK. This source preview is not published
 to npm yet; install the locally built `.tgz` with `npm install /path/package.tgz`.
-Node.js 20+ is required; Windows x64 is currently tested with Node.js 24.12.
-Linux and CUDA distribution still require package acceptance testing.
+Node.js 20+ is required. CPU platform packages cover Windows/Linux x64 and
+macOS 14+ on Intel x64 / Apple Silicon ARM64. The loader selects the package
+matching the running Node.js architecture. CUDA requires separate Windows/Linux acceptance testing.
 
 ## Inputs and results
 

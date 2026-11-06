@@ -26,7 +26,11 @@ test("missing CPU and CUDA packages identify the exact installable package", () 
     );
     assert.throws(
       () => resolveAddon({}, "darwin", "arm64"),
-      /Unsupported RapidDoc platform/,
+      /rapid-doc-darwin-arm64@/,
+    );
+    assert.throws(
+      () => resolveAddon({}, "darwin", "x64"),
+      /rapid-doc-darwin-x64@/,
     );
   } finally {
     if (previous !== undefined) process.env.RAPIDDOC_NODE_LIBRARY = previous;

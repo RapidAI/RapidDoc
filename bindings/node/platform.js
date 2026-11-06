@@ -14,6 +14,8 @@ function resolveAddon(
   const names = {
     "win32-x64": "rapid-doc-win32-x64",
     "linux-x64": "rapid-doc-linux-x64-gnu",
+    "darwin-x64": "rapid-doc-darwin-x64",
+    "darwin-arm64": "rapid-doc-darwin-arm64",
   };
   const base = names[`${platform}-${arch}`];
   if (!base)

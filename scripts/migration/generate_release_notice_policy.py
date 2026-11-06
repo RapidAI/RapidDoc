@@ -32,11 +32,12 @@ def main():
     by_id={p['id']:p for p in meta['packages']}
     nodes={n['id']:n for n in meta['resolve']['nodes']}
     profiles={}
-    for label,target in [('windows','x86_64-pc-windows-msvc'),('linux','x86_64-unknown-linux-gnu')]:
+    for label,target in [('windows','x86_64-pc-windows-msvc'),('linux','x86_64-unknown-linux-gnu'),
+                         ('macos-x86_64','x86_64-apple-darwin'),('macos-aarch64','aarch64-apple-darwin')]:
         text=subprocess.check_output(['cargo','tree','--locked','--offline','-p','rapiddoc-python','--features','cuda',
             '--edges','normal,no-proc-macro','--target',target,'--prefix','none','--format','{p}'],cwd=ROOT,text=True)
         profiles[label]=sorted({m[1]+' '+m[2] for line in text.splitlines() if (m:=re.match(r'^(\S+) v(\S+)',line))})
-    profiles['all']=sorted(set(profiles['windows'])|set(profiles['linux']))
+    profiles['all']=sorted(set().union(*map(set,profiles.values())))
     pending=[p['id'] for p in meta['packages'] if p['name'] in ('ureq','ureq-proto','sha2','parking_lot','parking_lot_core','lock_api','scopeguard')]
     seen=set()
     while pending:
@@ -97,7 +98,7 @@ def main():
     manifests.update(ROOT/name for name in ('licenses/MIGRATION-NOTICES.txt','licenses/migration-notices.json'))
     manifest_hashes={path.relative_to(ROOT).as_posix():sha(path.read_bytes().replace(b'\r\n',b'\n')) for path in sorted(manifests)}
     policy=dict(schema=1,cargo_lock_sha256=sha((ROOT/'Cargo.lock').read_bytes().replace(b'\r\n',b'\n')),manifest_hashes=manifest_hashes,profiles=profiles,files=rules,license_choices=choices,retained_migration=retained_migration,
-                scope='Windows MSVC and Linux glibc runtime (CPU and CUDA); normal edges excluding proc-macro/build/dev',
+                scope='Windows MSVC and Linux glibc (CPU/CUDA), macOS Intel/Apple Silicon (CPU); normal edges excluding proc-macro/build/dev',
                 source_audit_records='Development provenance and migration records remain in source; Cargo license alternatives are read from locked registry sources')
     POLICY.write_text(json.dumps(policy,indent=2)+'\n','utf8')
     print('Recorded',len(rules),'notice decisions;',len(generated),'selected runtime notice files')

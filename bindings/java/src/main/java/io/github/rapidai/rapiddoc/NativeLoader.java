@@ -35,7 +35,8 @@ final class NativeLoader {
         String directory = System.getProperty("rapid_doc.native.directory");
         String platform = platform();
         String library =
-                platform.startsWith("windows") ? "rapid_doc_jni.dll" : "librapid_doc_jni.so";
+                platform.startsWith("windows") ? "rapid_doc_jni.dll"
+                        : platform.startsWith("macos") ? "librapid_doc_jni.dylib" : "librapid_doc_jni.so";
         if (directory != null) {
             Path bundle = Paths.get(directory).toAbsolutePath();
             System.load(bundle.resolve(library).toString());
@@ -144,10 +145,14 @@ final class NativeLoader {
 
     static String platform() {
         String arch = System.getProperty("os.arch").toLowerCase(Locale.ROOT);
+        String os = System.getProperty("os.name").toLowerCase(Locale.ROOT);
+        if (os.startsWith("mac") || os.startsWith("darwin")) {
+            if (arch.equals("aarch64") || arch.equals("arm64")) return "macos-aarch64";
+            if (arch.equals("x86_64") || arch.equals("amd64")) return "macos-x86_64";
+        }
         if (!arch.equals("amd64") && !arch.equals("x86_64"))
             throw new RapidDocException(
                     "unsupported", "No bundled native runtime for architecture " + arch);
-        String os = System.getProperty("os.name").toLowerCase(Locale.ROOT);
         if (os.startsWith("windows")) return "windows-x86_64";
         if (os.startsWith("linux")) return "linux-x86_64";
         throw new RapidDocException("unsupported", "No bundled native runtime for OS " + os);

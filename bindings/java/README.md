@@ -22,7 +22,7 @@ Java 8 语法、API 和字节码兼容，直接调用共享 Rust 引擎，支持
 </dependency>
 ```
 
-Maven 根据系统自动引入 Windows/Linux x64 的引擎包 `rapid-doc-native` 和默认 CPU 运行库包 `rapid-doc-ort`。两者独立校验和提取，更换 ORT 不需要重编译 Rust。原生库首次使用时提取并校验至 `~/.cache/rapid_doc/native`，模型由 Rust 自动下载到共享模型目录。Java 字节码目标为 8。全部源码已用本机 Oracle JDK 8u421 编译，Oracle 8u421 / Corretto 8u422 已通过 DOCX 解析；Windows CPU 完整集成回归使用 Microsoft JDK 21 验证。Linux/CUDA 构建入口已提供，尚待独立验证。
+Maven 根据系统自动引入 Windows/Linux x64、macOS Intel/Apple Silicon CPU 的引擎包 `rapid-doc-native` 和默认 CPU 运行库包 `rapid-doc-ort`。两者独立校验和提取，更换 ORT 不需要重编译 Rust。原生库首次使用时提取并校验至 `~/.cache/rapid_doc/native`，模型由 Rust 自动下载到共享模型目录。Java 字节码目标为 8。全部源码已用本机 Oracle JDK 8u421 编译，Oracle 8u421 / Corretto 8u422 已通过 DOCX 解析；Windows CPU 完整集成回归使用 Microsoft JDK 21 验证。Linux/CUDA 构建入口已提供，尚待独立验证。
 
 部分旧 Windows JDK 自带的 MSVC 运行库会遮蔽系统新版本，导致 ORT 报 `LoadLibraryExW failed`。Windows 平台包现在默认携带私有 CRT 14.51，由共享 Rust 加载层在 ORT 初始化和创建会话时自动隔离使用，不改动 JDK、不安装系统运行库，也不在运行时下载 CRT。该机制目前验证 ORT 1.23.0/1.23.2 CPU；Windows CUDA 尚需实际显卡环境验收。详见[运行库排查报告](../../docs/plans/2026-11-04-windows-ort-runtime-compatibility.md)。
 

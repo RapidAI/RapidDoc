@@ -161,7 +161,7 @@ func New(config Config) (*Engine, error) {
 	if err != nil {
 		return nil, err
 	}
-	if runtime.GOARCH != "amd64" {
+	if runtime.GOARCH != "amd64" && !(runtime.GOOS == "darwin" && runtime.GOARCH == "arm64") {
 		return nil, fmt.Errorf("native SDK currently packaged for amd64, not %s", runtime.GOARCH)
 	}
 	api, err := openLibrary(path)

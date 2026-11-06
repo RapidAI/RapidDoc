@@ -14,7 +14,7 @@ RapidDoc 的 Python 绑定，调用共享 Rust 引擎，在本地将文档解析
 python -m pip install "./rapid_doc_rust-0.1.0-cp310-abi3-win_amd64.whl[cpu]"
 ```
 
-其他平台使用对应文件名；CUDA 环境须选择匹配的 GPU 构建及运行库。
+平台包覆盖 Windows/Linux x64，以及 macOS 14+ 的 Intel x64 / Apple Silicon ARM64（CPU）。其他平台使用对应文件名；CUDA 环境须选择匹配的 GPU 构建及运行库。
 
 基础包不强制安装 ORT。安装 `[cpu]` 使用 `onnxruntime`；GPU 构建安装 `[gpu]` 使用 `onnxruntime-gpu`（也能执行 CPU 推理），两者不要同时安装。已有合适运行库时直接安装 wheel 即可；Rust 自动定位其动态库，也支持显式设置 `RAPIDDOC_ONNXRUNTIME_LIBRARY`。Office 解析不需要 ORT。
 

@@ -1,4 +1,4 @@
-//go:build (windows || linux) && cgo
+//go:build (windows || linux || darwin) && cgo
 
 #include "bridge.h"
 #include "rapid_doc.h"

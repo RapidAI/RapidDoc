@@ -18,6 +18,25 @@ import static org.junit.jupiter.api.Assertions.*;
 class NativeLoaderTest {
     @TempDir Path temporary;
 
+    @Test
+    void detectsBothMacArchitectures() {
+        String os = System.getProperty("os.name"), arch = System.getProperty("os.arch");
+        try {
+            System.setProperty("os.name", "Mac OS X");
+            for (String value : new String[] {"aarch64", "arm64"}) {
+                System.setProperty("os.arch", value);
+                assertEquals("macos-aarch64", NativeLoader.platform());
+            }
+            for (String value : new String[] {"x86_64", "amd64"}) {
+                System.setProperty("os.arch", value);
+                assertEquals("macos-x86_64", NativeLoader.platform());
+            }
+        } finally {
+            System.setProperty("os.name", os);
+            System.setProperty("os.arch", arch);
+        }
+    }
+
     private Path runtime(String name, boolean corrupt) throws Exception {
         Path jar = temporary.resolve(name + ".jar");
         String prefix = "META-INF/rapiddoc-ort/" + NativeLoader.platform() + "/";

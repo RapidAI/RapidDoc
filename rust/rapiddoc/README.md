@@ -4,7 +4,7 @@ Use the shared `rapiddoc` crate directly. The same SDK backs the Python binding;
 
 ## ORT installation
 
-For a Rust application, enable `download-runtime` to download and verify the official ORT 1.23.2 archive during Cargo build (Windows MSVC x64 / Linux glibc x64):
+For a Rust application, enable `download-runtime` to download and verify the official ORT 1.23.2 archive during Cargo build (Windows MSVC x64 / Linux glibc x64 / macOS Intel and Apple Silicon CPU):
 
 ```toml
 [dependencies]
@@ -49,7 +49,7 @@ cargo run --release -p rapiddoc --example parse_document -- tests/migration/inpu
 cargo run --release -p rapiddoc --example parse_document -- document.pdf path/to/release/runtime
 ```
 
-The crates.io package is `rapiddoc`; local first-release packaging is checked with `python scripts/release/crates.py --allow-dirty`. This command verifies the source archives without publishing. Native build prerequisites are a C/C++ toolchain, CMake and NASM (MSVC on Windows; GCC/Clang on Linux). Platform PDFium/GEOS/ORT libraries remain separate runtime resources; a successful Cargo build does not install them. See the repository publishing guide for the manual release workflow. No crates.io upload has been performed by this change.
+The crates.io package is `rapiddoc`; local first-release packaging is checked with `python scripts/release/crates.py --allow-dirty`. This command verifies the source archives without publishing. Native build prerequisites are a C/C++ toolchain, CMake and NASM (MSVC on Windows; GCC/Clang on Linux; Xcode Command Line Tools on macOS). Platform PDFium/GEOS/ORT libraries remain separate runtime resources; a successful Cargo build does not install them. See the repository publishing guide for the manual release workflow. No crates.io upload has been performed by this change.
 
 `parse`/`parse_bytes`/`warmup` take `&self`: an `Arc<RapidDoc>` can serve concurrent requests. Office parsing is request-local. PDFium remains protected, and each shared model session serializes its own inference. OCR body preparation and decoding run outside that session lock without copying full logits. Configuration changes require `&mut self`; cloned engines preserve active configuration snapshots. Do not synchronously reenter parsing from a progress callback. Concurrent writers must use distinct output paths.
 

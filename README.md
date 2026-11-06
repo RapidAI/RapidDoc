@@ -31,6 +31,8 @@ RapidDoc 提供原 Python 实现和共享 Rust 引擎。原 Python 包继续使�
 
 **发布状态：新 Rust SDK 及各语言绑定当前为 `0.1.0` 发布候选，尚未发布到公共包仓库。** 版本变更记录见 [CHANGELOG.md](CHANGELOG.md)，发布构建与验证流程见[发布说明](docs/publishing.md)。
 
+Rust SDK 的 CPU 平台包覆盖 Windows/Linux x64，以及 macOS 14+ Intel x64 / Apple Silicon ARM64。
+
 Rust 引擎支持 PDF、DOC、DOCX、XLS、XLSX、PPT、PPTX，Office 格式直接原生解析；PDF 模型推理使用 ONNX Runtime。PDFium、ORT、GEOS 及 CUDA 算子等运行库的提供方式随语言和平台包而异，不能只复制一个动态库部署。模型缺失时按配置自动下载，也可使用已有模型目录，详见[模型配置](docs/rust-models.md)。
 
 原 Python 与 Rust 的配置和扩展能力尚未完全一致：Rust 完整 PDF 流程支持 V2/V3 版面、公式 S/M/L、UNET/SLANet 和 Table Transformer；Plus-L 完整 PDF 阅读顺序、增强阅读顺序及 `use_word_box=True` 字符框拆分仍未接入。原 Python 的 Torch、其他 OCR 推理引擎及 `CustomBaseModel` 扩展不代表 Rust 绑定也支持。完整支持范围与默认值以各 SDK 文档为准。

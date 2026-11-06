@@ -10,6 +10,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import zipfile
+from native_platform import host_platform, shared_library, is_shared_library
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -81,7 +82,7 @@ def main():
     if not match or int(match[1]) < 23:
         raise SystemExit("ORT version must be a release version >=1.23.0")
     windows = os.name == "nt"
-    platform = "windows-x86_64" if windows else "linux-x86_64"
+    platform = host_platform()
     classifier = platform + ("-cuda" if args.cuda else "")
     env = os.environ.copy()
     env["PATH"] = os.pathsep.join(
@@ -106,18 +107,17 @@ def main():
         else:
             raise SystemExit("Supply --ort-dir with CPU/GPU ORT shared libraries")
     ort = ort.resolve()
-    suffix = ".dll" if windows else ".so"
-    shared = lambda p: p.name.endswith(suffix) or (not windows and ".so." in p.name)
+    shared = is_shared_library
     ort_files = [p for p in ort.iterdir() if p.is_file() and shared(p)]
-    if not any(p.name.startswith(("onnxruntime.", "libonnxruntime.so")) for p in ort_files):
+    if not any(p.name.startswith(("onnxruntime.", "libonnxruntime.")) for p in ort_files):
         raise SystemExit("ORT main library missing")
     if args.cuda and not any("providers_cuda" in p.name for p in ort_files):
         raise SystemExit("CUDA build requires GPU ORT, not CPU ORT")
     if not args.cuda and any("providers_cuda" in p.name for p in ort_files):
         raise SystemExit("GPU ORT requires --cuda; it cannot be labeled as a CPU runtime artifact")
-    jni = "rapid_doc_jni.dll" if windows else "librapid_doc_jni.so"
+    jni = shared_library("rapid_doc_jni")
     actual_version = ort_version(
-        next(p for p in ort_files if p.name.startswith(("onnxruntime.", "libonnxruntime.so")))
+        next(p for p in ort_files if p.name.startswith(("onnxruntime.", "libonnxruntime.")))
     )
     if actual_version != args.ort_version:
         raise SystemExit(
@@ -198,7 +198,7 @@ def main():
         print("Installed independent ORT into local Maven:", ort_jar)
         return
     files = {jni: (ROOT / "target/release" / jni).read_bytes()}
-    for name in ("rapiddoc_pdfium.dll", "librapiddoc_pdfium.so"):
+    for name in (shared_library("rapiddoc_pdfium"),):
         p = runtime / name
         if p.is_file():
             files[name] = p.read_bytes()

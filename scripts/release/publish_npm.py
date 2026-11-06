@@ -26,6 +26,8 @@ def packages():
         "rapid-doc-linux-x64-gnu",
         "rapid-doc-win32-x64-cuda",
         "rapid-doc-linux-x64-gnu-cuda",
+        "rapid-doc-darwin-x64",
+        "rapid-doc-darwin-arm64",
     }
     for p in paths:
         with tarfile.open(p) as archive:
@@ -35,10 +37,11 @@ def packages():
             raise ValueError("Unexpected, duplicate or mismatched npm package: " + name)
         found[name] = p
     if (
-        not {"rapid-doc", "rapid-doc-win32-x64", "rapid-doc-linux-x64-gnu"}
+        not {"rapid-doc", "rapid-doc-win32-x64", "rapid-doc-linux-x64-gnu",
+             "rapid-doc-darwin-x64", "rapid-doc-darwin-arm64"}
         <= found.keys()
     ):
-        raise ValueError("The loader and both CPU platform packages must be present")
+        raise ValueError("The loader and all four CPU platform packages must be present")
     return [(name, p) for name, p in found.items() if name != "rapid-doc"] + [
         ("rapid-doc", found["rapid-doc"])
     ]

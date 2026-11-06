@@ -11,14 +11,23 @@ import tarfile
 import urllib.request
 import zipfile
 
-from common import ROOT, OUT, checked_files, run, sha
+from common import ROOT, OUT, checked_files, run, sha, host_platform, shared_library
 
 MIGRATION = ROOT / "scripts/migration"
 sys.path.insert(0, str(MIGRATION))
 from license_bundle import compact
+from native_platform import is_shared_library, relocate_dylibs
 
 ORT_VERSION = "1.23.2"
 ORT = {
+    "macos-aarch64": (
+        "onnxruntime-osx-arm64-1.23.2.tgz",
+        "b4d513ab2b26f088c66891dbbc1408166708773d7cc4163de7bdca0e9bbb7856",
+    ),
+    "macos-x86_64": (
+        "onnxruntime-osx-x86_64-1.23.2.tgz",
+        "d10359e16347b57d9959f7e80a225a5b4a66ed7d7e007274a15cae86836485a6",
+    ),
     "windows-x86_64": (
         "onnxruntime-win-x64-1.23.2.zip",
         "0b38df9af21834e41e73d602d90db5cb06dbd1ca618948b8f1d66d607ac9f3cd",
@@ -57,9 +66,7 @@ def download(url, destination, digest):
 
 def stage(cuda=False):
     windows = os.name == "nt"
-    platform = ("windows-x86_64" if windows else "linux-x86_64") + (
-        "-cuda" if cuda else ""
-    )
+    platform = host_platform(cuda)
     runtime = ROOT / "bindings/python/python/rapid_doc_rust/runtime"
     if runtime.exists():
         raise ValueError(
@@ -67,8 +74,8 @@ def stage(cuda=False):
         )
     runtime.mkdir(parents=True)
     raw = Path(metadata.distribution("pypdfium2").locate_file("pypdfium2_raw"))
-    library = "pdfium.dll" if windows else "libpdfium.so"
-    target = "rapiddoc_pdfium.dll" if windows else "librapiddoc_pdfium.so"
+    library = shared_library("pdfium")
+    target = shared_library("rapiddoc_pdfium")
     shutil.copy2(raw / library, runtime / target)
     licenses = raw / "licenses"
     if not licenses.is_dir():
@@ -98,12 +105,12 @@ def stage(cuda=False):
         )
     )
     distribution = metadata.distribution("shapely")
-    geos = Path(distribution.locate_file("shapely.libs"))
+    geos = Path(distribution.locate_file("shapely/.dylibs" if sys.platform == "darwin" else "shapely.libs"))
     notices = Path(distribution._path) / "licenses"
     dest = runtime / "geos"
     dest.mkdir()
     for p in geos.iterdir():
-        if p.is_file() and (p.suffix == ".dll" or ".so" in p.name):
+        if p.is_file() and is_shared_library(p):
             shutil.copy2(p, dest / p.name)
     if not list(dest.glob("*geos_c*")):
         raise ValueError("Paired Shapely GEOS distribution missing")
@@ -119,7 +126,9 @@ def stage(cuda=False):
         "df2c50503295f325e7c8d7b783aca8ba4773919cde984193850cf9e361dfd28c",
     )
     shutil.copy2(source, dest / source.name)
-    if not windows:
+    if sys.platform == "darwin":
+        relocate_dylibs(dest)
+    elif not windows:
         for p in dest.glob("libgeos_c*.so*"):
             run("patchelf", "--set-rpath", "$ORIGIN", p)
     archive_name, digest = ORT[platform]
@@ -138,7 +147,7 @@ def stage(cuda=False):
         return (
             len(parts) == 3
             and parts[-2] == "lib"
-            and (base.endswith(".dll") or ".so" in base)
+            and is_shared_library(base)
         ) or (len(parts) == 2 and base in ["LICENSE", "ThirdPartyNotices.txt"])
 
     if archive.suffix == ".zip":
@@ -149,8 +158,10 @@ def stage(cuda=False):
     else:
         with tarfile.open(archive) as z:
             for info in z:
-                if info.isfile() and selected(info.name):
+                if (info.isfile() or info.issym()) and selected(info.name):
                     (ort / Path(info.name).name).write_bytes(z.extractfile(info).read())
+    if sys.platform == "darwin":
+        relocate_dylibs(ort)
     if cuda:
         operators = Path(os.environ["RAPIDDOC_OPERATOR_BUNDLE"])
         manifest = json.loads((operators / "manifest.json").read_text())

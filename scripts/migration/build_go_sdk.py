@@ -8,6 +8,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import zipfile
+from native_platform import host_platform, shared_library, is_shared_library
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -24,7 +25,7 @@ def main():
     parser.add_argument("--external-ort", action="store_true")
     args = parser.parse_args()
     windows = os.name == "nt"
-    platform = ("windows-x86_64" if windows else "linux-x86_64") + ("-cuda" if args.cuda else "")
+    platform = host_platform(args.cuda)
     output = (args.output or ROOT / "build/go-sdk" / platform).resolve()
     if output.exists():
         raise SystemExit("Choose a fresh --output directory: " + str(output))
@@ -36,10 +37,10 @@ def main():
         subprocess.run(
             ["cargo", "build", "--release", "-p", "rapiddoc-c"], cwd=ROOT, env=env, check=True
         )
-    name = "rapid_doc_c.dll" if windows else "librapid_doc_c.so"
+    name = shared_library("rapid_doc_c")
     files = {name: (ROOT / "target/release" / name).read_bytes()}
     ort = args.ort_dir.resolve(strict=True)
-    shared = lambda p: p.suffix == ".dll" if windows else ".so" in p.name
+    shared = is_shared_library
     gpu = any("providers_cuda" in p.name for p in ort.iterdir())
     if gpu != args.cuda:
         raise SystemExit("ORT provider payload differs from --cuda selection")
@@ -54,7 +55,7 @@ def main():
     for notice in ("LICENSE", "ThirdPartyNotices.txt"):
         files["licenses/ort/" + notice] = (ort / notice).read_bytes()
     runtime = args.runtime_dir.resolve(strict=True)
-    pdfium = "rapiddoc_pdfium.dll" if windows else "librapiddoc_pdfium.so"
+    pdfium = shared_library("rapiddoc_pdfium")
     files[pdfium] = (runtime / pdfium).read_bytes()
     for path in (runtime / "geos").iterdir():
         if path.is_file() and (shared(path) or path.name.startswith("LICENSE") or path.name.endswith(".tar.bz2")):
@@ -91,7 +92,7 @@ def main():
     with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED) as package:
         for name, data in files.items():
             package.writestr(name, data)
-    print("Go native preview:", output / ("rapid_doc_c.dll" if windows else "librapid_doc_c.so"))
+    print("Go native preview:", output / name)
     print("Deployment archive:", archive)
 
 

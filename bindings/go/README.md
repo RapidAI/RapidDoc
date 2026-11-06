@@ -1,12 +1,12 @@
 # RapidDoc Go preview
 
-Go 调用共享 Rust SDK，支持 PDF、DOC、DOCX、XLS、XLSX、PPT、PPTX，不需要 Python、Java 或 PyTorch。Windows/Linux 统一使用 **C ABI + cgo**，模块没有第三方 Go 依赖。
+Go 调用共享 Rust SDK，支持 PDF、DOC、DOCX、XLS、XLSX、PPT、PPTX，不需要 Python、Java 或 PyTorch。Windows/Linux x64、macOS Intel/Apple Silicon（CPU）统一使用 **C ABI + cgo**，模块没有第三方 Go 依赖。
 
 当前为源码预览，尚未发布 Go 模块标签和原生运行库。Linux 调用层已提供，实际 Linux 原生包及 GPU 推理仍需单独验收。
 
 ## 编译准备
 
-Go 1.20+、`CGO_ENABLED=1` 和可用 C 编译器。Windows 使用 MinGW-w64 GCC（如 MSYS2 UCRT64），Linux 使用 GCC。只有编译 Go 应用的机器需要编译器；部署编译好的应用不需要 Go、GCC 或 Rust，但需要携带原生运行库包。
+Go 1.20+、`CGO_ENABLED=1` 和可用 C 编译器。Windows 使用 MinGW-w64 GCC（如 MSYS2 UCRT64），Linux 使用 GCC，macOS 使用 Xcode Command Line Tools 提供的 Clang。只有编译 Go 应用的机器需要编译器；部署编译好的应用不需要 Go、GCC 或 Rust，但需要携带原生运行库包。
 
 本机已准备便携 GCC，不改系统 PATH，在项目根目录的 PowerShell 中可设置：
 
@@ -23,7 +23,7 @@ $env:CGO_ENABLED = "1"
 
 输出目录必须是新目录；工具不自动删除旧构建。Python 仅用于源码构建脚本，Go 应用运行时不需要 Python。
 
-当前本机已生成 `build/go-sdk/windows-x86_64-cgo.zip`。解压整个目录并保留子目录结构，用 `Config.LibraryPath` 或 `RAPIDDOC_NATIVE_LIBRARY` 指定其中 `rapid_doc_c.dll`（Linux 为 `librapid_doc_c.so`）。ORT、PDFium、GEOS 和私有 CRT 从同一运行库目录自动发现；显式 `Resources` 路径仍优先。不会自动下载原生运行库。
+当前本机已生成 `build/go-sdk/windows-x86_64-cgo.zip`。解压整个目录并保留子目录结构，用 `Config.LibraryPath` 或 `RAPIDDOC_NATIVE_LIBRARY` 指定其中 `rapid_doc_c.dll`（Linux 为 `librapid_doc_c.so`，macOS 为 `librapid_doc_c.dylib`）。ORT、PDFium、GEOS 和私有 CRT 从同一运行库目录自动发现；显式 `Resources` 路径仍优先。不会自动下载原生运行库。
 
 ## 独立项目本地引入
 

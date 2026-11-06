@@ -18,6 +18,25 @@ import publish_npm
 VERSION = common.version()
 
 
+@pytest.mark.parametrize(
+    "os_name,machine,expected,library",
+    [("win32", "AMD64", "windows-x86_64", "test.dll"),
+     ("linux", "x86_64", "linux-x86_64", "libtest.so"),
+     ("darwin", "x86_64", "macos-x86_64", "libtest.dylib"),
+     ("darwin", "arm64", "macos-aarch64", "libtest.dylib")],
+)
+def test_native_platform_names_and_library_extensions(monkeypatch, os_name, machine, expected, library):
+    import native_platform
+    monkeypatch.setattr(native_platform.sys, "platform", os_name)
+    monkeypatch.setattr(native_platform.platform, "machine", lambda: machine)
+    assert native_platform.host_platform() == expected
+    assert native_platform.shared_library("test") == library
+    assert native_platform.is_shared_library(Path(library))
+    if os_name == "darwin":
+        with pytest.raises(ValueError, match="CPU"):
+            native_platform.host_platform(cuda=True)
+
+
 def test_versions_and_publish_tag_are_checked_before_upload(monkeypatch):
     common.check_version(VERSION)
     for value in ["../0.1.0", "0.1.0; echo invalid", "00.1.0", "0.1.0-rc1", "1.0.0"]:
@@ -46,6 +65,8 @@ def test_payload_integrity_rejects_corruption_and_directory_escape(tmp_path):
         ("windows-x86_64", "rapid-doc-win32-x64", "win32"),
         ("linux-x86_64", "rapid-doc-linux-x64-gnu", "linux"),
         ("linux-x86_64-cuda", "rapid-doc-linux-x64-gnu-cuda", "linux"),
+        ("macos-x86_64", "rapid-doc-darwin-x64", "darwin"),
+        ("macos-aarch64", "rapid-doc-darwin-arm64", "darwin"),
     ],
 )
 def test_npm_native_packages_have_distinct_names_and_retain_verified_payload(
@@ -61,7 +82,8 @@ def test_npm_native_packages_have_distinct_names_and_retain_verified_payload(
     out = tmp_path / "out"
     npm_packages.assemble(source, out)
     p = json.loads((out / "package.json").read_text())
-    assert p["name"] == package and p["os"] == [os_name] and p["cpu"] == ["x64"]
+    assert p["name"] == package and p["os"] == [os_name]
+    assert p["cpu"] == (["arm64"] if platform == "macos-aarch64" else ["x64"])
     assert (out / "runtime/rapid_doc_node.node").read_bytes() == b"fixture"
 
 
@@ -72,6 +94,8 @@ def test_npm_root_only_auto_installs_cpu_platforms(tmp_path):
     assert p["optionalDependencies"] == {
         "rapid-doc-win32-x64": VERSION,
         "rapid-doc-linux-x64-gnu": VERSION,
+        "rapid-doc-darwin-x64": VERSION,
+        "rapid-doc-darwin-arm64": VERSION,
     }
     assert (tmp_path / "root/platform.js").exists()
     assert not (tmp_path / "root/runtime").exists()
@@ -96,15 +120,17 @@ def test_npm_upload_plan_requires_both_platforms_and_publishes_loader_last(
         return path
 
     tarball(tmp_path / "build/release/npm-root", "rapid-doc")
-    with pytest.raises(ValueError, match="both CPU"):
+    with pytest.raises(ValueError, match="four CPU"):
         publish_npm.packages()
     for platform, package in [
         ("windows", "rapid-doc-win32-x64"),
         ("linux", "rapid-doc-linux-x64-gnu"),
+        ("macos-x86_64", "rapid-doc-darwin-x64"),
+        ("macos-aarch64", "rapid-doc-darwin-arm64"),
     ]:
         tarball(tmp_path / f"artifacts/sdk-{platform}/npm", package)
     plan = publish_npm.packages()
-    assert len(plan) == 3 and plan[-1][0] == "rapid-doc"
+    assert len(plan) == 5 and plan[-1][0] == "rapid-doc"
     tarball(tmp_path / "artifacts/sdk-duplicate/npm", "rapid-doc-win32-x64")
     with pytest.raises(ValueError, match="duplicate"):
         publish_npm.packages()

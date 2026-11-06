@@ -51,6 +51,8 @@ jobs:
           rows = [
             dict(platform='linux-x86_64', runner=['ubuntu-22.04'], cuda=False),
             dict(platform='windows-x86_64', runner=['windows-2025'], cuda=False),
+            dict(platform='macos-x86_64', runner=['macos-15-intel'], cuda=False),
+            dict(platform='macos-aarch64', runner=['macos-15'], cuda=False),
           ]
           if os.environ['INCLUDE_CUDA'] == 'true':
             rows += [
@@ -74,6 +76,7 @@ jobs:
       CGO_ENABLED: '1'
       SDK_VERSION: ${{ inputs.version }}
       SDK_CUDA: ${{ matrix.cuda }}
+      MACOSX_DEPLOYMENT_TARGET: ${{ startsWith(matrix.platform, 'macos-') && '14.0' || '' }}
       # CUDA operator bundles must have a platform + SHA256 files manifest.
       RAPIDDOC_OPERATOR_BUNDLE: ${{ startsWith(matrix.platform, 'windows-') && vars.CUDA_OPERATORS_WINDOWS || vars.CUDA_OPERATORS_LINUX }}
       RAPIDDOC_CRT_REDIST_DIR: ${{ vars.WINDOWS_CRT_REDIST_DIR }}
@@ -103,6 +106,9 @@ jobs:
       - name: Linux native build prerequisites
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y build-essential cmake ninja-build nasm patchelf
+      - name: macOS native build prerequisites
+        if: runner.os == 'macOS'
+        run: brew install nasm
       - name: Windows NASM and Go C compiler
         if: runner.os == 'Windows'
         shell: pwsh
@@ -124,6 +130,9 @@ jobs:
       - name: Linux wheel repair tools
         if: runner.os == 'Linux'
         run: python -m pip install "auditwheel>=6.8.2,<7" "patchelf>=0.17"
+      - name: macOS wheel repair tools
+        if: runner.os == 'macOS'
+        run: python -m pip install "delocate>=0.13,<1"
       - name: Node platform loader and progress checks
         run: node --test bindings/node/test/platform.test.js bindings/node/test/progress.test.js
       - name: Build packages and run seven-format installation checks

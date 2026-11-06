@@ -10,6 +10,8 @@ from common import ROOT, checked_files, run, version
 PLATFORMS = {
     "windows-x86_64": ("rapid-doc-win32-x64", "win32"),
     "linux-x86_64": ("rapid-doc-linux-x64-gnu", "linux"),
+    "macos-x86_64": ("rapid-doc-darwin-x64", "darwin"),
+    "macos-aarch64": ("rapid-doc-darwin-arm64", "darwin"),
 }
 
 
@@ -33,7 +35,7 @@ def assemble(source, output):
                 "description": f"RapidDoc native runtime: {platform}",
                 "license": "Apache-2.0",
                 "os": [os_name],
-                "cpu": ["x64"],
+                "cpu": ["arm64" if base == "macos-aarch64" else "x64"],
                 "repository": {
                     "type": "git",
                     "url": "git+https://github.com/RapidAI/RapidDoc.git",

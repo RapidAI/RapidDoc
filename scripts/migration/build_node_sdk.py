@@ -8,6 +8,8 @@ import re
 from pathlib import Path
 import shutil
 import subprocess
+import sys
+from native_platform import shared_library, host_platform
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -113,15 +115,15 @@ def main():
             ["cargo", "build", "--release", "-p", "rapiddoc-node"], cwd=ROOT, env=env, check=True
         )
     windows = os.name == "nt"
-    native = ROOT / "target/release" / ("rapid_doc_node.dll" if windows else "librapid_doc_node.so")
+    native = ROOT / "target/release" / shared_library("rapid_doc_node")
     output.mkdir(parents=True)
     source = ROOT / "bindings/node"
     for name in ("index.js", "index.d.ts", "worker.js", "progress.js", "platform.js", "README.md", "package.json"):
         shutil.copy2(source / name, output / name)
     shutil.copy2(ROOT / "LICENSE", output / "LICENSE")
     metadata = json.loads((output / "package.json").read_text())
-    metadata["os"] = ["win32" if windows else "linux"]
-    metadata["cpu"] = ["x64"]
+    metadata["os"] = [sys.platform]
+    metadata["cpu"] = ["arm64" if manifest["platform"] == "macos-aarch64" else "x64"]
     (output / "package.json").write_text(json.dumps(metadata, indent=2) + "\n")
     destination = output / "runtime"
     for name in manifest["files"]:
@@ -129,15 +131,17 @@ def main():
         if name.startswith("include/") or Path(name).name in (
             "rapid_doc_c.dll",
             "librapid_doc_c.so",
+            "librapid_doc_c.dylib",
         ):
             continue
         target = destination / name
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(runtime / name, target)
     shutil.copy2(native, destination / "rapid_doc_node.node")
-    add_node_notices(
-        destination, "x86_64-pc-windows-msvc" if windows else "x86_64-unknown-linux-gnu"
+    target = {"macos-aarch64": "aarch64-apple-darwin", "macos-x86_64": "x86_64-apple-darwin"}.get(
+        host_platform(), "x86_64-pc-windows-msvc" if windows else "x86_64-unknown-linux-gnu"
     )
+    add_node_notices(destination, target)
     files = {
         p.relative_to(destination).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
         for p in destination.rglob("*")

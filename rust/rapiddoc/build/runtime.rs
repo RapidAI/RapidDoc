@@ -15,6 +15,8 @@ fn asset(target: &str, gpu: bool) -> Result<(&'static str, &'static str)> {
         ("x86_64-pc-windows-msvc", true) => ("onnxruntime-win-x64-gpu-1.23.2.zip", "e77afdbbc2b8cb6da4e5a50d89841b48c44f3e47dce4fb87b15a2743786d0bb9"),
         ("x86_64-unknown-linux-gnu", false) => ("onnxruntime-linux-x64-1.23.2.tgz", "1fa4dcaef22f6f7d5cd81b28c2800414350c10116f5fdd46a2160082551c5f9b"),
         ("x86_64-unknown-linux-gnu", true) => ("onnxruntime-linux-x64-gpu-1.23.2.tgz", "2083e361072a79ce16a90dcd5f5cb3ab92574a82a3ce0ac01e5cfa3158176f53"),
+        ("aarch64-apple-darwin", false) => ("onnxruntime-osx-arm64-1.23.2.tgz", "b4d513ab2b26f088c66891dbbc1408166708773d7cc4163de7bdca0e9bbb7856"),
+        ("x86_64-apple-darwin", false) => ("onnxruntime-osx-x86_64-1.23.2.tgz", "d10359e16347b57d9959f7e80a225a5b4a66ed7d7e007274a15cae86836485a6"),
         _ => return Err(format!("download-runtime does not support {target}; disable it and supply an external ORT library").into()),
     })
 }

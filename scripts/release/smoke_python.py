@@ -4,9 +4,14 @@ import hashlib
 import json
 import os
 from pathlib import Path
-from rapid_doc_rust import RapidDoc
+from rapid_doc_rust import RapidDoc, OnnxSession
+from rapid_doc_rust._runtime import runtime_path
 
 root = Path(os.environ["RAPIDDOC_TEST_ROOT"])
+model = root / "tests/fixtures/table_partition/encoder.onnx"
+session = OnnxSession(str(runtime_path()), str(model), hashlib.sha256(model.read_bytes()).hexdigest())
+assert session.run([1, 1], [3.0]) == {"encoded": {"shape": [1, 1], "values": [6.0]}}
+print("Installed CPU ONNX inference: PASS")
 engine = RapidDoc(
     layout_config={"model_type": "docvortex_rule"},
     formula_enable=False,

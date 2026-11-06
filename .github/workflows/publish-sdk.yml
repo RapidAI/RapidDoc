@@ -75,8 +75,8 @@ jobs:
           from pathlib import Path
           import shutil
           destination = Path('dist'); destination.mkdir()
-          for os_name in ['windows', 'linux']:
-            paths = sorted(Path('artifacts').glob('sdk-' + os_name + '-*/python/*.whl'))
+          for os_name in ['windows', 'linux', 'macos-x86_64', 'macos-aarch64']:
+            paths = sorted(Path('artifacts').glob('sdk-' + os_name + '*/python/*.whl'))
             cuda = [p for p in paths if p.parent.parent.name.endswith('-cuda')]
             selected = cuda or paths
             if len(selected) != 1: raise ValueError(f'Expected exactly one selected wheel for {os_name}: {selected}')

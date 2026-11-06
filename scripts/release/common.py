@@ -6,10 +6,13 @@ import os
 from pathlib import Path
 import re
 import subprocess
+import sys
 import tomllib
 import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "scripts/migration"))
+from native_platform import host_platform, shared_library
 OUT = ROOT / "build/release"
 NS = {"m": "http://maven.apache.org/POM/4.0.0"}
 
