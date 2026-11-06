@@ -23,7 +23,7 @@ def packages():
     allowed = {
         "rapid-doc",
         "rapid-doc-linux-arm64-gnu",
-        "rapid-doc-win32-arm64",
+        "@hzkitty/rapid-doc-win32-arm64",
         "@hzkitty/rapid-doc-win32-x64",
         "rapid-doc-linux-x64-gnu",
         "@hzkitty/rapid-doc-win32-x64-cuda",
@@ -41,7 +41,7 @@ def packages():
     if (
         not {"rapid-doc", "@hzkitty/rapid-doc-win32-x64", "rapid-doc-linux-x64-gnu",
              "rapid-doc-darwin-x64", "rapid-doc-darwin-arm64",
-             "rapid-doc-linux-arm64-gnu", "rapid-doc-win32-arm64"}
+             "rapid-doc-linux-arm64-gnu", "@hzkitty/rapid-doc-win32-arm64"}
         <= found.keys()
     ):
         raise ValueError("The loader and all six CPU platform packages must be present")

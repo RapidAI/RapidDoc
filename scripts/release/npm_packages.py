@@ -9,7 +9,7 @@ from common import ROOT, checked_files, run, version
 
 PLATFORMS = {
     "linux-aarch64": ("rapid-doc-linux-arm64-gnu", "linux"),
-    "windows-aarch64": ("rapid-doc-win32-arm64", "win32"),
+    "windows-aarch64": ("@hzkitty/rapid-doc-win32-arm64", "win32"),
     "windows-x86_64": ("@hzkitty/rapid-doc-win32-x64", "win32"),
     "linux-x86_64": ("rapid-doc-linux-x64-gnu", "linux"),
     "macos-x86_64": ("rapid-doc-darwin-x64", "darwin"),
@@ -75,6 +75,10 @@ def root_package(output):
     metadata["optionalDependencies"] = {
         name: version() for name, _ in PLATFORMS.values()
     }
+    # Keep the installed directory name compatible with the 0.1.1 loader.
+    scoped_arm = "@hzkitty/rapid-doc-win32-arm64"
+    metadata["optionalDependencies"].pop(scoped_arm)
+    metadata["optionalDependencies"]["rapid-doc-win32-arm64"] = f"npm:{scoped_arm}@{version()}"
     metadata["repository"] = {
         "type": "git",
         "url": "git+https://github.com/RapidAI/RapidDoc.git",

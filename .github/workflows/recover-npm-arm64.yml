@@ -43,4 +43,8 @@ jobs:
       - name: Reuse verified platform payloads and publish the package alias
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: python scripts/release/recover_npm_arm64.py
+        run: |
+          # Recovery interprets the original artifact names, not future mappings.
+          git show sdk-v0.1.1:scripts/release/npm_packages.py > scripts/release/npm_packages.py
+          git show sdk-v0.1.1:scripts/release/publish_npm.py > scripts/release/publish_npm.py
+          python scripts/release/recover_npm_arm64.py

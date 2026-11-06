@@ -11,7 +11,7 @@ SDK `0.1.1` 已完成六平台验证，并已发布 Python、Java、Go/GitHub �
 | Java / Maven Central | 主包、六个平台 JNI 和 ORT CPU JAR 已发布 | `io.github.rapidai:rapid-doc:0.1.1` |
 | Go / GitHub | 模块标签及六个平台 CPU 原生库 ZIP 已发布 | `go get github.com/RapidAI/RapidDoc/bindings/go@v0.1.1` |
 | Rust / crates.io | 本次八个 crate 更新至 0.1.1，三个未修改 fork 保持原版本，全部已发布 | `cargo add rapiddoc@0.1.1` |
-| Node.js / npm | Linux/macOS 平台包已上传；Windows ARM64 改用个人 scope 补发，主包等待依赖就绪 | 尚未完成上架 |
+| Node.js / npm | 主包及六个平台依赖均已发布，Windows 平台包使用 `@hzkitty` scope | `npm install rapid-doc@0.1.1` |
 
 六个平台的编译、安装、CPU ONNX 推理与七格式跨绑定一致性均通过，见[验证任务](https://github.com/RapidAI/RapidDoc/actions/runs/42180244292)。
 [SDK Release](https://github.com/RapidAI/RapidDoc/releases/tag/sdk-v0.1.1) 已公开，Go 模块代理可读取 `v0.1.1`。

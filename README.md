@@ -29,7 +29,7 @@ RapidDoc 提供原 Python 实现和共享 Rust 引擎。原 Python 包继续使�
 | Go | `github.com/RapidAI/RapidDoc/bindings/go` | [Go SDK](bindings/go/README.md) |
 | Node.js / TypeScript | `rapid-doc`（npm） | [Node.js SDK](bindings/node/README.md) |
 
-**SDK `0.1.1` 发布状态（2026-11-06）：** Python 已上架 [PyPI](https://pypi.org/project/rapid-doc-rust/0.1.1/)，Java 已上架 Maven Central，Rust crates 和 Go `v0.1.1` 已发布；[六个平台的 CPU 原生运行库](https://github.com/RapidAI/RapidDoc/releases/tag/sdk-v0.1.1)已公开。npm 正在补发 Windows scoped 平台包，主包等待依赖就绪。安装方法见各 SDK 文档，变更和进度见 [CHANGELOG.md](CHANGELOG.md) 与[发布说明](docs/publishing.md)。
+**SDK `0.1.1` 发布状态（2026-11-06）：** Python 已上架 [PyPI](https://pypi.org/project/rapid-doc-rust/0.1.1/)，Java 已上架 Maven Central，Rust crates 和 Go `v0.1.1` 已发布；[六个平台的 CPU 原生运行库](https://github.com/RapidAI/RapidDoc/releases/tag/sdk-v0.1.1)已公开。npm 的六个平台依赖及 `rapid-doc@0.1.1` 主包均已发布。安装方法见各 SDK 文档，变更和进度见 [CHANGELOG.md](CHANGELOG.md) 与[发布说明](docs/publishing.md)。
 
 Rust SDK 的 CPU 平台包覆盖 Windows/Linux x64 与 ARM64，以及 macOS 14+ Intel x64 / Apple Silicon ARM64。Linux x64 要求 glibc 2.35+，Linux ARM64 要求 glibc 2.38+。
 

@@ -8,7 +8,7 @@ RapidDoc 的 Python 绑定，调用共享 Rust 引擎，在本地将文档解析
 
 ## 安装
 
-本页对应 SDK `0.1.1`。各渠道上架状态见[发布说明](https://github.com/RapidAI/RapidDoc/blob/main/docs/publishing.md)；发布后 CPU 环境安装：
+本页对应 SDK `0.1.1`。各渠道上架状态见[发布说明](https://github.com/RapidAI/RapidDoc/blob/main/docs/publishing.md)；CPU 环境安装：
 
 ```bash
 python -m pip install "rapid-doc-rust[cpu]==0.1.1"

@@ -77,7 +77,7 @@ def test_payload_integrity_rejects_corruption_and_directory_escape(tmp_path):
     [
         ("windows-x86_64", "@hzkitty/rapid-doc-win32-x64", "win32"),
         ("windows-x86_64-cuda", "@hzkitty/rapid-doc-win32-x64-cuda", "win32"),
-        ("windows-aarch64", "rapid-doc-win32-arm64", "win32"),
+        ("windows-aarch64", "@hzkitty/rapid-doc-win32-arm64", "win32"),
         ("linux-aarch64", "rapid-doc-linux-arm64-gnu", "linux"),
         ("linux-x86_64", "rapid-doc-linux-x64-gnu", "linux"),
         ("linux-x86_64-cuda", "rapid-doc-linux-x64-gnu-cuda", "linux"),
@@ -112,7 +112,7 @@ def test_npm_root_only_auto_installs_cpu_platforms(tmp_path):
         "rapid-doc-linux-x64-gnu": VERSION,
         "rapid-doc-darwin-x64": VERSION,
         "rapid-doc-darwin-arm64": VERSION,
-        "rapid-doc-win32-arm64": VERSION,
+        "rapid-doc-win32-arm64": f"npm:@hzkitty/rapid-doc-win32-arm64@{VERSION}",
         "rapid-doc-linux-arm64-gnu": VERSION,
     }
     assert (tmp_path / "root/platform.js").exists()
@@ -145,7 +145,7 @@ def test_npm_upload_plan_requires_both_platforms_and_publishes_loader_last(
         ("linux", "rapid-doc-linux-x64-gnu"),
         ("macos-x86_64", "rapid-doc-darwin-x64"),
         ("macos-aarch64", "rapid-doc-darwin-arm64"),
-        ("windows-aarch64", "rapid-doc-win32-arm64"),
+        ("windows-aarch64", "@hzkitty/rapid-doc-win32-arm64"),
         ("linux-aarch64", "rapid-doc-linux-arm64-gnu"),
     ]:
         tarball(tmp_path / f"artifacts/sdk-{platform}/npm", package)
