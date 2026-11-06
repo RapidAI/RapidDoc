@@ -76,8 +76,14 @@ def require_architecture(path, architecture):
     data = path.read_bytes()
     pe = struct.unpack_from("<I", data, 0x3C)[0]
     machine = struct.unpack_from("<H", data, pe + 4)[0]
-    # ARM64X CRT files include native ARM64 code and may be redistributed on Arm.
+    # Some official Arm CRT hybrids retain an AMD64 COFF machine value.
     expected = {"x86_64": (0x8664,), "aarch64": (0xAA64, 0xA64E)}[architecture]
+    if architecture == "aarch64" and machine == 0x8664 and data[pe : pe + 4] == b"PE\0\0":
+        # Use the installed MSVC tool to distinguish ARM64X from ordinary x64;
+        # a machine-value whitelist alone rejects vcruntime140_1.dll from VS.
+        headers = subprocess.check_output(["dumpbin", "/headers", str(path)], text=True)
+        if "(ARM64X)" in headers:
+            return
     if data[pe : pe + 4] != b"PE\0\0" or machine not in expected:
         raise RuntimeError(f"Expected Windows {architecture} PE: {path}")
 

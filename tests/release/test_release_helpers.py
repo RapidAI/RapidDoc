@@ -244,9 +244,10 @@ def test_crate_resume_skips_only_the_exact_published_version(monkeypatch):
 
 
 @pytest.mark.parametrize("architecture,machine", [("x86_64", 0x8664), ("aarch64", 0xAA64), ("aarch64", 0xA64E)])
-def test_windows_crt_payload_rejects_wrong_architecture(tmp_path, architecture, machine):
+def test_windows_crt_payload_rejects_wrong_architecture(tmp_path, monkeypatch, architecture, machine):
     import struct
     from windows_ort_bundle import require_architecture
+    monkeypatch.setattr("windows_ort_bundle.subprocess.check_output", lambda *a, **kw: "machine (x64)")
     data = bytearray(256)
     struct.pack_into("<I", data, 0x3C, 128)
     data[128:132] = b"PE\0\0"
@@ -278,3 +279,19 @@ def test_maven_arm_profile_selects_both_native_and_ort(system, arch):
     assert profile.findtext("m:activation/m:os/m:arch", namespaces=common.NS) == arch
     assert profile.findtext("m:properties/m:rapid-doc.native.classifier", namespaces=common.NS) == system + "-aarch64"
     assert {p.findtext("m:artifactId", namespaces=common.NS) for p in profile.findall("m:dependencies/m:dependency", common.NS)} == {"rapid-doc-native", "rapid-doc-ort"}
+
+
+def test_windows_crt_accepts_msvc_arm64x_but_not_plain_x64(tmp_path, monkeypatch):
+    import struct
+    import windows_ort_bundle as bundle
+    data = bytearray(256)
+    struct.pack_into("<I", data, 0x3C, 128)
+    data[128:132] = b"PE\0\0"
+    struct.pack_into("<H", data, 132, 0x8664)
+    dll = tmp_path / "vcruntime140_1.dll"
+    dll.write_bytes(data)
+    monkeypatch.setattr(bundle.subprocess, "check_output", lambda *a, **kw: "8664 machine (x64) (ARM64X)")
+    bundle.require_architecture(dll, "aarch64")
+    monkeypatch.setattr(bundle.subprocess, "check_output", lambda *a, **kw: "8664 machine (x64)")
+    with pytest.raises(RuntimeError, match="Expected Windows"):
+        bundle.require_architecture(dll, "aarch64")
