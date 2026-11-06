@@ -76,7 +76,6 @@ jobs:
       CGO_ENABLED: '1'
       SDK_VERSION: ${{ inputs.version }}
       SDK_CUDA: ${{ matrix.cuda }}
-      MACOSX_DEPLOYMENT_TARGET: ${{ startsWith(matrix.platform, 'macos-') && '14.0' || '' }}
       # CUDA operator bundles must have a platform + SHA256 files manifest.
       RAPIDDOC_OPERATOR_BUNDLE: ${{ startsWith(matrix.platform, 'windows-') && vars.CUDA_OPERATORS_WINDOWS || vars.CUDA_OPERATORS_LINUX }}
       RAPIDDOC_CRT_REDIST_DIR: ${{ vars.WINDOWS_CRT_REDIST_DIR }}
@@ -108,7 +107,9 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y build-essential cmake ninja-build nasm patchelf
       - name: macOS native build prerequisites
         if: runner.os == 'macOS'
-        run: brew install nasm
+        run: |
+          brew install nasm
+          echo "MACOSX_DEPLOYMENT_TARGET=14.0" >> "$GITHUB_ENV"
       - name: Windows NASM and Go C compiler
         if: runner.os == 'Windows'
         shell: pwsh
