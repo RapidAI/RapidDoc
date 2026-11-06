@@ -140,7 +140,7 @@ Windows 对应 DLL 名为 `onnxruntime_ops.dll`。本工作流校验、复制算
   `@hzkitty/rapid-doc-win32-x64`、`rapid-doc-linux-x64-gnu`、`rapid-doc-darwin-x64`、`rapid-doc-darwin-arm64`、`rapid-doc-win32-arm64`、`rapid-doc-linux-arm64-gnu`。Windows x64/Linux x64 CUDA 包分别增加 `-cuda` 后缀（Windows x64 保留 `@hzkitty/` scope），
   用户显式安装并通过 `config.device='cuda'` 选择，不给所有 CPU 用户下载 GPU 库。
   standalone tarball 的原有 `runtime/` 查找方式保留。发布平台包后才发布入口包，
-  npm dist-tag 使用 `preview`；包名所有权需发布前确认。
+  正式版本 npm dist-tag 使用 `latest`；包名所有权需发布前确认。
 - **Java**：一个 JVM SDK、平台 JNI classifier JAR、独立 ORT classifier JAR；
   生成 sources/javadoc、签名及校验文件后，按 Maven 仓库目录结构一次提交 Central。
   如果超时，先查看 receipt 中的 deployment ID，避免重复提交相同版本。

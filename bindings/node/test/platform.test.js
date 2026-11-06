@@ -32,7 +32,7 @@ test("Windows x64 resolves an installed scoped platform package", () => {
       require: createRequire(path.join(root, "platform.js")),
     };
     vm.runInNewContext(fs.readFileSync(path.join(__dirname, "../platform.js"), "utf8"), sandbox);
-    assert.equal(sandbox.module.exports.resolveAddon({ config: { device: "cpu" } }, "win32", "x64"), addon);
+    assert.equal(sandbox.module.exports.resolveAddon({ config: { device: "cpu" } }, "win32", "x64"), fs.realpathSync(addon));
   } finally {
     if (previous !== undefined) process.env.RAPIDDOC_NODE_LIBRARY = previous;
     fs.rmSync(root, { recursive: true, force: true });

@@ -76,7 +76,7 @@ def main():
             "public",
             "--provenance",
             "--tag",
-            "preview",
+            "latest",
         )
 
 
