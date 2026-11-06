@@ -8,6 +8,10 @@ on:
         default: '0.1.0'
         required: true
         type: string
+      source_run_id:
+        description: Reuse artifacts from a successful SDK build run; empty rebuilds all platforms
+        default: ''
+        type: string
       target:
         description: Publish one destination at a time
         type: choice
@@ -24,6 +28,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: sdk-publish-${{ inputs.version }}-${{ inputs.target }}
@@ -34,32 +39,69 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
       - env:
           VERSION: ${{ inputs.version }}
           PUBLISH: ${{ inputs.publish }}
+          SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+          INCLUDE_CUDA: ${{ inputs.include_cuda }}
+          GH_TOKEN: ${{ github.token }}
         shell: python
         run: |
-          import os, subprocess, sys
+          import json, os, subprocess, sys, urllib.request
           subprocess.run([sys.executable, 'scripts/release/common.py', os.environ['VERSION']] +
                          (['--publishing'] if os.environ['PUBLISH'] == 'true' else []), check=True)
+          source = os.environ['SOURCE_RUN_ID']
+          if source:
+            if not source.isdigit(): raise ValueError('Use a numeric SDK build run ID')
+            def get(path):
+              request = urllib.request.Request(
+                os.environ['GITHUB_API_URL'] + '/repos/' + os.environ['GITHUB_REPOSITORY'] + path,
+                headers={'Authorization': 'Bearer ' + os.environ['GH_TOKEN'], 'Accept': 'application/vnd.github+json'})
+              with urllib.request.urlopen(request, timeout=30) as response: return json.load(response)
+            build = get('/actions/runs/' + source)
+            if build['conclusion'] != 'success' or build['path'] != '.github/workflows/sdk-build.yml':
+              raise ValueError('Source must be a successful SDK build workflow')
+            changes = subprocess.check_output(
+              ['git', 'diff', '--name-only', build['head_sha'], 'HEAD'], text=True).splitlines()
+            if set(changes) - {'.github/workflows/publish-sdk.yml'}:
+              raise ValueError('Source build must contain exactly the release code; only publisher workflow changes are allowed')
+            artifacts = get('/actions/runs/' + source + '/artifacts?per_page=100')['artifacts']
+            names = {a['name'] for a in artifacts if not a['expired']}
+            expected = {'sdk-windows-x86_64', 'sdk-linux-x86_64', 'sdk-macos-x86_64', 'sdk-macos-aarch64'}
+            if os.environ['INCLUDE_CUDA'] == 'true':
+              expected |= {'sdk-windows-x86_64-cuda', 'sdk-linux-x86_64-cuda'}
+            if not expected <= names: raise ValueError('Verified build artifacts are missing or expired')
+            print('Reusing verified SDK build:', source, build['head_sha'])
+
 
   build:
+    if: inputs.source_run_id == ''
     needs: guard
     uses: ./.github/workflows/sdk-build.yml
     with:
       version: ${{ inputs.version }}
       include_cuda: ${{ inputs.include_cuda }}
 
+  ready:
+    needs: [guard, build]
+    if: always() && !cancelled() && needs.guard.result == 'success' && (needs.build.result == 'success' || needs.build.result == 'skipped')
+    runs-on: ubuntu-22.04
+    steps:
+      - run: echo "SDK artifacts are ready for the selected destination"
+
   pypi:
-    if: inputs.publish && inputs.target == 'pypi'
-    needs: build
+    if: always() && !cancelled() && needs.ready.result == 'success' && inputs.publish && inputs.target == 'pypi'
+    needs: ready
     runs-on: ubuntu-22.04
     environment: sdk-pypi
     permissions:
       contents: read
+      actions: read
       id-token: write
     env:
       PYPI_RUST_TOKEN: ${{ secrets.PYPI_RUST_TOKEN || secrets.RAPID_DOC }}
@@ -69,6 +111,8 @@ jobs:
         with:
           pattern: sdk-*
           path: artifacts
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.source_run_id || github.run_id }}
       - name: Select one wheel per OS (CUDA-capable build when requested)
         shell: python
         run: |
@@ -91,12 +135,13 @@ jobs:
           password: ${{ env.PYPI_RUST_TOKEN }}
 
   npm:
-    if: inputs.publish && inputs.target == 'npm'
-    needs: build
+    if: always() && !cancelled() && needs.ready.result == 'success' && inputs.publish && inputs.target == 'npm'
+    needs: ready
     runs-on: ubuntu-22.04
     environment: sdk-npm
     permissions:
       contents: read
+      actions: read
       id-token: write
     steps:
       - uses: actions/checkout@v4
@@ -111,6 +156,8 @@ jobs:
         with:
           pattern: sdk-*
           path: artifacts
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.source_run_id || github.run_id }}
       - name: Assemble the cross-platform public package
         run: python scripts/release/npm_packages.py --output build/release/npm-root
       - name: Publish platform packages before loader (OIDC or bootstrap token)
@@ -119,8 +166,8 @@ jobs:
         run: python scripts/release/publish_npm.py
 
   maven:
-    if: inputs.target == 'maven'
-    needs: build
+    if: always() && !cancelled() && needs.ready.result == 'success' && inputs.target == 'maven'
+    needs: ready
     runs-on: ubuntu-22.04
     environment: sdk-maven
     steps:
@@ -132,6 +179,8 @@ jobs:
         with:
           pattern: sdk-*
           path: artifacts
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.source_run_id || github.run_id }}
       - name: Assemble/sign Maven Central bundle; upload only when explicitly enabled
         env:
           PUBLISH: ${{ inputs.publish }}
@@ -153,12 +202,13 @@ jobs:
             build/release/central-status.json
 
   github:
-    if: inputs.publish && inputs.target == 'github'
-    needs: build
+    if: always() && !cancelled() && needs.ready.result == 'success' && inputs.publish && inputs.target == 'github'
+    needs: ready
     runs-on: ubuntu-22.04
     environment: sdk-github
     permissions:
       contents: write
+      actions: read
     steps:
       - uses: actions/checkout@v4
         with:
@@ -167,6 +217,8 @@ jobs:
         with:
           pattern: sdk-*
           path: artifacts
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.source_run_id || github.run_id }}
       - name: Create/update draft release and publish the Go submodule tag
         env:
           GH_TOKEN: ${{ github.token }}
