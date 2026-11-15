@@ -3,7 +3,7 @@
 项目根目录运行：
 
 ```powershell
-.venv/Scripts/python.exe demo/review_eval.py
+.venv/Scripts/python.exe evaluation/omnidocbench/review/review_eval.py
 ```
 
 会打开 `http://127.0.0.1:8766`。默认读取 `D:/Download/OmniDocBench`：

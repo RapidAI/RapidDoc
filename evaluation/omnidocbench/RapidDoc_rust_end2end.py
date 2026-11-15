@@ -44,11 +44,7 @@ def main():
                 os.environ['USE_DOC_ORIENTATION_CLASSIFY'], OUTPUT_DIR)
 
     table_config = {
-        "model_type": "unet_slanet_plus",
-        "rule_table_engine": "docvortex",
         "fallback_model_type": "table_transformer",
-        "fallback_to_text": False,
-        "fallback_text_loss_threshold": 0.2,
     }
     engine = RapidDoc(parse_method='auto', formula_enable=True, table_config=table_config)
     logger.info('Table configuration: {}', table_config)

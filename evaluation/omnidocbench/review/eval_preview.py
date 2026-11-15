@@ -86,9 +86,9 @@ def markdown_renderer(formulas):
 def render_formulas(formulas):
     """One Node process for all expressions; output needs no JS, CDN, or fonts."""
     if not formulas:return []
-    runtime = Path(__file__).resolve().parents[1]/'build/eval-review-katex-0.16.22/katex.js'
+    runtime = Path(__file__).resolve().parents[3]/'build/eval-review-katex-0.16.22/katex.js'
     if not runtime.is_file():
-        raise RuntimeError('Missing KaTeX runtime: run demo/prepare_eval_katex.py first')
+        raise RuntimeError('Missing KaTeX runtime: run evaluation/omnidocbench/review/prepare_eval_katex.py first')
     script = """const fs=require('fs'),katex=require(process.argv[1]);const items=JSON.parse(fs.readFileSync(0,'utf8'));process.stdout.write(JSON.stringify(items.map(x=>{try{return katex.renderToString(x.tex,{displayMode:x.display,output:'mathml',throwOnError:false,trust:false,strict:'ignore'})}catch(e){return null}})));"""
     result = subprocess.run(['node','-e',script,str(runtime)],input=json.dumps(formulas),
                             capture_output=True,text=True,encoding='utf8',check=True)

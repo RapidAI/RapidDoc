@@ -46,11 +46,8 @@ def load_result(folder):
             grouped[page].append((error, item))
         for page, items in grouped.items():
             for error, item in sorted(items, key=lambda x:x[0], reverse=True)[:2]:
-                def excerpt(value):
-                    text = str(value or '')
-                    return text[:1200] + ('…（截断；完整内容见评分 JSON）' if len(text)>1200 else '')
                 examples[page].append(dict(category=key, value=1-error if higher else error,
-                    gt=excerpt(item.get('gt')), pred=excerpt(item.get('pred'))))
+                    gt=str(item.get('gt') or ''), pred=str(item.get('pred') or '')))
     return dict(scores), dict(examples)
 
 

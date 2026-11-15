@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 def main():
-    target = Path(__file__).resolve().parents[1]/'build/eval-review-katex-0.16.22'
+    target = Path(__file__).resolve().parents[3]/'build/eval-review-katex-0.16.22'
     target.mkdir(parents=True,exist_ok=True)
     with urllib.request.urlopen('https://registry.npmjs.org/katex/-/katex-0.16.22.tgz',timeout=60) as response:
         data = response.read()

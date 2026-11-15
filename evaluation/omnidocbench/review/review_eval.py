@@ -1,6 +1,6 @@
 """One local review page for all OmniDocBench runs; previews are generated on demand.
 
-Run: .venv/Scripts/python.exe demo/review_eval.py
+Run: .venv/Scripts/python.exe evaluation/omnidocbench/review/review_eval.py
 """
 import argparse
 import csv

@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import pandas as pd
 import numpy as np
 import json
@@ -8,7 +9,7 @@ ocr_types_dict = {
     'end2end': 'predictions'
 }
 
-result_folder = r'D:\Download\OmniDocBench\result_rust_v3_unet_slanet_tatr_fallback_orientation_off_full_20261103'
+result_folder = r'D:\Download\OmniDocBench\result_rust_docvortex_sync_default_20261115'
 
 match_name = 'quick_match'
 
@@ -39,6 +40,8 @@ for ocr_type in ocr_types_dict.values():
 
 df = pd.DataFrame(dict_list, index=ocr_types_dict.keys()).round(3)
 df['overall'] = ((1 - df['text_block_Edit_dist']) * 100 + df['display_formula_CDM'] + df['table_TEDS']) / 3
-df.to_csv('./overall_rust_v3_unet_slanet_tatr_fallback_orientation_off_full_20261103.csv')
+output_dir = Path(__file__).resolve().parent / 'results'
+output_dir.mkdir(exist_ok=True)
+df.to_csv(output_dir / 'overall_rust_docvortex_sync_default_20261115.csv')
 
 # df

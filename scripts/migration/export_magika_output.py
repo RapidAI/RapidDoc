@@ -27,7 +27,7 @@ def main():
         '<html><body><h1>Hello</h1></body></html>',
         '{"name": "测试", "items": [1, 2, 3]}',
         'Algorithm 1: initialize x; repeat until convergence.']
-    for name in ['demo/RapidDoc_end2end.py','rust/rapiddoc-inference/src/magika.rs',
+    for name in ['evaluation/omnidocbench/RapidDoc_end2end.py','rust/rapiddoc-inference/src/magika.rs',
                  'rust/rapiddoc-native/native/clipper6/clipper.cpp']:
         path=ROOT/name
         if path.exists():examples.append(path.read_text(encoding='utf8'))

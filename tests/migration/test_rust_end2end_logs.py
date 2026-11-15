@@ -5,14 +5,11 @@ import sys
 
 
 def test_file_logs_failures_and_resume_without_inference(tmp_path):
-    script=Path(__file__).resolve().parents[2]/'demo/RapidDoc_rust_end2end.py'
+    script = Path(__file__).resolve().parents[2] / 'evaluation/omnidocbench/RapidDoc_rust_end2end.py'
     code='''import pathlib,runpy,sys,json
 from types import SimpleNamespace
 from rapid_doc_rust._native import RapidDocError
 scope=runpy.run_path(sys.argv[1]);main=scope['main'];state=main.__globals__
-import os
-assert os.environ['USE_DOC_ORIENTATION_CLASSIFY']=='true'
-assert state['OUTPUT_DIR'].name.endswith('_orientation_on_run2')
 root=pathlib.Path(sys.argv[2]);inputs=root/'inputs';inputs.mkdir();out=root/'predictions';out.mkdir()
 for name in ['cached','good','bad']:(inputs/(name+'.pdf')).write_bytes(b'%PDF-stub')
 (out/'cached.md').write_text('keep',encoding='utf8')

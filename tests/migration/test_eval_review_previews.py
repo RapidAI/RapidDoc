@@ -2,7 +2,7 @@ import importlib.util
 from pathlib import Path
 
 
-spec = importlib.util.spec_from_file_location('eval_preview', Path(__file__).resolve().parents[2]/'demo/eval_preview.py')
+spec = importlib.util.spec_from_file_location('eval_preview', Path(__file__).resolve().parents[2]/'evaluation/omnidocbench/review/eval_preview.py')
 preview = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(preview)
 

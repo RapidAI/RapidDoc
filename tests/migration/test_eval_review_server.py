@@ -10,8 +10,8 @@ from urllib.request import urlopen
 from urllib.error import HTTPError
 from http.server import ThreadingHTTPServer
 
-DEMO = Path(__file__).resolve().parents[2] / 'demo'
-sys.path.insert(0, str(DEMO))
+REVIEW = Path(__file__).resolve().parents[2] / 'evaluation/omnidocbench/review'
+sys.path.insert(0, str(REVIEW))
 from review_eval import Review, handler
 
 
@@ -63,7 +63,13 @@ class ReviewServer(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, '没有 Markdown'): self.review.data('result_empty')
 
     def test_http_file_scope_and_live_page(self):
-        self.make_run('first')
+        folder = self.make_run('first')
+        long_gt = '标注\n' * 600 + '标注结尾'
+        long_pred = '预测\n' * 600 + '预测结尾'
+        (folder / 'predictions_quick_match_text_block_result.json').write_text(
+            json.dumps([dict(image_name='example.png', gt=long_gt, pred=long_pred,
+                             metric={'Edit_dist': .1})]), encoding='utf-8',
+        )
         server = ThreadingHTTPServer(('127.0.0.1', 0), handler(self.review))
         thread = threading.Thread(target=server.serve_forever, daemon=True); thread.start()
         base = f'http://127.0.0.1:{server.server_port}'
@@ -72,6 +78,11 @@ class ReviewServer(unittest.TestCase):
             self.assertIn('window.REVIEW_LIVE=true', page)
             self.assertIn('sandbox="allow-same-origin"', page)
             self.assertNotIn('__DATA__', page)
+            with urlopen(base + '/api/run?run=result_first') as response:
+                data = json.load(response)
+            sample = next(ex for ex in data['rows'][0]['examples'] if ex['category'] == 'text')
+            self.assertEqual(sample['gt'], long_gt)
+            self.assertEqual(sample['pred'], long_pred)
             self.assertEqual(urlopen(base + '/files/first/example.md').read(), b'hello')
             with self.assertRaises(HTTPError) as error: urlopen(base + '/files/%2e%2e/private.md')
             self.assertEqual(error.exception.code, 400)
