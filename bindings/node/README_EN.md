@@ -67,6 +67,7 @@ const engine = new RapidDoc({
   config: {
     device: 'cpu',
     table_config: { model_type: 'table_transformer' },
+    image_config: { ocr_enable: true },
   },
   // resources: { model_directory: '/models', allow_download: false },
   progressMode: 'auto', // auto / bar / plain
@@ -74,6 +75,9 @@ const engine = new RapidDoc({
 const controller = new AbortController();
 const result = await engine.parse('input.pdf', {}, null, controller.signal);
 ```
+
+Image OCR is off by default. When enabled, recognized text appears under
+`text_image` in Markdown and in the content list as `image_text`.
 
 Default progress uses the same stage labels and active processing seconds as
 the Java/Go SDK. Bars refresh on stderr in terminals; redirected output uses

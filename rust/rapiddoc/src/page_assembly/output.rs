@@ -308,6 +308,10 @@ fn markdown(b: &Value, mode: &str, prefix: &str, budget: &mut Budget) -> Result<
                         if s["type"] == "image" && !string(s, "image_path")?.is_empty() {
                             text.push_str(&format!("![]({prefix}/{})", string(s, "image_path")?));
                         }
+                        if let Some(image_text) = s["image_text"].as_str().filter(|text| !text.is_empty()) {
+                            let escaped = image_text.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;");
+                            text.push_str(&format!("\n\n<details>\n<summary>text_image</summary>\n\n<pre>{escaped}</pre>\n</details>\n\n"));
+                        }
                         if !footnote && s["original_label"] == "seal" {
                             let seal = seal(s)?;
                             if !seal.is_empty() {
@@ -405,6 +409,9 @@ fn content_list(
                             out["text"] = json!(seal(s)?);
                         }
                         if s["type"] == kind {
+                            if kind == "image" && s["image_text"].is_string() {
+                                out["image_text"] = s["image_text"].clone();
+                            }
                             if kind == "table" && !string(s, "html")?.is_empty() {
                                 if s["text_fallback"] == true {
                                     out["type"] = json!("text");
@@ -609,6 +616,37 @@ pub fn render(request: &Value) -> Result<Value, Error> {
 #[cfg(test)]
 mod scope_tests {
     use super::*;
+
+    #[test]
+    fn inline_enumeration_wrap_renders_as_prose() {
+        let cases = [
+            (
+                "目风险提示：1）技术研发突破不及预期；2）政策支持不及预期；",
+                "3）下游需求不及预期；4）核心技术人员流失。",
+                "text",
+            ),
+            ("1）技术研发突破不及预期；", "2）政策支持不及预期。", "index"),
+            ("技术研发突破不及预期；", "政策支持不及预期。", "list"),
+        ];
+        for (first, second, kind) in cases {
+            let input = json!([{"page_idx": 0, "page_size": [600, 600], "preproc_blocks": [{
+                "type": "text",
+                "bbox": [0, 10, 400, 32],
+                "lines": [
+                    {"bbox": [0, 10, 400, 20], "spans": [{"type": "text", "content": first}]},
+                    {"bbox": [0, 22, 280, 32], "spans": [{"type": "text", "content": second}]},
+                ],
+            }]}]);
+            let pages = crate::legacy_paragraphs::split(&input).unwrap();
+            assert_eq!(pages[0]["para_blocks"][0]["type"], kind);
+            let markdown = render(&json!({
+                "pages": pages, "make_mode": "mm_markdown", "image_path_prefix": "",
+            }))
+            .unwrap();
+            assert_eq!(markdown.as_str().unwrap().contains("  \n"), kind != "text");
+        }
+    }
+
     #[test]
     fn recovered_table_text_is_visible_in_all_outputs() {
         let block = json!({"type":"table","bbox":[0,0,100,100],"blocks":[{"type":"table_body","lines":[{"spans":[{"type":"table","html":"<p>A &amp; B</p>\n<p>$x$</p>\n","text_fallback":true}]}]}]});

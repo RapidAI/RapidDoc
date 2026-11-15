@@ -353,13 +353,16 @@ pub(super) fn extract(
         .collect();
     let mut spans = Vec::new();
     for d in &data {
-        if !matches!(cat(d), 3 | 5 | 13 | 14 | 15 | 200) {
+        if truth(&d["unassigned_text"]) || !matches!(cat(d), 3 | 5 | 13 | 14 | 15 | 200) {
             continue;
         }
         let mut s = base(d);
         match cat(d) {
             3 => {
                 s["type"] = json!("image");
+                if let Some(text) = d["image_text"].as_str() {
+                    s["image_text"] = json!(text);
+                }
                 if d["original_label"] == "seal" {
                     s["content"] = d["text"].clone();
                 }
@@ -424,6 +427,9 @@ pub(super) fn extract(
                 }
                 if truth(&d["docvortex_native_text"]) {
                     s["docvortex_native_text"] = json!(true);
+                }
+                if truth(&d["layout_recovered_text"]) {
+                    s["layout_recovered_text"] = json!(true);
                 }
             }
             _ => unreachable!(),

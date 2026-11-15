@@ -333,7 +333,7 @@ pub fn run(request: &Value) -> Result<Value, Error> {
             })
         })
     });
-    let (mut dt, mut texts) = (Vec::new(), Vec::new());
+    let (mut dt, mut texts, mut token_ids) = (Vec::new(), Vec::new(), Vec::new());
     for (i, q) in qs.iter().enumerate() {
         let q = q.as_array().filter(|q| q.len() == 4).ok_or_else(invalid)?;
         let (mut x0, mut y0, mut x1, mut y2) = (
@@ -365,6 +365,7 @@ pub fn run(request: &Value) -> Result<Value, Error> {
             continue;
         }
         dt.push(b);
+        token_ids.push(i);
         texts.push(text.to_owned());
     }
     let mut work = Work(0);
@@ -375,7 +376,27 @@ pub fn run(request: &Value) -> Result<Value, Error> {
     } else {
         json!(dt)
     };
-    Ok(
-        json!({"raw_html":raw_html,"pred":pred,"matched":matched,"dt_boxes":formatted_dt,"logic_points":logic(&tags,&mut work)?}),
-    )
+    let mut result = json!({"raw_html":raw_html,"pred":pred,"matched":matched,"dt_boxes":formatted_dt,"logic_points":logic(&tags,&mut work)?});
+    if request["collect_evidence"].as_bool().unwrap_or(false) {
+        result["token_ids"] = json!(token_ids);
+    }
+    Ok(result)
+}
+
+#[cfg(test)]
+mod evidence_tests {
+    use super::*;
+    #[test]
+    fn filtered_ocr_keeps_original_instance_ids_only_when_requested() {
+        let mut request = json!({"structure":{"tokens":["<html>","<body>","<table>","<tr>","<td>","</td>","</tr>","</table>","</body>","</html>"],
+            "cell_bboxes":[[0,20,100,80]]},"width":100,"height":100,
+            "ocr_result":[[[[1,0],[20,0],[20,10],[1,10]],[[1,30],[20,30],[20,40],[1,40]]],["above","inside"],[0.99,0.99]]});
+        let old = run(&request).unwrap();
+        assert!(old.get("token_ids").is_none());
+        request["collect_evidence"] = json!(true);
+        let mut tracked = run(&request).unwrap();
+        assert_eq!(tracked["token_ids"], json!([1]));
+        tracked.as_object_mut().unwrap().remove("token_ids");
+        assert_eq!(old, tracked);
+    }
 }

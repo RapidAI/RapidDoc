@@ -37,12 +37,14 @@ fn classify_inner(
         let mut f = page(library, data, first + local, None, &limits)?;
         let width = f["size"][0].as_f64().unwrap();
         let height = f["size"][1].as_f64().unwrap();
-        if width > 0. && height > 0. && (width / height).max(height / width) > 10. {
-            return Ok(json!({"method":"ocr","reason":"extreme_aspect_ratio"}));
-        }
         let s = rules::sample(&f, local);
-        if s["cleaned_text"].as_str().unwrap().chars().count() < 50 && probe::sparse_bad(&f, &s) {
-            return Ok(json!({"method":"ocr","reason":"sparse_page"}));
+        if s["cleaned_text"].as_str().unwrap().chars().count() < 50 {
+            if width > 0. && height > 0. && (width / height).max(height / width) > 10. {
+                return Ok(json!({"method":"ocr","reason":"extreme_aspect_ratio"}));
+            }
+            if probe::sparse_bad(&f, &s) {
+                return Ok(json!({"method":"ocr","reason":"sparse_page"}));
+            }
         }
         f["chars"] = Value::Null;
         facts.push(f);

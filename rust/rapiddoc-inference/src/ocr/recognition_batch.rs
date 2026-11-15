@@ -1,4 +1,4 @@
-//! 旧 RapidOcrModel.text_recognizer_call 的排序、共同 padding 和顺序还原。
+//! Aspect-ratio sorting, width buckets, shared padding and order restoration.
 use crate::preprocess::{recognition_bgr_padded, PreparedTensor, RecognitionConfig};
 use rapiddoc_core::{Error, ErrorCode};
 use serde::Serialize;
@@ -45,7 +45,16 @@ pub fn plan(
     }
     let indices = crate::numpy_argsort::indices(&ratios)?;
     let mut batches = Vec::new();
-    for batch in indices.chunks(batch_size) {
+    let mut start = 0;
+    while start < indices.len() {
+        let bucket = |i: usize| ((48. * ratios[i] / 320.).ceil() as usize).max(1);
+        let mut end = start + 1;
+        while end < (start + batch_size).min(indices.len())
+            && bucket(indices[end]) == bucket(indices[start])
+        {
+            end += 1;
+        }
+        let batch = &indices[start..end];
         let ratio = batch.iter().map(|&i| ratios[i]).fold(320. / 48., f64::max);
         let width = (48. * ratio) as usize;
         if width == 0
@@ -61,6 +70,7 @@ pub fn plan(
             indices: batch.to_vec(),
             width,
         });
+        start = end;
     }
     Ok(batches)
 }

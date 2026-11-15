@@ -90,6 +90,41 @@ def test_geometry_matches_independent_upstream_operations():
             assert actual.get_area() == expected.get_area()
 
 
+@pytest.mark.parametrize('unique,forced,threshold', [
+    (True, False, .5), (True, True, .5), (False, False, 0), (False, True, .8),
+])
+def test_batched_token_matching_preserves_scalar_results(unique, forced, threshold):
+    from rapid_doc.model.table.rapid_table_self.table_structure.table_transformer.geometry import Rect
+    from rapid_doc.model.table.rapid_table_self.table_structure.table_transformer.postprocess import slot_into_containers
+
+    rng = np.random.default_rng(23)
+    starts = rng.uniform(0, 100, (600, 2))
+    ends = starts + rng.uniform(1, 20, starts.shape)
+    containers = [{'bbox': bbox} for bbox in np.column_stack((starts, ends))]
+    containers[1]['bbox'] = containers[0]['bbox']
+    containers[2]['bbox'] = [2, 2, 2, 5]
+    packages = [{'bbox': containers[0]['bbox']}, {'bbox': [200, 200, 220, 220]}]
+    packages.extend({'bbox': bbox} for bbox in np.column_stack((starts[:450], ends[:450])))
+
+    by_container = [[] for _ in containers]
+    by_package, best_scores = [], []
+    for package_index, package in enumerate(packages):
+        area = Rect(package['bbox']).get_area()
+        scores = [Rect(c['bbox']).intersect(package['bbox']).get_area() / area for c in containers]
+        order = sorted(range(len(scores)), key=lambda i: -scores[i])
+        best_scores.append(scores[order[0]])
+        matches = [i for i in (order[:1] if unique else order) if scores[i] >= threshold]
+        if forced and not matches:
+            matches = order[:1]
+        by_package.append(matches)
+        for index in matches:
+            by_container[index].append(package_index)
+
+    assert slot_into_containers(containers, packages, threshold, unique, forced) == (
+        by_container, by_package, best_scores,
+    )
+
+
 def test_model_lookup_and_engine_checks(tmp_path,monkeypatch):
     monkeypatch.setattr(ModelProcessor,'DEFAULT_MODEL_DIR',tmp_path)
     download=Mock(side_effect=lambda cfg:cfg.save_path.write_bytes(b'onnx-placeholder'))
@@ -138,6 +173,89 @@ def test_fully_spanned_rows_are_still_serialized():
     assert '<tr></tr>' in html
     assert 'rowspan="2"' in html and 'colspan="2"' in html
     np.testing.assert_array_equal(logic,[[0,1,0,1],[2,2,0,0]])
+
+
+def test_shrunk_supercell_does_not_reuse_its_old_bounds():
+    from rapid_doc.model.table.fallback import quality
+
+    grid = {
+        'rows': [{'bbox': [0, 0, 30, 10]}, {'bbox': [0, 10, 30, 20]}],
+        'columns': [{'bbox': [x, 0, x + 10, 20]} for x in (0, 10, 20)],
+        'spanning cells': [
+            {'bbox': [0, 0, 20, 20], 'row_numbers': [0, 1],
+             'column_numbers': [0], 'projected row header': False},
+            {'bbox': [10, 0, 30, 10], 'row_numbers': [0],
+             'column_numbers': [1, 2], 'projected row header': False},
+        ],
+    }
+    cells, _ = tatr.structure.structure_to_cells(grid, [])
+    html, _, logical = tatr.cells_to_result(cells, (30, 20))
+    assert quality(html, [[], [], []]).valid
+    np.testing.assert_array_equal(logical, [[0, 1, 0, 0], [0, 0, 1, 2], [1, 1, 1, 1], [1, 1, 2, 2]])
+
+
+@pytest.mark.parametrize('numeric_columns,expected_rows', [(3, 4), (2, 3)])
+def test_missing_numeric_row_requires_evidence_from_multiple_columns(numeric_columns, expected_rows):
+    grid = {
+        'rows': [{'bbox': [0, y, 80, y + 10]} for y in (0, 20, 30)],
+        'columns': [{'bbox': [x, 0, x + 20, 40]} for x in (0, 20, 40, 60)],
+        'spanning cells': [{'row_numbers': [1, 2]}],
+    }
+    tokens = [{'bbox': [2, 11, 12, 19], 'text': 'label'}]
+    tokens += [{'bbox': [x, 11, x + 8, 19], 'text': '123'}
+               for x in (22, 42, 62)[:numeric_columns]]
+    tatr.structure.restore_missing_numeric_rows(grid, tokens, str.isdecimal)
+    assert len(grid['rows']) == expected_rows
+    assert grid['spanning cells'][0]['row_numbers'] == [expected_rows - 2, expected_rows - 1]
+
+
+@pytest.mark.parametrize('data_rows,ambiguous,expected_columns', [(3, False, 4), (3, True, 3), (16, False, 3)])
+def test_missing_numeric_column_requires_unambiguous_repeated_values(data_rows, ambiguous, expected_columns):
+    height = 10 * (data_rows + 1)
+    grid = {
+        'rows': [{'bbox': [0, y, 80, y + 10], 'column header': y == 0} for y in range(0, height, 10)],
+        'columns': [{'bbox': [x, 0, x + 20, height]} for x in (0, 40, 60)],
+        'spanning cells': [{'row_numbers': [0], 'column_numbers': [0, 1],
+                            'column header': True, 'projected row header': False}],
+    }
+    tokens = [{'bbox': [23, y + 1, 30, y + 9], 'text': '123', 'confidence': .99, 'line_num': y}
+              for y in (10, 20, 30)]
+    if ambiguous:
+        tokens.append({'bbox': [32, 11, 39, 19], 'text': '456', 'confidence': .99, 'line_num': 1})
+    tatr.structure.restore_missing_numeric_columns(grid, tokens, str.isdecimal)
+    assert len(grid['columns']) == expected_columns
+    if expected_columns == 4:
+        assert grid['spanning cells'][0]['column_numbers'] == [0, 1, 2]
+        cells, _ = tatr.structure.structure_to_cells(grid, [
+            {**token, 'block_num': 0, 'span_num': 0} for token in tokens
+        ])
+        assert [(c['row_nums'], c['column_nums']) for c in cells if c['spans']] == [
+            ([1], [1]), ([2], [1]), ([3], [1]),
+        ]
+    else:
+        assert grid['spanning cells'][0]['column_numbers'] == [0, 1]
+
+
+def test_batch_empty_object_filter_preserves_scalar_semantics():
+    pp = tatr.structure.postprocess
+    spans = [
+        dict(bbox=[0, 0, 10, 10], text='A', line_num=0),
+        dict(bbox=[20, 0, 30, 10], text='2', line_num=1, flags=0),
+        dict(bbox=[40, 0, 50, 10], text='note', line_num=2),
+        dict(bbox=[60, 0, 70, 10], text='  ', line_num=3),
+        dict(bbox=[80, 0, 80, 10], text='zero area', line_num=4),
+    ]
+    spans = [dict(span, block_num=0, span_num=0) for span in spans]
+    objects = [dict(bbox=box) for box in (
+        [0, 0, 4.999, 10], [0, 0, 5, 10], [20, 0, 30, 10],
+        [40, 0, 50, 10], [60, 0, 70, 10], [79, 0, 81, 10],
+        [5, 0, 5, 10],
+    )]
+    scalar_spans = [span.copy() for span in spans]
+    expected = [obj for obj in objects if pp.extract_text_inside_bbox(scalar_spans, obj['bbox'])[0].strip()]
+    pp.remove_objects_without_content(spans, objects)
+    assert objects == expected
+    assert spans == scalar_spans
 
 
 def test_low_confidence_table_does_not_override_real_table():

@@ -1,41 +1,31 @@
 use rapiddoc_inference::recognition_batch::plan;
-use serde_json::Value;
 #[test]
-fn actual_old_shared_widths_match_for_every_original_image() {
-    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
-    let f: Value = serde_json::from_slice(
-        &std::fs::read(root.join("build/migration/recognition-batch.json")).unwrap(),
-    )
-    .unwrap();
-    for c in f["cases"].as_array().unwrap() {
-        let sizes: Vec<_> = c["sources"]
-            .as_array()
-            .unwrap()
-            .iter()
-            .map(|p| {
-                let png = std::fs::read(root.join(p.as_str().unwrap())).unwrap();
-                [
-                    u32::from_be_bytes(png[16..20].try_into().unwrap()) as usize,
-                    u32::from_be_bytes(png[20..24].try_into().unwrap()) as usize,
-                ]
-            })
-            .collect();
-        let result = plan(
-            &sizes,
-            c["batch_size"].as_u64().unwrap() as usize,
-            16_000_000,
-        );
-        for batch in result.unwrap() {
-            for i in batch.indices {
-                assert_eq!(
-                    batch.width as u64,
-                    c["tensors"][i]["shape"][2].as_u64().unwrap(),
-                    "{}",
-                    c["name"]
-                );
-            }
+fn mixed_widths_keep_every_crop_in_its_own_bucket() {
+    let sizes: Vec<_> = (1..=40).map(|i| [i * 47, 48]).collect();
+    let batches = plan(&sizes, 6, 16_000_000).unwrap();
+    let mut seen = Vec::new();
+    for batch in batches {
+        let first = batch.indices[0];
+        let bucket = |i: usize| ((sizes[i][0] as f64 / 320.).ceil() as usize).max(1);
+        for &i in &batch.indices {
+            assert_eq!(bucket(i), bucket(first));
+            assert!(batch.width >= sizes[i][0].max(320));
+            seen.push(i);
         }
+        assert!(batch.indices.len() <= 6);
     }
+    seen.sort();
+    assert_eq!(seen, (0..sizes.len()).collect::<Vec<_>>());
+}
+#[test]
+fn short_title_is_not_padded_to_long_text_width() {
+    let sizes = [[438, 79], [960, 48], [1056, 48], [1152, 48], [480, 48], [384, 48], [240, 48]];
+    let batches = plan(&sizes, 6, 16_000_000).unwrap();
+    assert_eq!(batches.iter().find(|b| b.indices.contains(&0)).unwrap().width, 320);
+    let mut seen: Vec<_> = batches.iter().flat_map(|b| b.indices.iter().copied()).collect();
+    seen.sort();
+    assert_eq!(seen, (0..sizes.len()).collect::<Vec<_>>());
+    assert!(batches.iter().all(|b| b.indices.len() <= 6));
 }
 #[test]
 fn batch_pixel_and_tensor_budgets_fail_before_allocating() {

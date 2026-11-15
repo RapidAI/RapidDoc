@@ -1,4 +1,5 @@
 import re
+from html import escape
 from loguru import logger
 
 from rapid_doc.utils.config_reader import get_latex_delimiter_config
@@ -6,6 +7,13 @@ from rapid_doc.backend.pipeline.para_split import ListLineTag
 from rapid_doc.utils.enum_class import BlockType, ContentType, MakeMode
 from rapid_doc.utils.guess_suffix_or_lang import guess_language_by_text
 from rapid_doc.utils.text_boundary import resolve_text_line_boundary, remove_invalid_surrogates
+
+
+def _image_text_details(span):
+    text = span.get('image_text')
+    if not text:
+        return ''
+    return f'\n\n<details>\n<summary>text_image</summary>\n\n<pre>{escape(text)}</pre>\n</details>\n\n'
 
 
 def make_blocks_to_markdown(paras_of_layout,
@@ -49,6 +57,7 @@ def make_blocks_to_markdown(paras_of_layout,
                                     if span['type'] == ContentType.IMAGE:
                                         if span.get('image_path', ''):
                                             para_text += f"![]({img_buket_path}/{span['image_path']})"
+                                        para_text += _image_text_details(span)
                     for block in para_block['blocks']:  # 3rd.拼image_footnote
                         if block['type'] == BlockType.IMAGE_FOOTNOTE:
                             para_text += '  \n' + merge_para_with_text(block)
@@ -60,6 +69,7 @@ def make_blocks_to_markdown(paras_of_layout,
                                     if span['type'] == ContentType.IMAGE:
                                         if span.get('image_path', ''):
                                             para_text += f"![]({img_buket_path}/{span['image_path']})"
+                                        para_text += _image_text_details(span)
                                         if 'seal' == span.get("original_label"):
                                             content = _get_seal_text(span)
                                             if content:
@@ -281,6 +291,8 @@ def make_blocks_to_content_list(para_block, img_buket_path, page_idx, page_size)
                         if span['type'] == ContentType.IMAGE:
                             if span.get('image_path', ''):
                                 para_content['img_path'] = f"{img_buket_path}/{span['image_path']}"
+                            if span.get('image_text'):
+                                para_content['image_text'] = span['image_text']
             if block['type'] == BlockType.IMAGE_CAPTION:
                 para_content[BlockType.IMAGE_CAPTION].append(merge_para_with_text(block))
             if block['type'] == BlockType.IMAGE_FOOTNOTE:

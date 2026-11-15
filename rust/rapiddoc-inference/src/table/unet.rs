@@ -73,7 +73,7 @@ fn area_coefficients(source: usize, target: usize) -> Vec<Vec<(usize, f32)>> {
         .collect()
 }
 
-fn resize_area(bytes: &[u8], width: usize, height: usize, w: usize, h: usize) -> Vec<u8> {
+pub(crate) fn resize_area(bytes: &[u8], width: usize, height: usize, w: usize, h: usize) -> Vec<u8> {
     let mut output = vec![0; w * h * 3];
     if width == w * 2 && height == h * 2 {
         for y in 0..h {

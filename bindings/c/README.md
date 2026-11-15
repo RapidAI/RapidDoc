@@ -17,6 +17,10 @@ borrowed binary assets. Free every response exactly once, even on errors. Copy
 any data needed after freeing it. Close engines explicitly. A numeric registry
 validates engine handles and protects active calls from concurrent close.
 
+To enable OCR for images in PDFs, pass `{"image_config":{"ocr_enable":true}}`
+as the SDK config JSON at creation. Image OCR is off by default. Recognized text
+appears in Markdown under `text_image` and in the content list as `image_text`.
+
 Progress callbacks are synchronous. Event buffers are valid only during the
 callback. Return nonzero to cancel; do not throw/longjmp/unwind across the C
 boundary. Same-engine reentry/concurrency fails explicitly instead of blocking.

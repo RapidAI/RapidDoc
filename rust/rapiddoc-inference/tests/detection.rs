@@ -2,20 +2,35 @@ use rapiddoc_core::ErrorCode;
 use rapiddoc_inference::detection::{boxes, sort_reading_order, Config, Detection};
 
 #[test]
+fn pale_recovery_crop_is_filtered_without_removing_gray_text() {
+    use rapiddoc_inference::detection::has_foreground_ink;
+    let mut pixels = vec![250; 6000];
+    pixels[..900].fill(225);
+    assert!(!has_foreground_ink(&pixels));
+    pixels[..900].fill(170);
+    assert!(has_foreground_ink(&pixels));
+    pixels.fill(60);
+    pixels[..900].fill(240);
+    assert!(has_foreground_ink(&pixels));
+}
+
+#[test]
 fn live_probability_map_preserves_python_boundary_and_recognition_width() {
     let data = include_bytes!("../../../tests/fixtures/detector_boundary/map.f32");
     let probabilities: Vec<f32> = data
         .chunks_exact(4)
         .map(|v| f32::from_le_bytes(v.try_into().unwrap()))
         .collect();
-    let default_profile = boxes(&probabilities, 384, 192, 384, 192, &Config::body()).unwrap();
+    // This boundary fixture was recorded with dilation explicitly enabled.
+    let config = Config { dilation: true, ..Config::body() };
+    let default_profile = boxes(&probabilities, 384, 192, 384, 192, &config).unwrap();
     assert_eq!(
         default_profile[0].points,
         [[51., 49.], [325., 49.], [325., 93.], [51., 93.]]
     );
     let result = rapiddoc_inference::crop::with_sampling(
         rapiddoc_inference::crop::Sampling::OpenCv4,
-        || boxes(&probabilities, 384, 192, 384, 192, &Config::body()),
+        || boxes(&probabilities, 384, 192, 384, 192, &config),
     )
     .unwrap();
     assert_eq!(result.len(), 1);
@@ -34,8 +49,10 @@ fn body_and_table_keep_the_original_distinct_box_thresholds() {
         }
     }
     let body = Config::body();
+    assert!(!body.dilation);
     assert_eq!((body.box_threshold, body.unclip_ratio), (0.3, 1.8));
     let table = Config::default();
+    assert!(!table.dilation);
     assert_eq!((table.box_threshold, table.unclip_ratio), (0.5, 1.6));
     assert_eq!(
         boxes(&probabilities, 32, 32, 32, 32, &body).unwrap().len(),

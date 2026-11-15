@@ -101,7 +101,7 @@ def doc_analyze(
         formula_config=None,
         table_config=None,
         checkbox_config=None,
-        start_page_id=None, end_page_id=None, pdf_pages_batch=None
+        start_page_id=None, end_page_id=None, pdf_pages_batch=None, image_config=None
 ):
     file_end_list = []
     if pdf_pages_batch:
@@ -202,7 +202,9 @@ def doc_analyze(
                     if use_docvortex_table and not _ocr_enable and page_dict['blocks']:
                         page_dict['_source_pdf_bytes'] = pdf_bytes
                         page_dict['_source_page_index'] = page_index
-                    if not _ocr_enable and page_dict['blocks'] and not use_docvortex_table:
+                    if not _ocr_enable and page_dict['blocks'] and (
+                        not use_docvortex_table or (table_config or {}).get('fallback_model_type')
+                    ):
                         from rapid_doc.utils.pdf_text_tool import get_page_vector_lines
                         page_dict['vector_lines'] = get_page_vector_lines(pdf_page)
                     if page_dict['blocks']:
@@ -253,7 +255,7 @@ def doc_analyze(
             f'Batch {index + 1}/{len(batch_images)}: '
             f'{processed_images_count} pages/{len(images_with_extra_info)} pages'
         )
-        batch_results = batch_image_analyze(batch_image, formula_enable, table_enable, layout_config, ocr_config, formula_config, table_config, checkbox_config)
+        batch_results = batch_image_analyze(batch_image, formula_enable, table_enable, layout_config, ocr_config, formula_config, table_config, checkbox_config, image_config)
         results.extend(batch_results)
 
     for document_pages in all_pdf_docs:
@@ -292,7 +294,7 @@ def batch_image_analyze(
         ocr_config=None,
         formula_config=None,
         table_config=None,
-        checkbox_config=None,):
+        checkbox_config=None, image_config=None):
 
     from .batch_analyze import BatchAnalyze
 
@@ -336,7 +338,7 @@ def batch_image_analyze(
             batch_ratio = 1
             logger.info(f'Could not determine GPU memory, using default batch_ratio: {batch_ratio}')
 
-    batch_model = BatchAnalyze(model_manager, batch_ratio, formula_enable, table_enable, layout_config, ocr_config, formula_config, table_config, checkbox_config)
+    batch_model = BatchAnalyze(model_manager, batch_ratio, formula_enable, table_enable, layout_config, ocr_config, formula_config, table_config, checkbox_config, image_config)
     results = batch_model(images_with_extra_info)
 
     clean_memory(get_device())

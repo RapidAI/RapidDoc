@@ -325,6 +325,7 @@ class RapidDoc:
                 start_page_id=tmp_start_page_id,
                 end_page_id=None,
                 pdf_pages_batch=pdf_pages_batch,
+                image_config=self.image_config,
             )
 
             for active_idx, model_list in enumerate(infer_results):

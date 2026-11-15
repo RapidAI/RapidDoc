@@ -2,6 +2,7 @@
 from copy import deepcopy
 import pytest
 from rapid_doc.backend.pipeline.para_split import para_split
+from rapid_doc.backend.pipeline.pipeline_middle_json_mkcontent import union_make
 
 def block(text, boxes, kind="text"):
     return {"type":kind,"bbox":[min(b[0] for b in boxes),min(b[1] for b in boxes),max(b[2] for b in boxes),max(b[3] for b in boxes)],"lines":[{"bbox":b,"spans":[{"type":"text","content":text if i==0 else "continued body text"}]} for i,b in enumerate(boxes)]}
@@ -39,3 +40,33 @@ def test_uppercase_preserves_protected_boundaries(damage):
     assert not [b for p in expected for b in p["para_blocks"]][1].get("lines_deleted")
     from rapid_doc_rust import split_paragraphs
     assert split_paragraphs(pages)==expected
+
+
+@pytest.mark.parametrize(
+    "lines, kind",
+    [
+        (("目风险提示：1）技术研发突破不及预期；2）政策支持不及预期；",
+          "3）下游需求不及预期；4）核心技术人员流失。"), "text"),
+        (("1）技术研发突破不及预期；", "2）政策支持不及预期。"), "index"),
+        (("技术研发突破不及预期；", "政策支持不及预期。"), "list"),
+    ],
+)
+def test_inline_enumeration_wrap(lines, kind):
+    paragraph = block(lines[0], [[0, 10, 400, 20], [0, 22, 280, 32]])
+    paragraph["lines"][1]["spans"][0]["content"] = lines[1]
+    pages = [{"page_idx": 0, "page_size": [600, 600], "preproc_blocks": [paragraph]}]
+
+    para_split(pages)
+
+    assert pages[0]["para_blocks"][0]["type"] == kind
+    assert ("  \n" in union_make(pages, "mm_markdown")) == (kind != "text")
+
+@pytest.mark.parametrize("ending, evidence, merged", [
+    (".", True, True), (".", False, False), ("！", True, True), (";", True, False),
+])
+def test_sentence_end_requires_continuation_geometry(ending, evidence, merged):
+    pages = sample(evidence=evidence)
+    pages[0]["preproc_blocks"][0]["lines"][-1]["spans"][-1]["content"] += ending
+    expected = deepcopy(pages)
+    para_split(expected)
+    assert bool(expected[1]["para_blocks"][0].get("lines_deleted")) == merged

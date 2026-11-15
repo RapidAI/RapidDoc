@@ -1,5 +1,7 @@
 """Selected Microsoft TATR postprocessing; see THIRD_PARTY_NOTICES.md."""
 from collections import defaultdict
+from statistics import median
+
 from .geometry import Rect
 from . import postprocess
 
@@ -160,7 +162,7 @@ def objects_to_structures(objects, tokens, class_thresholds):
         structure['column headers'] = column_headers
         structure['spanning cells'] = spanning_cells
 
-        if len(rows) > 0 and len(columns) > 1:
+        if rows and columns:
             structure = refine_table_structure(structure, class_thresholds)
 
         table_structures.append(structure)
@@ -168,7 +170,101 @@ def objects_to_structures(objects, tokens, class_thresholds):
     return table_structures
 
 
-def structure_to_cells(table_structure, tokens):
+def restore_missing_numeric_rows(table_structure, tokens, is_numeric):
+    """Restore a missing data row when OCR supplies a complete aligned band."""
+    rows, columns = table_structure['rows'], table_structure['columns']
+    if len(rows) < 3 or len(columns) < 4:
+        return
+    heights = [row['bbox'][3] - row['bbox'][1] for row in rows]
+    normal_height = median(heights)
+    gaps = [(i, left['bbox'][3], right['bbox'][1])
+            for i, (left, right) in enumerate(zip(rows, rows[1:]))
+            if not left.get('column header') and not right.get('column header')
+            and .65 * normal_height <= right['bbox'][1] - left['bbox'][3] <= 1.4 * normal_height]
+    if not gaps:
+        return
+    spans = table_structure['spanning cells']
+    insertions = {}
+    for i, top, bottom in gaps:
+        if any(min(span['row_numbers']) <= i < max(span['row_numbers']) for span in spans):
+            continue
+        band = [token for token in tokens
+                if top <= (token['bbox'][1] + token['bbox'][3]) / 2 <= bottom
+                and token['bbox'][1] >= top - .12 * normal_height
+                and token['bbox'][3] <= bottom + .12 * normal_height]
+        centers = [(token['bbox'][1] + token['bbox'][3]) / 2 for token in band]
+        if not centers or max(centers) - min(centers) > .45 * normal_height:
+            continue
+        slots, _, _ = postprocess.slot_into_containers(columns, band)
+        if not any(not is_numeric(band[j]['text']) for j in slots[0]):
+            continue
+        if sum(len(ids) == 1 and is_numeric(band[ids[0]]['text']) for ids in slots[1:]) < 3:
+            continue
+        left, _, right, _ = rows[i]['bbox']
+        insertions[i] = {'bbox': [left, top, right, bottom], 'column header': False}
+
+    if insertions:
+        rebuilt, row_indices = [], []
+        for i, row in enumerate(rows):
+            row_indices.append(len(rebuilt))
+            rebuilt.append(row)
+            if i in insertions:
+                rebuilt.append(insertions[i])
+        table_structure['rows'] = rebuilt
+        for span in spans:
+            span['row_numbers'] = [row_indices[index] for index in span['row_numbers']]
+
+
+def restore_missing_numeric_columns(table_structure, tokens, is_numeric):
+    """Return the logical indices of columns supported by repeated OCR."""
+    rows, columns = table_structure['rows'], table_structure['columns']
+    if len(rows) < 3 or len(columns) < 3:
+        return []
+    normal_width = median(col['bbox'][2] - col['bbox'][0] for col in columns)
+    if normal_width <= 0:
+        return []
+    insertions = {}
+    for i, (left, right) in enumerate(zip(columns, columns[1:])):
+        x0, x1 = left['bbox'][2], right['bbox'][0]
+        if x1 - x0 < .5 * normal_width:
+            continue
+        # 仅从网格内部的空档恢复列。多个数据行都必须有完整、对齐的独立数值，
+        # 同一行出现多个候选值时无法确定这是一列还是多列，保留原网格。
+        band = [token for token in tokens if token.get('confidence', 0) >= .85
+                and x0 <= token['bbox'][0] < token['bbox'][2] <= x1
+                and is_numeric(token['text'].strip())]
+        if len(band) < 3:
+            continue
+        slots, _, _ = postprocess.slot_into_containers(rows, band, overlap_threshold=.75)
+        data_slots = [ids for row, ids in zip(rows, slots) if not row.get('column header') and ids]
+        # 稀疏的孤立数值不足以推断整列。要求空档在可用数据行中反复出现。
+        if len(data_slots) < max(3, .25 * len(rows)) or any(len(ids) != 1 for ids in data_slots):
+            continue
+        boxes = [band[ids[0]]['bbox'] for ids in data_slots]
+        median_width = median(box[2] - box[0] for box in boxes)
+        if min(max(box[k] for box in boxes) - min(box[k] for box in boxes) for k in (0, 2)) > .45 * median_width:
+            continue
+        _, y0, _, y1 = left['bbox']
+        insertions[i] = {'bbox': [x0, y0, x1, y1]}
+
+    if insertions:
+        rebuilt, indices = [], []
+        added = []
+        for i, column in enumerate(columns):
+            indices.append(len(rebuilt))
+            rebuilt.append(column)
+            if i in insertions:
+                added.append(len(rebuilt))
+                rebuilt.append(insertions[i])
+        table_structure['columns'] = rebuilt
+        for span in table_structure['spanning cells']:
+            start, end = min(span['column_numbers']), max(span['column_numbers'])
+            span['column_numbers'] = list(range(indices[start], indices[end] + 1))
+        return added
+    return []
+
+
+def structure_to_cells(table_structure, tokens, *, compute_confidence=True):
     """
     Assuming the row, column, spanning cell, and header bounding boxes have
     been refined into a set of consistent table structures, process these
@@ -181,69 +277,50 @@ def structure_to_cells(table_structure, tokens):
     rows = table_structure['rows']
     spanning_cells = table_structure['spanning cells']
     cells = []
-    subcells = []
+    covered = set()
+    merged = []
+    # NMS can shrink the indices of a span while leaving its original bbox.
+    # Assign every slot exactly once using the refined logical coordinates.
+    for span in spanning_cells:
+        row_nums = sorted(span['row_numbers'])
+        col_nums = sorted(span['column_numbers'])
+        if not row_nums or not col_nums:
+            continue
+        if (row_nums[-1] - row_nums[0] + 1 != len(row_nums)
+                or col_nums[-1] - col_nums[0] + 1 != len(col_nums)):
+            continue
+        slots = {(r, c) for r in row_nums for c in col_nums}
+        if not covered.isdisjoint(slots):
+            continue
+        covered.update(slots)
+        merged.append({
+            'bbox': [
+                columns[col_nums[0]]['bbox'][0], rows[row_nums[0]]['bbox'][1],
+                columns[col_nums[-1]]['bbox'][2], rows[row_nums[-1]]['bbox'][3],
+            ],
+            'column_nums': col_nums, 'row_nums': row_nums,
+            'column header': all(rows[r].get('column header', False) for r in row_nums),
+            'projected row header': span['projected row header'],
+        })
 
-    # Identify complete cells and subcells
     for column_num, column in enumerate(columns):
         for row_num, row in enumerate(rows):
-            column_rect = Rect(list(column['bbox']))
-            row_rect = Rect(list(row['bbox']))
-            cell_rect = row_rect.intersect(column_rect)
-            header = 'column header' in row and row['column header']
-            cell = {'bbox': list(cell_rect), 'column_nums': [column_num], 'row_nums': [row_num],
-                    'column header': header}
-
-            cell['subcell'] = False
-            for spanning_cell in spanning_cells:
-                spanning_cell_rect = Rect(list(spanning_cell['bbox']))
-                if (spanning_cell_rect.intersect(cell_rect).get_area()
-                        / cell_rect.get_area()) > 0.5:
-                    cell['subcell'] = True
-                    break
-
-            if cell['subcell']:
-                subcells.append(cell)
-            else:
-                #cell text = extract_text_inside_bbox(table_spans, cell['bbox'])
-                #cell['cell text'] = cell text
-                cell['projected row header'] = False
-                cells.append(cell)
-
-    for spanning_cell in spanning_cells:
-        spanning_cell_rect = Rect(list(spanning_cell['bbox']))
-        cell_columns = set()
-        cell_rows = set()
-        cell_rect = None
-        header = True
-        for subcell in subcells:
-            subcell_rect = Rect(list(subcell['bbox']))
-            subcell_rect_area = subcell_rect.get_area()
-            if (subcell_rect.intersect(spanning_cell_rect).get_area()
-                    / subcell_rect_area) > 0.5:
-                if cell_rect is None:
-                    cell_rect = Rect(list(subcell['bbox']))
-                else:
-                    cell_rect.include_rect(Rect(list(subcell['bbox'])))
-                cell_rows = cell_rows.union(set(subcell['row_nums']))
-                cell_columns = cell_columns.union(set(subcell['column_nums']))
-                # By convention here, all subcells must be classified
-                # as header cells for a spanning cell to be classified as a header cell;
-                # otherwise, this could lead to a non-rectangular header region
-                header = header and 'column header' in subcell and subcell['column header']
-        if len(cell_rows) > 0 and len(cell_columns) > 0:
-            cell = {'bbox': list(cell_rect), 'column_nums': list(cell_columns), 'row_nums': list(cell_rows),
-                    'column header': header, 'projected row header': spanning_cell['projected row header']}
-            cells.append(cell)
+            if (row_num, column_num) in covered:
+                continue
+            cell_rect = Rect(list(row['bbox'])).intersect(Rect(list(column['bbox'])))
+            cells.append({
+                'bbox': list(cell_rect), 'column_nums': [column_num], 'row_nums': [row_num],
+                'column header': row.get('column header', False), 'projected row header': False,
+            })
+    cells.extend(merged)
 
     # Compute a confidence score based on how well the page tokens
     # slot into the cells reported by the model
-    _, _, cell_match_scores = postprocess.slot_into_containers(cells, tokens)
-    try:
-        mean_match_score = sum(cell_match_scores) / len(cell_match_scores)
-        min_match_score = min(cell_match_scores)
-        confidence_score = (mean_match_score + min_match_score)/2
-    except:
-        confidence_score = 0
+    confidence_score = 0
+    if compute_confidence:
+        _, _, scores = postprocess.slot_into_containers(cells, tokens)
+        if scores:
+            confidence_score = (sum(scores) / len(scores) + min(scores)) / 2
 
     # Dilate rows and columns before final extraction
     #dilated_columns = fill_column_gaps(columns, table_bbox)

@@ -151,7 +151,7 @@ def _process_pipeline_docs_in_batches(
         active_pdf_bytes_list = [pdf_bytes_list[idx] for idx in active_indexes]
         infer_results, all_image_lists, all_page_dicts, lang_list, ocr_enabled_list, file_end_list = pipeline_doc_analyze(active_pdf_bytes_list, parse_method=parse_method, formula_enable=p_formula_enable,table_enable=p_table_enable,
                                                                                                          layout_config=layout_config, ocr_config=ocr_config, formula_config=formula_config, table_config=table_config, checkbox_config=checkbox_config,
-                                                                                                         start_page_id=tmp_start_page_id, end_page_id=None, pdf_pages_batch=pdf_pages_batch)
+                                                                                                         start_page_id=tmp_start_page_id, end_page_id=None, pdf_pages_batch=pdf_pages_batch, image_config=image_config)
 
         for active_idx, model_list in enumerate(infer_results):
             original_idx = active_indexes[active_idx]
@@ -248,6 +248,7 @@ def _build_config():
 
     # 版面识别元素为图片的配置
     image_config = {
+        # "ocr_enable": True,  # 将图中文字输出到图片下方的折叠区，默认关闭
         # "extract_original_image": True, # 是否提取原始图片（使用 pypdfium2 提取原始图片。截图可能导致清晰度降低和边界丢失，默认关闭）
         # "extract_original_image_iou_thresh": 0.5, # 是否提取原始图片和版面识别的图片，bbox重叠度，默认0.9
     }

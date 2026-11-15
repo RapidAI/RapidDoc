@@ -226,3 +226,116 @@ pub fn prepare(png: &[u8], mut words: Vec<Word>) -> Result<Prepared, Error> {
         angle,
     })
 }
+/// 与 Python 三层证据的灰度、均值阈值和方向开运算一致。
+pub fn evidence_rules(rgb: &[u8], width: usize, height: usize, em: f64) -> Vec<Rule> {
+    if width == 0 || height == 0 {
+        return vec![];
+    }
+    let factor = (1400. / width.max(height) as f64).min(1.);
+    let (w, h) = (
+        ((width as f64 * factor).round_ties_even() as usize).max(1),
+        ((height as f64 * factor).round_ties_even() as usize).max(1),
+    );
+    let gray = gray(rgb);
+    let gray = if factor < 1. {
+        let bytes: Vec<_> = gray.iter().flat_map(|v| [*v; 3]).collect();
+        super::unet::resize_area(&bytes, width, height, w, h)
+            .chunks_exact(3)
+            .map(|p| p[0])
+            .collect()
+    } else {
+        gray
+    };
+    let window = ((2. * em * factor).round_ties_even() as usize | 1).max(15);
+    let r = window / 2;
+    // BORDER_REPLICATE 的可分离盒滤波，整数和避免浮点累计误差。
+    let mut horizontal = vec![0u64; w * h];
+    for y in 0..h {
+        let mut prefix = vec![0u64; w + 1];
+        for x in 0..w {
+            prefix[x + 1] = prefix[x] + u64::from(gray[y * w + x]);
+        }
+        for x in 0..w {
+            let lo = x.saturating_sub(r);
+            let hi = (x + r + 1).min(w);
+            horizontal[y * w + x] = prefix[hi] - prefix[lo]
+                + r.saturating_sub(x) as u64 * u64::from(gray[y * w])
+                + (x + r + 1).saturating_sub(w) as u64 * u64::from(gray[y * w + w - 1]);
+        }
+    }
+    let mut binary = vec![false; w * h];
+    for x in 0..w {
+        let mut prefix = vec![0u64; h + 1];
+        for y in 0..h {
+            prefix[y + 1] = prefix[y] + horizontal[y * w + x];
+        }
+        for y in 0..h {
+            let lo = y.saturating_sub(r);
+            let hi = (y + r + 1).min(h);
+            let sum = prefix[hi] - prefix[lo]
+                + r.saturating_sub(y) as u64 * horizontal[x]
+                + (y + r + 1).saturating_sub(h) as u64 * horizontal[(h - 1) * w + x];
+            let mean = (sum as f64 / (window * window) as f64).round_ties_even() as i32;
+            binary[y * w + x] = i32::from(gray[y * w + x]) <= mean - 8;
+        }
+    }
+    let mut result = Vec::new();
+    for axis in [0usize, 1] {
+        let length = ((2.5 * em * factor).round_ties_even() as usize)
+            .max(12)
+            .max([h, w][axis] / 25);
+        let horizontal = axis == 1;
+        let mut mask = morphology(
+            &morphology(&binary, w, h, length, horizontal, false),
+            w,
+            h,
+            length,
+            horizontal,
+            true,
+        );
+        let mut components = Vec::new();
+        for seed in 0..w * h {
+            if !mask[seed] {
+                continue;
+            }
+            mask[seed] = false;
+            let mut pending = vec![seed];
+            let (mut x0, mut y0, mut x1, mut y1) = (seed % w, seed / w, seed % w, seed / w);
+            while let Some(p) = pending.pop() {
+                let (x, y) = (p % w, p / w);
+                x0 = x0.min(x);
+                x1 = x1.max(x);
+                y0 = y0.min(y);
+                y1 = y1.max(y);
+                for yy in y.saturating_sub(1)..=(y + 1).min(h - 1) {
+                    for xx in x.saturating_sub(1)..=(x + 1).min(w - 1) {
+                        let i = yy * w + xx;
+                        if mask[i] {
+                            mask[i] = false;
+                            pending.push(i);
+                        }
+                    }
+                }
+            }
+            let (bw, bh) = (x1 - x0 + 1, y1 - y0 + 1);
+            let (long, thick) = if horizontal { (bw, bh) } else { (bh, bw) };
+            if long < length || long < 6 * thick {
+                continue;
+            }
+            components.push(Rule {
+                bbox: [
+                    x0 as f64 / factor,
+                    y0 as f64 / factor,
+                    (x1 + 1) as f64 / factor,
+                    (y1 + 1) as f64 / factor,
+                ],
+                width: thick as f64 / factor,
+                orientation: if horizontal { "horizontal" } else { "vertical" }.into(),
+            });
+        }
+        // OpenCV 返回外轮廓的顺序是扫描顺序的逆序。
+        components.reverse();
+        result.extend(components);
+    }
+    result
+}

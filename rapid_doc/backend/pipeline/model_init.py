@@ -48,7 +48,7 @@ def ocr_model_init(det_db_box_thresh=0.5, lang=None, ocr_config=None, det_db_unc
             det_db_box_thresh=det_db_box_thresh,
             lang=lang,
             ocr_config=ocr_config,
-            use_dilation=True,
+            use_dilation=False,
             det_db_unclip_ratio=det_db_unclip_ratio,
             enable_merge_det_boxes=enable_merge_det_boxes,
             is_seal=is_seal)

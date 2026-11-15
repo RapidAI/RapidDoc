@@ -18,6 +18,7 @@ class EngineType(Enum):
     OPENVINO = "openvino"
 
 class ModelType(Enum):
+    IMG2TABLE = "img2table"
     TABLE_TRANSFORMER = "table_transformer"
     SLANETPLUS = "slanet_plus"
     SLANET1M = "slanet_1m"
@@ -50,6 +51,9 @@ class RapidTableOutput:
     cell_bboxes: List[np.ndarray] = field(default_factory=list)
     logic_points: List[np.ndarray] = field(default_factory=list)
     elapse: float = 0.0
+    token_cells: List[Optional[dict]] = field(default_factory=list)
+    evidence_grids: List[Optional[tuple]] = field(default_factory=list)
+    verified_cell_splits: List[int] = field(default_factory=list)
 
     def vis(
         self,

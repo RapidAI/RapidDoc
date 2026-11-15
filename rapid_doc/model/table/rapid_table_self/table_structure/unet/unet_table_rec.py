@@ -16,21 +16,6 @@ from .utils.utils_table_recover import (
     gather_ocr_list_by_row,
 )
 
-BLANK_CELL_REC_DROP_TEXTS = {
-    "1",
-    "一",
-    "—",
-    "口",
-    "■",
-    "（204号",
-    "（20",
-    "（2",
-    "（2号",
-    "（20号",
-    "号",
-    "（204",
-}
-
 class UnetTableRecognition:
     def __init__(self, cfg: Dict):
         self.cfg = cfg
@@ -40,6 +25,7 @@ class UnetTableRecognition:
 
     def __call__(
         self, ori_imgs: List[np.ndarray], ocr_results,
+        *, token_cells=None, evidence_grids=None, verified_cell_splits=None, protected_token_count=0,
         **kwargs,
     ):
         need_ocr = True
@@ -52,6 +38,13 @@ class UnetTableRecognition:
 
         pred_htmls, cell_bboxes, logic_points_list = [], [], []
         for i, img in enumerate(ori_imgs):
+            if verified_cell_splits is not None:
+                verified_cell_splits.append(0)
+            assignments = {} if token_cells is not None else None
+            if token_cells is not None:
+                token_cells.append(None)
+            if evidence_grids is not None:
+                evidence_grids.append(None)
 
             ocr_result = list(
                 zip(ocr_results[i][0], ocr_results[i][1], ocr_results[i][2])
@@ -82,9 +75,26 @@ class UnetTableRecognition:
                     logic_points_list.append(logi_points[idx_list])
                     continue
 
-                cell_box_det_map, not_match_orc_boxes = match_ocr_cell(ocr_result, polygons)
-                # 如果有识别框没有ocr结果，直接进行rec补充
-                cell_box_det_map = self.fill_blank_rec(img, polygons, cell_box_det_map)
+                recovered = self.recognize_cross_cell_text(
+                    img, polygons, logi_points, ocr_result, protected_token_count=protected_token_count
+                )
+                original_ids = [i for i in range(len(ocr_result)) if i not in recovered]
+                remaining = [ocr_result[i] for i in original_ids]
+                cell_box_det_map, not_match_orc_boxes = match_ocr_cell(remaining, polygons, token_cells=assignments)
+                if recovered:
+                    if assignments is not None:
+                        assignments = {original_ids[i]: cells for i, cells in assignments.items()}
+                    for token_id, cells in recovered.items():
+                        for cell, text in cells.items():
+                            cell_box_det_map.setdefault(cell, []).extend(text)
+                        if assignments is not None:
+                            assignments[token_id] = tuple(cells)
+                if self.ocr_engine is not None and not_match_orc_boxes:
+                    self.recover_joined_cells(
+                        img, polygons, logi_points, cell_box_det_map, not_match_orc_boxes,
+                        token_ids={id(token): idx for idx, token in enumerate(ocr_result)} if assignments is not None else None,
+                        token_cells=assignments,
+                    )
                 # 转换为中间格式，修正识别框坐标,将物理识别框，逻辑识别框，ocr识别框整合为dict，方便后续处理
                 t_rec_ocr_list = self.transform_res(cell_box_det_map, polygons, logi_points)
                 # 将每个单元格中的ocr识别结果排序和同行合并，输出的html能完整保留文字的换行格式
@@ -96,9 +106,21 @@ class UnetTableRecognition:
                     ]
                     for t_box_ocr in t_rec_ocr_list
                 }
-                pred_html = plot_html_table(logi_points, cell_box_det_map, polygons)
+                emitted = {} if assignments is not None else None
+                pred_html = plot_html_table(logi_points, cell_box_det_map, polygons, emitted_cells=emitted)
+                if verified_cell_splits is not None:
+                    verified_cell_splits[-1] = sum(len(cells) - 1 for cells in recovered.values())
                 polygons = np.array(polygons).reshape(-1, 8)
                 logi_points = np.array(logi_points)
+                if emitted:
+                    # HTML 会裁掉边缘噪声格，证据网格与文字归属使用实际输出的单元格。
+                    indices = {cell: index for index, cell in enumerate(emitted)}
+                    token_cells[-1] = {
+                        token: tuple(indices[cell] for cell in cells if cell in indices)
+                        for token, cells in assignments.items()
+                    }
+                    if evidence_grids is not None:
+                        evidence_grids[-1] = (polygons[list(emitted)], np.asarray(list(emitted.values())))
 
                 pred_htmls.append(pred_html)
                 cell_bboxes.append(polygons)
@@ -111,6 +133,109 @@ class UnetTableRecognition:
                 logic_points_list.append([])
 
         return pred_htmls, cell_bboxes, logic_points_list
+
+    def recognize_cross_cell_text(self, image, polygons, logic_points, tokens, *, protected_token_count=0):
+        if self.ocr_engine is None or not tokens or len(polygons) < 2:
+            return {}
+
+        from rapid_doc.model.table.table_evidence import _raster_lines
+
+        lower, upper = polygons.min(axis=1), polygons.max(axis=1)
+        logic = np.asarray(logic_points)
+        rects = np.asarray([np.stack((np.min(box, axis=0), np.max(box, axis=0))) for box, _, _ in tokens])
+        em = max(2., float(np.median(rects[:, 1, 1] - rects[:, 0, 1])))
+        candidates = {}
+        lines = None
+        for token_id, ((left, top), (right, bottom)) in enumerate(rects):
+            if token_id >= len(tokens) - protected_token_count:
+                break
+            height = bottom - top
+            if height <= 0 or not tokens[token_id][1].strip():
+                continue
+            overlap = np.minimum(upper, [right, bottom]) - np.maximum(lower, [left, top])
+            cells = np.flatnonzero((overlap[:, 0] >= .3 * height) & (overlap[:, 1] >= .75 * height))
+            if len(cells) < 2:
+                continue
+            cells = cells[np.argsort(logic[cells, 2])]
+            rows, cols = logic[cells, :2], logic[cells, 2:]
+            if not (np.all(rows == rows[0, 0]) and np.all(np.diff(cols[:, 0]) == 1)
+                    and np.all(cols[:, 0] == cols[:, 1])):
+                continue
+            if lines is None:
+                lines = [(pos, lo, hi) for axis, pos, lo, hi in _raster_lines(image, em) if axis == 0]
+            # 模型网格与原图同时确认分隔线，避免把同一个合并单元格内的文字拆开。
+            boundaries = (upper[cells[:-1], 0] + lower[cells[1:], 0]) / 2
+            if not all(any(abs(pos - edge) <= .45 * em and left < pos < right
+                           and lo <= top + .2 * height and hi >= bottom - .2 * height
+                           for pos, lo, hi in lines) for edge in boundaries):
+                continue
+            candidates[token_id] = tuple(map(int, cells))
+
+        if not candidates:
+            return {}
+        # 一个格子还有独立 OCR 框时，保留原匹配，避免把整格重识别结果叠加进去。
+        owners = {}
+        for i, ((left, top), (right, bottom)) in enumerate(rects):
+            center = [(left + right) / 2, (top + bottom) / 2]
+            cells = candidates.get(i)
+            if cells is None:
+                cells = np.flatnonzero(np.all((lower < center) & (center < upper), axis=1))
+            for cell in cells:
+                owners.setdefault(cell, set()).add(i)
+        candidates = {i: cells for i, cells in candidates.items() if all(len(owners[c]) == 1 for c in cells)}
+        if not candidates:
+            return {}
+        cells = sorted({cell for group in candidates.values() for cell in group})
+        recognized = self.fill_blank_rec(image, polygons[cells], {})
+        recognized = {cell: recognized[i] for i, cell in enumerate(cells)}
+        # 每个待拆框都必须在格线两侧得到独立识别，且保留原识别的非空白字符。
+        return {
+            i: {cell: recognized[cell] for cell in group}
+            for i, group in candidates.items()
+            if all(recognized[cell][0][1] for cell in group)
+            and "".join("".join(recognized[cell][0][1].split()) for cell in group)
+            == "".join(tokens[i][1].split())
+        }
+
+    def recover_joined_cells(self, img, polygons, logic_points, matched, unmatched, *, token_ids=None, token_cells=None):
+        lower = polygons.min(axis=1)
+        upper = polygons.max(axis=1)
+        logic = np.asarray(logic_points)
+        for token in unmatched:
+            box, text, score = token
+            joined = "".join(str(text).split())
+            if score < 0.9 or len(joined) < 2:
+                continue
+            left, top = np.min(box, axis=0)
+            right, bottom = np.max(box, axis=0)
+            if bottom <= top or right - left < 2 * (bottom - top):
+                continue
+            overlap = np.minimum(upper, [right, bottom]) - np.maximum(lower, [left, top])
+            indices = np.flatnonzero(
+                (overlap[:, 0] > 0.5 * (upper[:, 0] - lower[:, 0]))
+                & (overlap[:, 1] >= 0.75 * (bottom - top))
+            )
+            if not 2 <= len(indices) <= len(joined) or any(i in matched for i in indices):
+                continue
+            indices = indices[np.argsort(logic[indices, 2])]
+            rows = logic[indices, :2]
+            cols = logic[indices, 2:]
+            if not (np.all(rows == rows[0, 0]) and np.all(cols[:, 0] == cols[:, 1])
+                    and np.all(np.diff(cols[:, 0]) == 1)):
+                continue
+            recovered = self.fill_blank_rec(img, polygons[indices], {})
+            texts = ["".join(recovered[i][0][1].split()) for i in range(len(indices))]
+            if (len(indices) >= 4 and len(joined) == len(indices)
+                    and texts.count("") == 1
+                    and all(not text or text == char for text, char in zip(texts, joined))):
+                # The other cells independently confirm the character alignment.
+                missing = texts.index("")
+                recovered[missing] = [[polygons[indices[missing]], joined[missing], score]]
+                texts[missing] = joined[missing]
+            if all(texts) and "".join(texts) == joined:
+                matched.update((int(idx), recovered[i]) for i, idx in enumerate(indices))
+                if token_cells is not None:
+                    token_cells[token_ids[id(token)]] = tuple(map(int, indices))
 
     def transform_res(
         self,
@@ -230,4 +355,4 @@ class UnetTableRecognition:
             return True
 
         normalized_text = "" if text is None else str(text).strip()
-        return not normalized_text or normalized_text in BLANK_CELL_REC_DROP_TEXTS
+        return not normalized_text

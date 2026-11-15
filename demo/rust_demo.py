@@ -28,7 +28,7 @@ if __name__ == "__main__":
     for source in FILES:
         start_time = time.time()
         label = source.name if isinstance(source, Path) else source
-        result = engine(source)
+        result = engine(source, f_draw_layout_bbox=True, f_draw_span_bbox=True)
         print(f"总运行时间: {time.time() - start_time}秒")
         print(f"{label}: {len(result.middle_json['pdf_info'])} logical pages, {len(result.images)} assets")
     print(f"Output: {output}")

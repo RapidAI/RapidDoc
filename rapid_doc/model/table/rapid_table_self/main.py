@@ -88,6 +88,9 @@ class RapidTable:
         ocr_results: Optional[Tuple[np.ndarray, Tuple[str], Tuple[float]]] = None,
         batch_size: int = 1,
         tqdm_enable=False,
+        *,
+        collect_evidence=False,
+        protected_token_count=0,
     ) -> RapidTableOutput:
         s = time.perf_counter()
 
@@ -105,6 +108,7 @@ class RapidTable:
                 )
 
         results = RapidTableOutput()
+        token_cells = results.token_cells if collect_evidence else None
 
         total_nums = len(img_contents)
         for start_i in tqdm(range(0, total_nums, batch_size), desc="BatchRec", disable=not tqdm_enable):
@@ -125,16 +129,22 @@ class RapidTable:
                          [item[0] for item in recs], [item[1] for item in recs])
                         for boxes, recs in zip(dt_boxes, rec_res)
                     ]
-                pred_htmls, cell_bboxes, logic_points = self.table_structure(imgs, crop_ocr)
+                kwargs = {'token_cells': token_cells} if collect_evidence else {}
+                pred_htmls, cell_bboxes, logic_points = self.table_structure(imgs, crop_ocr, **kwargs)
             elif self.cfg.model_type == ModelType.UNET:
-                pred_htmls, cell_bboxes, logic_points = self.table_structure(imgs, ocr_results[start_i:end_i])
+                pred_htmls, cell_bboxes, logic_points = self.table_structure(
+                    imgs, ocr_results[start_i:end_i], token_cells=token_cells,
+                    evidence_grids=results.evidence_grids if collect_evidence else None,
+                    verified_cell_splits=results.verified_cell_splits,
+                    protected_token_count=protected_token_count,
+                )
             else:
                 pred_structures, cell_bboxes = self.table_structure(imgs)
                 logic_points = self.table_matcher.decode_logic_points(pred_structures)
 
                 dt_boxes, rec_res = self.get_ocr_results(imgs, start_i, end_i, ocr_results)
                 pred_htmls = self.table_matcher(
-                    pred_structures, cell_bboxes, dt_boxes, rec_res
+                    pred_structures, cell_bboxes, dt_boxes, rec_res, token_cells=token_cells,
                 )
 
             results.imgs.extend(imgs)

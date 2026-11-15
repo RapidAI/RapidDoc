@@ -127,15 +127,19 @@ class TableMatch:
         cell_bboxes: List[np.ndarray],
         dt_boxes: List[np.ndarray],
         rec_reses: List[List[Tuple[str, float]]],
+        *,
+        token_cells=None,
     ) -> List[Optional[str]]:
         results = []
         for item in zip(pred_structures, cell_bboxes, dt_boxes, rec_reses):
             pred_struct, cell_bbox, dt_box, rec_res = item
             if dt_box is None or rec_res is None:
                 results.append(None)
+                if token_cells is not None:
+                    token_cells.append(None)
                 continue
 
-            one_result = self.process_one(pred_struct, cell_bbox, dt_box, rec_res)
+            one_result = self.process_one(pred_struct, cell_bbox, dt_box, rec_res, token_cells=token_cells)
             results.append(one_result)
         return results
 
@@ -145,9 +149,21 @@ class TableMatch:
         cell_bboxes: np.ndarray,
         dt_boxes: np.ndarray,
         rec_res: List[Tuple[str, float]],
+        *,
+        token_cells=None,
     ) -> str:
+        if token_cells is not None:
+            # 过滤框之前保留输入下标，重复文本也能追溯到独立 OCR 实例。
+            y1 = cell_bboxes[:, 1::2].min()
+            indices = [i for i, box in enumerate(dt_boxes) if np.max(box[1::2]) >= y1]
         dt_boxes, rec_res = self.filter_ocr_result(cell_bboxes, dt_boxes, rec_res)
         matched_index = self.match_result(cell_bboxes, dt_boxes)
+        if token_cells is not None:
+            cell_count = sum("</td>" in tag for tag in pred_struct[0])
+            token_cells.append({
+                indices[i]: (cell,) for cell, group in matched_index.items()
+                if cell < cell_count for i in group
+            })
         pred_html, pred = self.get_pred_html(pred_struct[0], matched_index, rec_res)
         return pred_html
 

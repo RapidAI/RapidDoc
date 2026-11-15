@@ -62,6 +62,7 @@ const engine = new RapidDoc({
   config: {
     device: 'cpu',
     table_config: { model_type: 'table_transformer' },
+    image_config: { ocr_enable: true },
   },
   // resources: { model_directory: '/models', allow_download: false },
   progressMode: 'auto', // auto / bar / plain
@@ -69,6 +70,8 @@ const engine = new RapidDoc({
 const controller = new AbortController();
 const result = await engine.parse('input.pdf', {}, null, controller.signal);
 ```
+
+图片 OCR 默认关闭。上例开启后，识别文字出现在 Markdown 的 `text_image` 折叠区和内容列表的 `image_text` 字段。
 
 默认进度使用与 Java/Go SDK 相同的阶段名称和有效处理耗时。终端中进度条在 stderr 刷新，重定向输出时改为普通文本行；状态和下载消息输出到 stdout。
 

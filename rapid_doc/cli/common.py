@@ -316,7 +316,8 @@ def _process_pipeline(
                 formula_enable=p_formula_enable, table_enable=p_table_enable,
                 layout_config=layout_config, ocr_config=ocr_config, formula_config=formula_config,
                 table_config=table_config, checkbox_config=checkbox_config,
-                start_page_id=tmp_start_page_id, end_page_id=None, pdf_pages_batch=pdf_pages_batch
+                start_page_id=tmp_start_page_id, end_page_id=None, pdf_pages_batch=pdf_pages_batch,
+                image_config=image_config,
             )
         )
 

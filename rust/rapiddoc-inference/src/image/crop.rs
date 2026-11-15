@@ -107,6 +107,15 @@ impl PipelineImage {
         points: [[f32; 2]; 4],
         max_crop_pixels: usize,
     ) -> Result<Crop, Error> {
+        self.crop_pixels_with_ratio(points, max_crop_pixels, 2.)
+    }
+
+    pub fn crop_pixels_with_ratio(
+        &self,
+        points: [[f32; 2]; 4],
+        max_crop_pixels: usize,
+        rotate_ratio: f64,
+    ) -> Result<Crop, Error> {
         with_rotation_limits(
             &self.bgr,
             self.width,
@@ -114,7 +123,7 @@ impl PipelineImage {
             points,
             self.max_source_pixels,
             max_crop_pixels,
-            2.,
+            rotate_ratio,
         )
     }
 }

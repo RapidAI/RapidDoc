@@ -42,3 +42,26 @@ fn legacy_overlapping_cells_follow_python_last_write_ownership() {
         "<html><body><table><tr><td rowspan=1 colspan=1>B</td></tr></table></body></html>"
     );
 }
+
+#[test]
+fn emitted_grid_tracks_trimmed_cells_and_overlap_ownership() {
+    let mut emitted = Vec::new();
+    let result = rapiddoc_render::wired::legacy_html_with_grid(
+        &[[0, 0, 0, 0], [0, 0, 1, 1]],
+        &[p(0., 10.), p(10., 110.)],
+        &[vec![], vec!["A".into()]],
+        &mut emitted,
+    )
+    .unwrap();
+    assert!(result.contains(">A</td>"));
+    assert_eq!(emitted, vec![(1, [0, 0, 0, 0])]);
+    emitted.clear();
+    rapiddoc_render::wired::legacy_html_with_grid(
+        &[[0, 0, 0, 0], [0, 0, 0, 0]],
+        &[p(0., 100.), p(0., 100.)],
+        &[vec!["A".into()], vec!["B".into()]],
+        &mut emitted,
+    )
+    .unwrap();
+    assert_eq!(emitted, vec![(1, [0, 0, 0, 0])]);
+}

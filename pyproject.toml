@@ -51,6 +51,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+img2table = ["img2table>=2.0.0,<3"]
 test = ["rapid-doc[cpu]", "pytest", "tomli; python_version < '3.11'", "fuzzywuzzy"]
 
 cpu = [

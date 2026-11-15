@@ -5,6 +5,11 @@ mod continuations;
 mod regions;
 mod relations;
 mod xycut;
+
+pub(crate) fn recovery_order(boxes: &[[f64; 4]]) -> Option<Vec<usize>> {
+    let blocks: Vec<_> = boxes.iter().map(|bbox| serde_json::json!({"bbox": bbox})).collect();
+    xycut::sort(&blocks, &mut Work(0)).ok()
+}
 pub(super) fn recover_with_work(
     bs: &mut Vec<Value>,
     rules: &[Value],

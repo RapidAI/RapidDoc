@@ -357,7 +357,7 @@ class MagicModel:
                 continue
             
             # 跳过 VL OCR 结果，由 get_vl_ocr_spans 单独处理
-            if layout_det.get('vl_ocr'):
+            if layout_det.get('vl_ocr') or layout_det.get('unassigned_text'):
                 continue
             
             span = {
@@ -370,6 +370,8 @@ class MagicModel:
             
             if category_id == CategoryId.ImageBody:
                 span['type'] = ContentType.IMAGE
+                if layout_det.get('image_text'):
+                    span['image_text'] = layout_det['image_text']
                 if 'seal' == layout_det.get("original_label"):
                     span['content'] = layout_det.get('text')
             elif category_id == CategoryId.TableBody:
@@ -400,6 +402,8 @@ class MagicModel:
             elif category_id == CategoryId.OcrText:
                 span['content'] = layout_det['text']
                 span['type'] = ContentType.TEXT
+                if layout_det.get('layout_recovered_text'):
+                    span['layout_recovered_text'] = True
                 native_bbox = native_text_regions.get(layout_det.get('original_order'))
                 if native_bbox is not None:
                     span['native_text_region'] = True

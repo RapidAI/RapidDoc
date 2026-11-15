@@ -118,7 +118,8 @@ def _read_input(item, index):
             buffer = BytesIO()
             try:
                 frames[0].save(
-                    buffer, format="PDF", resolution=200.0, save_all=True, append_images=frames[1:]
+                    buffer, format="PDF", resolution=200.0, quality=95, subsampling=0,
+                    save_all=True, append_images=frames[1:]
                 )
                 return name, buffer.getvalue(), None
             finally:
@@ -192,7 +193,7 @@ class RapidDoc:
             raise ValueError("formula batch_num must be a positive integer")
         if self.checkbox_config.get("enable"):
             raise NotImplementedError("复选框不在当前集成范围内")
-        if set(self.image_config) - {"extract_original_image", "extract_original_image_iou_thresh"}:
+        if set(self.image_config) - {"extract_original_image", "extract_original_image_iou_thresh", "ocr_enable"}:
             raise ValueError("Unknown image_config option")
         if self.ocr_config.get("custom_model"):
             raise NotImplementedError("自定义 OCR 协议尚未接入兼容入口")
@@ -547,6 +548,21 @@ class RapidDoc:
                     logger.warning("{}: {}", name, message)
                 for route in parsed["metadata"].get("native_table_routes", []):
                     quality = route.get("text_retention") or {}
+                    if quality:
+                        logger.debug(
+                            "{}: table fallback page={} table={} ran={} selected={} main_evidence={} fallback_evidence={} delta={} keeps_numbers={} ruled_blank_rows={} protected_empty_rows={} protected_structure={}",
+                            name, route.get("page_index"), route.get("layout_index"),
+                            quality.get("fallback_ran"), quality.get("selected"),
+                            quality.get("main_evidence"), quality.get("fallback_evidence"),
+                            quality.get("evidence_delta"), quality.get("keeps_numbers"),
+                            quality.get("ruled_blank_rows"), quality.get("protected_empty_rows"),
+                            quality.get("protected_structure"),
+                        )
+                        if quality.get("selected") == "fallback":
+                            if quality.get("fallback_device") == "cpu":
+                                logger.info("{}: Table fallback selected: {} (CPU retry)", name, quality.get("fallback"))
+                            else:
+                                logger.info("{}: Table fallback selected: {}", name, quality.get("fallback"))
                     for key in ("main_rejected", "fallback_rejected"):
                         if quality.get(key):
                             logger.warning(

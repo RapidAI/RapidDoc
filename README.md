@@ -53,7 +53,7 @@ Rust 引擎支持 PDF、DOC、DOCX、XLS、XLSX、PPT、PPTX，Office 格式直�
 - **OCR 识别**
   - 使用 [RapidOCR](https://github.com/RapidAI/RapidOCR) 支持多种推理引擎
   - CPU/CUDA 下默认使用 ONNX Runtime：CPU 安装 `rapid-doc[cpu]`，CUDA GPU 安装 `rapid-doc[gpu]`
-  
+
 - **版面识别**
   - 模型使用 `PP-DocLayout` 系列 ONNX 模型（v2、plus-L、L、M、S）
     - **PP-DocLayoutV3**：自带阅读顺序，支持异形框，默认使用
@@ -64,15 +64,15 @@ Rust 引擎支持 PDF、DOC、DOCX、XLS、XLSX、PPT、PPTX，Office 格式直�
 
 - **公式识别**
   - 使用 `PP-FormulaNet_plus` 系列 ONNX 模型（L、M、S）
-    - **PP-FormulaNet_plus-L**：速度慢，支持onnx  
-    - **PP-FormulaNet_plus-M**：默认使用，支持onnx和torch    
+    - **PP-FormulaNet_plus-L**：速度慢，支持onnx
+    - **PP-FormulaNet_plus-M**：默认使用，支持onnx和torch
     - **PP-FormulaNet_plus-S**：速度最快，支持onnx，复杂公式精度不够
   - 支持配置只识别行间公式
   - CPU/CUDA 下默认使用 ONNX Runtime；GPU 路径已接入内置 CUDA 算子库，详见 [算子库说明](native/onnx_ops/README.md)
   - 显式选择 Torch 引擎时，需自行安装对应的 Torch 依赖
 
 - **表格识别**
-  - 基于 [rapid_table_self](rapid_doc/model/table/rapid_table_self) 增强，在原有基础上增强为多模型串联方案：  
+  - 基于 [rapid_table_self](rapid_doc/model/table/rapid_table_self) 增强，在原有基础上增强为多模型串联方案：
     - **表格分类**（区分有线/无线表格）
     - **[有线表格识别UNET](https://github.com/RapidAI/TableStructureRec)** + SLANET_plus/UNITABLE（作为无线表格识别）
 
@@ -116,6 +116,8 @@ result = parser("document.pdf")
 
 ## 基准测试结果
 
+另见 [RapidDoc 与 AnyDoc / pdf-inspector 对比](docs/benchmarks/firecrawl.md)，包含 Office 公开夹具和 OpenDataLoader Bench 200 份 PDF 的同机实测。
+
 ### 1. OmniDocBench
 
 以下是RapidDoc在 OmniDocBench v1.6 上的评估结果。
@@ -148,7 +150,7 @@ Pipeline 模型使用 PP-DocLayoutV3、PP-OCRv6-small、PP-FormulaNet_plus-M、U
             <td><strong>95.92</strong></td>
             <td><ins>0.120<ins></td>
         </tr>
-        <tr>    
+        <tr>
             <td>GLM-OCR</td>
             <td>Specialized VLMs</td>
             <td>0.9B</td>
@@ -159,7 +161,7 @@ Pipeline 模型使用 PP-DocLayoutV3、PP-OCRv6-small、PP-FormulaNet_plus-M、U
             <td><ins>95.39<ins></td>
             <td>0.133</td>
         </tr>
-        <tr>    
+        <tr>
             <td>PaddleOCR-VL-1.5</td>
             <td>Specialized VLMs</td>
             <td>0.9B</td>
@@ -170,7 +172,7 @@ Pipeline 模型使用 PP-DocLayoutV3、PP-OCRv6-small、PP-FormulaNet_plus-M、U
             <td>94.37</td>
             <td>0.130</td>
         </tr>
-        <tr>    
+        <tr>
             <td>PaddleOCR-VL</td>
             <td>Specialized VLMs</td>
             <td>0.9B</td>
@@ -306,11 +308,11 @@ Pipeline 模型使用 PP-DocLayoutV3、PP-OCRv6-small、PP-FormulaNet_plus-M、U
             <td><strong>RapidDoc</strong></td>
             <td><strong>Pipeline Tools</strong></td>
             <td><strong>-</strong></td>
-            <td><strong>90.479</strong></td>
+            <td><strong>90.60</strong></td>
             <td><strong>0.047</strong></td>
-            <td><strong>94.342</strong></td>
-            <td><strong>81.797</strong></td>
-            <td><strong>88.433</strong></td>
+            <td><strong>94.36</strong></td>
+            <td><strong>82.14</strong></td>
+            <td><strong>88.51</strong></td>
             <td><strong>0.135</strong></td>
         </tr>
         <tr>
@@ -534,7 +536,7 @@ os.environ['MINERU_DEVICE_MODE'] = "cuda"
 os.environ['MINERU_DEVICE_MODE'] = "cuda:1"
 ```
 #### 使用PaddleOCRVL系列推理
-vl模型的部署，参考[官方文档](https://www.paddleocr.ai/main/version3.x/pipeline_usage/PaddleOCR-VL.html#31-vlm) 
+vl模型的部署，参考[官方文档](https://www.paddleocr.ai/main/version3.x/pipeline_usage/PaddleOCR-VL.html#31-vlm)
 ```python
 import os
 os.environ['PADDLEOCRVL_VERSION'] = "v1.6"
@@ -603,9 +605,9 @@ for output in outputs:
 
 ## 模型下载
 不指定模型路径，初次运行时，会自动下载
-- [RapidDoc 模型集（版面/公式/表格）](https://www.modelscope.cn/models/RapidAI/RapidDoc)  
-- [RapidOCR 模型](https://www.modelscope.cn/models/RapidAI/RapidOCR)  
-- [部分表格模型RapidTable](https://www.modelscope.cn/models/RapidAI/RapidTable) 
+- [RapidDoc 模型集（版面/公式/表格）](https://www.modelscope.cn/models/RapidAI/RapidDoc)
+- [RapidOCR 模型](https://www.modelscope.cn/models/RapidAI/RapidOCR)
+- [部分表格模型RapidTable](https://www.modelscope.cn/models/RapidAI/RapidTable)
 
 ---
 

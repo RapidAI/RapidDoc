@@ -83,23 +83,7 @@ pub fn crop(bytes: &[u8], width: usize, height: usize, p: Polygon) -> Result<Opt
 pub fn accepted(text: &str, confidence: f64) -> bool {
     let text =
         text.trim_matches(|c: char| c.is_whitespace() || matches!(c, '\u{001c}'..='\u{001f}'));
-    confidence.is_finite()
-        && confidence >= 0.6
-        && !text.is_empty()
-        && !matches!(
-            text,
-            "1" | "一"
-                | "—"
-                | "口"
-                | "■"
-                | "（204号"
-                | "（20"
-                | "（2"
-                | "（2号"
-                | "（20号"
-                | "号"
-                | "（204"
-        )
+    confidence.is_finite() && confidence >= 0.6 && !text.is_empty()
 }
 fn normalize(text: &str) -> String {
     let text =
@@ -138,7 +122,8 @@ impl Model {
         let (bytes, width, height) = preprocess::decode_png(data, 4_000_000)?;
         let mut results = Vec::new();
         let mut remaining = rapiddoc_core::resources::limit(32_000_000usize);
-        let mut inferred = 0;
+        let mut images = Vec::new();
+        let mut indices = Vec::new();
         for (cell_index, &p) in polygons.iter().enumerate() {
             if !needed[cell_index] {
                 continue;
@@ -159,40 +144,34 @@ impl Model {
                 if crop.contrast <= 0.17 {
                     result.reason = "low_contrast".into();
                 } else {
-                    inferred += 1;
-                    if inferred > rapiddoc_core::resources::limit(1000) {
-                        return Err(error(ErrorCode::ResourceLimit, "UNET 空格推理次数超过预算"));
-                    }
-                    let config = preprocess::RecognitionConfig {
-                        max_elements: self.max_elements,
-                        ..Default::default()
-                    };
-                    let tensor =
-                        preprocess::recognition_bgr(&crop.bgr, crop.width, crop.height, &config)?;
-                    let recognition = self.run_ctc(tensor.shape, tensor.values)?;
-                    if recognition.len() != 1 {
-                        return Err(error(
-                            ErrorCode::Unsupported,
-                            "UNET 空格识别输出必须为 batch=1",
-                        ));
-                    }
-                    let recognition = &recognition[0];
-                    result.accepted = accepted(&recognition.text, recognition.confidence);
-                    result.confidence = recognition.confidence;
-                    result.text = if result.accepted {
-                        normalize(&recognition.text)
-                    } else {
-                        recognition.text.clone()
-                    };
-                    result.reason = if result.accepted {
-                        "accepted"
-                    } else {
-                        "filtered"
-                    }
-                    .into();
+                    indices.push(results.len());
+                    images.push(crate::recognition_batch::Image {
+                        bgr: crop.bgr,
+                        width: crop.width,
+                        height: crop.height,
+                    });
                 }
             }
             results.push(result);
+        }
+        if !images.is_empty() {
+            let recognized = self.recognize_images(&images, 6)?;
+            for (i, recognition) in indices.into_iter().zip(recognized) {
+                let result = &mut results[i];
+                result.accepted = accepted(&recognition.text, recognition.confidence);
+                result.confidence = recognition.confidence;
+                result.text = if result.accepted {
+                    normalize(&recognition.text)
+                } else {
+                    recognition.text
+                };
+                result.reason = if result.accepted {
+                    "accepted"
+                } else {
+                    "filtered"
+                }
+                .into();
+            }
         }
         Ok(results)
     }

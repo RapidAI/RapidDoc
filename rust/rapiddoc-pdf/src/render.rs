@@ -1,10 +1,16 @@
 //! 受像素预算约束的按页渲染；位图编码在释放 PDFium 锁后执行。
 
-use crate::{map_error, with_runtime};
+use crate::with_raw;
 use image::{codecs::png::PngEncoder, ExtendedColorType, ImageEncoder};
 use pdfium_render::prelude::*;
 use rapiddoc_core::{Error, ErrorCode, Limits};
 use std::path::Path;
+
+// PDFium public C API constants (pdfium-render does not re-export these).
+const FPDFBITMAP_BGR: i32 = 2;
+const FPDFBITMAP_BGRA: i32 = 4;
+const FPDF_ANNOT: i32 = 0x01;
+const FPDF_REVERSE_BYTE_ORDER: i32 = 0x10;
 
 /// 完全自有 PNG 资产，调用方无需维护 PDFium 文档或位图句柄。
 pub struct RenderedPage {
@@ -156,11 +162,27 @@ fn render_mode_pixels(
     if !dpi.is_finite() || dpi <= 0. || dpi > 1200. || max_pixels == 0 {
         return Err(error(ErrorCode::InvalidInput, "dpi 或像素预算无效"));
     }
-    let (width, height, pixels, scale) = with_runtime(library, |pdfium| {
-        let document = pdfium
-            .load_pdf_from_byte_slice(bytes, password)
-            .map_err(map_error)?;
-        let count = usize::try_from(document.pages().len())
+    if password.is_some_and(|value| value.contains('\0')) {
+        return Err(error(ErrorCode::InvalidInput, "密码包含NUL"));
+    }
+    // All handles remain under the existing process-wide PDFium lock. Use the
+    // same viewport API as pypdfium2 without initializing a form-fill environment.
+    let (width, height, pixels, scale) = with_raw(library, |api| unsafe {
+        let mut handles = RenderHandles {
+            api,
+            document: api.FPDF_LoadMemDocument64(bytes, password),
+            page: std::ptr::null_mut(),
+            bitmap: std::ptr::null_mut(),
+        };
+        if handles.document.is_null() {
+            let code = if matches!(api.FPDF_GetLastError(), 4 | 5) {
+                ErrorCode::Encrypted
+            } else {
+                ErrorCode::CorruptDocument
+            };
+            return Err(error(code, "无法打开渲染 PDF"));
+        }
+        let count = usize::try_from(api.FPDF_GetPageCount(handles.document))
             .map_err(|_| error(ErrorCode::CorruptDocument, "无效页数"))?;
         if count > limits.max_pages {
             return Err(error(ErrorCode::ResourceLimit, "文档页数超过限制"));
@@ -168,9 +190,12 @@ fn render_mode_pixels(
         if page_index >= count {
             return Err(error(ErrorCode::InvalidInput, "渲染页号越界"));
         }
-        let page = document.pages().get(page_index as i32).map_err(map_error)?;
-        let page_width = page.width().value as f64;
-        let page_height = page.height().value as f64;
+        handles.page = api.FPDF_LoadPage(handles.document, page_index as i32);
+        if handles.page.is_null() {
+            return Err(error(ErrorCode::CorruptDocument, "无法读取渲染页"));
+        }
+        let page_width = api.FPDF_GetPageWidthF(handles.page) as f64;
+        let page_height = api.FPDF_GetPageHeightF(handles.page) as f64;
         let scale = max_edge.map_or(dpi / 72., |edge| {
             (dpi / 72.).min(edge / page_width.max(page_height))
         });
@@ -205,32 +230,47 @@ fn render_mode_pixels(
         }
         // pypdfium2's opaque default uses BGR. Rendering to BGRA and then
         // dropping alpha can change antialias rounding (and every crop name).
-        let format = if rgb {
-            PdfBitmapFormat::BGR
-        } else {
-            PdfBitmapFormat::BGRA
-        };
-        let config = PdfRenderConfig::new()
-            .set_target_size(width as i32, height as i32)
-            .set_format(format)
-            .set_reverse_byte_order(true)
-            .render_form_data(false);
-        let bitmap = page.render_with_config(&config).map_err(map_error)?;
-        if bitmap.width() != width as i32
-            || bitmap.height() != height as i32
-            || bitmap.format().map_err(map_error)? != format
-        {
-            return Err(error(
-                ErrorCode::CorruptDocument,
-                "PDFium 返回的位图契约不匹配",
-            ));
+        handles.bitmap = api.FPDFBitmap_CreateEx(
+            width as i32,
+            height as i32,
+            if rgb {
+                FPDFBITMAP_BGR as i32
+            } else {
+                FPDFBITMAP_BGRA as i32
+            },
+            std::ptr::null_mut(),
+            0,
+        );
+        if handles.bitmap.is_null() {
+            return Err(error(ErrorCode::CorruptDocument, "无法创建渲染位图"));
         }
+        api.FPDFBitmap_FillRect(
+            handles.bitmap,
+            0,
+            0,
+            width as i32,
+            height as i32,
+            0xffffffff,
+        );
+        // Matrix rendering resamples differently; enabling pdfium-render's form
+        // mode selects the viewport API but also paints widgets absent in Python.
+        api.FPDF_RenderPageBitmap(
+            handles.bitmap,
+            handles.page,
+            0,
+            0,
+            width as i32,
+            height as i32,
+            0,
+            (FPDF_ANNOT | FPDF_REVERSE_BYTE_ORDER) as i32,
+        );
+        let buffer = api.FPDFBitmap_GetBuffer_as_vec(handles.bitmap);
         let pixels = if rgb {
             // reverse_byte_order already made the BGR bitmap RGB. Retain those
             // exact bytes, removing row padding without expanding to RGBA.
-            packed_rgb(bitmap.as_raw_bytes(), width, height)?
+            packed_rgb(buffer, width, height)?
         } else {
-            let rgba = bitmap.as_rgba_bytes();
+            let rgba = buffer;
             if rgba.len() != size {
                 return Err(error(ErrorCode::CorruptDocument, "RGBA 位图长度不匹配"));
             }
@@ -259,6 +299,30 @@ fn render_mode_pixels(
         },
         pixels,
     ))
+}
+
+struct RenderHandles<'a> {
+    api: &'a dyn PdfiumLibraryBindings,
+    document: FPDF_DOCUMENT,
+    page: FPDF_PAGE,
+    bitmap: FPDF_BITMAP,
+}
+
+impl Drop for RenderHandles<'_> {
+    fn drop(&mut self) {
+        // Release in dependency order before the runtime lock is released.
+        unsafe {
+            if !self.bitmap.is_null() {
+                self.api.FPDFBitmap_Destroy(self.bitmap);
+            }
+            if !self.page.is_null() {
+                self.api.FPDF_ClosePage(self.page);
+            }
+            if !self.document.is_null() {
+                self.api.FPDF_CloseDocument(self.document);
+            }
+        }
+    }
 }
 
 fn packed_rgb(mut bytes: Vec<u8>, width: usize, height: usize) -> Result<Vec<u8>, Error> {

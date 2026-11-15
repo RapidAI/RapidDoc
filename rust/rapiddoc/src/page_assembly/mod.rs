@@ -403,6 +403,17 @@ fn filter_spans(
                 if eq(a, b) || contains(&dropped, a) || contains(&dropped, b) {
                     continue;
                 }
+                if let Some(recovered) = [(a, b), (b, a)].into_iter().find_map(|(candidate, existing)| {
+                    (truth(&candidate["layout_recovered_text"])
+                        && !truth(&existing["layout_recovered_text"])
+                        && matches!(existing["type"].as_str(), Some("text" | "inline_equation" | "interline_equation"))
+                        && truth(&existing["content"])
+                        && small(&candidate["bbox"], &existing["bbox"], 0.65).is_some())
+                    .then_some(candidate)
+                }) {
+                    dropped.push(recovered.clone());
+                    continue;
+                }
                 if mode == 0 {
                     if iou(&a["bbox"], &b["bbox"]) > 0.9 {
                         let d = if num(&a["score"]) < num(&b["score"]) {
@@ -415,6 +426,14 @@ fn filter_spans(
                         }
                     }
                 } else {
+                    if [(a, b), (b, a)].iter().any(|(text, background)| {
+                        truth(&text["layout_recovered_text"])
+                            && (background["type"] == "image"
+                                || (background["type"] == "table"
+                                    && !truth(&background["html"]) && !truth(&background["latex"])))
+                    }) {
+                        continue;
+                    }
                     if ((a["type"] == "image" && b["type"] == "text")
                         || (a["type"] == "text" && b["type"] == "image"))
                         && ((a["type"] == "text" && truth(&a["native_text_region"]))
@@ -764,6 +783,11 @@ fn assemble_validated(
         }
     }
     let (categories, mut spans) = magic::extract(dets, scale, formula, work, writer)?;
+    let unassigned: Vec<_> = dets.iter().filter(|d| d["unassigned_text"] == true).map(|d| {
+        let p = &d["poly"];
+        let bbox = [0, 1, 4, 5].map(|i| (p[i].as_f64().unwrap() / scale * 100.).round() / 100.);
+        json!({"bbox":bbox,"text":d["text"],"score":d["score"]})
+    }).collect();
     let (blocks, discarded, footnotes) = prepare(&categories, width, height, work)?;
     filter_spans(&mut spans, &blocks, &discarded, work)?;
     if let Some(fill) = native.as_mut() {
@@ -773,7 +797,7 @@ fn assemble_validated(
         .into_iter()
         .map(|b| fix(b, true))
         .collect::<Vec<_>>();
-    if blocks.is_empty() && discarded.is_empty() {
+    if blocks.is_empty() && discarded.is_empty() && unassigned.is_empty() {
         return Ok(Value::Null);
     }
     // 与 image_writer=None 的旧 cut_image_and_table 一致；不伪造图片已写出的路径。
@@ -806,9 +830,11 @@ fn assemble_validated(
             &json!({"blocks":fixed,"page_width":width,"page_height":height,"footnote_blocks":footnotes}),
         )?
     };
-    Ok(
-        json!({"preproc_blocks":sorted,"page_idx":page_idx,"page_size":[width,height],"discarded_blocks":discarded}),
-    )
+    let mut page = json!({"preproc_blocks":sorted,"page_idx":page_idx,"page_size":[width,height],"discarded_blocks":discarded});
+    if !unassigned.is_empty() {
+        page["unassigned_text"] = json!(unassigned);
+    }
+    Ok(page)
 }
 
 /// 多页仅组合已验证的单页组装和 para_split；不冒充 result_to_middle_json 的全部后处理。

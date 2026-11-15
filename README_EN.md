@@ -148,6 +148,8 @@ If model paths are not specified, RapidDoc downloads models automatically on fir
 
 ## Benchmark
 
+See the [RapidDoc comparison with AnyDoc and pdf-inspector](docs/benchmarks/firecrawl.md) for same-machine results on the public Office fixtures and 200 OpenDataLoader Bench PDFs.
+
 RapidDoc is evaluated on OmniDocBench v1.6 using a pipeline with PP-DocLayoutV3, PP-OCRv6-small, PP-FormulaNet_plus-M, and UNET_SLANET_PLUS. See the Chinese [README](README.md#基准测试结果) for the detailed benchmark table.
 
 ## Acknowledgements

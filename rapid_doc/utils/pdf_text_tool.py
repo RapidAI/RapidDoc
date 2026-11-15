@@ -62,6 +62,33 @@ def _bbox_coords(char: dict[str, Any]) -> list[float]:
     return [float(value) for value in bbox]
 
 
+def _restore_surrogate_pairs(chars, textpage):
+    restored = []
+    for char in chars:
+        if restored and char["char"] == "\ufffd" and restored[-1]["char"] == "\ufffd":
+            first = restored[-1]
+            index = first.get("char_idx")
+            if index is not None and char.get("char_idx") == index + 1:
+                high = pdfium_c.FPDFText_GetUnicode(textpage, index)
+                low = pdfium_c.FPDFText_GetUnicode(textpage, index + 1)
+                if 0xD800 <= high <= 0xDBFF and 0xDC00 <= low <= 0xDFFF:
+                    first["char"] = chr(0x10000 + ((high - 0xD800) << 10) + low - 0xDC00)
+                    a, b = _bbox_coords(first), _bbox_coords(char)
+                    first["bbox"] = type(first["bbox"])([
+                        min(a[0], b[0]), min(a[1], b[1]), max(a[2], b[2]), max(a[3], b[3])
+                    ])
+                    continue
+        restored.append(char)
+    return restored
+
+
+def _visible_chars(chars, width, height):
+    for char in chars:
+        left, top, right, bottom = _bbox_coords(char)
+        if char["char"] in ("\r", "\n") or (left < width and right > 0 and top < height and bottom > 0):
+            yield char
+
+
 def _get_visible_char_signature(
     char: dict[str, Any],
 ) -> tuple[str, tuple[Any, Any, Any, Any], float]:
@@ -336,12 +363,15 @@ def get_page_chars(
             if page_char_count is None:
                 page_char_count = textpage.count_chars()
 
-            chars = deduplicate_chars(
-                get_chars(textpage, page_bbox, page_rotation, quote_loosebox)
-            )
-            chars = _ensure_legacy_chars(chars)
-            chars = _deduplicate_adjacent_offset_chars(chars)
+            chars = get_chars(textpage, page_bbox, page_rotation, quote_loosebox)
+            if ("\ufffd" in chars.text if _is_page_chars(chars)
+                    else any(char["char"] == "\ufffd" for char in chars)):
+                chars = _restore_surrogate_pairs(_ensure_legacy_chars(chars), textpage)
+                chars = _legacy_chars_to_page_chars(chars)
+            chars = _ensure_legacy_chars(deduplicate_chars(chars))
             page_size = page.get_size()
+            width, height = page_size
+            chars = _deduplicate_adjacent_offset_chars(list(_visible_chars(chars, width, height)))
     finally:
         if owns_textpage:
             close_pdfium_child(textpage)

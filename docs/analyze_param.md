@@ -146,7 +146,7 @@ formula_config = {
 |                 engine_type                  |           推理引擎            | ONNXRUNTIME |                             None                              |  torch仅支持UNITABLE模型   |
 |                 use_word_box                 |        使用单字坐标匹配单元格        |              False              |                                                               |
 |              use_compare_table               |   启用表格结果比较（同时跑有线/无线并比对）   |             False              |       如果开启，分类判断为有线表格时，也会用无线表格模型识别，然后比较两个模型选择有效单元格识别结果多的       |
-|             table_formula_enable             |          表格内公式识别          |              True              |                                                               |
+|             table_formula_enable             |          表格内公式识别          |              True              | Python 和 Rust 会在公式识别前复用表格方向判断，将确认旋转的表内公式裁图转正；单元格匹配使用同步旋转后的公式坐标，原页坐标保持不变。 |
 |              table_image_enable              |          表格内图片识别          |              True              |                                                               |
 |            extract_original_image            |        是否提取表格内原始图片        |             False              |                                                               |
 |              model_dir_or_path               |           模型地址            |              None              |                 单个模型使用。如SLANET_PLUS、UNITABLE                  |
@@ -208,15 +208,44 @@ checkbox_config = {
 | :-------: |:------:|:-----:|:-----------------------------------------:|
 | extract_original_image |  是否提取原始图片  | False | 使用 pypdfium2 提取原始图片。截图可能导致清晰度降低和边界丢失，默认关闭 |
 | extract_original_image_iou_thresh |  原始图片和版面识别的图片，bbox重叠度  |  0.9  |  |
+| ocr_enable | 是否提取图片内文字 | False | 适用于原版 Python 的文字版和扫描版 PDF。近整页的扫描底图仍走正文识别。 |
+
+通过 `RapidDoc(image_config={"ocr_enable": True})` 开启图片文字提取。有识别结果时，多模态 Markdown 会在对应图片下方输出标题为 `text_image` 的折叠区，结构化结果会在对应图片中保存 `image_text`。图中文字按行输出，同行从左到右排列。图注单独保留。
+
+直接使用底层接口时，把同一份 `image_config` 传给 `pipeline_doc_analyze` 和 `pipeline_result_to_middle_json`。图片 OCR 在分析阶段执行。
 示例：
 ```python
 from rapid_doc.backend.pipeline.model_json_to_middle_json import result_to_middle_json as pipeline_result_to_middle_json
 image_config = {
+    "ocr_enable": True, # 提取图片内文字，默认 False
     "extract_original_image": True, # 是否提取原始图片（使用 pypdfium2 提取原始图片。截图可能导致清晰度降低和边界丢失，默认关闭）
     "extract_original_image_iou_thresh": 0.5, # 原始图片和版面识别的图片，bbox重叠度，默认0.9
 }
 middle_json = pipeline_result_to_middle_json(model_list, images_list, pdf_dict, image_writer, _lang, _ocr_enable, p_formula_enable, ocr_config=ocr_config, image_config=image_config)
 ```
+### img2table 表格后端（仅原生 Python）
+
+可选安装 `pip install "rapid-doc[img2table]"`，使用 img2table 2.x（接入验证版本为 2.0.0）。
+
+```python
+table_config = {
+    "model_type": "img2table",  # 也支持 TableModelType.IMG2TABLE
+    "use_rule_table": False,  # 直接比较 img2table 时关闭优先的 DocVortex 规则路径
+    "img2table": {
+        "implicit_rows": False,
+        "implicit_columns": False,
+        "borderless_tables": True,
+        "min_confidence": 50,
+    },
+    # "fallback_model_type": "table_transformer",
+}
+```
+
+也可保持现有主模型，设置 `fallback_model_type="img2table"`，沿用现有文字丢失/HTML 无效的回退触发条件，不会自动判断所有结构错误。
+此后端复用当前表格裁图及 PDF/OCR 文字、公式和图片占位符，不另外加载 OCR 引擎。保留现有方向处理，禁用 img2table 自身旋转以避免坐标错位。
+一个版面表格裁图若检测出多个表格，取面积最大的一个；未检出返回空结果，可由显式配置的备用模型处理。
+`min_confidence` 为文字置信度过滤阈值（0–99），不是结构准确率；上述选项不会改变已有默认表格后端。
+
 ### Office 原生解析
 
 doc/docx、xls/xlsx（含 xlsm）、ppt/pptx 统一使用内置解析器，支持路径、bytes、二进制流、URL 和批处理。已有扩展名用作分派依据；无扩展名时优先识别 OOXML/OLE 结构。不会自动调用 LibreOffice 转为新版 Office。旧 converter、标签字符串 spans、fasttext 接口和 docvortex extra 已删除。

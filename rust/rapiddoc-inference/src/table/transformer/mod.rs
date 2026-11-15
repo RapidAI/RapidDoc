@@ -11,7 +11,7 @@ use rapiddoc_core::{
     Error, ErrorCode,
 };
 use std::collections::BTreeMap;
-pub use structure::{decode_objects, Cell, Object, Token};
+pub use structure::{decode_objects, is_numeric, Cell, Object, Token};
 
 pub fn prepare(rgb: Vec<u8>, width: usize, height: usize) -> Result<Input, Error> {
     let size = pillow_resize::size(width, height)?;

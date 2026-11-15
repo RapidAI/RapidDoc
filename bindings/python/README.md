@@ -93,6 +93,7 @@ engine = RapidDoc(
     parse_method="auto",
     formula_enable=True,
     table_enable=True,
+    image_config={"ocr_enable": True},
     pdf_pages_batch=64,
     output_dir="output",
 )
@@ -110,6 +111,7 @@ result = engine(
 
 - `parse_method`：默认 `auto`，也可选择 `txt` 或 `ocr`，用于 PDF。
 - `formula_enable`、`table_enable`：默认开启。
+- `image_config={"ocr_enable": True}` 开启 PDF 图片 OCR。默认关闭，开启后 Markdown 图片下会显示 `text_image` 折叠区，内容列表通过 `image_text` 提供识别文字。
 - `pdf_pages_batch`：PDF 分页处理窗口，默认 64 页。
 - `preload_model=True`：提前加载当前配置需要的模型，后续解析复用相同会话。
 - `image_output_mode="data_uri"`：将 Markdown 图片引用改为内嵌数据；默认是相对路径。

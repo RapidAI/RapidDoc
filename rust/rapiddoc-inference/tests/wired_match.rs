@@ -81,7 +81,8 @@ fn invalid_score_and_blank_rec_constraints() {
         .code,
         ErrorCode::InvalidInput
     );
-    assert!(!blank_cell::accepted("口", 0.99));
+    assert!(blank_cell::accepted("口", 0.99));
+    assert!(blank_cell::accepted("1", 0.99));
     assert!(!blank_cell::accepted("ABC", 0.59));
     assert!(blank_cell::accepted("ABC", 0.6));
     let blank = blank_cell::crop(&vec![255; 30 * 20 * 3], 30, 20, p(0., 0., 30., 20.))

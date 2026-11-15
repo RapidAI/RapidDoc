@@ -144,8 +144,17 @@ class RapidLayoutModel(object):
                     results[index] = page_result
             return results
         images_layout_res = []
+
+        # from pathlib import Path
+        # output_dir = Path("images")
+        # output_dir.mkdir(parents=True, exist_ok=True)
+        # for ii, image in enumerate(images):
+        #     path = output_dir / f"{ii}.png"
+        #     cv2.imwrite(str(path), image)
+
         all_results = self.model(img_contents=images, batch_size=batch_size, tqdm_enable=True)
         for img_idx, results in enumerate(all_results):
+            # results.vis(r"layout_vis.png")
             layout_res = []
             boxes, scores, class_names = results.boxes, results.scores, results.class_names
             orders = results.orders if results.orders is not None else [-1] * len(boxes)

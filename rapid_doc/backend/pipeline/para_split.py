@@ -5,7 +5,8 @@ from rapid_doc.utils.enum_class import ContentType, BlockType, SplitFlag
 from rapid_doc.utils.text_boundary import uses_unspaced_script
 
 
-LINE_STOP_FLAG = ('.', '!', '?', '。', '！', '？', ')', '）', '"', '”', ':', '：', ';', '；')
+SENTENCE_END_FLAGS = ('.', '!', '?', '。', '！', '？')
+LINE_STOP_FLAG = (*SENTENCE_END_FLAGS, ')', '）', '"', '”', ':', '：', ';', '；')
 LIST_END_FLAG = ('.', '。', ';', '；')
 
 
@@ -47,6 +48,13 @@ def __process_blocks(blocks):
                     max(line["bbox"][2] for line in current_block["lines"]),
                     max(line["bbox"][3] for line in current_block["lines"]),
                 ]
+            if current_group:
+                previous = current_group[-1]
+                left, _, right, _ = current_block["bbox_fs"]
+                prev_left, _, prev_right, _ = previous["bbox_fs"]
+                if (current_block.get("page_num") == previous.get("page_num")
+                        and min(right, prev_right) <= max(left, prev_left)):
+                    flush_current_group()
             # 累积到当前 text group
             current_group.append(current_block)
 
@@ -124,6 +132,15 @@ def __is_list_or_index_block(block):
             # 添加所有文本，包括空行，保持与block['lines']长度一致
             lines_text_list.append(line_text)
             block_text = ''.join(lines_text_list)
+
+        # A numbered clause can start on the next physical line of a paragraph.
+        first_text = lines_text_list[0]
+        if (
+            not _LIST_START.match(first_text)
+            and _LIST_START.match(lines_text_list[1])
+            and any(_LIST_START.match(part.lstrip()) for part in re.split(r'[:：;；]', first_text)[1:])
+        ):
+            return BlockType.TEXT
 
         unspaced_script = uses_unspaced_script(block_text)
 
@@ -343,7 +360,10 @@ def __merge_2_text_blocks(block1, block2, *, allow_uppercase_start=False):
                             # 上一个block的最后一个line的右边界和block的右边界差距不超过line_height
                             abs(block2['bbox_fs'][2] - last_line['bbox'][2]) < line_height
                             # 上一个block的最后一个span不是以特定符号结尾
-                            and not last_span['content'].endswith(LINE_STOP_FLAG)
+                            and (
+                                not last_span['content'].endswith(LINE_STOP_FLAG)
+                                or (allow_uppercase_start and last_span['content'].endswith(SENTENCE_END_FLAGS))
+                            )
                             # 两个block宽度差距超过2倍也不合并
                             and abs(block1_weight - block2_weight) < min_block_weight
                             # 下一个block的第一个字符是数字

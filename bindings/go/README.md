@@ -77,6 +77,7 @@ func main() {
 ```go
 config := rapiddoc.Config{Options: rapiddoc.Options{
     "layout_config": map[string]any{"model_type": "pp_doclayoutv3"},
+    "image_config": map[string]any{"ocr_enable": true},
     "formula_enable": true,
     "table_enable": true,
     "device": "cpu",
@@ -89,6 +90,8 @@ options := rapiddoc.Options{
     "image_dir_name": "images",
 }
 ```
+
+图片 OCR 默认关闭。上例开启后，识别文字出现在 Markdown 的 `text_image` 折叠区和内容列表的 `image_text` 字段。
 
 未知字段会报错，未指定的字段保持 Rust 默认值。`Parse`/`ParseAll` 的字符串支持本地路径及 HTTP/HTTPS URL；下载、重定向和错误处理由共享 Rust 层完成。图片文件不属于直接输入范围。
 

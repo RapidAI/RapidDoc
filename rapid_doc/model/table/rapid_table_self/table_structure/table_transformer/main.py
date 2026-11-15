@@ -35,7 +35,7 @@ def ocr_to_tokens(ocr):
     if not len(boxes) == len(texts) == len(scores):
         raise ValueError("Table Transformer OCR boxes/texts/scores length mismatch")
     tokens = []
-    for idx, (box, text) in enumerate(zip(boxes, texts)):
+    for idx, (box, text, score) in enumerate(zip(boxes, texts, scores)):
         points = np.asarray(box, dtype=np.float32).reshape(-1, 2)
         if not np.isfinite(points).all():
             continue
@@ -43,17 +43,18 @@ def ocr_to_tokens(ocr):
         x1, y1 = points.max(axis=0)
         if x1 > x0 and y1 > y0:
             tokens.append(dict(bbox=[float(x0), float(y0), float(x1), float(y1)], text=str(text),
-                               block_num=0, line_num=idx, span_num=0))
+                               block_num=0, line_num=idx, span_num=0, confidence=score))
     return tokens
 
 
-def cells_to_result(cells, image_size):
+def cells_to_result(cells, image_size, token_cells=None):
     table = ET.Element("table")
     # Rows fully occupied by rowspan still need a <tr>; otherwise the following
     # row shifts upward and HTML disagrees with the returned logical coordinates.
     rows = {r: ET.SubElement(table, "tr")
             for r in range(max((max(c["row_nums"]) for c in cells), default=-1)+1)}
     boxes, logic = [], []
+    assignments = {}
     for cell in sorted(cells, key=lambda c: (min(c["row_nums"]), min(c["column_nums"]))):
         r0, r1 = min(cell["row_nums"]), max(cell["row_nums"])
         c0, c1 = min(cell["column_nums"]), max(cell["column_nums"])
@@ -64,8 +65,13 @@ def cells_to_result(cells, image_size):
             attrs["colspan"] = str(c1-c0+1)
         node = ET.SubElement(rows[r0], "th" if cell.get("column header") else "td", attrs)
         node.text = cell.get("cell text", "")
+        if token_cells is not None:
+            for span in cell.get("spans", ()):
+                assignments.setdefault(span["line_num"], []).append(len(boxes))
         boxes.append(np.clip(cell["bbox"], [0, 0, 0, 0], [*image_size, *image_size]))
         logic.append([r0, r1, c0, c1])
+    if token_cells is not None:
+        token_cells.append(assignments)
     return (ET.tostring(table, encoding="unicode", short_empty_elements=False),
             np.asarray(boxes, dtype=np.float32).reshape(-1, 4),
             np.asarray(logic, dtype=np.int64).reshape(-1, 4))
@@ -88,20 +94,41 @@ def outputs_to_objects(logits, boxes, image_size):
             for label, score, box in zip(labels, scores, xyxy) if LABELS[label] != "no object"]
 
 
-def decode(logits, boxes, image_size, tokens):
+def decode(logits, boxes, image_size, tokens, token_cells=None):
     objects = outputs_to_objects(logits, boxes, image_size)
     tables = [obj for obj in objects
               if obj["label"] == "table" and obj["score"] >= THRESHOLDS["table"]]
     if not tables:
-        return cells_to_result([], image_size)
+        return cells_to_result([], image_size, token_cells)
     # The caller supplies one table crop; preserve the largest predicted table.
     table = max(tables, key=lambda t: max(0, t["bbox"][2]-t["bbox"][0]) * max(0, t["bbox"][3]-t["bbox"][1]))
     selected = [obj for obj in objects if obj["label"] != "table"] + [table]
     structures = structure.objects_to_structures(deepcopy(selected), deepcopy(tokens), THRESHOLDS)
     if not structures or not structures[0]["rows"] or not structures[0]["columns"]:
-        return cells_to_result([], image_size)
-    cells, _ = structure.structure_to_cells(structures[0], deepcopy(tokens))
-    return cells_to_result(cells, image_size)
+        return cells_to_result([], image_size, token_cells)
+    from ....fallback import _NUMERIC_CELL
+    def is_numeric(text):
+        return bool(_NUMERIC_CELL.fullmatch(text.strip()))
+
+    grid = structures[0]
+    structure.restore_missing_numeric_rows(grid, tokens, is_numeric)
+    repaired_grid = deepcopy(grid)
+    added = structure.restore_missing_numeric_columns(repaired_grid, tokens, is_numeric)
+    cells, _ = structure.structure_to_cells(grid, deepcopy(tokens), compute_confidence=False)
+    if added:
+        repaired, _ = structure.structure_to_cells(repaired_grid, deepcopy(tokens), compute_confidence=False)
+        assigned = {span['line_num'] for cell in cells for span in cell['spans']}
+        retained = {span['line_num'] for cell in repaired for span in cell['spans']}
+        # 跨列格可能早已包含空档里的文字。只有新列确实恢复了多行未归属数值，
+        # 且没有挤掉原候选里的文字，才提交网格修复。
+        if assigned <= retained and all(
+            sum(cell['column_nums'] == [col] and len(cell['row_nums']) == 1
+                and any(span['line_num'] not in assigned and is_numeric(span['text'])
+                        for span in cell['spans']) for cell in repaired)
+            >= max(3, .25 * len(grid['rows'])) for col in added
+        ):
+            cells = repaired
+    return cells_to_result(cells, image_size, token_cells)
 
 
 class TableTransformerRecognition:
@@ -116,12 +143,12 @@ class TableTransformerRecognition:
         if self.session.get_output_names() != ["logits", "pred_boxes"]:
             raise ValueError("Use scripts/export_table_transformer.py to export the Table Transformer model")
 
-    def __call__(self, images, ocr_results):
+    def __call__(self, images, ocr_results, *, token_cells=None):
         if len(images) != len(ocr_results):
             raise ValueError("Table Transformer image/OCR batch length mismatch")
         htmls, boxes, logic = [], [], []
         for image, ocr in zip(images, ocr_results):
-            result = decode(*self.session(preprocess(image)), (image.shape[1], image.shape[0]), ocr_to_tokens(ocr))
+            result = decode(*self.session(preprocess(image)), (image.shape[1], image.shape[0]), ocr_to_tokens(ocr), token_cells)
             htmls.append(result[0])
             boxes.append(result[1])
             logic.append(result[2])

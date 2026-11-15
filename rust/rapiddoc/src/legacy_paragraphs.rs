@@ -229,6 +229,16 @@ fn classify(block: &mut Block) {
                 .collect::<String>()
         })
         .collect();
+    // A numbered clause can start on the next physical line of a paragraph.
+    if !list_marker().is_match(&texts[0])
+        && list_marker().is_match(&texts[1])
+        && texts[0]
+            .split([':', '：', ';', '；'])
+            .skip(1)
+            .any(|part| list_marker().is_match(part.trim_start_matches(python_space)))
+    {
+        return;
+    }
     let cjk = uses_unspaced_script(&texts.concat());
     let (
         mut left_close,
@@ -365,9 +375,12 @@ fn body_content(block: &Block) -> String {
         .trim_matches(python_space)
         .into()
 }
-fn list_start(block: &Block) -> bool {
+fn list_marker() -> &'static regex::Regex {
     static RE: std::sync::OnceLock<regex::Regex> = std::sync::OnceLock::new();
-    RE.get_or_init(||regex::Regex::new(r"^(?:[-*+•●○▪▫◦‣⁃–—](?:\s|$)|[（(]?(?:\d+|[A-Za-z]|[IVXLCDMivxlcdm]+)[.．、)）]|[\[［]\d+[\]］]|[一二三四五六七八九十百]+[、.．)）]|[①-⑳])").unwrap()).is_match(&body_content(block))
+    RE.get_or_init(||regex::Regex::new(r"^(?:[-*+•●○▪▫◦‣⁃–—](?:\s|$)|[（(]?(?:\d+|[A-Za-z]|[IVXLCDMivxlcdm]+)[.．、)）]|[\[［]\d+[\]］]|[一二三四五六七八九十百]+[、.．)）]|[①-⑳])").unwrap())
+}
+fn list_start(block: &Block) -> bool {
+    list_marker().is_match(&body_content(block))
 }
 fn vertical(lines: &[Line]) -> bool {
     !lines.is_empty()
@@ -523,10 +536,10 @@ fn merge_text_allowed(current: &Block, previous: &Block) -> Result<bool, Error> 
     let w1 = current.bounds[2] - current.bounds[0];
     let w2 = previous.bounds[2] - previous.bounds[0];
     Ok((previous.frame[2] - last.bounds[2]).abs() < last_h
-        && !last_content
-            .chars()
-            .last()
-            .is_some_and(|c| ".!?。！？)）\"”:：;；".contains(c))
+        && !last_content.chars().last().is_some_and(|c| {
+            ".!?。！？)）\"”:：;；".contains(c)
+                && !(current.allow_uppercase && ".!?。！？".contains(c))
+        })
         && (w1 - w2).abs() < w1.min(w2)
         && !python_digit(c)
         && (!python_upper(c) || current.allow_uppercase)
@@ -638,6 +651,14 @@ pub fn split(pages: &Value) -> Result<Value, Error> {
         }
         let mut end = start + 1;
         while end < blocks.len() && blocks[end].kind == "text" {
+            blocks[end - 1].reframe();
+            blocks[end].reframe();
+            let a = &blocks[end - 1];
+            let b = &blocks[end];
+            if a.page_idx == b.page_idx && a.frame[2].min(b.frame[2]) <= a.frame[0].max(b.frame[0])
+            {
+                break;
+            }
             end += 1;
         }
         for b in &mut blocks[start..end] {
@@ -675,4 +696,54 @@ pub fn split(pages: &Value) -> Result<Value, Error> {
     Ok(Value::Array(
         output.into_iter().map(Value::Object).collect(),
     ))
+}
+
+#[cfg(test)]
+mod sentence_end_tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn sentence_end_requires_continuation_geometry() {
+        for (punctuation, evidence, merged) in [
+            (".", true, true),
+            (".", false, false),
+            ("！", true, true),
+            (";", true, false),
+        ] {
+            let block = |content: &str, lines: &[[i32; 4]]| {
+                json!({
+                    "type": "text",
+                    "bbox": [lines.iter().map(|b| b[0]).min().unwrap(), lines[0][1], 400, lines.last().unwrap()[3]],
+                    "lines": lines.iter().enumerate().map(|(i, b)| json!({
+                        "bbox": b, "spans": [{"type": "text", "content": if i == 0 { content } else { "continued body text" }}]
+                    })).collect::<Vec<_>>()
+                })
+            };
+            let mut previous = block(
+                "previous body text",
+                &[[0, 100, 400, 110], [0, 112, 400, 122], [0, 124, 400, 134], [0, 136, 400, 146]],
+            );
+            previous["lines"][3]["spans"][0]["content"] = json!(format!("continued body text{punctuation}"));
+            let current = block(
+                "Uppercase continuation",
+                &[[0, 10, 400, 20], [0, 22, 340, 32]],
+            );
+            let indent = block(
+                "Indented body",
+                &[
+                    [if evidence { 20 } else { 0 }, 50, 400, 60],
+                    [0, 62, 400, 72],
+                    [0, 74, 400, 84],
+                    [0, 86, 250, 96],
+                ],
+            );
+            let pages = json!([
+                {"page_idx": 0, "page_size": [600, 600], "preproc_blocks": [previous]},
+                {"page_idx": 1, "page_size": [600, 600], "preproc_blocks": [current, indent]},
+            ]);
+            let result = split(&pages).unwrap();
+            assert_eq!(result[1]["para_blocks"][0]["lines_deleted"] == true, merged);
+        }
+    }
 }

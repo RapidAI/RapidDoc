@@ -174,9 +174,10 @@ pub fn read(
             {
                 return Err(error(ErrorCode::ResourceLimit, "字符数量超过限制"));
             }
-            let mut chars = Vec::with_capacity(n as usize);
+            let mut chars: Vec<Char> = Vec::with_capacity(n as usize);
             let mut buffer = vec![0u8; 256];
             let mut name_bytes = 0usize;
+            let mut previous_code = 0;
             for i in 0..n {
                 let code = api.FPDFText_GetUnicode(owner.text, i);
                 if code > 0x10ffff {
@@ -262,6 +263,15 @@ pub fn read(
                     270 => [y0, width - x1, y1, width - x0],
                     _ => [x0, y0, x1, y1],
                 };
+                let high = std::mem::replace(&mut previous_code, code);
+                if (0xd800..=0xdbff).contains(&high) && (0xdc00..=0xdfff).contains(&code) {
+                    if let Some(previous) = chars.last_mut() {
+                        let scalar = 0x10000 + ((high - 0xd800) << 10) + code - 0xdc00;
+                        previous.char = char::from_u32(scalar).unwrap().to_string();
+                        merge(&mut previous.bbox, bbox);
+                        continue;
+                    }
+                }
                 chars.push(Char {
                     bbox,
                     char: c.to_string(),
@@ -270,6 +280,15 @@ pub fn read(
                     char_idx: i as usize,
                 });
             }
+            let [visual_width, visual_height] = size;
+            let chars = deduplicate(chars)
+                .into_iter()
+                .filter(|character| {
+                    let [left, top, right, bottom] = character.bbox;
+                    matches!(character.char.as_str(), "\r" | "\n")
+                        || (left < visual_width && right > 0. && top < visual_height && bottom > 0.)
+                })
+                .collect();
             Ok(PageChars {
                 size,
                 bbox,
@@ -277,7 +296,7 @@ pub fn read(
                 height: height as u64,
                 rotation,
                 char_count: n as usize,
-                chars: deduplicate(chars),
+                chars,
             })
         }
     })

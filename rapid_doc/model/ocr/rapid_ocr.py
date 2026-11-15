@@ -44,7 +44,7 @@ DEFAULT_SEAL_DEBUG_DIR = os.path.join(
 )
 
 class RapidOcrModel(object):
-    def __init__(self, det_db_box_thresh=0.5, lang=None, ocr_config=None, use_dilation=True, det_db_unclip_ratio=1.8, enable_merge_det_boxes=True, is_seal=False):
+    def __init__(self, det_db_box_thresh=0.5, lang=None, ocr_config=None, use_dilation=False, det_db_unclip_ratio=1.8, enable_merge_det_boxes=True, is_seal=False):
         ocr_config = dict(ocr_config or {})
         onnx_ops_settings = ops_settings(ocr_config.pop("onnx_ops", True))
         self.drop_score = 0.5
@@ -408,7 +408,7 @@ class RapidOcrModel(object):
                 img_crop = get_rotate_crop_image(ori_im, tmp_box)
                 img_crop_list.append(img_crop)
 
-        rec_result = self.text_recognizer(TextRecInput(img_crop_list))
+        rec_result = self.text_recognizer_call(TextRecInput(img_crop_list))
         rec_res = list(zip(rec_result.txts, rec_result.scores))
         elapse = rec_result.elapse
         # logger.debug("rec_res num  : {}, elapsed : {}".format(len(rec_res), elapse))
@@ -442,10 +442,10 @@ class RapidOcrModel(object):
 
         batch_num = self.text_recognizer.rec_batch_num
         with tqdm(total=img_num, desc=tqdm_desc, disable=not tqdm_enable) as pbar:
-            index = 0
             elapse = 0
-            for beg_img_no in range(0, img_num, batch_num):
-                end_img_no = min(img_num, beg_img_no + batch_num)
+            from .recognition_batch import batch_ranges
+            _, rec_height, rec_width = self.text_recognizer.rec_image_shape[:3]
+            for beg_img_no, end_img_no in batch_ranges(width_list, indices, batch_num, rec_height, rec_width):
 
                 # Parameter Alignment for PaddleOCR
                 imgC, imgH, imgW = self.text_recognizer.rec_image_shape[:3]
@@ -481,8 +481,7 @@ class RapidOcrModel(object):
                 elapse += time.perf_counter() - start_time
 
                 # 更新进度条，每次增加batch_size，但要注意最后一个batch可能不足batch_size
-                current_batch_size = min(batch_num, img_num - index * batch_num)
-                index += 1
+                current_batch_size = end_img_no - beg_img_no
                 pbar.update(current_batch_size)
 
             all_line_results, all_word_results = list(zip(*rec_res))

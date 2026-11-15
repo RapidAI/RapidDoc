@@ -127,6 +127,7 @@ impl Config {
             "doc_orientation_classify":options.doc_orientation_classify.unwrap_or(self.doc_orientation_classify),"docvortex_mode":mode,"native_only":native_only,
             "native_text":method!="ocr","auto_classify":method=="auto","clamp_page_range":true,
             "formula_enabled":options.formula_enable.unwrap_or(self.formula_enable),"formula_batch_size":f.get("batch_num").unwrap_or(&json!(1)),
+            "table_formula_enabled":t.get("table_formula_enable").unwrap_or(&json!(true)),
             "table_enabled":options.table_enable.unwrap_or(self.table_enable),"seal_enabled":o.get("seal_enable").unwrap_or(&json!(true)),
             "lang":options.lang.as_deref().unwrap_or(&self.lang),"table_variant":plan.table_variant,
             "layout_shape":plan.layout_shape,"layout_model_type":layout,
@@ -142,6 +143,7 @@ impl Config {
             "markdown_ignore_labels":l.get("markdown_ignore_labels"),"use_det_mode":o.get("use_det_mode").unwrap_or(&json!("auto")),
             "table_force_ocr":t.get("force_ocr").and_then(Value::as_bool).unwrap_or(false),
             "extract_original_image":i.get("extract_original_image").unwrap_or(&json!(false)),
+            "image_ocr":i.get("ocr_enable").unwrap_or(&json!(false)),
             "extract_original_image_iou_thresh":i.get("extract_original_image_iou_thresh").unwrap_or(&json!(0.9)),
             "crop_sampling":o.get("crop_sampling").cloned().unwrap_or(serde_json::to_value(self.crop_sampling).unwrap()),
         });

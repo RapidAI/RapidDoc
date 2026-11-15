@@ -27,7 +27,7 @@ pub fn html(
     polygons: &[Polygon],
     texts: &[Vec<String>],
 ) -> Result<String, Error> {
-    render(points, polygons, texts, true, true)
+    render(points, polygons, texts, true, true, None)
 }
 
 /// 旧 UNET 不再转义已转义文本；逻辑格重叠按原 Python 的后写覆盖处理。
@@ -36,7 +36,17 @@ pub fn legacy_html(
     polygons: &[Polygon],
     texts: &[Vec<String>],
 ) -> Result<String, Error> {
-    render(points, polygons, texts, false, false)
+    render(points, polygons, texts, false, false, None)
+}
+
+/// The grid entries refer to the original polygons and the cells emitted in HTML.
+pub fn legacy_html_with_grid(
+    points: &[[usize; 4]],
+    polygons: &[Polygon],
+    texts: &[Vec<String>],
+    emitted: &mut Vec<(usize, [usize; 4])>,
+) -> Result<String, Error> {
+    render(points, polygons, texts, false, false, Some(emitted))
 }
 
 fn render(
@@ -45,6 +55,7 @@ fn render(
     texts: &[Vec<String>],
     escape: bool,
     reject_overlaps: bool,
+    mut emitted: Option<&mut Vec<(usize, [usize; 4])>>,
 ) -> Result<String, Error> {
     if points.len() != polygons.len() || points.len() != texts.len() {
         return Err(invalid("UNET 逻辑格/物理格/文字数量不匹配"));
@@ -205,6 +216,11 @@ fn render(
                     if r == top && c == left {
                         let rs = p[1].min(range[1] - 1) - top + 1;
                         let cs = p[3].min(range[3] - 1) - left + 1;
+                        if let Some(grid) = emitted.as_deref_mut() {
+                            let row = top - range[0];
+                            let col = left - range[2];
+                            grid.push((i, [row, row + rs - 1, col, col + cs - 1]));
+                        }
                         output.push_str(&format!("<td rowspan={rs} colspan={cs}>"));
                         output.push_str(
                             &texts[i]

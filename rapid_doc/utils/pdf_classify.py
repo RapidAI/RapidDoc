@@ -133,14 +133,18 @@ def classify(pdf_bytes):
                 pdf,
                 page_indices,
             )
-            if extreme_page_index is not None:
+            text_samples = _collect_pdfium_text_samples(pdf, page_indices)
+            if extreme_page_index is not None and any(
+                sample["page_index"] == extreme_page_index
+                and len(sample["cleaned_text"]) < CHARS_THRESHOLD
+                for sample in text_samples
+            ):
                 logger.debug(
                     "Classify PDF as OCR due to extreme sampled-page aspect ratio: "
                     f"page={extreme_page_index + 1}, ratio={extreme_ratio:.2f}"
                 )
                 return "ocr"
 
-            text_samples = _collect_pdfium_text_samples(pdf, page_indices)
             for sample in text_samples:
                 if len(sample["cleaned_text"]) >= CHARS_THRESHOLD:
                     continue

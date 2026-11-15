@@ -77,6 +77,7 @@ try (RapidDoc engine = RapidDoc.builder()
         .layoutModel("pp_doclayoutv3")
         .formulaModel("pp_formulanet_plus_m")
         .tableModel("unet_slanet_plus")
+        .imageConfig(java.util.Map.of("ocr_enable", true))
         .outputDirectory(Paths.get("output"))
         .build()) {
     ParseOptions options = ParseOptions.builder()
@@ -90,6 +91,8 @@ try (RapidDoc engine = RapidDoc.builder()
 ```
 
 默认模型、参数和回退规则来自共享 Rust SDK。`formulaEnabled`/`tableEnabled` 默认开启；可通过各 `*Config(Map)` 方法设置高级配置。`ParseOptions` 提供单次调用覆盖；`option` 传入共享 Rust 字段，未知字段会明确报错。
+
+图片 OCR 默认关闭。上例开启后，识别文字出现在 Markdown 的 `text_image` 折叠区和内容列表的 `image_text` 字段。
 
 结果提供 Markdown、middle JSON、内容列表、图片和绘图数据。`writeTo(outputRoot)` 保存到 `outputRoot/源文件名/auto|txt|ocr|office/`，文件加源文件名前缀，例如 `示例1.md`、`示例1_middle.json`、`示例1_layout.pdf`；图片路径仍遵循 `imageDirectory`。`getOutputDirectory(outputRoot)` 返回最终目录。路径输入设置 `outputDirectory` 后自动按同一规则保存；字节/流输入使用 `document` 作为名称，需要保存时调用结果的 `writeTo`。
 

@@ -20,7 +20,7 @@ impl Default for Config {
             threshold: 0.3,
             box_threshold: 0.5,
             unclip_ratio: 1.6,
-            dilation: true,
+            dilation: false,
             max_candidates: 1000,
             max_pixels: 4_000_000,
             max_work: 50_000_000,
@@ -44,6 +44,23 @@ pub struct Detection {
     /// 左上、右上、右下、左下；原图像素坐标。
     pub points: [[f32; 2]; 4],
     pub score: f64,
+}
+
+/// Very pale bleed-through filter for unowned full-page recovery candidates.
+pub fn has_foreground_ink(bgr: &[u8]) -> bool {
+    let count = bgr.len() / 3;
+    if count == 0 { return false; }
+    let mut histogram = [0usize; 256];
+    for pixel in bgr.chunks_exact(3) {
+        histogram[(pixel[0] as usize + pixel[1] as usize + pixel[2] as usize) / 3] += 1;
+    }
+    let target = ((count - 1) as f64 * 0.9).ceil() as usize;
+    let mut cumulative = 0;
+    let background = histogram.iter().position(|n| {
+        cumulative += n;
+        cumulative > target
+    }).unwrap_or(255);
+    background < 200 || histogram[..=180.min(background.saturating_sub(60))].iter().sum::<usize>() * 100 >= count
 }
 
 /// 与当前 RapidOCR 相同：稳定 y 排序，相邻 y 差小于 10 的连通组按 x 排序。

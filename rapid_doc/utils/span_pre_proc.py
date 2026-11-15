@@ -80,6 +80,19 @@ def remove_outside_spans(spans, all_bboxes, all_discarded_blocks):
     return new_spans
 
 
+def _recovered_duplicate(span1, span2):
+    for candidate, existing in ((span1, span2), (span2, span1)):
+        if (candidate.get("layout_recovered_text")
+                and not existing.get("layout_recovered_text")
+                and existing["type"] in (
+                    ContentType.TEXT, ContentType.INLINE_EQUATION, ContentType.INTERLINE_EQUATION,
+                )
+                and existing.get("content")
+                and get_minbox_if_overlap_by_ratio(candidate["bbox"], existing["bbox"], 0.65) is not None):
+            return candidate
+    return None
+
+
 def remove_overlaps_low_confidence_spans(spans):
     dropped_spans = []
     #  删除重叠spans中置信度低的的那些
@@ -90,6 +103,10 @@ def remove_overlaps_low_confidence_spans(spans):
                 if span1 in dropped_spans or span2 in dropped_spans:
                     continue
                 else:
+                    recovered = _recovered_duplicate(span1, span2)
+                    if recovered is not None:
+                        dropped_spans.append(recovered)
+                        continue
                     if calculate_iou(span1['bbox'], span2['bbox']) > 0.9:
                         if span1['score'] < span2['score']:
                             span_need_remove = span1
@@ -118,10 +135,22 @@ def remove_overlaps_min_spans(spans):
                 if span1 in dropped_spans or span2 in dropped_spans:
                     continue
                 else:
+                    recovered = _recovered_duplicate(span1, span2)
+                    if recovered is not None:
+                        dropped_spans.append(recovered)
+                        continue
                     if ({span1['type'], span2['type']} == {ContentType.IMAGE, ContentType.TEXT}
                             and any(s['type'] == ContentType.TEXT and s.get('native_text_region') for s in (span1, span2))):
                         # A separately owned native foreground is not a duplicate
                         # of the background image behind it.
+                        continue
+                    if any(
+                        text.get('layout_recovered_text')
+                        and (background['type'] == ContentType.IMAGE
+                             or (background['type'] == ContentType.TABLE
+                                 and not (background.get('html') or background.get('latex'))))
+                        for text, background in ((span1, span2), (span2, span1))
+                    ):
                         continue
                     overlap_box = get_minbox_if_overlap_by_ratio(
                         span1['bbox'], span2['bbox'], 0.65

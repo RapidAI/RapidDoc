@@ -13,6 +13,8 @@ from loguru import logger
 from tqdm import tqdm
 
 from .analyze_utils import _extract_text_from_pdf, _run_ocr_det_batch, _process_single_table, _run_ocr_rec_postprocess
+from .layout_recovery import format_image_text, recover_layout_text, recover_unread_body_lines
+from .table_formula import prepare_table_formula_crops
 from .model_init import AtomModelSingleton
 from .model_list import AtomicModel
 from ..utils.utils import remove_layout_in_ori_images, filter_overlap_boxes, _expand_formula_crop_res
@@ -41,8 +43,10 @@ class BatchAnalyze:
         formula_config: Optional[Dict] = None,
         table_config: Optional[Dict] = None,
         checkbox_config: Optional[Dict] = None,
+        image_config: Optional[Dict] = None,
     ):
         self.model_manager = model_manager
+        self.image_ocr_enable = (image_config or {}).get("ocr_enable", False)
         self.batch_ratio = batch_ratio
         
         # 功能开关
@@ -132,6 +136,12 @@ class BatchAnalyze:
         )
         # 3. 公式识别
         if self.formula_enable:
+            if (self.table_enable and self.table_config.get('table_formula_enable', True)
+                    and not isinstance(self.model.table_model, CustomBaseModel)):
+                prepare_table_formula_crops(
+                    formula_res_all_page, table_res_all_page, pdf_dict_list,
+                    scale_list, atom_model_manager, self.table_config, self.ocr_config,
+                )
             self._run_formula_recognition(formula_res_all_page)
         # 4. OCR 识别 (根据模式选择不同的处理方式)
         if isinstance(self.model.ocr_model, CustomBaseModel):
@@ -143,8 +153,15 @@ class BatchAnalyze:
         # 5. 表格识别
         if self.table_enable:
             self._run_table_recognition(atom_model_manager, table_res_all_page, pdf_dict_list, scale_list)
+        scanned_pages, image_ocr = recover_layout_text(
+            ocr_res_all_page, pdf_dict_list, scale_list, atom_model_manager, self.ocr_config,
+            self.image_ocr_enable,
+        )
         # 6. 后处理 OCR rec 结果
-        _run_ocr_rec_postprocess(images_layout_res, self.ocr_config)
+        _run_ocr_rec_postprocess(images_layout_res + [spans for _, spans in image_ocr], self.ocr_config)
+        for image, spans in image_ocr:
+            image["image_text"] = format_image_text(spans)
+        recover_unread_body_lines(scanned_pages, _run_ocr_rec_postprocess, self.ocr_config)
 
         # 7. 印章识别
         if self.seal_enable:
@@ -275,6 +292,7 @@ class BatchAnalyze:
                     'formula_res': formula_res,
                     'lang': _lang,
                     'formula_img': formula_img,
+                    'page_idx': index,
                 })
 
         return ocr_res_all_page, table_res_all_page, formula_res_all_page

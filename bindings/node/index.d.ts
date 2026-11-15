@@ -27,7 +27,12 @@ export type Progress = (event: ProgressEvent) => void | Promise<void>;
 export interface Config {
   libraryPath?: string;
   runtimeDirectory?: string;
-  config?: Record<string, unknown>;
+  config?: Record<string, unknown> & {
+    image_config?: Record<string, unknown> & {
+      /** Include text found in PDF images. Defaults to false. */
+      ocr_enable?: boolean;
+    };
+  };
   resources?: {
     bundle_dirs?: string[];
     model_directory?: string;

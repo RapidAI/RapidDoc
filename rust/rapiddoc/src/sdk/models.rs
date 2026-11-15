@@ -134,7 +134,7 @@ impl ModelPlan {
                 "use_word_box=true is not implemented in the native table pipeline",
             ));
         }
-        let fixed = json!({"Det.limit_side_len":960,"Det.limit_type":"max","Det.thresh":0.3,"Det.box_thresh":0.3,"Det.unclip_ratio":1.8,"Det.use_dilation":true,"Det.mean":[0.485,0.456,0.406],"Det.std":[0.229,0.224,0.225]});
+        let fixed = json!({"Det.limit_side_len":960,"Det.limit_type":"max","Det.thresh":0.3,"Det.box_thresh":0.3,"Det.unclip_ratio":1.8,"Det.use_dilation":false,"Det.mean":[0.485,0.456,0.406],"Det.std":[0.229,0.224,0.225]});
         for (key, default) in fixed.as_object().unwrap() {
             if let Some(value) = o.get(key) {
                 if !compatible(value, default) {

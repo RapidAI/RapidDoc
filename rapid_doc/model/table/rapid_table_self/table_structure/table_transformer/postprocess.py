@@ -3,6 +3,8 @@ Copyright (C) 2021 Microsoft Corporation
 """
 from collections import defaultdict
 
+import numpy as np
+
 from .geometry import Rect
 
 
@@ -205,6 +207,12 @@ def nms_by_containment(container_objects, package_objects, overlap_threshold=0.5
     return final_objects
 
 
+def _intersection_areas(packages, containers):
+    lower = np.maximum(packages[:, None, :2], containers[None, :, :2])
+    upper = np.minimum(packages[:, None, 2:], containers[None, :, 2:])
+    return np.prod(np.maximum(upper - lower, 0), axis=2)
+
+
 def slot_into_containers(container_objects, package_objects, overlap_threshold=0.5,
                          unique_assignment=True, forced_assignment=False):
     """
@@ -218,32 +226,38 @@ def slot_into_containers(container_objects, package_objects, overlap_threshold=0
     if len(container_objects) == 0 or len(package_objects) == 0:
         return container_assignments, package_assignments, best_match_scores
 
-    match_scores = defaultdict(dict)
-    for package_num, package in enumerate(package_objects):
-        match_scores = []
-        package_rect = Rect(package['bbox'])
-        package_area = package_rect.get_area()        
-        for container_num, container in enumerate(container_objects):
-            container_rect = Rect(container['bbox'])
-            intersect_area = container_rect.intersect(package['bbox']).get_area()
-            overlap_fraction = intersect_area / package_area
-            match_scores.append({'container': container, 'container_num': container_num, 'score': overlap_fraction})
+    containers = np.asarray([item['bbox'] for item in container_objects], dtype=np.float64)
+    packages = np.asarray([item['bbox'] for item in package_objects], dtype=np.float64)
+    areas = np.prod(np.maximum(packages[:, 2:] - packages[:, :2], 0), axis=1)
+    if np.any(areas == 0):
+        raise ZeroDivisionError('division by zero')
+    # Rect rounds intersection coordinates to float32 and computes areas
+    # from those coordinates using double precision.
+    rounded_containers = containers.astype(np.float32).astype(np.float64)
+    rounded_packages = packages.astype(np.float32).astype(np.float64)
+    empty_containers = np.any(containers[:, 2:] <= containers[:, :2], axis=1)
+    batch_size = max(1, 262144 // len(containers))
+    for start in range(0, len(packages), batch_size):
+        end = start + batch_size
+        scores = _intersection_areas(rounded_packages[start:end], rounded_containers) / areas[start:end, None]
+        scores[:, empty_containers] = 0
 
-        sorted_match_scores = sort_objects_by_score(match_scores)
-
-        best_match_score = sorted_match_scores[0]
-        best_match_scores.append(best_match_score['score'])
-        if forced_assignment or best_match_score['score'] >= overlap_threshold:
-            container_assignments[best_match_score['container_num']].append(package_num)
-            package_assignments[package_num].append(best_match_score['container_num'])
-
-        if not unique_assignment: # slot package into all eligible slots
-            for match_score in sorted_match_scores[1:]:
-                if match_score['score'] >= overlap_threshold:
-                    container_assignments[match_score['container_num']].append(package_num)
-                    package_assignments[package_num].append(match_score['container_num'])
-                else:
-                    break
+        # argmax and stable sorting preserve the input order of tied boxes.
+        best_indices = np.argmax(scores, axis=1)
+        for offset, (row, best) in enumerate(zip(scores, best_indices)):
+            package_num = start + offset
+            best_score = float(row[best])
+            best_match_scores.append(best_score)
+            if unique_assignment:
+                matches = [int(best)] if forced_assignment or best_score >= overlap_threshold else []
+            else:
+                matches = [int(index) for index in np.argsort(-row, kind='stable')
+                           if row[index] >= overlap_threshold]
+                if forced_assignment and not matches:
+                    matches = [int(best)]
+            package_assignments[package_num] = matches
+            for index in matches:
+                container_assignments[index].append(package_num)
             
     return container_assignments, package_assignments, best_match_scores
 
@@ -264,10 +278,40 @@ def remove_objects_without_content(page_spans, objects):
     Remove any objects (these can be rows, columns, supercells, etc.) that don't
     have any text associated with them.
     """
-    for obj in objects[:]:
-        object_text, _ = extract_text_inside_bbox(page_spans, obj['bbox'])
-        if len(object_text.strip()) == 0:
-            objects.remove(obj)
+    if not page_spans or not objects:
+        objects.clear()
+        return
+    spans = np.asarray([span['bbox'] for span in page_spans], dtype=np.float64)
+    boxes = np.asarray([obj['bbox'] for obj in objects], dtype=np.float64)
+    # 交集坐标与 Rect 一样先舍入到 float32，分母仍用 OCR 原坐标面积。
+    rounded_spans = spans.astype(np.float32).astype(np.float64)
+    rounded_boxes = boxes.astype(np.float32).astype(np.float64)
+    areas = np.prod(np.maximum(spans[:, 2:] - spans[:, :2], 0), axis=1)
+    valid_spans = areas > 0
+    if not np.isfinite(rounded_spans).all() or not np.isfinite(rounded_boxes).all():
+        for obj in objects[:]:
+            object_text, _ = extract_text_inside_bbox(page_spans, obj['bbox'])
+            if not object_text.strip():
+                objects.remove(obj)
+        return
+
+    kept = []
+    batch_size = max(1, 262144 // len(spans))
+    for start in range(0, len(boxes), batch_size):
+        end = start + batch_size
+        intersections = _intersection_areas(rounded_spans, rounded_boxes[start:end])
+        coverage = np.divide(intersections, areas[:, None], out=intersections, where=valid_spans[:, None])
+        for index, mask in enumerate(coverage.T, start):
+            obj = objects[index]
+            # 空矩形沿用 Rect 的历史行为。正常框保持 OCR 顺序及上标处理。
+            if np.any(boxes[index, 2:] <= boxes[index, :2]):
+                object_text, _ = extract_text_inside_bbox(page_spans, obj['bbox'])
+            else:
+                subset = [page_spans[i] for i in np.flatnonzero(valid_spans & (mask >= .5))]
+                object_text = extract_text_from_spans(subset, remove_integer_superscripts=True)
+            if object_text.strip():
+                kept.append(obj)
+    objects[:] = kept
             
             
 def extract_text_inside_bbox(spans, bbox):

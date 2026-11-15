@@ -147,6 +147,18 @@ impl Clone for Models {
     }
 }
 impl Models {
+    pub fn cuda_descriptor(&self, role: &str) -> Result<Option<Descriptor>, Error> {
+        let cache = self
+            .cache
+            .lock()
+            .map_err(|_| error(ErrorCode::RuntimeUnavailable, "Model cache lock poisoned"))?;
+        Ok(cache
+            .descriptors
+            .get(role)
+            .filter(|d| d.device == "cuda")
+            .cloned())
+    }
+
     pub fn retain_roles(&mut self, roles: &[&str]) {
         // Configuration changes detach from in-flight requests' cache.
         let mut cache = self.cache.lock().unwrap_or_else(|e| e.into_inner()).clone();

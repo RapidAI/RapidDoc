@@ -439,7 +439,7 @@ def _select_clear_best_cell(
     return None
 
 
-def match_ocr_cell(dt_rec_boxes: List[List[Union[Any, str]]], pred_bboxes: np.ndarray):
+def match_ocr_cell(dt_rec_boxes: List[List[Union[Any, str]]], pred_bboxes: np.ndarray, *, token_cells=None):
     """
     :param dt_rec_boxes: [[(4.2), text, score]]
     :param pred_bboxes: shap (4,2)
@@ -527,6 +527,8 @@ def match_ocr_cell(dt_rec_boxes: List[List[Union[Any, str]]], pred_bboxes: np.nd
                 projection_indices,
             )
             if split_results:
+                if token_cells is not None:
+                    token_cells[i] = tuple(cell_idx for cell_idx, _ in split_results)
                 for cell_idx, split_gt_box in split_results:
                     matched.setdefault(cell_idx, []).append(split_gt_box)
                 continue
@@ -544,6 +546,8 @@ def match_ocr_cell(dt_rec_boxes: List[List[Union[Any, str]]], pred_bboxes: np.nd
             pred_boxes,
         )
         if best_cell_idx is not None:
+            if token_cells is not None:
+                token_cells[i] = (best_cell_idx,)
             matched.setdefault(best_cell_idx, []).append(gt_box)
             continue
 
@@ -554,6 +558,8 @@ def match_ocr_cell(dt_rec_boxes: List[List[Union[Any, str]]], pred_bboxes: np.nd
             matched_indices,
         )
         if split_results:
+            if token_cells is not None:
+                token_cells[i] = tuple(cell_idx for cell_idx, _ in split_results)
             for cell_idx, split_gt_box in split_results:
                 matched.setdefault(cell_idx, []).append(split_gt_box)
             continue
@@ -866,6 +872,8 @@ def plot_html_table(
     logi_points: Union[np.ndarray, List],
     cell_box_map: Dict[int, List[str]],
     cell_bboxes: Optional[Union[np.ndarray, List]] = None,
+    *,
+    emitted_cells=None,
 ) -> str:
     logic_points = _normalize_logic_points(logi_points)
     if logic_points.size == 0:
@@ -896,6 +904,9 @@ def plot_html_table(
             clipped_row_start = max(origin_row_start, row_start)
             clipped_col_start = max(origin_col_start, col_start)
             if row == clipped_row_start and col == clipped_col_start:
+                if emitted_cells is not None:
+                    emitted_cells[cell_idx] = (clipped_row_start - row_start, min(origin_row_end, row_end) - row_start,
+                                               clipped_col_start - col_start, min(origin_col_end, col_end) - col_start)
                 row_span = min(origin_row_end, row_end) - clipped_row_start + 1
                 col_span = min(origin_col_end, col_end) - clipped_col_start + 1
                 text = _cell_text(cell_text_map, cell_idx)

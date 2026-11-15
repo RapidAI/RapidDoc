@@ -1,14 +1,63 @@
 import json
+import os
+import pickle
+import subprocess
+import sys
+import tempfile
+from functools import wraps
 from io import BytesIO
 import logging
+from pathlib import Path
 from loguru import logger
 from pypdf import PdfReader, PdfWriter, PageObject
+from pypdf import errors as pypdf_errors
 from reportlab.pdfgen import canvas
 
 from rapid_doc.data.data_reader_writer import DataWriter
 from .enum_class import BlockType, ContentType, SplitFlag
 
 logging.getLogger("pypdf").setLevel(logging.ERROR)
+
+
+def _retry_large_stream_in_process(func):
+    """Keep pypdf's large-stream limit isolated from concurrent callers."""
+    @wraps(func)
+    def wrapped(pdf_info, pdf_bytes, out_path, filename):
+        try:
+            return func(pdf_info, pdf_bytes, out_path, filename)
+        except Exception as exc:
+            limit_error = getattr(pypdf_errors, "LimitReachedError", ())
+            if not isinstance(exc, limit_error) or "Declared stream length" not in str(exc):
+                raise
+
+        code = '''
+import pickle, sys
+import pypdf.filters
+with open(sys.argv[1], "rb") as source:
+    info, data, name = pickle.load(source)
+pypdf.filters.MAX_DECLARED_STREAM_LENGTH = max(
+    pypdf.filters.MAX_DECLARED_STREAM_LENGTH, len(data)
+)
+from rapid_doc.utils import draw_bbox
+getattr(draw_bbox, name)(info, data, sys.argv[2], "output.pdf")
+'''
+        with tempfile.TemporaryDirectory(prefix="rapid-doc-bbox-") as directory:
+            input_path = Path(directory) / "input.pkl"
+            with input_path.open("wb") as source:
+                pickle.dump((pdf_info, pdf_bytes, func.__name__), source)
+            env = os.environ.copy()
+            package_root = str(Path(__file__).resolve().parents[2])
+            env["PYTHONPATH"] = os.pathsep.join(
+                value for value in (package_root, env.get("PYTHONPATH")) if value
+            )
+            subprocess.run([sys.executable, "-c", code, str(input_path), directory],
+                           check=True, env=env)
+            result = (Path(directory) / "output.pdf").read_bytes()
+            if isinstance(out_path, DataWriter):
+                out_path.write(str(filename), result)
+            else:
+                (Path(out_path) / filename).write_bytes(result)
+    return wrapped
 
 
 def cal_canvas_rect(page, bbox):
@@ -229,6 +278,7 @@ def _layout_item(bbox, polygon_points=None):
     return {"bbox": bbox, "polygon_points": None}
 
 
+@_retry_large_stream_in_process
 def draw_layout_bbox(pdf_info, pdf_bytes, out_path: str | DataWriter, filename):
     dropped_bbox_list = []
     tables_body_list, tables_caption_list, tables_footnote_list = [], [], []
@@ -433,6 +483,7 @@ def draw_layout_bbox(pdf_info, pdf_bytes, out_path: str | DataWriter, filename):
             output_pdf.write(f)
 
 
+@_retry_large_stream_in_process
 def draw_span_bbox(pdf_info, pdf_bytes, out_path: str | DataWriter, filename):
     text_list = []
     inline_equation_list = []
@@ -549,6 +600,7 @@ def draw_span_bbox(pdf_info, pdf_bytes, out_path: str | DataWriter, filename):
             output_pdf.write(f)
 
 
+@_retry_large_stream_in_process
 def draw_line_sort_bbox(pdf_info, pdf_bytes, out_path, filename):
     layout_bbox_list = []
 

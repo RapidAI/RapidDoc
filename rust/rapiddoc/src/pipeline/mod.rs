@@ -11,9 +11,13 @@ use std::{
 mod ocr;
 mod export;
 mod orientation;
+mod recovery;
 mod seals;
 mod table_fallback;
+mod table_evidence;
 mod tables;
+mod table_recovery;
+mod table_formula;
 type Images = BTreeMap<String, Arc<Vec<u8>>>;
 #[derive(Default, Clone)]
 struct Timings(BTreeMap<&'static str, (std::time::Duration, usize)>);
@@ -64,6 +68,7 @@ pub struct Request {
     pub formula_enabled: bool,
     pub formula_batch_size: usize,
     pub table_enabled: bool,
+    pub table_formula_enabled: bool,
     pub seal_enabled: bool,
     pub doc_orientation_classify: bool,
     pub layout_shape: String,
@@ -84,6 +89,7 @@ pub struct Request {
     pub rule_table_score_threshold: f64,
     pub table_force_ocr: bool,
     pub extract_original_image: bool,
+    pub image_ocr: bool,
     pub extract_original_image_iou_thresh: f64,
     pub markdown_ignore_labels: Option<Vec<String>>,
     pub geos_library: Option<PathBuf>,
@@ -102,6 +108,7 @@ impl Default for Request {
             formula_enabled: true,
             formula_batch_size: 1,
             table_enabled: true,
+            table_formula_enabled: true,
             seal_enabled: true,
             doc_orientation_classify: false,
             layout_shape: "auto".into(),
@@ -122,6 +129,7 @@ impl Default for Request {
             rule_table_score_threshold: 0.9,
             table_force_ocr: false,
             extract_original_image: false,
+            image_ocr: false,
             extract_original_image_iou_thresh: 0.9,
             markdown_ignore_labels: None,
             geos_library: None,
@@ -167,9 +175,11 @@ pub(super) struct Page {
     image: rapiddoc_pdf::render::RenderedPage,
     original_image: Option<rapiddoc_pdf::render::RenderedPage>,
     orientation_label: Option<String>,
+    rule_layout: bool,
     plan: Value,
     images: Images,
     formula_pixels: BTreeMap<String, rapiddoc_core::pillow_resize::Rgb>,
+    table_formula_probes: BTreeMap<usize, (Value, String)>,
     recognition_pixels: BTreeMap<String, rapiddoc_inference::recognition_batch::Image>,
     ocr_model_prefix: usize,
 }
@@ -516,6 +526,9 @@ impl Engine {
                     self.models.initialization_time() - loading,
                     1,
                 );
+                let rule_layout = route
+                    .as_ref()
+                    .is_some_and(|route| route["method"] == "native");
                 if let Some(route) = route {
                     layout_routes.push(json!({"page_index":index,"method":route["method"],"reason":route["reason"]}));
                 }
@@ -525,8 +538,10 @@ impl Engine {
                     image: rendered,
                     original_image,
                     orientation_label,
+                    rule_layout,
                     plan: json!({"model":model}),
                     formula_pixels: BTreeMap::new(),
+                    table_formula_probes: BTreeMap::new(),
                     recognition_pixels: BTreeMap::new(),
                     ocr_model_prefix: 0,
                     images: Images::new(),
@@ -588,6 +603,9 @@ impl Engine {
                         .into_iter()
                         .map(|(k, v)| (k, Arc::new(v)))
                         .collect();
+                    if r.formula_enabled && r.table_enabled && r.table_formula_enabled {
+                        self.prepare_table_formulas(page, r, resolve, &mut timings)?;
+                    }
                     progress(Progress {
                         completed: None,
                         elapsed_seconds: None,
@@ -838,6 +856,21 @@ impl Engine {
                         )?;
                     }
                 }
+                let rotated = matches!(
+                    page.orientation_label.as_deref(),
+                    Some("90" | "180" | "270")
+                );
+                let needs_ocr = !r.native_text || r.use_det_mode == "ocr" || rotated;
+                let recover_body = needs_ocr && !page.rule_layout;
+                if recover_body || r.image_ocr {
+                    self.recover_ocr_text(
+                        &mut page,
+                        resolve,
+                        recover_body,
+                        r.image_ocr,
+                        !needs_ocr,
+                    )?;
+                }
                 if let Some(label) = &page.orientation_label {
                     let original = page.original_image.as_ref().unwrap_or(&page.image);
                     orientation::restore(
@@ -849,6 +882,15 @@ impl Engine {
                 }
                 if let Some(original) = page.original_image.take() {
                     page.image = original;
+                }
+                if !needs_ocr && !page.rule_layout {
+                    recovery::native_text(
+                        &mut page.plan["model"],
+                        &page.facts,
+                        page.image.scale,
+                        page.image.width as f64,
+                        page.image.height as f64,
+                    );
                 }
                 let phase_started = std::time::Instant::now();
                 progress(Progress {

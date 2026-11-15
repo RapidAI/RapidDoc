@@ -344,6 +344,138 @@ def _detect_table_text(
     return restored.tolist()
 
 
+def _recover_rotated_table_boxes(before, after, source_shape, angle):
+    """Replace a merged line only when the old boxes align with nearby columns."""
+    if not len(before) or not len(after):
+        return after
+    height, width = source_shape[:2]
+    x, y = np.asarray(before, dtype=np.float32).transpose(2, 0, 1)
+    if angle == "270":
+        projected = np.stack((height - 1 - y, x), axis=-1)[:, [3, 0, 1, 2]]
+    else:
+        projected = np.stack((y, width - 1 - x), axis=-1)[:, [1, 2, 3, 0]]
+    lo, hi = projected.min(axis=1), projected.max(axis=1)
+    centers = (lo + hi) / 2
+    sizes = hi - lo
+    recovered = []
+    for box in after:
+        left, top = np.min(box, axis=0)
+        right, bottom = np.max(box, axis=0)
+        w, h = right - left, bottom - top
+        if h <= 0 or w < 4 * h:
+            recovered.append(box)
+            continue
+        overlap_y = np.minimum(hi[:, 1], bottom) - np.maximum(lo[:, 1], top)
+        ids = np.flatnonzero(
+            (centers[:, 0] >= left) & (centers[:, 0] <= right)
+            & (overlap_y >= 0.65 * np.maximum(h, sizes[:, 1]))
+            & (sizes[:, 0] > 0) & (sizes[:, 0] <= w / 2)
+        )
+        ids = ids[np.argsort(centers[ids, 0])]
+        if (len(ids) < 3 or hi[ids[-1], 0] - lo[ids[0], 0] < 0.8 * w
+                or np.any(np.diff(centers[ids, 0]) < 0.7 * np.maximum(sizes[ids[:-1], 0], sizes[ids[1:], 0]))):
+            recovered.append(box)
+            continue
+        # Adjacent rows provide evidence that these are columns rather than
+        # fragments of a sentence in a single merged cell.
+        center_y = (top + bottom) / 2
+        dy = np.abs(centers[:, 1] - center_y)
+        peers = centers[(dy >= h) & (dy <= 4 * h), 0]
+        aligned = np.any(
+            np.abs(centers[ids, 0, None] - peers) <= 0.3 * sizes[ids, 0, None], axis=1,
+        )
+        if np.count_nonzero(aligned) >= 0.75 * len(ids):
+            recovered.extend(projected[ids].tolist())
+        else:
+            recovered.append(box)
+    return recovered
+
+
+def _verify_table_direction(ocr_model, image, boxes, model_label):
+    """Compare the same elongated text crops in both sideways directions."""
+    candidates = []
+    for box in boxes:
+        points = np.asarray(box, dtype=np.float32)
+        width = max(np.linalg.norm(points[0] - points[1]), np.linalg.norm(points[2] - points[3]))
+        height = max(np.linalg.norm(points[0] - points[3]), np.linalg.norm(points[1] - points[2]))
+        if width >= 2 and 1.4 * width <= height <= 10 * width:
+            candidates.append((height / width, points))
+    crops = [get_rotate_crop_image(image, points, rotate_ratio=1.4)
+             for _, points in sorted(candidates, key=lambda item: item[0], reverse=True)[:4]]
+    # get_rotate_crop_image rotates tall crops counterclockwise.
+    crops = [crop for crop in crops if crop.shape[1] > crop.shape[0]]
+    if len(crops) < 2:
+        return "0"
+    flipped = [cv2.rotate(crop, cv2.ROTATE_180) for crop in crops]
+    try:
+        results = ocr_model.ocr(crops + flipped, det=False)[0]
+    except Exception as exc:
+        logger.debug(f"Table orientation OCR verification skipped: {exc}")
+        return "0"
+
+    def evidence(result):
+        text, score = result[:2]
+        return score if sum(char.isalpha() for char in text) >= 2 else 0
+
+    left_votes = right_votes = 0
+    numeric_agreement = set()
+    numeric_conflict = False
+    for left, right in zip(results[:len(crops)], results[len(crops):]):
+        lscore, rscore = evidence(left), evidence(right)
+        left_votes += lscore >= .8 and lscore - rscore >= .2
+        right_votes += rscore >= .8 and rscore - lscore >= .2
+        # On numeric tables, use repeated score differences for the same
+        # recognized number as corroboration of the model's direction.
+        number = "".join(left[0].split())
+        if len(number) >= 4 and number.isdecimal() and number == "".join(right[0].split()):
+            preferred, opposite = (left, right) if model_label == "90" else (right, left)
+            if preferred[1] >= .98 and preferred[1] - opposite[1] >= .15:
+                numeric_agreement.add(number)
+            numeric_conflict |= opposite[1] >= .98 and opposite[1] - preferred[1] >= .15
+    if left_votes >= 2 and not right_votes:
+        return "90"
+    if right_votes >= 2 and not left_votes:
+        return "270"
+    if not left_votes and not right_votes and len(numeric_agreement) >= 3 and not numeric_conflict:
+        return model_label
+    return "0"
+
+
+def _get_table_ocr_model(atom_model_manager, lang, ocr_config):
+    config = copy.deepcopy(ocr_config) if ocr_config is not None else None
+    if config is not None:
+        config.pop("custom_model", None)
+    return atom_model_manager.get_atom_model(
+        atom_model_name=AtomicModel.OCR,
+        det_db_box_thresh=0.5,
+        det_db_unclip_ratio=1.6,
+        lang=lang,
+        ocr_config=config,
+        enable_merge_det_boxes=False,
+    )
+
+
+def _probe_table_direction(table, page, scale, manager, ocr_model, table_config, masks):
+    """Shared direction probe; its boxes can be reused after formula inference."""
+    image = cv2.cvtColor(table['table_img'], cv2.COLOR_RGB2BGR)
+    det_image = _apply_mask_boxes_to_image(image, masks) if masks else image
+    boxes = _detect_table_text(
+        ocr_model, det_image, masks,
+        retry_padding=int(table_config.get('ocr_det_retry_padding', 8)),
+        retry_short_side=int(table_config.get('ocr_det_retry_short_side', 32)),
+    )
+    label, angles = '0', []
+    if page.get('rotate_label') not in ['90', '180', '270']:
+        label, angles = txt_most_angle_extract_table(page, table, scale=scale)
+    if not angles:
+        model = manager.get_atom_model(atom_model_name=AtomicModel.ImgOrientationCls)
+        label = model.predict(
+            image, boxes, table_mode=True,
+            verify_direction=lambda candidate: _verify_table_direction(ocr_model, image, boxes, candidate),
+        )
+    return boxes, label
+
+
 def _process_single_table(
         table_res_dict: Dict,
         page_dict: Dict,
@@ -455,47 +587,25 @@ def _process_single_table(
         except Exception as exc:
             logger.warning(f'PDFium rule table failed, fallback to model: {exc}')
 
-    ocr_config_clean = None
-    if ocr_config is not None:
-        ocr_config_clean = copy.deepcopy(ocr_config)
-        ocr_config_clean.pop("custom_model", None)
-    ocr_model = atom_model_manager.get_atom_model(
-        atom_model_name=AtomicModel.OCR,
-        det_db_box_thresh=0.5,
-        det_db_unclip_ratio=1.6,
-        lang=_lang,
-        ocr_config=ocr_config_clean,
-        enable_merge_det_boxes=False,
-    )
+    ocr_model = _get_table_ocr_model(atom_model_manager, _lang, ocr_config)
 
     # 获取表格文本框
     bgr_image = cv2.cvtColor(table_res_dict["table_img"], cv2.COLOR_RGB2BGR)
-    det_image = (
-        _apply_mask_boxes_to_image(bgr_image, adjusted_mfdetrec_res)
-        if adjusted_mfdetrec_res
-        else bgr_image
-    )
-    det_res = _detect_table_text(
-        ocr_model,
-        det_image,
-        adjusted_mfdetrec_res,
-        retry_padding=ocr_det_retry_padding,
-        retry_short_side=ocr_det_retry_short_side,
-    )
-
-    angles = []
-    rotate_label = "0"
-    if pdf_not_rotate:
-        # 检测文字旋转
-        rotate_label, angles = txt_most_angle_extract_table(page_dict, table_res_dict, scale=scale)
-    if not angles:
-        # 如果没有文本的角度，使用模型判断是否旋转
-        img_orientation_cls_model = atom_model_manager.get_atom_model(
-            atom_model_name=AtomicModel.ImgOrientationCls,
+    probe = table_res_dict.pop('_formula_direction_probe', None)
+    if probe is None:
+        probe = _probe_table_direction(
+            table_res_dict, page_dict, scale, atom_model_manager,
+            ocr_model, table_config, adjusted_mfdetrec_res,
         )
-        rotate_label = img_orientation_cls_model.predict(bgr_image, det_res, table_mode=True)
+    det_res, rotate_label = probe
     if rotate_label in ["90", "270"]:
+        original_boxes = det_res
+        original_shape = bgr_image.shape
         rotate_table_image(table_res_dict, rotate_label)
+        from .table_formula import rotate_table_hint_boxes
+        adjusted_mfdetrec_res = rotate_table_hint_boxes(
+            adjusted_mfdetrec_res, original_shape, rotate_label
+        )
         # 旋转后的表格需要重新获取文本框
         bgr_image = cv2.cvtColor(table_res_dict["table_img"], cv2.COLOR_RGB2BGR)
         det_image = (
@@ -510,6 +620,8 @@ def _process_single_table(
             retry_padding=ocr_det_retry_padding,
             retry_short_side=ocr_det_retry_short_side,
         )
+        if original_boxes is not None and det_res is not None:
+            det_res = _recover_rotated_table_boxes(original_boxes, det_res, original_shape, rotate_label)
 
     ocr_result = []
 
@@ -583,6 +695,12 @@ def _process_single_table(
             table_class=table_class,
             table_class_score=table_class_score,
         )
+        if table_config.get('fallback_model_type') and pdf_not_rotate and page_dict.get('vector_lines'):
+            from rapid_doc.model.table.table_evidence import crop_vector_lines
+
+            predict_kwargs['vector_lines'] = crop_vector_lines(
+                page_dict['vector_lines'], useful_list, scale, rotate_label,
+            )
     html_code = table_model.predict(
         table_res_dict['table_img'], ocr_result,
         fill_image_res, adjusted_mfdetrec_res,

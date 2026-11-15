@@ -15,7 +15,7 @@ from rapid_doc.backend.pipeline.para_split import para_split
 from rapid_doc.utils.block_pre_proc import prepare_block_bboxes, process_groups
 from rapid_doc.utils.block_sort import sort_blocks_by_bbox
 from rapid_doc.utils.cut_image import cut_image_and_table
-from rapid_doc.utils.enum_class import BlockType, ContentType
+from rapid_doc.utils.enum_class import BlockType, CategoryId, ContentType
 from rapid_doc.utils.model_utils import clean_memory
 from rapid_doc.backend.pipeline.pipeline_magic_model import MagicModel
 from rapid_doc.utils.ocr_utils import OcrConfidence
@@ -71,6 +71,12 @@ def page_model_info_to_page_info(
                 markup, image_writer, page_index, image_path_prefix=f'{image_dir}/' if image_dir else '')
     
     magic_model = MagicModel(page_model_info, scale)
+    unassigned_text = [
+        {"text": item["text"], "bbox": item["bbox"], "score": item["score"]}
+        for item in page_model_info["layout_dets"]
+        if item.get("unassigned_text") and item["category_id"] == CategoryId.OcrText
+        and item.get("text", "").strip()
+    ]
     
     # 图像配置
     extract_original_image = image_config.get("extract_original_image", False) if image_config else False
@@ -166,7 +172,7 @@ def page_model_info_to_page_info(
     fix_discarded_blocks = fix_discarded_block(discarded_block_with_spans)
     
     # 检查是否有有效的 bbox
-    if len(all_bboxes) == 0 and len(fix_discarded_blocks) == 0:
+    if not all_bboxes and not fix_discarded_blocks and not unassigned_text:
         return None
     
     # 对 image/table/interline_equation 截图
@@ -189,6 +195,8 @@ def page_model_info_to_page_info(
     
     # 构造 page_info
     page_info = make_page_info_dict(sorted_blocks, page_index, page_w, page_h, fix_discarded_blocks)
+    if unassigned_text:
+        page_info["unassigned_text"] = unassigned_text
     
     return page_info
 
