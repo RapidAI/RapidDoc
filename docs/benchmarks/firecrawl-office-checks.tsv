@@ -1,0 +1,179 @@
+file	sha256	category	check	match	expected
+doc/handmade-blockstyle.doc	04c252746d7cb2dbeaef607d6a8bcec31713165b88b2ba8cd640f81d53bbd3c5	content	Body before.	text	Body before.
+doc/handmade-blockstyle.doc	04c252746d7cb2dbeaef607d6a8bcec31713165b88b2ba8cd640f81d53bbd3c5	content	A quotation.	text	A quotation.
+doc/handmade-blockstyle.doc	04c252746d7cb2dbeaef607d6a8bcec31713165b88b2ba8cd640f81d53bbd3c5	content	Body after.	text	Body after.
+doc/handmade-blockstyle.doc	04c252746d7cb2dbeaef607d6a8bcec31713165b88b2ba8cd640f81d53bbd3c5	structure	One code block preserves first function	regex	```[^\n]*\nfn main\(\) \{\n(?:[^\n]*println!.*\n)?\}\n```
+doc/handmade-blockstyle.doc	04c252746d7cb2dbeaef607d6a8bcec31713165b88b2ba8cd640f81d53bbd3c5	structure	Quotation block	regex	^>\s*A quotation\.
+doc/handmade-cyrillic.doc	707497f7f28257b7aba290657e2d799cfc4cecddea0626642820f3b33338f301	content	Привет, мир!	text	Привет, мир!
+doc/handmade-cyrillic.doc	707497f7f28257b7aba290657e2d799cfc4cecddea0626642820f3b33338f301	content	Второй абзац по-русски.	text	Второй абзац по-русски.
+doc/handmade-shiftjis.doc	87cf99313cfb3171f966b4bbd38ba797bb4f8e23aa74b0f9a2547a6b9db417e5	content	こんにちは世界。	text	こんにちは世界。
+doc/handmade-shiftjis.doc	87cf99313cfb3171f966b4bbd38ba797bb4f8e23aa74b0f9a2547a6b9db417e5	content	日本語の段落です。	text	日本語の段落です。
+doc/text.doc	0d7c077cf4b49939a05ccd5f8012164649752be0c5841fa50da6258e0517e6e5	content	Interrupting paragraph between lists.	text	Interrupting paragraph between lists.
+doc/text.doc	0d7c077cf4b49939a05ccd5f8012164649752be0c5841fa50da6258e0517e6e5	content	Fourth, continuing the count	text	Fourth, continuing the count
+doc/text.doc	0d7c077cf4b49939a05ccd5f8012164649752be0c5841fa50da6258e0517e6e5	content	Footnote after an astral character.	text	Footnote after an astral character.
+doc/text.doc	0d7c077cf4b49939a05ccd5f8012164649752be0c5841fa50da6258e0517e6e5	content	Endnote body text.	text	Endnote body text.
+doc/text.doc	0d7c077cf4b49939a05ccd5f8012164649752be0c5841fa50da6258e0517e6e5	content	Inside the text box.	text	Inside the text box.
+doc/text.doc	0d7c077cf4b49939a05ccd5f8012164649752be0c5841fa50da6258e0517e6e5	content	Value below one millionth: 0.0000004 should survive.	text	Value below one millionth: 0.0000004 should survive.
+doc/text.doc	0d7c077cf4b49939a05ccd5f8012164649752be0c5841fa50da6258e0517e6e5	structure	Heading: Fixture Document	regex	^#{1,6} .*Fixture\ Document
+doc/text.doc	0d7c077cf4b49939a05ccd5f8012164649752be0c5841fa50da6258e0517e6e5	structure	Heading: Lists	regex	^#{1,6} .*Lists
+doc/text.doc	0d7c077cf4b49939a05ccd5f8012164649752be0c5841fa50da6258e0517e6e5	structure	Table represented as a table	regex	<table\b|^\|.*\|\s*\n\|[ :|\-]+\|
+doc/text.doc	0d7c077cf4b49939a05ccd5f8012164649752be0c5841fa50da6258e0517e6e5	structure	Numbered list remains a list	regex	^1\.\s+First numbered
+doc/text.doc	0d7c077cf4b49939a05ccd5f8012164649752be0c5841fa50da6258e0517e6e5	formatting	External hyperlink	regex	"\]\(https://example\.com/page\)|href=[""\x27]https://example\.com/page[""\x27]"
+doc/text.doc	0d7c077cf4b49939a05ccd5f8012164649752be0c5841fa50da6258e0517e6e5	formatting	Relative hyperlink	regex	"\]\(\.\./\.\./fixture\-src/sibling\.odt\)|href=[""\x27]\.\./\.\./fixture\-src/sibling\.odt[""\x27]"
+doc/text.doc	0d7c077cf4b49939a05ccd5f8012164649752be0c5841fa50da6258e0517e6e5	structure	colspan merge: Wide head	regex	"<t[dh]\b[^>]*\bcolspan=[""\x27]2[""\x27][^>]*>(?:\s*<p>)?\s*Wide\ head"
+doc/text.doc	0d7c077cf4b49939a05ccd5f8012164649752be0c5841fa50da6258e0517e6e5	structure	rowspan merge: Tall	regex	"<t[dh]\b[^>]*\browspan=[""\x27]2[""\x27][^>]*>(?:\s*<p>)?\s*Tall"
+doc/text.doc	0d7c077cf4b49939a05ccd5f8012164649752be0c5841fa50da6258e0517e6e5	formatting	bold formatting	regex	<strong>bold</strong>|\*\*bold\*\*
+doc/text.doc	0d7c077cf4b49939a05ccd5f8012164649752be0c5841fa50da6258e0517e6e5	formatting	italic formatting	regex	<em>italic</em>|\*italic\*
+doc/text.doc	0d7c077cf4b49939a05ccd5f8012164649752be0c5841fa50da6258e0517e6e5	formatting	struck formatting	regex	<s>struck</s>|~~struck~~
+docx/text.docx	6b674297884f9ed57809763c9f60ea3a849d5cc6fb28c9837c714e322eceddcf	content	Interrupting paragraph between lists.	text	Interrupting paragraph between lists.
+docx/text.docx	6b674297884f9ed57809763c9f60ea3a849d5cc6fb28c9837c714e322eceddcf	content	Fourth, continuing the count	text	Fourth, continuing the count
+docx/text.docx	6b674297884f9ed57809763c9f60ea3a849d5cc6fb28c9837c714e322eceddcf	content	Footnote after an astral character.	text	Footnote after an astral character.
+docx/text.docx	6b674297884f9ed57809763c9f60ea3a849d5cc6fb28c9837c714e322eceddcf	content	Endnote body text.	text	Endnote body text.
+docx/text.docx	6b674297884f9ed57809763c9f60ea3a849d5cc6fb28c9837c714e322eceddcf	content	Inside the text box.	text	Inside the text box.
+docx/text.docx	6b674297884f9ed57809763c9f60ea3a849d5cc6fb28c9837c714e322eceddcf	content	Value below one millionth: 0.0000004 should survive.	text	Value below one millionth: 0.0000004 should survive.
+docx/text.docx	6b674297884f9ed57809763c9f60ea3a849d5cc6fb28c9837c714e322eceddcf	structure	Heading: Fixture Document	regex	^#{1,6} .*Fixture\ Document
+docx/text.docx	6b674297884f9ed57809763c9f60ea3a849d5cc6fb28c9837c714e322eceddcf	structure	Heading: Lists	regex	^#{1,6} .*Lists
+docx/text.docx	6b674297884f9ed57809763c9f60ea3a849d5cc6fb28c9837c714e322eceddcf	structure	Table represented as a table	regex	<table\b|^\|.*\|\s*\n\|[ :|\-]+\|
+docx/text.docx	6b674297884f9ed57809763c9f60ea3a849d5cc6fb28c9837c714e322eceddcf	structure	Numbered list remains a list	regex	^1\.\s+First numbered
+docx/text.docx	6b674297884f9ed57809763c9f60ea3a849d5cc6fb28c9837c714e322eceddcf	formatting	External hyperlink	regex	"\]\(https://example\.com/page\)|href=[""\x27]https://example\.com/page[""\x27]"
+docx/text.docx	6b674297884f9ed57809763c9f60ea3a849d5cc6fb28c9837c714e322eceddcf	formatting	Relative hyperlink	regex	"\]\(\.\./\.\./fixture\-src/sibling\.odt\)|href=[""\x27]\.\./\.\./fixture\-src/sibling\.odt[""\x27]"
+docx/text.docx	6b674297884f9ed57809763c9f60ea3a849d5cc6fb28c9837c714e322eceddcf	structure	colspan merge: Wide head	regex	"<t[dh]\b[^>]*\bcolspan=[""\x27]2[""\x27][^>]*>(?:\s*<p>)?\s*Wide\ head"
+docx/text.docx	6b674297884f9ed57809763c9f60ea3a849d5cc6fb28c9837c714e322eceddcf	structure	rowspan merge: Tall	regex	"<t[dh]\b[^>]*\browspan=[""\x27]2[""\x27][^>]*>(?:\s*<p>)?\s*Tall"
+docx/text.docx	6b674297884f9ed57809763c9f60ea3a849d5cc6fb28c9837c714e322eceddcf	formatting	bold formatting	regex	<strong>bold</strong>|\*\*bold\*\*
+docx/text.docx	6b674297884f9ed57809763c9f60ea3a849d5cc6fb28c9837c714e322eceddcf	formatting	italic formatting	regex	<em>italic</em>|\*italic\*
+docx/text.docx	6b674297884f9ed57809763c9f60ea3a849d5cc6fb28c9837c714e322eceddcf	formatting	struck formatting	regex	<s>struck</s>|~~struck~~
+docx/handmade-altpath.docx	fb77751c25853f876f9cda0b819819f690c4baadf080c1170ad06ffc98e52545	content	Body found via rels	text	Body found via rels
+docx/handmade-altpath.docx	fb77751c25853f876f9cda0b819819f690c4baadf080c1170ad06ffc98e52545	content	A relocated footnote	text	A relocated footnote
+docx/handmade-altpath.docx	fb77751c25853f876f9cda0b819819f690c4baadf080c1170ad06ffc98e52545	structure	Heading: Relocated heading	regex	^#{1,6} .*Relocated\ heading
+docx/handmade-blockstyle.docx	a8c1013b60b03c6e65dfb404b1901c81661e344a2fb7e2dd12146fa41c48444e	content	Body before.	text	Body before.
+docx/handmade-blockstyle.docx	a8c1013b60b03c6e65dfb404b1901c81661e344a2fb7e2dd12146fa41c48444e	content	Its second paragraph.	text	Its second paragraph.
+docx/handmade-blockstyle.docx	a8c1013b60b03c6e65dfb404b1901c81661e344a2fb7e2dd12146fa41c48444e	content	Word intense quote.	text	Word intense quote.
+docx/handmade-blockstyle.docx	a8c1013b60b03c6e65dfb404b1901c81661e344a2fb7e2dd12146fa41c48444e	content	Inherits Source Code.	text	Inherits Source Code.
+docx/handmade-blockstyle.docx	a8c1013b60b03c6e65dfb404b1901c81661e344a2fb7e2dd12146fa41c48444e	content	Body after.	text	Body after.
+docx/handmade-blockstyle.docx	a8c1013b60b03c6e65dfb404b1901c81661e344a2fb7e2dd12146fa41c48444e	structure	One code block preserves first function	regex	```[^\n]*\nfn main\(\) \{\n(?:[^\n]*println!.*\n)?\}\n```
+docx/handmade-blockstyle.docx	a8c1013b60b03c6e65dfb404b1901c81661e344a2fb7e2dd12146fa41c48444e	structure	Quotation block	regex	^>\s*A quotation\.
+docx/handmade-manyrefs.docx	219cfa32f83401f6415191d33d391ddbc35edbbbb3e04678b0d1b74ad6d14cb7	content	Seventy references to one image follow.	text	Seventy references to one image follow.
+docx/handmade-manyrefs.docx	219cfa32f83401f6415191d33d391ddbc35edbbbb3e04678b0d1b74ad6d14cb7	structure	Embedded image represented in Markdown	regex	!\[[^\]]*\]\([^)]+\)|<img\b
+docx/handmade-math.docx	6499c01602a376977b1b1d40496cc0a4808047c2b78806bf5a7aa96e0ebc80dc	content	The roots are	text	The roots are
+docx/handmade-math.docx	6499c01602a376977b1b1d40496cc0a4808047c2b78806bf5a7aa96e0ebc80dc	content	A price of $5 or $6 is not math.	text	A price of $5 or $6 is not math.
+docx/handmade-math.docx	6499c01602a376977b1b1d40496cc0a4808047c2b78806bf5a7aa96e0ebc80dc	formatting	Quadratic formula	regex	\\frac
+docx/handmade-math.docx	6499c01602a376977b1b1d40496cc0a4808047c2b78806bf5a7aa96e0ebc80dc	formatting	Summation formula	regex	\\sum
+docx/handmade-math.docx	6499c01602a376977b1b1d40496cc0a4808047c2b78806bf5a7aa96e0ebc80dc	formatting	Real-number domain	regex	\\mathbb\{R\}
+docx/handmade-numbering.docx	6975897719c716d0c323758b05c287bc8b93e8d022a4119aca042e026ad0646c	content	Deep bullet	text	Deep bullet
+docx/handmade-numbering.docx	6975897719c716d0c323758b05c287bc8b93e8d022a4119aca042e026ad0646c	content	Interruption paragraph.	text	Interruption paragraph.
+docx/handmade-numbering.docx	6975897719c716d0c323758b05c287bc8b93e8d022a4119aca042e026ad0646c	content	Suppressed numbering paragraph	text	Suppressed numbering paragraph
+docx/handmade-numbering.docx	6975897719c716d0c323758b05c287bc8b93e8d022a4119aca042e026ad0646c	structure	First numbered paragraph	regex	^1\.\s+One-one
+docx/handmade-numbering.docx	6975897719c716d0c323758b05c287bc8b93e8d022a4119aca042e026ad0646c	structure	Continuation after interruption	regex	^4\.\s+One-four
+docx/handmade-numbering.docx	6975897719c716d0c323758b05c287bc8b93e8d022a4119aca042e026ad0646c	structure	Independent list counter	regex	^1\.\s+Two-one
+docx/handmade-numbering.docx	6975897719c716d0c323758b05c287bc8b93e8d022a4119aca042e026ad0646c	structure	Override starts at ten	regex	^10\.\s+Ten-start
+docx/handmade-numbering.docx	6975897719c716d0c323758b05c287bc8b93e8d022a4119aca042e026ad0646c	structure	Letter G override	regex	^\s*(?:[-*]\s+)?G\)\s+Level replaced
+docx/handmade-numbering.docx	6975897719c716d0c323758b05c287bc8b93e8d022a4119aca042e026ad0646c	structure	Heading: Inherited subheading	regex	^#{1,6} .*Inherited\ subheading
+docx/handmade-ole.docx	346a10b066ab72098556dd55b3ef7cd5e0be261c019087e9794b095dc0cdf4a9	content	Before the object	text	Before the object
+docx/handmade-ole.docx	346a10b066ab72098556dd55b3ef7cd5e0be261c019087e9794b095dc0cdf4a9	content	Excel.Sheet.12	text	Excel.Sheet.12
+docx/handmade-outline.docx	2c4c232cde1ead23360922df6db0d472500c7c5b5d6149d5ccf9ecd2dac90909	structure	Style heading stays a heading	regex	^#{2} +Style\ heading\ stays\ a\ heading\s*$
+docx/handmade-outline.docx	2c4c232cde1ead23360922df6db0d472500c7c5b5d6149d5ccf9ecd2dac90909	structure	Direct level overrides the style	regex	^#{3} +Direct\ level\ overrides\ the\ style\s*$
+docx/handmade-outline.docx	2c4c232cde1ead23360922df6db0d472500c7c5b5d6149d5ccf9ecd2dac90909	structure	Direct outline without a style	regex	^#{1} +Direct\ outline\ without\ a\ style\s*$
+docx/handmade-outline.docx	2c4c232cde1ead23360922df6db0d472500c7c5b5d6149d5ccf9ecd2dac90909	structure	Direct nine turns the style heading off	regex	^Direct\ nine\ turns\ the\ style\ heading\ off\s*$
+docx/handmade-outline.docx	2c4c232cde1ead23360922df6db0d472500c7c5b5d6149d5ccf9ecd2dac90909	structure	Child style nine stops inheritance	regex	^Child\ style\ nine\ stops\ inheritance\s*$
+docx/handmade-rich.docx	22afadb7927cc11d7520cd0f471aa1eea658369a1ba85da48123aded0700aafa	content	Rich objects follow.	text	Rich objects follow.
+docx/handmade-rich.docx	22afadb7927cc11d7520cd0f471aa1eea658369a1ba85da48123aded0700aafa	content	Quarterly Widgets	text	Quarterly Widgets
+docx/handmade-rich.docx	22afadb7927cc11d7520cd0f471aa1eea658369a1ba85da48123aded0700aafa	content	Plan	text	Plan
+docx/handmade-rich.docx	22afadb7927cc11d7520cd0f471aa1eea658369a1ba85da48123aded0700aafa	content	Build	text	Build
+docx/handmade-rich.docx	22afadb7927cc11d7520cd0f471aa1eea658369a1ba85da48123aded0700aafa	content	Ship	text	Ship
+docx/handmade-rich.docx	22afadb7927cc11d7520cd0f471aa1eea658369a1ba85da48123aded0700aafa	content	After the objects.	text	After the objects.
+docx/handmade-rich.docx	22afadb7927cc11d7520cd0f471aa1eea658369a1ba85da48123aded0700aafa	content	Excel.Sheet.12	text	Excel.Sheet.12
+docx/handmade-rich.docx	22afadb7927cc11d7520cd0f471aa1eea658369a1ba85da48123aded0700aafa	structure	Table represented as a table	regex	<table\b|^\|.*\|\s*\n\|[ :|\-]+\|
+docx/handmade-strict.docx	f65da59839848f8bbe0b72ddc03f8765bf06662994ae980f22095eb85cb0096a	structure	Heading: Strict heading	regex	^#{1,6} .*Strict\ heading
+docx/handmade-strict.docx	f65da59839848f8bbe0b72ddc03f8765bf06662994ae980f22095eb85cb0096a	content	Strict body with **toggled bold**	text	Strict body with **toggled bold**
+docx/handmade-tables.docx	cf847fbf73810f6af47181230cd4ad2704a53e8b2668297dba4904f7366da6ce	content	Head A	text	Head A
+docx/handmade-tables.docx	cf847fbf73810f6af47181230cd4ad2704a53e8b2668297dba4904f7366da6ce	content	Head B	text	Head B
+docx/handmade-tables.docx	cf847fbf73810f6af47181230cd4ad2704a53e8b2668297dba4904f7366da6ce	content	Head C	text	Head C
+docx/handmade-tables.docx	cf847fbf73810f6af47181230cd4ad2704a53e8b2668297dba4904f7366da6ce	content	legacy start	text	legacy start
+docx/handmade-tables.docx	cf847fbf73810f6af47181230cd4ad2704a53e8b2668297dba4904f7366da6ce	content	legacy cont	text	legacy cont
+docx/handmade-tables.docx	cf847fbf73810f6af47181230cd4ad2704a53e8b2668297dba4904f7366da6ce	content	after the table	text	after the table
+docx/handmade-tables.docx	cf847fbf73810f6af47181230cd4ad2704a53e8b2668297dba4904f7366da6ce	structure	Table represented as a table	regex	<table\b|^\|.*\|\s*\n\|[ :|\-]+\|
+docx/handmade-tables.docx	cf847fbf73810f6af47181230cd4ad2704a53e8b2668297dba4904f7366da6ce	structure	rowspan merge: Head A	regex	"<t[dh]\b[^>]*\browspan=[""\x27]2[""\x27][^>]*>(?:\s*<p>)?\s*Head\ A"
+ppt/handmade-multimaster.ppt	7f4ccf9350fb4b366f2638f1d1b54bd9f88bd1e7492141df02d709b001ae2026	content	Alpha master body text	text	Alpha master body text
+ppt/handmade-multimaster.ppt	7f4ccf9350fb4b366f2638f1d1b54bd9f88bd1e7492141df02d709b001ae2026	content	Beta master body text	text	Beta master body text
+ppt/handmade-multimaster.ppt	7f4ccf9350fb4b366f2638f1d1b54bd9f88bd1e7492141df02d709b001ae2026	formatting	Inherited bold	regex	\*\*Alpha master body text\*\*|<strong>Alpha master body text</strong>
+ppt/handmade-multimaster.ppt	7f4ccf9350fb4b366f2638f1d1b54bd9f88bd1e7492141df02d709b001ae2026	formatting	Inherited italic	regex	\*Beta master body text\*|<em>Beta master body text</em>
+ppt/handmade-sparsenotes.ppt	a73a3ec85cba14e7b9adac569bb324dca8b6efc061a5ead677cb17c37999f2fe	content	First slide text	text	First slide text
+ppt/handmade-sparsenotes.ppt	a73a3ec85cba14e7b9adac569bb324dca8b6efc061a5ead677cb17c37999f2fe	content	Second slide text	text	Second slide text
+ppt/handmade-sparsenotes.ppt	a73a3ec85cba14e7b9adac569bb324dca8b6efc061a5ead677cb17c37999f2fe	content	Notes for the second slide	text	Notes for the second slide
+ppt/pres.ppt	8b92d2304598dafc977ff309095aa405151ac741d3374b3d5a214377b57765b3	content	Deck Title Slide	text	Deck Title Slide
+ppt/pres.ppt	8b92d2304598dafc977ff309095aa405151ac741d3374b3d5a214377b57765b3	content	Nested detail	text	Nested detail
+ppt/pres.ppt	8b92d2304598dafc977ff309095aa405151ac741d3374b3d5a214377b57765b3	content	Numbers Slide	text	Numbers Slide
+ppt/pres.ppt	8b92d2304598dafc977ff309095aa405151ac741d3374b3d5a214377b57765b3	content	Region	text	Region
+ppt/pres.ppt	8b92d2304598dafc977ff309095aa405151ac741d3374b3d5a214377b57765b3	content	Total	text	Total
+ppt/pres.ppt	8b92d2304598dafc977ff309095aa405151ac741d3374b3d5a214377b57765b3	content	North	text	North
+ppt/pres.ppt	8b92d2304598dafc977ff309095aa405151ac741d3374b3d5a214377b57765b3	content	42	text	42
+ppt/pres.ppt	8b92d2304598dafc977ff309095aa405151ac741d3374b3d5a214377b57765b3	content	Inside a group shape.	text	Inside a group shape.
+ppt/pres.ppt	8b92d2304598dafc977ff309095aa405151ac741d3374b3d5a214377b57765b3	content	Speaker note for the intro slide.	text	Speaker note for the intro slide.
+ppt/pres.ppt	8b92d2304598dafc977ff309095aa405151ac741d3374b3d5a214377b57765b3	content	Second slide notes mention the table.	text	Second slide notes mention the table.
+ppt/pres.ppt	8b92d2304598dafc977ff309095aa405151ac741d3374b3d5a214377b57765b3	structure	Table represented as a table	regex	<table\b|^\|.*\|\s*\n\|[ :|\-]+\|
+pptx/pres.pptx	c96aa52da19f273f602040490203d9319872f512707e1a6c5a3fc53251b6d050	content	Deck Title Slide	text	Deck Title Slide
+pptx/pres.pptx	c96aa52da19f273f602040490203d9319872f512707e1a6c5a3fc53251b6d050	content	Nested detail	text	Nested detail
+pptx/pres.pptx	c96aa52da19f273f602040490203d9319872f512707e1a6c5a3fc53251b6d050	content	Numbers Slide	text	Numbers Slide
+pptx/pres.pptx	c96aa52da19f273f602040490203d9319872f512707e1a6c5a3fc53251b6d050	content	Region	text	Region
+pptx/pres.pptx	c96aa52da19f273f602040490203d9319872f512707e1a6c5a3fc53251b6d050	content	Total	text	Total
+pptx/pres.pptx	c96aa52da19f273f602040490203d9319872f512707e1a6c5a3fc53251b6d050	content	North	text	North
+pptx/pres.pptx	c96aa52da19f273f602040490203d9319872f512707e1a6c5a3fc53251b6d050	content	42	text	42
+pptx/pres.pptx	c96aa52da19f273f602040490203d9319872f512707e1a6c5a3fc53251b6d050	content	Inside a group shape.	text	Inside a group shape.
+pptx/pres.pptx	c96aa52da19f273f602040490203d9319872f512707e1a6c5a3fc53251b6d050	content	Speaker note for the intro slide.	text	Speaker note for the intro slide.
+pptx/pres.pptx	c96aa52da19f273f602040490203d9319872f512707e1a6c5a3fc53251b6d050	content	Second slide notes mention the table.	text	Second slide notes mention the table.
+pptx/pres.pptx	c96aa52da19f273f602040490203d9319872f512707e1a6c5a3fc53251b6d050	structure	Table represented as a table	regex	<table\b|^\|.*\|\s*\n\|[ :|\-]+\|
+pptx/handmade-altpath.pptx	1f364b417eb31799d7fdfabe00af8e15a689a535fb2ec40dd1aadd38654bbfdf	structure	Heading: Relocated deck title	regex	^#{1,6} .*Relocated\ deck\ title
+pptx/handmade-altpath.pptx	1f364b417eb31799d7fdfabe00af8e15a689a535fb2ec40dd1aadd38654bbfdf	content	Relocated deck title	text	Relocated deck title
+pptx/handmade-inherit.pptx	4bbab27a28b2532eaa3ad93b86d2667e454f6d40bbf4b178524de3f0a0d0bfe3	content	Plain closing line	text	Plain closing line
+pptx/handmade-inherit.pptx	4bbab27a28b2532eaa3ad93b86d2667e454f6d40bbf4b178524de3f0a0d0bfe3	content	with bold turned off	text	with bold turned off
+pptx/handmade-inherit.pptx	4bbab27a28b2532eaa3ad93b86d2667e454f6d40bbf4b178524de3f0a0d0bfe3	structure	Heading: Inherited Title Slide	regex	^#{1,6} .*Inherited\ Title\ Slide
+pptx/handmade-inherit.pptx	4bbab27a28b2532eaa3ad93b86d2667e454f6d40bbf4b178524de3f0a0d0bfe3	structure	Inherited Roman numbering	regex	^\s*(?:[-*]\s+)?iii\.\s+.*Roman three
+pptx/handmade-inherit.pptx	4bbab27a28b2532eaa3ad93b86d2667e454f6d40bbf4b178524de3f0a0d0bfe3	formatting	Inherited italic	regex	\*Dash bullet italic via master level two\*
+pptx/handmade-links.pptx	32cc7652099218a1f15190615607697583afb5a76c9fffc2d2dea23b29c66533	content	Second slide content	text	Second slide content
+pptx/handmade-links.pptx	32cc7652099218a1f15190615607697583afb5a76c9fffc2d2dea23b29c66533	formatting	External hyperlink	regex	"\]\(https://example\.com/\)|href=[""\x27]https://example\.com/[""\x27]"
+pptx/handmade-links.pptx	32cc7652099218a1f15190615607697583afb5a76c9fffc2d2dea23b29c66533	structure	Internal link with local target	regex	"(?s)\]\(#slide-2\).*?<a id=""slide-2"""
+pptx/handmade-math.pptx	b95ba383c185208fd171a86f38f0a9ee01e00e5fc72dcdace82c46f844753d4c	structure	Heading: Quadratic formula	regex	^#{1,6} .*Quadratic\ formula
+pptx/handmade-math.pptx	b95ba383c185208fd171a86f38f0a9ee01e00e5fc72dcdace82c46f844753d4c	formatting	Quadratic equation	regex	\\frac
+pptx/handmade-math.pptx	b95ba383c185208fd171a86f38f0a9ee01e00e5fc72dcdace82c46f844753d4c	formatting	Summation	regex	\\sum
+pptx/handmade-order.pptx	b05bc15dd2b901373e566e938d988fa387aa27d9f03c0fc5918097fef1652a07	content	Quarterly numbers	text	Quarterly numbers
+pptx/handmade-order.pptx	b05bc15dd2b901373e566e938d988fa387aa27d9f03c0fc5918097fef1652a07	structure	Slide source text order	regex	(?s)Kicker before the title.*Title placed second.*Body after the title
+pptx/handmade-order.pptx	b05bc15dd2b901373e566e938d988fa387aa27d9f03c0fc5918097fef1652a07	structure	Heading: Title placed second	regex	^#{1,6} .*Title\ placed\ second
+pptx/handmade-strict.pptx	8890634f199ede31676cc86ad08db97240fe31eefa3fcf49012466aaa8c53d4b	structure	Heading: Strict slide title	regex	^#{1,6} .*Strict\ slide\ title
+pptx/handmade-strict.pptx	8890634f199ede31676cc86ad08db97240fe31eefa3fcf49012466aaa8c53d4b	content	Strict body text	text	Strict body text
+xls/sheet.xls	1b3fc8f35f4c7ad6bb4dcf9b9f1fdf4ddf1f4c7f2f6748f33b7948204f940136	structure	Heading: Values	regex	^#{1,6} .*Values
+xls/sheet.xls	1b3fc8f35f4c7ad6bb4dcf9b9f1fdf4ddf1f4c7f2f6748f33b7948204f940136	structure	Heading: Merged Grid	regex	^#{1,6} .*Merged\ Grid
+xls/sheet.xls	1b3fc8f35f4c7ad6bb4dcf9b9f1fdf4ddf1f4c7f2f6748f33b7948204f940136	structure	Table represented as a table	regex	<table\b|^\|.*\|\s*\n\|[ :|\-]+\|
+xls/sheet.xls	1b3fc8f35f4c7ad6bb4dcf9b9f1fdf4ddf1f4c7f2f6748f33b7948204f940136	structure	colspan merge: Span two	regex	"<t[dh]\b[^>]*\bcolspan=[""\x27]2[""\x27][^>]*>(?:\s*<p>)?\s*Span\ two"
+xls/sheet.xls	1b3fc8f35f4c7ad6bb4dcf9b9f1fdf4ddf1f4c7f2f6748f33b7948204f940136	content	fifteen and a half	text	fifteen and a half
+xls/sheet.xls	1b3fc8f35f4c7ad6bb4dcf9b9f1fdf4ddf1f4c7f2f6748f33b7948204f940136	content	four ten-millionths	text	four ten-millionths
+xls/sheet.xls	1b3fc8f35f4c7ad6bb4dcf9b9f1fdf4ddf1f4c7f2f6748f33b7948204f940136	content	Right	text	Right
+xls/sheet.xls	1b3fc8f35f4c7ad6bb4dcf9b9f1fdf4ddf1f4c7f2f6748f33b7948204f940136	formatting	Displayed Percent	regex	(?m)(?:\|\s*Percent\s*\|\s*15\.5%\s*\||<td><p>Percent</p></td>\s*<td><p>15\.5%</p></td>)
+xls/sheet.xls	1b3fc8f35f4c7ad6bb4dcf9b9f1fdf4ddf1f4c7f2f6748f33b7948204f940136	formatting	Displayed Currency	regex	(?m)(?:\|\s*Currency\s*\|\s*\$1,234\.50\s*\||<td><p>Currency</p></td>\s*<td><p>\$1,234\.50</p></td>)
+xls/sheet.xls	1b3fc8f35f4c7ad6bb4dcf9b9f1fdf4ddf1f4c7f2f6748f33b7948204f940136	formatting	Displayed Thousands	regex	(?m)(?:\|\s*Thousands\s*\|\s*9,876,543\s*\||<td><p>Thousands</p></td>\s*<td><p>9,876,543</p></td>)
+xls/sheet.xls	1b3fc8f35f4c7ad6bb4dcf9b9f1fdf4ddf1f4c7f2f6748f33b7948204f940136	formatting	Displayed Date	regex	(?m)(?:\|\s*Date\s*\|\s*2026\-03\-15\s*\||<td><p>Date</p></td>\s*<td><p>2026\-03\-15</p></td>)
+xls/sheet.xls	1b3fc8f35f4c7ad6bb4dcf9b9f1fdf4ddf1f4c7f2f6748f33b7948204f940136	formatting	Displayed Duration	regex	(?m)(?:\|\s*Duration\s*\|\s*26:30:15\s*\||<td><p>Duration</p></td>\s*<td><p>26:30:15</p></td>)
+xls/sheet.xls	1b3fc8f35f4c7ad6bb4dcf9b9f1fdf4ddf1f4c7f2f6748f33b7948204f940136	formatting	Displayed Tiny	regex	(?m)(?:\|\s*Tiny\s*\|\s*0\.0000004\s*\||<td><p>Tiny</p></td>\s*<td><p>0\.0000004</p></td>)
+xls/sheet.xls	1b3fc8f35f4c7ad6bb4dcf9b9f1fdf4ddf1f4c7f2f6748f33b7948204f940136	formatting	Displayed Boolean	regex	(?m)(?:\|\s*Boolean\s*\|\s*TRUE\s*\||<td><p>Boolean</p></td>\s*<td><p>TRUE</p></td>)
+xlsx/sheet.xlsx	ddfec7c1e98c7b50611b1c3ac55c0aa0d9d413135aa7afc36732338e44f4d26c	structure	Heading: Values	regex	^#{1,6} .*Values
+xlsx/sheet.xlsx	ddfec7c1e98c7b50611b1c3ac55c0aa0d9d413135aa7afc36732338e44f4d26c	structure	Heading: Merged Grid	regex	^#{1,6} .*Merged\ Grid
+xlsx/sheet.xlsx	ddfec7c1e98c7b50611b1c3ac55c0aa0d9d413135aa7afc36732338e44f4d26c	structure	Table represented as a table	regex	<table\b|^\|.*\|\s*\n\|[ :|\-]+\|
+xlsx/sheet.xlsx	ddfec7c1e98c7b50611b1c3ac55c0aa0d9d413135aa7afc36732338e44f4d26c	structure	colspan merge: Span two	regex	"<t[dh]\b[^>]*\bcolspan=[""\x27]2[""\x27][^>]*>(?:\s*<p>)?\s*Span\ two"
+xlsx/sheet.xlsx	ddfec7c1e98c7b50611b1c3ac55c0aa0d9d413135aa7afc36732338e44f4d26c	content	fifteen and a half	text	fifteen and a half
+xlsx/sheet.xlsx	ddfec7c1e98c7b50611b1c3ac55c0aa0d9d413135aa7afc36732338e44f4d26c	content	four ten-millionths	text	four ten-millionths
+xlsx/sheet.xlsx	ddfec7c1e98c7b50611b1c3ac55c0aa0d9d413135aa7afc36732338e44f4d26c	content	Right	text	Right
+xlsx/sheet.xlsx	ddfec7c1e98c7b50611b1c3ac55c0aa0d9d413135aa7afc36732338e44f4d26c	formatting	Displayed Percent	regex	(?m)(?:\|\s*Percent\s*\|\s*15\.5%\s*\||<td><p>Percent</p></td>\s*<td><p>15\.5%</p></td>)
+xlsx/sheet.xlsx	ddfec7c1e98c7b50611b1c3ac55c0aa0d9d413135aa7afc36732338e44f4d26c	formatting	Displayed Currency	regex	(?m)(?:\|\s*Currency\s*\|\s*\$1,234\.50\s*\||<td><p>Currency</p></td>\s*<td><p>\$1,234\.50</p></td>)
+xlsx/sheet.xlsx	ddfec7c1e98c7b50611b1c3ac55c0aa0d9d413135aa7afc36732338e44f4d26c	formatting	Displayed Thousands	regex	(?m)(?:\|\s*Thousands\s*\|\s*9,876,543\s*\||<td><p>Thousands</p></td>\s*<td><p>9,876,543</p></td>)
+xlsx/sheet.xlsx	ddfec7c1e98c7b50611b1c3ac55c0aa0d9d413135aa7afc36732338e44f4d26c	formatting	Displayed Date	regex	(?m)(?:\|\s*Date\s*\|\s*2026\-03\-15\s*\||<td><p>Date</p></td>\s*<td><p>2026\-03\-15</p></td>)
+xlsx/sheet.xlsx	ddfec7c1e98c7b50611b1c3ac55c0aa0d9d413135aa7afc36732338e44f4d26c	formatting	Displayed Duration	regex	(?m)(?:\|\s*Duration\s*\|\s*26:30:15\s*\||<td><p>Duration</p></td>\s*<td><p>26:30:15</p></td>)
+xlsx/sheet.xlsx	ddfec7c1e98c7b50611b1c3ac55c0aa0d9d413135aa7afc36732338e44f4d26c	formatting	Displayed Tiny	regex	(?m)(?:\|\s*Tiny\s*\|\s*0\.0000004\s*\||<td><p>Tiny</p></td>\s*<td><p>0\.0000004</p></td>)
+xlsx/sheet.xlsx	ddfec7c1e98c7b50611b1c3ac55c0aa0d9d413135aa7afc36732338e44f4d26c	formatting	Displayed Boolean	regex	(?m)(?:\|\s*Boolean\s*\|\s*TRUE\s*\||<td><p>Boolean</p></td>\s*<td><p>TRUE</p></td>)
+xlsx/handmade-merged.xlsx	70b735ffc96268b3856348d8fa226f6c8b91e0c52ae1abdbc9f1bf7e34576d53	content	Merged across	text	Merged across
+xlsx/handmade-merged.xlsx	70b735ffc96268b3856348d8fa226f6c8b91e0c52ae1abdbc9f1bf7e34576d53	content	padded	text	padded
+xlsx/handmade-merged.xlsx	70b735ffc96268b3856348d8fa226f6c8b91e0c52ae1abdbc9f1bf7e34576d53	content	tall	text	tall
+xlsx/handmade-merged.xlsx	70b735ffc96268b3856348d8fa226f6c8b91e0c52ae1abdbc9f1bf7e34576d53	content	b2	text	b2
+xlsx/handmade-merged.xlsx	70b735ffc96268b3856348d8fa226f6c8b91e0c52ae1abdbc9f1bf7e34576d53	content	b3	text	b3
+xlsx/handmade-merged.xlsx	70b735ffc96268b3856348d8fa226f6c8b91e0c52ae1abdbc9f1bf7e34576d53	content	3.5	text	3.5
+xlsx/handmade-merged.xlsx	70b735ffc96268b3856348d8fa226f6c8b91e0c52ae1abdbc9f1bf7e34576d53	structure	Table represented as a table	regex	<table\b|^\|.*\|\s*\n\|[ :|\-]+\|
+xlsx/handmade-merged.xlsx	70b735ffc96268b3856348d8fa226f6c8b91e0c52ae1abdbc9f1bf7e34576d53	structure	colspan merge: Merged across	regex	"<t[dh]\b[^>]*\bcolspan=[""\x27]2[""\x27][^>]*>(?:\s*<p>)?\s*Merged\ across"
+xlsx/handmade-merged.xlsx	70b735ffc96268b3856348d8fa226f6c8b91e0c52ae1abdbc9f1bf7e34576d53	structure	rowspan merge: tall	regex	"<t[dh]\b[^>]*\browspan=[""\x27]2[""\x27][^>]*>(?:\s*<p>)?\s*tall"

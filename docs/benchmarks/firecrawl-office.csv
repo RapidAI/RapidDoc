@@ -1,0 +1,83 @@
+group,engine,version,file,sha256,status,median_ms,error
+normal,anydoc,0.2.4,doc/handmade-blockstyle.doc,04c252746d7cb2dbeaef607d6a8bcec31713165b88b2ba8cd640f81d53bbd3c5,ok,0.0195,
+normal,anydoc,0.2.4,doc/handmade-cyrillic.doc,707497f7f28257b7aba290657e2d799cfc4cecddea0626642820f3b33338f301,ok,0.0207,
+normal,anydoc,0.2.4,doc/handmade-shiftjis.doc,87cf99313cfb3171f966b4bbd38ba797bb4f8e23aa74b0f9a2547a6b9db417e5,ok,0.0164,
+normal,anydoc,0.2.4,doc/text.doc,0d7c077cf4b49939a05ccd5f8012164649752be0c5841fa50da6258e0517e6e5,ok,0.2421,
+normal,anydoc,0.2.4,docx/handmade-altpath.docx,fb77751c25853f876f9cda0b819819f690c4baadf080c1170ad06ffc98e52545,ok,0.0865,
+normal,anydoc,0.2.4,docx/handmade-blockstyle.docx,a8c1013b60b03c6e65dfb404b1901c81661e344a2fb7e2dd12146fa41c48444e,ok,0.097,
+normal,anydoc,0.2.4,docx/handmade-manyrefs.docx,219cfa32f83401f6415191d33d391ddbc35edbbbb3e04678b0d1b74ad6d14cb7,ok,0.2288,
+normal,anydoc,0.2.4,docx/handmade-math.docx,6499c01602a376977b1b1d40496cc0a4808047c2b78806bf5a7aa96e0ebc80dc,ok,0.0813,
+normal,anydoc,0.2.4,docx/handmade-numbering.docx,6975897719c716d0c323758b05c287bc8b93e8d022a4119aca042e026ad0646c,ok,0.2438,
+normal,anydoc,0.2.4,docx/handmade-ole.docx,346a10b066ab72098556dd55b3ef7cd5e0be261c019087e9794b095dc0cdf4a9,ok,0.0707,
+normal,anydoc,0.2.4,docx/handmade-outline.docx,2c4c232cde1ead23360922df6db0d472500c7c5b5d6149d5ccf9ecd2dac90909,ok,0.0728,
+normal,anydoc,0.2.4,docx/handmade-rich.docx,22afadb7927cc11d7520cd0f471aa1eea658369a1ba85da48123aded0700aafa,ok,0.171,
+normal,anydoc,0.2.4,docx/handmade-strict.docx,f65da59839848f8bbe0b72ddc03f8765bf06662994ae980f22095eb85cb0096a,ok,0.0651,
+normal,anydoc,0.2.4,docx/handmade-tables.docx,cf847fbf73810f6af47181230cd4ad2704a53e8b2668297dba4904f7366da6ce,ok,0.0687,
+normal,anydoc,0.2.4,docx/text.docx,6b674297884f9ed57809763c9f60ea3a849d5cc6fb28c9837c714e322eceddcf,ok,0.945,
+normal,anydoc,0.2.4,ppt/handmade-multimaster.ppt,7f4ccf9350fb4b366f2638f1d1b54bd9f88bd1e7492141df02d709b001ae2026,ok,0.0168,
+normal,anydoc,0.2.4,ppt/handmade-sparsenotes.ppt,a73a3ec85cba14e7b9adac569bb324dca8b6efc061a5ead677cb17c37999f2fe,ok,0.016,
+normal,anydoc,0.2.4,ppt/pres.ppt,8b92d2304598dafc977ff309095aa405151ac741d3374b3d5a214377b57765b3,ok,0.2983,
+normal,anydoc,0.2.4,pptx/handmade-altpath.pptx,1f364b417eb31799d7fdfabe00af8e15a689a535fb2ec40dd1aadd38654bbfdf,ok,0.0718,
+normal,anydoc,0.2.4,pptx/handmade-inherit.pptx,4bbab27a28b2532eaa3ad93b86d2667e454f6d40bbf4b178524de3f0a0d0bfe3,ok,0.1474,
+normal,anydoc,0.2.4,pptx/handmade-links.pptx,32cc7652099218a1f15190615607697583afb5a76c9fffc2d2dea23b29c66533,ok,0.0935,
+normal,anydoc,0.2.4,pptx/handmade-math.pptx,b95ba383c185208fd171a86f38f0a9ee01e00e5fc72dcdace82c46f844753d4c,ok,0.1175,
+normal,anydoc,0.2.4,pptx/handmade-order.pptx,b05bc15dd2b901373e566e938d988fa387aa27d9f03c0fc5918097fef1652a07,ok,0.0913,
+normal,anydoc,0.2.4,pptx/handmade-strict.pptx,8890634f199ede31676cc86ad08db97240fe31eefa3fcf49012466aaa8c53d4b,ok,0.0701,
+normal,anydoc,0.2.4,pptx/pres.pptx,c96aa52da19f273f602040490203d9319872f512707e1a6c5a3fc53251b6d050,ok,0.6618,
+normal,anydoc,0.2.4,xls/sheet.xls,1b3fc8f35f4c7ad6bb4dcf9b9f1fdf4ddf1f4c7f2f6748f33b7948204f940136,ok,0.1001,
+normal,anydoc,0.2.4,xlsx/handmade-merged.xlsx,70b735ffc96268b3856348d8fa226f6c8b91e0c52ae1abdbc9f1bf7e34576d53,ok,0.0805,
+normal,anydoc,0.2.4,xlsx/sheet.xlsx,ddfec7c1e98c7b50611b1c3ac55c0aa0d9d413135aa7afc36732338e44f4d26c,ok,0.4067,
+normal,rapid-office,0.1.1,doc/handmade-blockstyle.doc,04c252746d7cb2dbeaef607d6a8bcec31713165b88b2ba8cd640f81d53bbd3c5,ok,0.0879,
+normal,rapid-office,0.1.1,doc/handmade-cyrillic.doc,707497f7f28257b7aba290657e2d799cfc4cecddea0626642820f3b33338f301,ok,0.1469,
+normal,rapid-office,0.1.1,doc/handmade-shiftjis.doc,87cf99313cfb3171f966b4bbd38ba797bb4f8e23aa74b0f9a2547a6b9db417e5,ok,0.0793,
+normal,rapid-office,0.1.1,doc/text.doc,0d7c077cf4b49939a05ccd5f8012164649752be0c5841fa50da6258e0517e6e5,ok,0.806,
+normal,rapid-office,0.1.1,docx/handmade-altpath.docx,fb77751c25853f876f9cda0b819819f690c4baadf080c1170ad06ffc98e52545,ok,0.2045,
+normal,rapid-office,0.1.1,docx/handmade-blockstyle.docx,a8c1013b60b03c6e65dfb404b1901c81661e344a2fb7e2dd12146fa41c48444e,ok,0.3641,
+normal,rapid-office,0.1.1,docx/handmade-manyrefs.docx,219cfa32f83401f6415191d33d391ddbc35edbbbb3e04678b0d1b74ad6d14cb7,ok,0.471,
+normal,rapid-office,0.1.1,docx/handmade-math.docx,6499c01602a376977b1b1d40496cc0a4808047c2b78806bf5a7aa96e0ebc80dc,ok,0.3003,
+normal,rapid-office,0.1.1,docx/handmade-numbering.docx,6975897719c716d0c323758b05c287bc8b93e8d022a4119aca042e026ad0646c,ok,0.4796,
+normal,rapid-office,0.1.1,docx/handmade-ole.docx,346a10b066ab72098556dd55b3ef7cd5e0be261c019087e9794b095dc0cdf4a9,ok,0.2553,
+normal,rapid-office,0.1.1,docx/handmade-outline.docx,2c4c232cde1ead23360922df6db0d472500c7c5b5d6149d5ccf9ecd2dac90909,ok,0.253,
+normal,rapid-office,0.1.1,docx/handmade-rich.docx,22afadb7927cc11d7520cd0f471aa1eea658369a1ba85da48123aded0700aafa,ok,0.3386,
+normal,rapid-office,0.1.1,docx/handmade-strict.docx,f65da59839848f8bbe0b72ddc03f8765bf06662994ae980f22095eb85cb0096a,ok,0.1892,
+normal,rapid-office,0.1.1,docx/handmade-tables.docx,cf847fbf73810f6af47181230cd4ad2704a53e8b2668297dba4904f7366da6ce,ok,0.2648,
+normal,rapid-office,0.1.1,docx/text.docx,6b674297884f9ed57809763c9f60ea3a849d5cc6fb28c9837c714e322eceddcf,ok,1.9987,
+normal,rapid-office,0.1.1,ppt/handmade-multimaster.ppt,7f4ccf9350fb4b366f2638f1d1b54bd9f88bd1e7492141df02d709b001ae2026,ok,0.1203,
+normal,rapid-office,0.1.1,ppt/handmade-sparsenotes.ppt,a73a3ec85cba14e7b9adac569bb324dca8b6efc061a5ead677cb17c37999f2fe,ok,0.1626,
+normal,rapid-office,0.1.1,ppt/pres.ppt,8b92d2304598dafc977ff309095aa405151ac741d3374b3d5a214377b57765b3,ok,0.3058,
+normal,rapid-office,0.1.1,pptx/handmade-altpath.pptx,1f364b417eb31799d7fdfabe00af8e15a689a535fb2ec40dd1aadd38654bbfdf,ok,0.1798,
+normal,rapid-office,0.1.1,pptx/handmade-inherit.pptx,4bbab27a28b2532eaa3ad93b86d2667e454f6d40bbf4b178524de3f0a0d0bfe3,ok,0.219,
+normal,rapid-office,0.1.1,pptx/handmade-links.pptx,32cc7652099218a1f15190615607697583afb5a76c9fffc2d2dea23b29c66533,ok,0.1627,
+normal,rapid-office,0.1.1,pptx/handmade-math.pptx,b95ba383c185208fd171a86f38f0a9ee01e00e5fc72dcdace82c46f844753d4c,ok,0.1942,
+normal,rapid-office,0.1.1,pptx/handmade-order.pptx,b05bc15dd2b901373e566e938d988fa387aa27d9f03c0fc5918097fef1652a07,ok,0.1597,
+normal,rapid-office,0.1.1,pptx/handmade-strict.pptx,8890634f199ede31676cc86ad08db97240fe31eefa3fcf49012466aaa8c53d4b,ok,0.1919,
+normal,rapid-office,0.1.1,pptx/pres.pptx,c96aa52da19f273f602040490203d9319872f512707e1a6c5a3fc53251b6d050,ok,0.6575,
+normal,rapid-office,0.1.1,xls/sheet.xls,1b3fc8f35f4c7ad6bb4dcf9b9f1fdf4ddf1f4c7f2f6748f33b7948204f940136,ok,0.2724,
+normal,rapid-office,0.1.1,xlsx/handmade-merged.xlsx,70b735ffc96268b3856348d8fa226f6c8b91e0c52ae1abdbc9f1bf7e34576d53,ok,0.1519,
+normal,rapid-office,0.1.1,xlsx/sheet.xlsx,ddfec7c1e98c7b50611b1c3ac55c0aa0d9d413135aa7afc36732338e44f4d26c,ok,0.4829,
+exceptional,anydoc,0.2.4,abuse/deepnest--errors.ppt,693b1560dbc0fc91371b5f4ad546d147b998a7560ce28f4c8a9addb1f0d87bcf,failed,,ResourceLimitError: resource limit exceeded (max_record_depth): record nesting exceeds 64
+exceptional,anydoc,0.2.4,abuse/deepxml--errors.docx,86650b49a31fc5b7c684b15d75af996fabe38c915524b8670f1cc42355af1b73,failed,,ResourceLimitError: resource limit exceeded (max_xml_depth): element nesting exceeds 256
+exceptional,anydoc,0.2.4,abuse/hugespan--errors.pptx,8e5e31a2f08763cedf95ca8676780718cad49c26eb5fdf1b37b05ca8cdf97430,failed,,ResourceLimitError: resource limit exceeded (max_expansion): table span expansion exceeds the content budget
+exceptional,anydoc,0.2.4,abuse/imagebomb--errors.docx,2331f48e333162ead5f2897ae948295b743793c85a70cd4227d9db19302fc524,failed,,ResourceLimitError: resource limit exceeded (max_entry_bytes): word/media/image1.png declares 201326592 decompressed bytes
+exceptional,anydoc,0.2.4,abuse/zipbomb--errors.docx,132715bbfe9f82b5a5e4e9ea21375dbd32d00300fc127facb73c2214dd2512c2,failed,,ResourceLimitError: resource limit exceeded (max_entry_bytes): word/document.xml declares 201326759 decompressed bytes
+exceptional,anydoc,0.2.4,malformed/brokenpersist--recovers.ppt,9439be914d8b3285c2a8b9a2043401dad713a10289a792e86faee15fb95d79f6,ok,,
+exceptional,anydoc,0.2.4,malformed/corrupt-styles--skips.docx,3abf6167d3cc89fcc478c6074b53246882a887e4b5e5b2c0dbaec7db9890b931,ok,,
+exceptional,anydoc,0.2.4,malformed/empty--errors.docx,e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855,failed,,UnsupportedError: unsupported input: unrecognized file content: name the format explicitly
+exceptional,anydoc,0.2.4,malformed/mismatched--recovers.docx,d56750725a8207b2a29eb19d8da2b200e9dfc743f18bfa4a9cea5bc9e2624244,ok,,
+exceptional,anydoc,0.2.4,malformed/missing-styles--skips.docx,ae46e869662780d0d90e9add25a1f4ee67d731107f18029e575035dadbb82912,ok,,
+exceptional,anydoc,0.2.4,malformed/truncated--errors.doc,0f400750cc84e132fbe085d9c50d039c71d4d48c01dff3c169bdeaa72627741a,failed,,UnsupportedError: unsupported input: unrecognized file content: name the format explicitly
+exceptional,anydoc,0.2.4,malformed/truncated--errors.docx,65b78f02a11298d0b860247911e34431aedb05637749f49819a6b7a70fe1967b,failed,,UnsupportedError: unsupported input: unrecognized file content: name the format explicitly
+exceptional,anydoc,0.2.4,malformed/unclosed--recovers.docx,eb22511ee03c793511fc3e4a780dc1c2b1d44ea8bc5b2c117bf0b295e81f2d94,ok,,
+exceptional,rapid-office,0.1.1,abuse/deepnest--errors.ppt,693b1560dbc0fc91371b5f4ad546d147b998a7560ce28f4c8a9addb1f0d87bcf,failed,,RapidDocError: resource_limit: record nesting exceeds original max_record_depth=64
+exceptional,rapid-office,0.1.1,abuse/deepxml--errors.docx,86650b49a31fc5b7c684b15d75af996fabe38c915524b8670f1cc42355af1b73,failed,,ValueError: Empty Markdown
+exceptional,rapid-office,0.1.1,abuse/hugespan--errors.pptx,8e5e31a2f08763cedf95ca8676780718cad49c26eb5fdf1b37b05ca8cdf97430,ok,,
+exceptional,rapid-office,0.1.1,abuse/imagebomb--errors.docx,2331f48e333162ead5f2897ae948295b743793c85a70cd4227d9db19302fc524,ok,,
+exceptional,rapid-office,0.1.1,abuse/zipbomb--errors.docx,132715bbfe9f82b5a5e4e9ea21375dbd32d00300fc127facb73c2214dd2512c2,ok,,
+exceptional,rapid-office,0.1.1,malformed/brokenpersist--recovers.ppt,9439be914d8b3285c2a8b9a2043401dad713a10289a792e86faee15fb95d79f6,ok,,
+exceptional,rapid-office,0.1.1,malformed/corrupt-styles--skips.docx,3abf6167d3cc89fcc478c6074b53246882a887e4b5e5b2c0dbaec7db9890b931,failed,,RapidDocError: malformed: unknown token at 1:1
+exceptional,rapid-office,0.1.1,malformed/empty--errors.docx,e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855,failed,,"ValueError: Unsupported or invalid document; supported formats: PDF, images, DOC, DOCX, XLS, XLSX, PPT, PPTX"
+exceptional,rapid-office,0.1.1,malformed/mismatched--recovers.docx,d56750725a8207b2a29eb19d8da2b200e9dfc743f18bfa4a9cea5bc9e2624244,failed,,"RapidDocError: malformed: expected 'w:p' tag, not 'w:q' at 1:155"
+exceptional,rapid-office,0.1.1,malformed/missing-styles--skips.docx,ae46e869662780d0d90e9add25a1f4ee67d731107f18029e575035dadbb82912,ok,,
+exceptional,rapid-office,0.1.1,malformed/truncated--errors.doc,0f400750cc84e132fbe085d9c50d039c71d4d48c01dff3c169bdeaa72627741a,failed,,"RapidDocError: malformed: Malformed FAT (FAT has 39 entries, but file has only 7 sectors)"
+exceptional,rapid-office,0.1.1,malformed/truncated--errors.docx,65b78f02a11298d0b860247911e34431aedb05637749f49819a6b7a70fe1967b,failed,,RapidDocError: malformed: invalid Zip archive: Could not find EOCD
+exceptional,rapid-office,0.1.1,malformed/unclosed--recovers.docx,eb22511ee03c793511fc3e4a780dc1c2b1d44ea8bc5b2c117bf0b295e81f2d94,failed,,RapidDocError: malformed: the root node was opened but never closed
