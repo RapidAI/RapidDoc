@@ -290,8 +290,11 @@ def cut_image(span, ori_image_list, extract_original_image, extract_original_ima
     if not crop_img:
         crop_img = get_crop_img(bbox, page_pil_img, scale=scale)
 
+    if crop_img.width <= 0 or crop_img.height <= 0:
+        raise ValueError("empty image crop")
     img_bytes = image_to_bytes(crop_img, image_format="PNG")
-
+    if not img_bytes.startswith(b"\x89PNG\r\n\x1a\n"):
+        raise ValueError("invalid encoded PNG")
     image_writer.write(img_hash256_path, img_bytes)
     return img_hash256_path
 

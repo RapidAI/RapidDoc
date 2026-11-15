@@ -80,14 +80,74 @@ fn escaped(s: &str) -> String {
         .replace('>', "&gt;")
 }
 impl Dom {
-    pub fn copy_within(&mut self, id: usize, parent: usize) -> usize {
-        let mut node = self.nodes[id].clone();
-        let children = std::mem::take(&mut node.children);
-        let copy = self.push(parent, node);
-        for child in children {
-            self.copy_within(child, copy);
+    fn cell_boundary(&self, id: usize, from_end: bool) -> (String, Option<usize>) {
+        let node = &self.nodes[id];
+        if node.attrs.get("data-block-type").is_some_and(|value| {
+            matches!(
+                value.as_str(),
+                "equation" | "code" | "code_body" | "algorithm" | "algorithm_body"
+            )
+        }) {
+            return (String::new(), None);
         }
-        copy
+        let mut parts = Vec::new();
+        for i in 0..node.children.len() {
+            let child = node.children[if from_end {
+                node.children.len() - i - 1
+            } else {
+                i
+            }];
+            let n = &self.nodes[child];
+            let part = match n.tag.as_str() {
+                "" if n.text.is_empty() => continue,
+                "" => (n.text.clone(), Some(child)),
+                "a" | "abbr" | "b" | "bdi" | "bdo" | "big" | "cite" | "del" | "em" | "font"
+                | "i" | "ins" | "mark" | "s" | "small" | "span" | "strike" | "strong" | "sub"
+                | "sup" | "u" => self.cell_boundary(child, from_end),
+                _ => break,
+            };
+            if part.1.is_none() {
+                break;
+            }
+            parts.push(part);
+        }
+        let edge = parts.first().and_then(|part| part.1);
+        if from_end {
+            parts.reverse();
+        }
+        (parts.into_iter().map(|part| part.0).collect(), edge)
+    }
+    pub(super) fn append_merged_cell(
+        &mut self,
+        target: usize,
+        other: &Self,
+        source: usize,
+        work: &mut Work,
+    ) -> Result<(), Error> {
+        let (left, edge) = self.cell_boundary(target, true);
+        let (right, _) = other.cell_boundary(source, false);
+        if left.chars().next_back().is_some_and(|c| !python_space(c))
+            && right.chars().next().is_some_and(|c| !python_space(c))
+        {
+            let (processed, separator) = rapiddoc_native::text_boundary::resolve(&left, &right);
+            if let Some(edge) = edge.filter(|_| processed.len() < left.len()) {
+                self.nodes[edge].text.pop();
+            }
+            if !separator.is_empty() {
+                self.push(
+                    target,
+                    Node {
+                        text: separator.into(),
+                        ..Node::default()
+                    },
+                );
+            }
+        }
+        for &child in &other.nodes[source].children {
+            work.charge(other.serialize(child).len())?;
+            self.copy_from(other, child, target);
+        }
+        Ok(())
     }
     pub fn parse(html: &str, work: &mut Work) -> Result<Self, Error> {
         Self::parse_mode(html, work, false)

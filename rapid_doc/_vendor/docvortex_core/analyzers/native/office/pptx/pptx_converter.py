@@ -9,6 +9,8 @@ from ..equation.image import OfficeImageEquationDecoder
 from ..equation.ooxml import OoxmlEquationDecoder
 from ..errors import LegacyOfficeResourceLimitError
 from ..streams import read_stream_bytes_from_start, rewind_stream
+from .....foundation.ooxml_zip import validate_ooxml_package
+from ..errors import OoxmlPackageError
 from .package_normalizer import normalize_pptx_package
 from ..._shared.xycut import sort_entries
 from .....schema import BlockType
@@ -73,7 +75,7 @@ class PptxConverter(_PptxResources, _PptxShapes, _PptxTextStyles, _PptxLists, _P
             try:
                 self._convert_package_stream(file_stream)
                 return
-            except (LegacyOfficeResourceLimitError, MemoryError):
+            except (OoxmlPackageError, LegacyOfficeResourceLimitError, MemoryError):
                 raise
             except Exception as exc:
                 file_bytes = read_stream_bytes_from_start(file_stream)
@@ -83,7 +85,7 @@ class PptxConverter(_PptxResources, _PptxShapes, _PptxTextStyles, _PptxLists, _P
         file_bytes = file_stream.read()
         try:
             self._convert_package_bytes(file_bytes)
-        except (LegacyOfficeResourceLimitError, MemoryError):
+        except (OoxmlPackageError, LegacyOfficeResourceLimitError, MemoryError):
             raise
         except Exception as exc:
             self._retry_convert_package_bytes_after_normalization(file_bytes, exc)
@@ -108,6 +110,7 @@ class PptxConverter(_PptxResources, _PptxShapes, _PptxTextStyles, _PptxLists, _P
         """直接使用可复位的 PPTX 流解析正常路径，避免提前复制完整包字节。"""
         self._reset_state()
         rewind_stream(file_stream)
+        validate_ooxml_package(file_stream)
         self.file_stream = file_stream
         self.pptx_obj = Presentation(self.file_stream)
         self.pages.append(self.cur_page)

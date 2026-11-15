@@ -192,6 +192,7 @@ pub fn convert_package(
             pages,
             normalized_members: vec![],
         }),
+        Err(error) if error.kind == crate::ErrorKind::ResourceLimit => Err(error),
         Err(original) => {
             let mut package = Package::open(data)?;
             let normalized_members = normalize::apply(&mut package)?;
@@ -269,6 +270,7 @@ impl Workbook {
         };
         let mut sheets = vec![];
         let mut titles = vec![];
+        let mut merge_budget = MergeBudget::default();
         for n in child(root, "sheets")
             .into_iter()
             .flat_map(|n| n.children())
@@ -291,8 +293,9 @@ impl Workbook {
                 continue;
             };
             let relationships = package.relationships(Some(&part))?;
-            let (cells, cell_images) =
-                read_sheet(&text, &relationships, &styles, &shared, date1904)?;
+            let (cells, cell_images) = read_sheet(
+                &text, &relationships, &styles, &shared, date1904, &mut merge_budget,
+            )?;
             let title = sheet_title(
                 n.attribute("name")
                     .ok_or_else(|| Error::missing("sheet name"))?,
@@ -404,12 +407,29 @@ impl Workbook {
         Ok(pages)
     }
 }
+#[derive(Default)]
+struct MergeBudget {
+    ranges: u64,
+    cells: u64,
+}
+impl MergeBudget {
+    fn charge(&mut self, area: u64) -> Result<()> {
+        self.ranges += 1;
+        self.cells += area;
+        if area > 100_000 || self.ranges > 100_000 || self.cells > 500_000 {
+            return Err(Error::new(crate::ErrorKind::ResourceLimit, "XLSX merged-cell budget exceeded"));
+        }
+        Ok(())
+    }
+}
+
 fn read_sheet(
     text: &str,
     rels: &[Relationship],
     styles: &styles::Styles,
     shared: &[Text],
     epoch: bool,
+    merge_budget: &mut MergeBudget,
 ) -> Result<(Sheet, BTreeMap<(u32, u32), String>)> {
     let tree = xml::parse(text)?;
     let root = tree.root_element();
@@ -457,9 +477,9 @@ fn read_sheet(
                             .and_then(|s| s.parse::<num_bigint::BigInt>().ok())
                             .map(|v| Text {
                                 plain: if v == num_bigint::BigInt::from(0) {
-                                    "False"
+                                    "FALSE"
                                 } else {
-                                    "True"
+                                    "TRUE"
                                 }
                                 .into(),
                                 rich_html: None,
@@ -480,21 +500,23 @@ fn read_sheet(
                 "n" => raw
                     .map(|s| {
                         let number = workbook::number(s)?;
-                        let date = styles.dates.get(style).copied().unwrap_or_default();
-                        let plain = if date.0 {
-                            let n = match &number {
-                                value::Value::Int(v) => {
-                                    v.to_string().parse().unwrap_or(f64::INFINITY)
-                                }
-                                value::Value::Float(v) => *v,
-                                _ => unreachable!(),
-                            };
-                            if date.1 {
-                                value::duration(n, true)
+                        let format = styles.number_formats.get(style).and_then(Option::as_deref);
+                        let plain = if let Some(format) =
+                            format.filter(|s| !s.eq_ignore_ascii_case("general"))
+                        {
+                            let numeric = s.parse::<f64>().unwrap_or(f64::INFINITY);
+                            if numeric.is_finite() {
+                                crate::xls::number_format::number(numeric, Some(format), epoch)
+                                    .unwrap_or_else(|_| value_text(number))
                             } else {
-                                value::excel(n, epoch, false)
+                                value_text(number)
                             }
-                            .unwrap_or_else(|| "#VALUE!".into())
+                        } else if let value::Value::Float(n) = number {
+                            if (1e-10..1e-4).contains(&n.abs()) {
+                                n.to_string()
+                            } else {
+                                value_text(number)
+                            }
                         } else {
                             value_text(number)
                         };
@@ -529,9 +551,11 @@ fn read_sheet(
             .attribute("ref")
             .and_then(workbook::bounds)
             .ok_or_else(|| Error::malformed("invalid worksheet merge"))?;
-        if r1 < r0 || c1 < c0 {
-            return Err(Error::malformed("inverted worksheet merge"));
+        if r1 < r0 || c1 < c0 || r1 > 1_048_576 || c1 > 16_384 {
+            return Err(Error::malformed("invalid worksheet merge bounds"));
         }
+        // 先按面积计费，再展开成单元格；整个工作簿共用同一预算。
+        merge_budget.charge(u64::from(r1 - r0 + 1) * u64::from(c1 - c0 + 1))?;
         merges.push(Merge {
             min_row: r0 - 1,
             max_row: r1 - 1,

@@ -35,3 +35,7 @@ class LegacyOfficeResourceLimitError(LegacyOfficeError):
 
 class LegacyOfficeImageLimitError(LegacyOfficeResourceLimitError):
     """单张 BLIP 图片超过大小限制，可在图片收集边界跳过。"""
+
+
+class OoxmlPackageError(LegacyOfficeMalformedError):
+    """OOXML 包预检失败，后续格式探测或规范化不可重新打开该包。"""

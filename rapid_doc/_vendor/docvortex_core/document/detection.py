@@ -5,6 +5,9 @@ from pathlib import Path
 from xml.etree import ElementTree
 from zipfile import BadZipFile, ZipFile
 
+from ..analyzers.native.office.errors import LegacyOfficeResourceLimitError, OoxmlPackageError
+from ..foundation.ooxml_zip import OoxmlZipFile
+
 OLE2_SIG_BYTES = b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1"
 
 OOXML_ROOT_RELS = "_rels/.rels"
@@ -135,8 +138,10 @@ def _guess_ooxml_suffix_from_zip(package: ZipFile) -> str | None:
 def _guess_ooxml_suffix_by_bytes(file_bytes: bytes) -> str | None:
     """优先用 OOXML 包结构识别 docx/pptx/xlsx，避免 Magika 被内嵌对象误导。"""
     try:
-        with ZipFile(BytesIO(file_bytes)) as package:
+        with OoxmlZipFile(BytesIO(file_bytes), ooxml_only=True, validate_payloads=False) as package:
             return _guess_ooxml_suffix_from_zip(package)
+    except (LegacyOfficeResourceLimitError, OoxmlPackageError):
+        raise
     except (
         BadZipFile,
         KeyError,
@@ -150,8 +155,10 @@ def _guess_ooxml_suffix_by_bytes(file_bytes: bytes) -> str | None:
 def _guess_ooxml_suffix_by_path(file_path: Path) -> str | None:
     """从文件路径读取 OOXML 包结构；失败时交给 Magika 原有逻辑兜底。"""
     try:
-        with ZipFile(file_path) as package:
+        with OoxmlZipFile(file_path, ooxml_only=True, validate_payloads=False) as package:
             return _guess_ooxml_suffix_from_zip(package)
+    except (LegacyOfficeResourceLimitError, OoxmlPackageError):
+        raise
     except (
         BadZipFile,
         KeyError,

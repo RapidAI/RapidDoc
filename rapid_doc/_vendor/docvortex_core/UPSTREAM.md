@@ -86,3 +86,11 @@ boundary rule across page cells while preserving inline HTML. Rust normalizes
 out-of-range PDFium font weights before layout heuristics. The complete
 DocVortex package is still not vendored wholesale, and the Rust font path does
 not read embedded OS/2 tables yet.
+
+## Selective follow-up through v0.6.22 (2026-11-15)
+
+- `5b71188` (v0.6.16): RapidDoc's Python and Rust continuation logic joins complete visual column intervals, extends inherited rowspans and retains independent blank cells.
+- `10366ce` and `094bbe0` (v0.6.17): OOXML ZIP directory, member and expansion limits, plus cumulative XLSX merge limits, use the existing Office error categories.
+- `948f47c` (v0.6.20): normal sentence-ending punctuation allows continuation only with the existing cross-page or cross-column indentation evidence.
+- `d66ae7e` (v0.6.21): validate PDF crop payloads and attach page, type and bounds to crop failures. The main Python export still warns and skips invalid geometry; the vendored visual materialization API reports missing selected crops.
+- `f767e37` (v0.6.22): RapidDoc's visual-line paths already use circular angle distance. Real PDF samples from -0.099 to +0.099 degrees and at 90/180/270 degrees produce the expected text in Python and Rust.

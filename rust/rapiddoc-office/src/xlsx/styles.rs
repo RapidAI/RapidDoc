@@ -16,7 +16,7 @@ pub struct Style {
 pub struct Styles {
     pub cell: Vec<Style>,
     pub default: Style,
-    pub dates: Vec<(bool, bool)>,
+    pub number_formats: Vec<Option<String>>,
 }
 fn rgb(n: Node<'_, '_>) -> Result<Option<String>> {
     if n.attribute("indexed").is_some()
@@ -107,11 +107,22 @@ impl Styles {
             return Ok(Self {
                 cell: vec![Style::default()],
                 default: Style::default(),
-                dates: vec![],
+                number_formats: vec![],
             });
         };
         let tree = xml::parse(text)?;
         let root = tree.root_element();
+        let custom_formats: BTreeMap<u16, &str> = child(root, "numFmts")
+            .into_iter()
+            .flat_map(|n| n.children())
+            .filter(|n| is(*n, "numFmt"))
+            .filter_map(|n| {
+                n.attribute("numFmtId")?
+                    .parse()
+                    .ok()
+                    .zip(n.attribute("formatCode"))
+            })
+            .collect();
         let fonts = child(root, "fonts")
             .into_iter()
             .flat_map(|n| n.children())
@@ -150,6 +161,7 @@ impl Styles {
             None,
         );
         let mut cells = vec![];
+        let mut number_formats = vec![];
         for n in child(root, "cellXfs")
             .into_iter()
             .flat_map(|n| n.children())
@@ -161,18 +173,29 @@ impl Styles {
                 .ok_or_else(|| Error::malformed("missing cell font"))?;
             let fill = fills.get(index(n.attribute("fillId"), fills.len())?);
             cells.push(style(font, fill, child(n, "alignment")));
+            let id = n
+                .attribute("numFmtId")
+                .and_then(|value| value.parse().ok())
+                .unwrap_or(0);
+            number_formats.push(
+                custom_formats
+                    .get(&id)
+                    .copied()
+                    .or_else(|| crate::xls::number_format::builtin(id))
+                    .map(str::to_owned),
+            );
         }
         if cells.is_empty() {
             return Ok(Self {
                 cell: vec![Style::default()],
                 default: Style::default(),
-                dates: vec![],
+                number_formats: vec![],
             });
         }
         Ok(Self {
             cell: cells,
             default,
-            dates: crate::chart::workbook::formats(Some(text))?,
+            number_formats,
         })
     }
 }

@@ -70,7 +70,7 @@ def test_sparse_page_break_row_continues_previous_cells():
     )
 
     flags = _infer_sparse_continuation_cell_merge(previous, current, 0)
-    assert flags == [0, 1, 0, 1]
+    assert flags == [1, 1, 1, 1]
     current.owner_block['cell_merge'] = flags
     _apply_cell_merge(previous, current, 0)
 
@@ -88,3 +88,18 @@ def test_sparse_first_row_with_key_is_not_inferred_as_continuation():
         '<tr><td>11</td><td>next</td><td>1</td></tr></table>'
     )
     assert _infer_sparse_continuation_cell_merge(previous, current, 0) is None
+
+def test_explicit_blank_cell_preserves_independent_boundary_and_inherited_rowspan():
+    previous = build_table_state_from_html(
+        '<table><tr><td rowspan="2">ID</td><td>X</td></tr><tr><td>Y</td></tr></table>'
+    )
+    current = build_table_state_from_html(
+        '<table><tr><td rowspan="2"></td><td></td></tr><tr><td>Z</td></tr></table>'
+    )
+    current.owner_block["cell_merge"] = [1, 0]
+    _apply_cell_merge(previous, current, 0)
+
+    assert previous.rows[0].td["rowspan"] == "4"
+    assert len(current.rows) == 2
+    assert len(current.rows[0].find_all("td")) == 1
+    assert previous.tail_occupied == {0: {0}, 1: {0}}

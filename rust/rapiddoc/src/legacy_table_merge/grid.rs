@@ -245,11 +245,32 @@ pub(super) fn expanded_header(state: &State, n: usize) -> Result<usize, Error> {
     }
     Ok(n)
 }
-type Sources = BTreeMap<usize, (usize, usize)>;
-fn sources(state: &State, target: usize, work: &mut Work) -> Result<(Sources, usize), Error> {
-    let mut occupied: BTreeMap<usize, Sources> = BTreeMap::new();
+pub(super) type Sources = BTreeMap<usize, (usize, usize)>;
+pub(super) fn sources(
+    state: &State,
+    target: usize,
+    work: &mut Work,
+) -> Result<(Sources, usize), Error> {
+    scan_sources(state, 0, target, &BTreeMap::new(), work)
+}
+pub(super) fn scan_sources(
+    state: &State,
+    start: usize,
+    target: usize,
+    initial: &BTreeMap<usize, BTreeSet<usize>>,
+    work: &mut Work,
+) -> Result<(Sources, usize), Error> {
+    let mut occupied: BTreeMap<usize, Sources> = initial
+        .iter()
+        .map(|(&r, cols)| {
+            (
+                start + r,
+                cols.iter().map(|&col| (col, (usize::MAX, 0))).collect(),
+            )
+        })
+        .collect();
     let mut total = 0;
-    for r in 0..=target {
+    for r in start..=target {
         let mut col = 0;
         for (ci, id) in state.cells(r).into_iter().enumerate() {
             while occupied.get(&r).is_some_and(|c| c.contains_key(&col)) {

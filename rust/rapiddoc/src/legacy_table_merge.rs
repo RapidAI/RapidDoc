@@ -349,31 +349,56 @@ fn apply_cells(
         return Ok(());
     }
     let last = previous.rows.len() - 1;
-    let (pc, pm) = visual_cells(previous, last, work)?;
-    let (cc, cm) = visual_cells(current, header, work)?;
-    let mut pairs = BTreeSet::new();
-    let mut cleared = BTreeSet::new();
-    for (i, flag) in flags.iter().enumerate() {
-        if flag.as_f64() == Some(1.) || flag.as_bool() == Some(true) {
-            if let (Some(&pi), Some(&ci)) = (pm.get(&i), cm.get(&i)) {
-                if pairs.insert((pi, ci)) {
-                    for child in current.dom.nodes[cc[ci]].children.clone() {
-                        work.charge(current.dom.serialize(child).len())?;
-                        previous.dom.copy_from(&current.dom, child, pc[pi]);
-                    }
-                    current.dom.nodes[cc[ci]].children.clear();
-                }
-                cleared.insert(ci);
-            }
+    let (previous_columns, _) = sources(previous, last, work)?;
+    let (next_columns, _) = scan_sources(current, header, header, &previous.scan.tail, work)?;
+    let source_cells = current.cells(header);
+    let mut transferred = false;
+    for (&start, &marker) in &next_columns {
+        let before = start.checked_sub(1);
+        if marker.0 != header || before.is_some_and(|col| next_columns.get(&col) == Some(&marker)) {
+            continue;
         }
+        let source = source_cells[marker.1];
+        let end = start + span(&current.dom, source, "colspan")?;
+        let Some(target) = previous_columns.get(&start) else {
+            continue;
+        };
+        if end > flags.len()
+            || !flags[start..end]
+                .iter()
+                .all(|flag| flag.as_f64() == Some(1.) || flag.as_bool() == Some(true))
+            || (start..end).any(|col| next_columns.get(&col) != Some(&marker))
+            || before.is_some_and(|col| previous_columns.get(&col) == Some(target))
+            || previous_columns.get(&end) == Some(target)
+            || (start..end).any(|col| previous_columns.get(&col) != Some(target))
+        {
+            continue;
+        }
+        let target_id = previous.cells(target.0)[target.1];
+        if current.dom.semantic(source) {
+            previous
+                .dom
+                .append_merged_cell(target_id, &current.dom, source, work)?;
+        }
+        // 目标可以起始于上一页更早的一行，使用全表行号计算跨度。
+        let height = previous.rows.len() + span(&current.dom, source, "rowspan")? - target.0;
+        set_span(&mut previous.dom, target_id, "rowspan", height);
+        current.dom.detach(source);
+        transferred = true;
     }
-    for i in cleared {
-        current.dom.nodes[cc[i]].children.clear();
-    }
-    if !cc.iter().any(|&id| current.dom.semantic(id)) {
-        carry(current, header, work)?;
-        let id = current.rows.remove(header);
-        current.dom.detach(id);
+    if transferred {
+        if current.cells(header).is_empty() {
+            for (row, index) in previous_columns.values().copied().collect::<BTreeSet<_>>() {
+                let id = previous.cells(row)[index];
+                let height = span(&previous.dom, id, "rowspan")?;
+                if row + height > previous.rows.len() {
+                    set_span(&mut previous.dom, id, "rowspan", height - 1);
+                }
+            }
+            let id = current.rows.remove(header);
+            current.dom.detach(id);
+        }
+        previous.refresh(work)?;
     }
     Ok(())
 }
@@ -416,41 +441,12 @@ fn infer(
         return Ok(None);
     }
     let mut flags = vec![0; previous.scan.total];
-    for i in nonempty {
-        if i < flags.len() {
-            flags[i] = 1;
+    for &col in cm.keys() {
+        if col < flags.len()
+            && (nonempty.contains(&col) || (pm.contains_key(&col) && !populated(&cc, &cm, col)))
+        {
+            flags[col] = 1;
         }
     }
     Ok(Some(flags))
-}
-fn carry(current: &mut State, header: usize, work: &mut Work) -> Result<(), Error> {
-    if header + 1 >= current.rows.len() {
-        return Ok(());
-    }
-    let cells = current.cells(header);
-    let placements = mapping(current, header, work)?;
-    for (&cell, &start) in cells.iter().zip(&placements).rev() {
-        let rowspan = span(&current.dom, cell, "rowspan")?;
-        if rowspan <= 1 || current.dom.semantic(cell) {
-            continue;
-        }
-        let next = current.rows[header + 1];
-        work.charge(current.dom.serialize(cell).len())?;
-        let copy = current.dom.copy_within(cell, next);
-        set_span(&mut current.dom, copy, "rowspan", rowspan - 1);
-        current.dom.nodes[next].children.retain(|&id| id != copy);
-        let targets = current.cells(header + 1);
-        let positions = mapping(current, header + 1, work)?;
-        let at = targets
-            .iter()
-            .zip(positions)
-            .find(|(_, p)| *p >= start)
-            .map(|(&id, _)| id);
-        let children = &mut current.dom.nodes[next].children;
-        let position = at
-            .and_then(|id| children.iter().position(|&c| c == id))
-            .unwrap_or(children.len());
-        children.insert(position, copy);
-    }
-    Ok(())
 }

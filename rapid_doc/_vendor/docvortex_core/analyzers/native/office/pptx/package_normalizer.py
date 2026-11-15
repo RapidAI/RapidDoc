@@ -1,6 +1,7 @@
 import posixpath
 import re
 from io import BytesIO
+from .....foundation.ooxml_zip import OoxmlZipFile
 from zipfile import BadZipFile, ZipFile, ZipInfo
 
 from loguru import logger
@@ -68,7 +69,7 @@ def normalize_pptx_package(file_bytes: bytes) -> bytes:
         raise ValueError("Legacy binary PPT files are not supported; convert the file to PPTX before parsing.")
 
     try:
-        with ZipFile(BytesIO(file_bytes)) as source:
+        with OoxmlZipFile(BytesIO(file_bytes)) as source:
             loaded_members: list[tuple[ZipInfo, bytes]] = []
             rewritten_members: list[tuple[ZipInfo, bytes]] = []
             skipped_members: set[str] = set()

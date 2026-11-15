@@ -518,7 +518,14 @@ pub fn assemble_with_table_images(
         if assets.len() >= rapiddoc_core::resources::limit(1000) {
             return Err(limit());
         }
-        coord(&span["bbox"], true)?;
+        let asset_error = |mut error: Error| {
+            error.message = format!(
+                "PDF visual asset generation failed: page={}, type={}, bbox={}: {}",
+                request["page_index"], span["type"], span["bbox"], error.message,
+            );
+            error
+        };
+        coord(&span["bbox"], true).map_err(&asset_error)?;
         let bbox = bb(&span["bbox"]);
         let scale = num(&request["scale"]);
         let b = bbox.map(|n| (n * scale) as i64);
@@ -536,7 +543,7 @@ pub fn assemble_with_table_images(
         let pixels = if let Some(i) = selected {
             &original_pixels[i]
         } else {
-            cropped = page.crop(b)?;
+            cropped = page.crop(b).map_err(&asset_error)?;
             &cropped
         };
         let count = pixels.width * pixels.height;
@@ -559,7 +566,7 @@ pub fn assemble_with_table_images(
             bbox[3] as i64
         );
         let name = format!("{:x}.png", Sha256::digest(name.as_bytes()));
-        let png = pixels.png()?;
+        let png = pixels.png().map_err(&asset_error)?;
         total_png = total_png
             .checked_add(png.len())
             .filter(|n| *n <= rapiddoc_core::resources::limit(128_000_000))

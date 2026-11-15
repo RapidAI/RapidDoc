@@ -59,9 +59,202 @@ fn zip_error(error: zip::result::ZipError) -> Error {
     };
     Error::new(kind, error.to_string())
 }
+const MAX_DIRECTORY_BYTES: u64 = 32 * 1024 * 1024;
+const MAX_MEMBERS: u64 = 1_000_000;
+const MAX_ENTRY_BYTES: u64 = 256 * 1024 * 1024;
+const MAX_CONTROL_XML_BYTES: u64 = 16 * 1024 * 1024;
+const MAX_TOTAL_BYTES: u64 = 4 * 1024 * 1024 * 1024;
+
+fn package_limit(message: impl Into<String>) -> Error {
+    Error::new(ErrorKind::ResourceLimit, message)
+}
+
+fn check_directory(bytes: &[u8]) -> Result<()> {
+    let invalid = || Error::malformed("invalid OOXML ZIP central directory");
+    let u16_at = |p| u16::from_le_bytes(bytes[p..p + 2].try_into().unwrap()) as u64;
+    let u32_at = |p| u32::from_le_bytes(bytes[p..p + 4].try_into().unwrap()) as u64;
+    let u64_at = |p| u64::from_le_bytes(bytes[p..p + 8].try_into().unwrap());
+    let end = (bytes.len().saturating_sub(65_557)..bytes.len().saturating_sub(21))
+        .rev()
+        .find(|&i| {
+            bytes[i..].starts_with(b"PK\x05\x06") && i + 22 + u16_at(i + 20) as usize <= bytes.len()
+        })
+        .ok_or_else(invalid)?;
+    if u16_at(end + 4) != 0 || u16_at(end + 6) != 0 {
+        return Err(invalid());
+    }
+    let (count, size, directory_end) = if let Some(locator) = end
+        .checked_sub(20)
+        .filter(|&i| bytes[i..].starts_with(b"PK\x06\x07"))
+    {
+        if u32_at(locator + 4) != 0 || u32_at(locator + 16) != 1 {
+            return Err(invalid());
+        }
+        let valid = |i: usize| {
+            i <= locator.saturating_sub(56)
+                && bytes[i..].starts_with(b"PK\x06\x06")
+                && u64_at(i + 4) == (locator - i - 12) as u64
+        };
+        let record = usize::try_from(u64_at(locator + 8))
+            .ok()
+            .filter(|&i| locator >= 56 && valid(i))
+            .or_else(|| {
+                let start = locator.saturating_sub(MAX_DIRECTORY_BYTES as usize + 12);
+                let end = locator.checked_sub(56)?;
+                (start..=end).rev().find(|&i| valid(i))
+            })
+            .ok_or_else(invalid)?;
+        if u64_at(record + 4) > MAX_DIRECTORY_BYTES {
+            return Err(package_limit(
+                "OOXML ZIP64 metadata exceeds the directory budget",
+            ));
+        }
+        if u32_at(record + 16) != 0
+            || u32_at(record + 20) != 0
+            || u64_at(record + 24) != u64_at(record + 32)
+        {
+            return Err(invalid());
+        }
+        (u64_at(record + 32), u64_at(record + 40), record)
+    } else {
+        if u16_at(end + 8) != u16_at(end + 10) {
+            return Err(invalid());
+        }
+        (u16_at(end + 10), u32_at(end + 12), end)
+    };
+    if count > MAX_MEMBERS || size > MAX_DIRECTORY_BYTES {
+        return Err(package_limit(
+            "OOXML ZIP central directory exceeds the budget",
+        ));
+    }
+    let mut pos = directory_end
+        .checked_sub(size as usize)
+        .ok_or_else(invalid)?;
+    // 按实际目录记录计数，不能只信 ZIP 结束记录声明的条目数。
+    let mut actual = 0;
+    while pos < directory_end {
+        if directory_end - pos < 46 || !bytes[pos..].starts_with(b"PK\x01\x02") {
+            return Err(invalid());
+        }
+        pos += 46 + (u16_at(pos + 28) + u16_at(pos + 30) + u16_at(pos + 32)) as usize;
+        actual += 1;
+        if actual > MAX_MEMBERS {
+            return Err(package_limit("OOXML ZIP has too many members"));
+        }
+    }
+    if pos != directory_end || actual != count {
+        return Err(invalid());
+    }
+    Ok(())
+}
+
+fn member_limit(name: &str) -> u64 {
+    if name == CONTENT_TYPES || name.ends_with(".rels") {
+        MAX_CONTROL_XML_BYTES
+    } else {
+        MAX_ENTRY_BYTES
+    }
+}
+
+fn compressed_limit(expanded: u64) -> u64 {
+    expanded + expanded / 100 + 64 * 1024
+}
+
+fn validate_members(archive: &mut zip::ZipArchive<Cursor<Arc<[u8]>>>) -> Result<()> {
+    use zip::CompressionMethod::{Deflated, Stored};
+
+    let mut declared = 0;
+    let mut compressed = 0;
+    for index in 0..archive.len() {
+        let entry = archive.by_index_data(index).map_err(zip_error)?;
+        let name = entry.name().map_err(zip_error)?;
+        let cap = member_limit(&name);
+        if entry.size() > cap || entry.compressed_size() > compressed_limit(cap) {
+            return Err(package_limit(format!(
+                "OOXML member exceeds the ZIP budget: {name}"
+            )));
+        }
+        declared += entry.size();
+        compressed += entry.compressed_size();
+        if declared > MAX_TOTAL_BYTES || compressed > compressed_limit(MAX_TOTAL_BYTES) {
+            return Err(package_limit("OOXML package exceeds the ZIP budget"));
+        }
+        if !matches!(entry.compression(), Stored | Deflated) {
+            return Err(Error::new(
+                ErrorKind::Unsupported,
+                "OOXML requires stored or deflated members",
+            ));
+        }
+        if entry.compression() == Stored
+            && !entry.encrypted()
+            && entry.size() != entry.compressed_size()
+        {
+            return Err(Error::malformed(format!(
+                "OOXML ZIP member length mismatch: {name}"
+            )));
+        }
+    }
+
+    let mut actual = 0;
+    let mut buffer = [0; 64 * 1024];
+    for index in 0..archive.len() {
+        let Ok(entry) = archive.by_index_raw(index) else {
+            continue; // 由各格式现有路径处理损坏的可选成员。
+        };
+        if entry.encrypted() {
+            continue;
+        }
+        let name = entry.name().map_err(zip_error)?.into_owned();
+        let expected = entry.size();
+        if entry.compression() == Stored {
+            actual += expected;
+            if actual > MAX_TOTAL_BYTES {
+                return Err(package_limit(
+                    "OOXML actual decompression exceeds the package budget",
+                ));
+            }
+            continue;
+        }
+        // 原始 Deflate 流的计数独立于 ZIP 中央目录声明的展开长度。
+        let limit = member_limit(&name).min(MAX_TOTAL_BYTES - actual);
+        let mut reader = flate2::read::DeflateDecoder::new(entry);
+        let mut count = 0;
+        loop {
+            let chunk = (limit - count + 1).min(buffer.len() as u64) as usize;
+            match reader.read(&mut buffer[..chunk]) {
+                Ok(0) => {
+                    if count != expected && reader.total_in() == reader.get_ref().compressed_size()
+                    {
+                        return Err(Error::malformed(format!(
+                            "OOXML ZIP member length mismatch: {name}"
+                        )));
+                    }
+                    break;
+                }
+                Ok(size) => {
+                    count += size as u64;
+                    if count > limit {
+                        return Err(package_limit(format!(
+                            "OOXML actual decompression exceeds the budget: {name}"
+                        )));
+                    }
+                }
+                Err(_) => break, // 保留可选损坏部件的格式专用修复逻辑。
+            }
+        }
+        actual += count;
+    }
+    Ok(())
+}
+
 impl Package {
     pub fn open(bytes: Arc<[u8]>) -> Result<Self> {
-        let archive = zip::ZipArchive::new(Cursor::new(bytes)).map_err(zip_error)?;
+        check_directory(&bytes)?;
+        let mut archive = zip::ZipArchive::new(Cursor::new(bytes)).map_err(zip_error)?;
+        if archive.has_duplicate_names() {
+            return Err(Error::malformed("duplicate OOXML ZIP member names"));
+        }
+        validate_members(&mut archive)?;
         let names = archive
             .file_names()
             .map(|name| name.map(|v| v.into_owned()).map_err(zip_error))
@@ -106,7 +299,7 @@ impl Package {
         if let Some(bytes) = self.patches.get(part) {
             return Ok(Some(Arc::clone(bytes)));
         }
-        let mut entry = match self.archive.by_name(part) {
+        let entry = match self.archive.by_name(part) {
             Ok(entry) => entry,
             Err(zip::result::ZipError::FileNotFound) => return Ok(None),
             Err(error) => return Err(zip_error(error)),
@@ -121,7 +314,15 @@ impl Package {
         bytes
             .try_reserve_exact(size)
             .map_err(|_| Error::new(ErrorKind::ResourceLimit, "cannot allocate ZIP entry"))?;
-        entry.read_to_end(&mut bytes).map_err(Error::malformed)?;
+        entry
+            .take(size as u64 + 1)
+            .read_to_end(&mut bytes)
+            .map_err(Error::malformed)?;
+        if bytes.len() != size {
+            return Err(Error::malformed(format!(
+                "OOXML ZIP member length mismatch: {part}"
+            )));
+        }
         Ok(Some(bytes.into()))
     }
     pub fn required(&mut self, part: &str) -> Result<Arc<[u8]>> {

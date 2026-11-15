@@ -1,6 +1,7 @@
 from collections import Counter
 from io import BytesIO
 from pathlib import Path
+from zipfile import ZipFile
 import subprocess
 import asyncio
 import xml.etree.ElementTree as ET
@@ -15,10 +16,37 @@ from rapid_doc.backend.office.office_analyze import office_analyze
 from rapid_doc.backend.office.office_middle_json_mkcontent import union_make
 from rapid_doc.utils.enum_class import MakeMode
 from rapid_doc.utils.guess_suffix_or_lang import guess_suffix_by_bytes, guess_suffix_by_path
+from rapid_doc._vendor.docvortex_core.analyzers.native.office.errors import LegacyOfficeResourceLimitError
+from rapid_doc._vendor.docvortex_core.analyzers.native.office.xlsx.xlsx_converter import XlsxConverter
 
 FIXTURES = Path(__file__).parent / "fixtures/docvortex_migration"
 CASES = [("docx_01.docx", 3), ("docx_01.doc", 3), ("xlsx_01.xlsx", 3),
          ("xlsx_01.xls", 3), ("pptx_01.pptx", 6), ("pptx_01.ppt", 6)]
+
+
+def test_xlsx_rejects_oversize_merge_before_openpyxl(monkeypatch):
+    from openpyxl import Workbook
+    from rapid_doc._vendor.docvortex_core.analyzers.native.office.xlsx import xlsx_converter
+
+    original = BytesIO()
+    Workbook().save(original)
+    rewritten = BytesIO()
+    with ZipFile(original) as source, ZipFile(rewritten, "w") as target:
+        for member in source.infolist():
+            payload = source.read(member)
+            if member.filename == "xl/worksheets/sheet1.xml":
+                payload = payload.replace(
+                    b"<pageMargins",
+                    b'<mergeCells><mergeCell ref="A1:XFD1048576"/></mergeCells><pageMargins',
+                )
+            target.writestr(member, payload)
+
+    def unexpected_load(*args, **kwargs):
+        pytest.fail("openpyxl was called before the merged-cell budget check")
+
+    monkeypatch.setattr(xlsx_converter, "load_workbook", unexpected_load)
+    with pytest.raises(LegacyOfficeResourceLimitError, match="max_merge_range_cells"):
+        XlsxConverter().convert(rewritten)
 
 
 def _leaves(value, structured):

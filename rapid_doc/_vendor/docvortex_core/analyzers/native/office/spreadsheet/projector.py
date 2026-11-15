@@ -675,12 +675,15 @@ class SpreadsheetProjector:
                 rich_text_html = f'<a href="{link_target}">{rich_text_html}</a>'
             return rich_text_html, True
 
-        plain_text = str(cell.value)
+        plain_text = self._cell_display_text(cell)
         if link_target and plain_text:
             escaped_text = self._escape_text_with_line_breaks(plain_text)
             return f'<a href="{link_target}">{escaped_text}</a>', True
 
         return plain_text, False
+
+    def _cell_display_text(self, cell: Any) -> str:
+        return str(cell.value)
 
     def _extract_cell_style(self, cell: Any) -> dict[str, Any]:
         """从 openpyxl 单元格提取当前 IR 保留的可见样式。"""

@@ -13,6 +13,7 @@ from ...foundation._coordinates import normalize_bbox as _normalize_model_bbox_f
 from ...foundation._coordinates import normalize_quarter_turn_angle as _normalize_visual_block_angle
 from ...foundation._geometry import calculate_overlap_area_in_bbox1_area_ratio
 from ...foundation._image_operations import encode_crop_as_jpeg_data_uri as _encode_page_crop_as_jpeg_data_uri
+from ...foundation._image_payload import parse_image_data_uri_strict
 from ...schema import BBox, BlockType
 from .constants import (
     IMAGE_BLOCK_CONTAINMENT_THRESHOLD,
@@ -113,9 +114,22 @@ def attach_visual_block_images_from_pdf(
         if len(crops) != end - start + 1:
             raise ValueError("PDF visual crop page count mismatch")
         for offset, page_crops in enumerate(crops, start=start):
-            for block_index, payload in page_crops:
-                if payload is not None:
-                    model_list[offset][block_index]["image_base64"] = payload
+            received = dict(page_crops)
+            for block_index, block in prepared_visuals[offset]:
+                payload = received.get(block_index)
+                if not payload:
+                    raise ValueError(
+                        f"PDF visual asset missing: page={offset}, block={block_index}, "
+                        f"type={block.get('type')}, bbox={block.get('bbox')}"
+                    )
+                try:
+                    parse_image_data_uri_strict(payload)
+                except ValueError as exc:
+                    raise ValueError(
+                        f"PDF visual asset invalid: page={offset}, block={block_index}, "
+                        f"type={block.get('type')}, bbox={block.get('bbox')}"
+                    ) from exc
+                model_list[offset][block_index]["image_base64"] = payload
 
 
 def _attach_prepared_visual_block_images(

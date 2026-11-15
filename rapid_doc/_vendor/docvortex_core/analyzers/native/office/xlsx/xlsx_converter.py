@@ -3,7 +3,8 @@ import hashlib
 import posixpath
 import re
 import xml.etree.ElementTree as ET
-import zipfile
+from datetime import date, time, timedelta
+from decimal import Decimal
 from io import BytesIO
 from typing import Any, BinaryIO, cast
 
@@ -12,18 +13,22 @@ from openpyxl import load_workbook
 from openpyxl.cell.cell import Cell
 from openpyxl.drawing.image import Image as XlsImage
 from openpyxl.utils.cell import range_to_tuple
+from openpyxl.utils.datetime import MAC_EPOCH, to_excel
 from openpyxl.worksheet.worksheet import Worksheet
 from PIL import Image
 from ..image import serialize_office_image
 from ..equation.image import OfficeImageEquationDecoder
 from ..equation.ooxml import OoxmlEquationDecoder
-from ..errors import LegacyOfficeResourceLimitError
+from ..errors import LegacyOfficeResourceLimitError, OoxmlPackageError
+from .....foundation.ooxml_zip import OoxmlZipFile
+from .resource_budget import validate_xlsx_merge_budget
 from ..limits import MAX_ENTRY_BYTES
 from ..equation.omml import oMath2Latex
 from ..streams import read_stream_bytes_from_start, rewind_stream
 from ..spreadsheet.html import EQUATION_BOOKENDS, render_spreadsheet_table
 from ..spreadsheet.models import AnchoredBlock, FormulaMap, SheetImage
 from ..spreadsheet.projector import SpreadsheetProjector
+from ..xls.number_format import format_number
 from .package_normalizer import normalize_xlsx_package, strip_xlsx_ole_objects_for_openpyxl
 from .ooxml_ole import (
     XlsxOleEquationArtifact,
@@ -67,6 +72,8 @@ class XlsxConverter(SpreadsheetProjector):
             try:
                 self._convert_package_stream(file_stream)
                 return
+            except (OoxmlPackageError, LegacyOfficeResourceLimitError, MemoryError):
+                raise
             except Exception as exc:
                 file_bytes = read_stream_bytes_from_start(file_stream)
                 self._retry_convert_package_bytes_after_normalization(file_bytes, exc)
@@ -75,6 +82,8 @@ class XlsxConverter(SpreadsheetProjector):
         file_bytes = file_stream.read()
         try:
             self._convert_package_bytes(file_bytes)
+        except (OoxmlPackageError, LegacyOfficeResourceLimitError, MemoryError):
+            raise
         except Exception as exc:
             self._retry_convert_package_bytes_after_normalization(file_bytes, exc)
 
@@ -112,6 +121,20 @@ class XlsxConverter(SpreadsheetProjector):
             self._cell_style_cache[style_key] = style
         return dict(style)
 
+    def _cell_display_text(self, cell: Any) -> str:
+        value = cell.value
+        if isinstance(value, bool):
+            return "TRUE" if value else "FALSE"
+        if isinstance(value, (date, time, timedelta)):
+            value = to_excel(value, self.workbook.epoch)
+        if isinstance(value, (int, float)):
+            code = cell.number_format
+            text = format_number(value, code, date1904=self.workbook.epoch == MAC_EPOCH)
+            if code.casefold() == "general" and 1e-10 <= abs(value) < 1e-4:
+                return format(Decimal(text), "f")
+            return text
+        return super()._cell_display_text(cell)
+
     def _convert_package_bytes(self, file_bytes: bytes) -> None:
         """用独立字节流解析 XLSX 包，便于原始包失败后用规范化包重试。"""
         self._convert_package_stream(BytesIO(file_bytes))
@@ -121,13 +144,14 @@ class XlsxConverter(SpreadsheetProjector):
         self._reset_state()
         self._projection_cache_enabled = True
         try:
-            self.zf = zipfile.ZipFile(file_stream)
-            self._sheet_part_by_title = workbook_sheet_parts(self.zf)
-        except Exception as e:
-            logger.warning(f"Failed to open zip file: {e}")
-            self.zf = None
-
-        try:
+            self.zf = OoxmlZipFile(file_stream)
+            validate_xlsx_merge_budget(self.zf)
+            try:
+                self._sheet_part_by_title = workbook_sheet_parts(self.zf)
+            except (OoxmlPackageError, LegacyOfficeResourceLimitError, MemoryError):
+                raise
+            except Exception as exc:
+                logger.warning(f"Failed to map XLSX worksheet resources: {exc}")
             workbook_stream: BinaryIO = file_stream
             if self.zf is not None and package_has_sheet_ole_objects(
                 self.zf,
@@ -135,6 +159,9 @@ class XlsxConverter(SpreadsheetProjector):
             ):
                 file_bytes = read_stream_bytes_from_start(file_stream)
                 workbook_stream = BytesIO(strip_xlsx_ole_objects_for_openpyxl(file_bytes))
+                with OoxmlZipFile(workbook_stream) as sanitized:
+                    validate_xlsx_merge_budget(sanitized)
+                rewind_stream(workbook_stream)
             else:
                 rewind_stream(file_stream)
             self.workbook = load_workbook(

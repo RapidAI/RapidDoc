@@ -11,6 +11,8 @@ from typing import Any, Final
 
 from lxml import etree
 from openpyxl import load_workbook
+
+from ....foundation.ooxml_zip import validate_ooxml_package
 from openpyxl.utils.cell import range_to_tuple
 from openpyxl.utils.datetime import MAC_EPOCH, WINDOWS_EPOCH, from_excel
 from openpyxl.workbook.workbook import Workbook
@@ -78,6 +80,7 @@ def html_table_from_excel_bytes(excel_bytes: bytes) -> str:
         return ""
 
     try:
+        validate_ooxml_package(excel_bytes)
         workbook = load_workbook(
             filename=BytesIO(excel_bytes),
             data_only=True,
@@ -289,6 +292,7 @@ def parse_chart_spec_from_ooxml(chart_xml: bytes) -> ChartSpec | None:
 def render_chart_html_from_workbook(spec: ChartSpec, workbook_bytes: bytes) -> str:
     """根据图表公式从嵌入工作簿读取数据并渲染 HTML 表格。"""
     try:
+        validate_ooxml_package(workbook_bytes)
         workbook = load_workbook(
             filename=BytesIO(workbook_bytes),
             data_only=True,

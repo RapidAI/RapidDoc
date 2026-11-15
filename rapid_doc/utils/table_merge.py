@@ -402,7 +402,7 @@ def calculate_visual_columns(row):
     return len(cells)
 
 
-def _scan_row_visual_sources(rows, target_row_index: int) -> tuple[dict[int, tuple[int, int]], int]:
+def _scan_row_visual_sources(rows, target_row_index: int, initial_occupied=None) -> tuple[dict[int, tuple[int, int]], int]:
     """扫描到目标行，记录每个视觉列当前由哪个源单元格占据。"""
     if target_row_index < 0:
         target_row_index += len(rows)
@@ -410,7 +410,8 @@ def _scan_row_visual_sources(rows, target_row_index: int) -> tuple[dict[int, tup
         return {}, 0
 
     # occupied[row_idx][col_idx] = (source_row_idx, source_cell_idx)
-    occupied: dict[int, dict[int, tuple[int, int]]] = {}
+    occupied = {row: {col: (-1, -1) for col in cols}
+                for row, cols in (initial_occupied or {}).items()}
     total_cols = 0
 
     for r_idx in range(target_row_index + 1):
@@ -779,11 +780,6 @@ def _cell_has_semantic_content(cell) -> bool:
     )
 
 
-def _row_has_semantic_content(row) -> bool:
-    """判断整行是否仍保留未并回的语义内容。"""
-    return any(_cell_has_semantic_content(cell) for cell in row.find_all(["td", "th"]))
-
-
 _CELL_TEXT_INLINE_TAGS = frozenset({
     "a", "abbr", "b", "bdi", "bdo", "big", "cite", "del", "em", "font",
     "i", "ins", "mark", "s", "small", "span", "strike", "strong", "sub", "sup", "u",
@@ -794,24 +790,23 @@ def _cell_boundary_text(cell, *, from_end: bool) -> tuple[str, NavigableString |
     """读取单元格接缝处连续行内文字，保留结构节点边界。"""
     if cell is None or cell.get("data-block-type") in {"equation", "code", "code_body", "algorithm", "algorithm_body"}:
         return "", None
-    nodes = []
+    parts = []
     children = reversed(cell.contents) if from_end else iter(cell.contents)
     for child in children:
         if type(child) is NavigableString:
             if child:
-                nodes.append(child)
+                parts.append((str(child), child))
         elif isinstance(child, Tag) and child.name in _CELL_TEXT_INLINE_TAGS:
             text, node = _cell_boundary_text(child, from_end=from_end)
-            if not node:
+            if node is None:
                 break
-            nodes.append(node)
+            parts.append((text, node))
         else:
             break
-    if not nodes:
-        return "", None
+    edge = parts[0][1] if parts else None
     if from_end:
-        nodes.reverse()
-    return "".join(str(node) for node in nodes), nodes[-1] if from_end else nodes[0]
+        parts.reverse()
+    return "".join(text for text, _ in parts), edge
 
 
 def _append_merged_cell_content(target, source) -> None:
@@ -827,122 +822,67 @@ def _append_merged_cell_content(target, source) -> None:
         target.append(child.extract())
 
 
-def _insert_cell_before_visual_column(rows, target_row_index: int, start_vcol: int, cell) -> None:
-    """将单元格插入到目标行中对应视觉列之前。"""
-    target_row = rows[target_row_index]
-    target_cells = target_row.find_all(["td", "th"])
-    target_vcol_map = build_visual_col_mapping(rows, target_row_index)
-
-    for idx, target_start_vcol in enumerate(target_vcol_map):
-        if target_start_vcol > start_vcol:
-            target_cells[idx].insert_before(cell)
-            return
-
-    target_row.append(cell)
-
-
-def _carry_rowspan_structure_to_next_row(rows, row_idx: int) -> None:
-    """下沉空白结构占位单元格，避免删除当前行后破坏后续列对齐。"""
-    next_row_idx = row_idx + 1
-    if next_row_idx >= len(rows):
-        return
-
-    current_row = rows[row_idx]
-    current_cells = current_row.find_all(["td", "th"])
-    current_vcol_map = build_visual_col_mapping(rows, row_idx)
-    carried_cells = []
-
-    for cell, start_vcol in zip(current_cells, current_vcol_map):
-        rowspan = int(cell.get("rowspan", 1))
-        if rowspan <= 1 or _cell_has_semantic_content(cell):
-            continue
-
-        carried_cell = deepcopy(cell)
-        new_rowspan = rowspan - 1
-        if new_rowspan > 1:
-            carried_cell["rowspan"] = str(new_rowspan)
-        else:
-            carried_cell.attrs.pop("rowspan", None)
-        carried_cells.append((start_vcol, carried_cell))
-
-    for start_vcol, carried_cell in sorted(carried_cells, key=lambda item: item[0], reverse=True):
-        _insert_cell_before_visual_column(rows, next_row_idx, start_vcol, carried_cell)
-
-
 def _apply_cell_merge(
     previous_state: TableMergeState,
     current_state: TableMergeState,
     header_count: int,
 ) -> None:
-    """应用 cell_merge 语义合并。
-
-    当 cell_merge 中的值为 1 时，将下表第一数据行对应单元格的内容
-    追加到上表最后一行对应单元格中。全部为 1 时删除该数据行，
-    混合时清空已合并单元格的内容但保留行。
-
-    cell_merge 按视觉列索引对齐，通过构建视觉列映射来正确匹配
-    两个表格中可能因 rowspan 而具有不同 <td> 元素数量的行。
-    """
-    cell_merge = current_state.owner_block.get("cell_merge")
-    if not cell_merge:
+    """按视觉列范围连接续页单元格，保留未标记的独立空格。"""
+    flags = current_state.owner_block.get("cell_merge")
+    rows1, rows2 = previous_state.rows, current_state.rows
+    if not flags or not rows1 or header_count >= len(rows2):
         return
 
-    rows2 = current_state.rows
-    if header_count >= len(rows2):
+    last = len(rows1) - 1
+    previous_columns, _ = _scan_row_visual_sources(rows1, last)
+    next_columns, _ = _scan_row_visual_sources(
+        rows2[header_count:], 0, previous_state.tail_occupied
+    )
+    first_row = rows2[header_count]
+    transferred = False
+    source = first_row.find_all(["td", "th"])
+
+    for start, marker in sorted(next_columns.items()):
+        if marker[0] != 0 or next_columns.get(start - 1) == marker:
+            continue
+        cell = source[marker[1]]
+        end = start + int(cell.get("colspan", 1))
+        target_marker = previous_columns.get(start)
+        if (
+            end > len(flags)
+            or not all(flag == 1 for flag in flags[start:end])
+            or any(next_columns.get(col) != marker for col in range(start, end))
+            or target_marker is None
+            or previous_columns.get(start - 1) == target_marker
+            or previous_columns.get(end) == target_marker
+            or any(previous_columns.get(col) != target_marker for col in range(start, end))
+        ):
+            continue
+        target_row, target_index = target_marker
+        target = rows1[target_row].find_all(["td", "th"])[target_index]
+        if _cell_has_semantic_content(cell):
+            _append_merged_cell_content(target, cell)
+        # 目标可能起始于上一页更早的一行，跨度按整张表的行号计算。
+        target["rowspan"] = str(len(rows1) + int(cell.get("rowspan", 1)) - target_row)
+        cell.extract()
+        transferred = True
+
+    if not transferred:
         return
-    if not previous_state.rows:
-        return
-
-    first_data_row = rows2[header_count]
-    last_row = previous_state.rows[-1]
-
-    cells1 = last_row.find_all(["td", "th"])
-    cells2 = first_data_row.find_all(["td", "th"])
-
-    # 构建视觉列到单元格索引的映射
-    last_row_idx = len(previous_state.rows) - 1
-    vcol_map1 = build_visual_col_mapping(previous_state.rows, last_row_idx)
-    vcol_map2 = build_visual_col_mapping(rows2, header_count)
-
-    # 构建视觉列 -> 单元格索引的反向映射（展开 colspan）
-    vcol_to_cell1: dict[int, int] = {}
-    for ci, start_vcol in enumerate(vcol_map1):
-        colspan = int(cells1[ci].get("colspan", 1))
-        for c in range(start_vcol, start_vcol + colspan):
-            vcol_to_cell1[c] = ci
-    vcol_to_cell2: dict[int, int] = {}
-    for ci, start_vcol in enumerate(vcol_map2):
-        colspan = int(cells2[ci].get("colspan", 1))
-        for c in range(start_vcol, start_vcol + colspan):
-            vcol_to_cell2[c] = ci
-
-    # 按唯一 (src_cell_idx, dst_cell_idx) 对执行一次转移，避免 colspan 重复处理
-    transferred_pairs: set[tuple[int, int]] = set()
-    for vi, merge_flag in enumerate(cell_merge):
-        if merge_flag == 1:
-            ci1 = vcol_to_cell1.get(vi)
-            ci2 = vcol_to_cell2.get(vi)
-            if ci1 is not None and ci2 is not None:
-                pair = (ci1, ci2)
-                if pair not in transferred_pairs:
-                    _append_merged_cell_content(cells1[ci1], cells2[ci2])
-                    transferred_pairs.add(pair)
-
-    # 只清空确实成功转移过的源单元格
-    cleared_ci2: set[int] = set()
-    for vi, merge_flag in enumerate(cell_merge):
-        if merge_flag == 1:
-            ci1 = vcol_to_cell1.get(vi)
-            ci2 = vcol_to_cell2.get(vi)
-            if ci1 is not None and ci2 is not None and ci2 not in cleared_ci2:
-                cells2[ci2].clear()
-                cleared_ci2.add(ci2)
-
-    if not _row_has_semantic_content(first_data_row):
-        _carry_rowspan_structure_to_next_row(rows2, header_count)
-        first_data_row.extract()
-        if first_data_row in rows2:
-            rows2.remove(first_data_row)
+    if not first_row.find_all(["td", "th"], recursive=False):
+        # 整行均被消费才删除；穿过该行的所有上一页单元格都少跨一行。
+        for row, index in set(previous_columns.values()):
+            target = rows1[row].find_all(["td", "th"])[index]
+            rowspan = int(target.get("rowspan", 1))
+            if row + rowspan <= len(rows1):
+                continue
+            if rowspan > 2:
+                target["rowspan"] = str(rowspan - 1)
+            else:
+                target.attrs.pop("rowspan", None)
+        first_row.extract()
+        rows2.pop(header_count)
+    _refresh_table_state_metrics(previous_state)
 
 
 def _infer_sparse_continuation_cell_merge(
@@ -1001,8 +941,11 @@ def _infer_sparse_continuation_cell_merge(
         return None
 
     flags = [0] * previous_state.total_cols
-    for col in populated:
-        if col < len(flags):
+    # 已确认是续行时，列对齐的空白占位也随续行合并。
+    for col, cell in continuation_map.items():
+        if col < len(flags) and (col in populated or (
+            col in previous_map and not _cell_has_semantic_content(cell)
+        )):
             flags[col] = 1
     return flags
 
