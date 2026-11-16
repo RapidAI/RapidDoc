@@ -9,6 +9,8 @@ use std::{
 };
 use tokenizers::{AddedToken, Tokenizer};
 
+mod speckle;
+
 fn check_text(s: &str) -> Result<(), Error> {
     if s.len() > rapiddoc_core::resources::limit(65_536) {
         Err(error(ErrorCode::ResourceLimit, "公式文本超过64KB"))
@@ -372,6 +374,17 @@ impl Model {
         timings: &mut FormulaTimings,
         progress: &mut dyn FnMut(usize, usize) -> Result<(), Error>,
     ) -> Result<Vec<String>, Error> {
+        self.recognize_formula_images_impl(images, batch_size, timings, progress, true)
+    }
+
+    fn recognize_formula_images_impl(
+        &mut self,
+        images: &[FormulaImage<'_>],
+        batch_size: usize,
+        timings: &mut FormulaTimings,
+        progress: &mut dyn FnMut(usize, usize) -> Result<(), Error>,
+        retry_speckles: bool,
+    ) -> Result<Vec<String>, Error> {
         let started = std::time::Instant::now();
         if batch_size == 0
             || batch_size > rapiddoc_core::resources::limit(64)
@@ -548,19 +561,38 @@ impl Model {
                         .collect()
                 })
                 .collect::<Result<Vec<Vec<u32>>, Error>>()?;
-            let decoded = self
+            let texts = self
                 .formula_decoder
                 .as_ref()
                 .unwrap()
                 .decode_with_work(&rows, &mut text_work)?;
-            output_bytes += decoded.iter().map(String::len).sum::<usize>();
-            if output_bytes > rapiddoc_core::resources::limit(2_000_000) {
-                return Err(error(ErrorCode::ResourceLimit, "公式累计输出超过2MB"));
-            }
-            for (&index, text) in batch.iter().zip(decoded) {
+            timings.decoding += started.elapsed();
+            for (&index, mut text) in batch.iter().zip(texts) {
+                if retry_speckles && speckle::repetitive(&text) {
+                    let started = std::time::Instant::now();
+                    let cleaned = speckle::clean(decoded[index].rgb());
+                    timings.preprocessing += started.elapsed();
+                    if let Some(cleaned) = cleaned {
+                        let mut retry = self.recognize_formula_images_impl(
+                            &[FormulaImage::Rgb(&cleaned)],
+                            1,
+                            timings,
+                            &mut |_, _| Ok(()),
+                            false,
+                        )?;
+                        if let Some(candidate) = retry.pop() {
+                            if !candidate.trim().is_empty() && !speckle::repetitive(&candidate) {
+                                text = candidate;
+                            }
+                        }
+                    }
+                }
+                output_bytes += text.len();
+                if output_bytes > rapiddoc_core::resources::limit(2_000_000) {
+                    return Err(error(ErrorCode::ResourceLimit, "公式累计输出超过2MB"));
+                }
                 result[index] = text;
             }
-            timings.decoding += started.elapsed();
             done += batch.len();
             progress(done, images.len())?;
         }
