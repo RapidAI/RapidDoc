@@ -64,10 +64,11 @@ fn native_line(line: &Value, scale: f64) -> Option<(Bounds, String)> {
         .iter()
         .filter_map(|span| span["chars"].as_array())
         .flatten();
+    let visible = chars
+        .clone()
+        .filter(|c| c["char"].as_str().is_some_and(|s| !s.trim().is_empty()));
     if line["rotation"].as_f64().unwrap_or(0.) != 0. {
-        let mut visible = chars
-            .clone()
-            .filter(|c| c["char"].as_str().is_some_and(|s| !s.trim().is_empty()));
+        let mut visible = visible.clone();
         let a = bounds(&visible.next()?["bbox"])?;
         let b = bounds(&visible.next_back()?["bbox"])?;
         if (b[0] + b[2] - a[0] - a[2]).abs() <= 2. * (b[1] + b[3] - a[1] - a[3]).abs() {
@@ -75,7 +76,17 @@ fn native_line(line: &Value, scale: f64) -> Option<(Bounds, String)> {
         }
     }
     let text: String = chars.filter_map(|c| c["char"].as_str()).collect();
-    let b = bounds(&line["bbox"])?.map(|v| v * scale);
+    // PDFium 的空白和换行字符可能把行框撑到可见文字之外。
+    let mut glyph_bounds = visible.map(|c| {
+        bounds(&c["bbox"]).filter(|b| b.iter().all(|v| v.is_finite()) && b[0] < b[2] && b[1] < b[3])
+    });
+    let ink = glyph_bounds.next().flatten().and_then(|first| {
+        glyph_bounds.try_fold(first, |a, glyph| {
+            let [l, t, r, b] = glyph?;
+            Some([a[0].min(l), a[1].min(t), a[2].max(r), a[3].max(b)])
+        })
+    });
+    let b = ink.or_else(|| bounds(&line["bbox"]))?.map(|v| v * scale);
     (!text.trim().is_empty() && b[0] < b[2] && b[1] < b[3]).then_some((b, text))
 }
 
@@ -316,6 +327,22 @@ fn local_column_order(b: Bounds, regions: &[Region<'_>]) -> Option<f64> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn native_recovery_geometry_ignores_trailing_line_breaks() {
+        let line = json!({
+            "bbox": [10, 5, 120, 15],
+            "spans": [{"chars": [
+                {"char": "A", "bbox": [10, 5, 18, 15]},
+                {"char": "\r", "bbox": [120, 10, 120, 10]},
+                {"char": "\n", "bbox": [120, 10, 120, 10]}
+            ]}]
+        });
+        assert_eq!(
+            native_line(&line, 2.),
+            Some(([20., 10., 36., 30.], "A\r\n".into()))
+        );
+    }
 
     #[test]
     fn single_caption_between_title_and_picture_is_recovered() {

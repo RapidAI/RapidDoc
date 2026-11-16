@@ -1,8 +1,36 @@
 import pytest
 
-from rapid_doc.backend.pipeline.layout_recovery import _conflicts_with_recognized
+from rapid_doc.backend.pipeline.analyze_utils import _native_row_gaps, _without_native_rows
+from rapid_doc.backend.pipeline.layout_recovery import _conflicts_with_recognized, _native_lines
 from rapid_doc.backend.pipeline.layout_recovery import _has_foreground_ink, _between_layout_blocks
 import numpy as np
+
+
+def test_partial_native_block_only_recognizes_missing_rows():
+    def quad(left, top, right, bottom):
+        return [[left, top], [right, top], [right, bottom], [left, bottom]]
+
+    image = np.full((60, 120, 3), 255, dtype=np.uint8)
+    crop = (5, 5, 0, 0, 110, 50, 120, 60)
+    native = [quad(40, 35, 55, 45), quad(65, 35, 70, 45)]
+    assert _native_row_gaps(image, native, crop) == []
+
+    image[14:23, 20:90] = 0
+    bands = _native_row_gaps(image, native, crop)
+    missing = quad(20, 14, 90, 23)
+    same_row = quad(56, 34, 64, 44)
+    assert bands
+    assert _without_native_rows([missing, same_row], bands) == [missing]
+
+
+def test_native_recovery_geometry_ignores_trailing_line_breaks():
+    line = {"bbox": (10, 5, 120, 15), "spans": [{"chars": [
+        {"char": "A", "bbox": (10, 5, 18, 15)},
+        {"char": "\r", "bbox": (120, 10, 120, 10)},
+        {"char": "\n", "bbox": (120, 10, 120, 10)},
+    ]}]}
+    page = {"blocks": [{"lines": [line]}]}
+    assert list(_native_lines(page, 2)) == [((20, 10, 36, 30), "A\r\n")]
 
 
 def test_single_caption_between_title_and_image_has_body_owner():

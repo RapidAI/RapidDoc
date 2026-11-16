@@ -371,7 +371,10 @@ class BatchAnalyze:
 
         # PDF 文本提取模式
         if self.use_det_mode != 'ocr':
-            _extract_text_from_pdf(ocr_res_all_page, pdf_dict_list, scale_list)
+            _extract_text_from_pdf(
+                ocr_res_all_page, pdf_dict_list, scale_list,
+                recover_missing_rows=self.use_det_mode == 'auto',
+            )
 
         # OCR 检测处理
         _run_ocr_det_batch(ocr_res_all_page, atom_model_manager, self.ocr_config)

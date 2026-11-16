@@ -11,6 +11,7 @@ import numpy as np
 from loguru import logger
 from tqdm import tqdm
 
+from .layout_recovery import _has_foreground_ink
 from .model_init import AtomModelSingleton
 from .model_list import AtomicModel
 from ...model.table.utils import normalize_table_ocr_text
@@ -31,10 +32,43 @@ from ...utils.span_pre_proc import (
 
 
 # =================================== OCR-det ===================================
+def _native_row_gaps(image, native_boxes, useful_list):
+    pad_x, pad_y, x0, y0, x1, y1, _, _ = useful_list
+    bands = sorted((min(p[1] for p in box), max(p[1] for p in box)) for box in native_boxes)
+    line_height = float(np.median([bottom - top for top, bottom in bands]))
+    if line_height <= 0:
+        return []
+    # 只检查高度足够容纳另一行的空档。同行内的缺字继续由原生文本负责。
+    end = pad_y + y1 - y0
+    cursor = pad_y
+    for top, bottom in (*bands, (end, end)):
+        top = min(top, end)
+        if top - cursor >= .8 * line_height and _has_foreground_ink(
+            image, (pad_x, cursor, pad_x + x1 - x0, top)
+        ):
+            return bands
+        cursor = max(cursor, bottom)
+    return []
+
+
+def _without_native_rows(boxes, native_bands):
+    missing = []
+    for box in boxes:
+        top, bottom = min(p[1] for p in box), max(p[1] for p in box)
+        if bottom > top and not any(
+            min(bottom, end) - max(top, start) > .2 * min(bottom - top, end - start)
+            for start, end in native_bands
+        ):
+            missing.append(box)
+    return missing
+
+
 def _extract_text_from_pdf(
         ocr_res_all_page: List[Dict],
         pdf_dict_list: List[Dict],
-        scale_list: List[float]
+        scale_list: List[float],
+        *,
+        recover_missing_rows=False,
 ):
     """从 PDF 中提取文本框"""
     ocr_res_grouped = {}
@@ -83,6 +117,10 @@ def _extract_text_from_pdf(
                     )
 
                     if ocr_res:
+                        if recover_missing_rows:
+                            native_bands = _native_row_gaps(bgr_image, ocr_res, useful_list)
+                            if native_bands:
+                                res['_native_ocr_bands'] = native_bands
                         ocr_result_list = get_ocr_result_list(
                             ocr_res, useful_list, ocr_res_dict['ocr_enable'],
                             bgr_image, ocr_res_dict['lang'],
@@ -130,9 +168,10 @@ def _run_ocr_det_batch(
     for ocr_res_dict in ocr_res_all_page:
         for res in ocr_res_dict['ocr_res_list']:
             ocr_enable = ocr_res_dict['ocr_enable']
+            native_bands = res.pop('_native_ocr_bands', [])
 
             if not ocr_res_dict['ocr_enable']:
-                if res.get('need_ocr_det'):
+                if res.get('need_ocr_det') or native_bands:
                     ocr_enable = True
                 elif use_det_mode == 'txt' or (use_det_mode != 'ocr' and not res.get('need_ocr_det')):
                     continue
@@ -156,7 +195,7 @@ def _run_ocr_det_batch(
 
             all_cropped_info.append((
                 bgr_image, det_image, useful_list, ocr_res_dict,
-                adjusted_mfdetrec_res, ocr_res_dict['lang'], res, ocr_enable
+                adjusted_mfdetrec_res, ocr_res_dict['lang'], res, ocr_enable, native_bands
             ))
 
     if not all_cropped_info:
@@ -204,7 +243,7 @@ def _run_ocr_det_batch(
             batch_results = ocr_model.det_batch_predict(batch_images, det_batch_size)
 
             for info, (dt_boxes, _) in zip(group_crops, batch_results):
-                bgr_image, _det_image, useful_list, ocr_res_dict, adjusted_mfdetrec_res, _lang, res, ocr_enable = info
+                bgr_image, _det_image, useful_list, ocr_res_dict, adjusted_mfdetrec_res, _lang, res, ocr_enable, native_bands = info
 
                 if dt_boxes is not None and len(dt_boxes) > 0:
                     dt_boxes_sorted = sorted_boxes(dt_boxes)
@@ -215,6 +254,8 @@ def _run_ocr_det_batch(
                         if dt_boxes_merged and adjusted_mfdetrec_res
                         else dt_boxes_merged
                     )
+                    if native_bands:
+                        dt_boxes_final = _without_native_rows(dt_boxes_final, native_bands)
 
                     if dt_boxes_final:
                         ocr_res = [box.tolist() if hasattr(box, 'tolist') else box for box in dt_boxes_final]

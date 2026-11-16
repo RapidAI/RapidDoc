@@ -1,5 +1,5 @@
 //! 旧 _apply_mask_boxes_to_image 和 64像素分辨率分组；生成独立检测PNG，不执行模型。
-use super::{number, useful};
+use super::{number, uncovered_row_gaps, useful};
 use crate::legacy_page::{assets::Pixels, invalid, limit, unsupported, validate_tree};
 use image::{codecs::png::PngEncoder, ExtendedColorType, ImageEncoder};
 use rapiddoc_core::Error;
@@ -19,6 +19,26 @@ pub fn prepare(request: &Value, pngs: &[Vec<u8>]) -> Result<Output, Error> {
 pub fn prepare_pixels(request: &Value, pngs: &[&[u8]]) -> Result<Output, Error> {
     prepare_impl(request, pngs, true)
 }
+
+fn has_uncovered_row_ink(page: &Pixels, task: &Value, bands: &[[f64; 2]]) -> Result<bool, Error> {
+    let u = useful(&task["useful_list"])?;
+    let start = number(&u[1])?;
+    let end = start + number(&u[5])? - number(&u[3])?;
+    let pad_x = number(&u[0])?;
+    let left = pad_x.clamp(0., page.width as f64) as usize;
+    let right = (pad_x + number(&u[4])? - number(&u[2])?).clamp(left as f64, page.width as f64) as usize;
+    let stride = page.width * 3;
+    Ok(uncovered_row_gaps(bands, start, end).into_iter().any(|[top, bottom]| {
+        let top = top.clamp(0., page.height as f64) as usize;
+        let bottom = bottom.clamp(top as f64, page.height as f64) as usize;
+        let mut strip = Vec::with_capacity((bottom - top) * (right - left) * 3);
+        for y in top..bottom {
+            strip.extend_from_slice(&page.data[y * stride + left * 3..y * stride + right * 3]);
+        }
+        rapiddoc_inference::detection::has_foreground_ink(&strip)
+    }))
+}
+
 fn prepare_impl(request: &Value, pngs: &[&[u8]], raw: bool) -> Result<Output, Error> {
     validate_tree(request)?;
     let index = request["page_index"]
@@ -109,6 +129,12 @@ fn prepare_impl(request: &Value, pngs: &[&[u8]], raw: bool) -> Result<Output, Er
             let (w, h) = dimensions[i];
             if page.channels != 3 || page.width != w || page.height != h {
                 return Err(invalid());
+            }
+            if let Some(bands) = tasks[i].get("native_row_bands") {
+                let bands: Vec<[f64; 2]> = serde_json::from_value(bands.clone()).map_err(|_| invalid())?;
+                if !has_uncovered_row_ink(&page, &tasks[i], &bands)? {
+                    continue;
+                }
             }
             let mut data = vec![255; width * height * 3];
             for y in 0..h {

@@ -321,6 +321,36 @@ fn native_dets(
     }
     Ok(out)
 }
+
+pub(super) fn row_band(box_: &[[f64; 2]; 4]) -> [f64; 2] {
+    let y = box_.map(|point| point[1]);
+    [y.into_iter().fold(f64::INFINITY, f64::min), y.into_iter().fold(f64::NEG_INFINITY, f64::max)]
+}
+
+pub(super) fn uncovered_row_gaps(bands: &[[f64; 2]], start: f64, end: f64) -> Vec<[f64; 2]> {
+    let mut heights = bands.iter().map(|[top, bottom]| bottom - top).collect::<Vec<_>>();
+    heights.sort_by(f64::total_cmp);
+    let n = heights.len();
+    if n == 0 {
+        return vec![];
+    }
+    let line_height = (heights[(n - 1) / 2] + heights[n / 2]) * 0.5;
+    if line_height <= 0. {
+        return vec![];
+    }
+    let mut gaps = Vec::new();
+    let mut cursor = start;
+    // 只有足够容纳一行的空档才值得检查图像。
+    for [top, bottom] in bands.iter().copied().chain([[end, end]]) {
+        let top = top.min(end);
+        if top - cursor >= 0.8 * line_height {
+            gaps.push([cursor, top]);
+        }
+        cursor = cursor.max(bottom);
+    }
+    gaps
+}
+
 /// 原生阶段追加空文字 span；需要 OCR 检测的任务另列，未调用任何模型。
 pub fn plan(request: &Value) -> Result<Value, Error> {
     validate_tree(request)?;
@@ -333,6 +363,7 @@ pub fn plan(request: &Value) -> Result<Value, Error> {
         .get("use_det_mode")
         .and_then(Value::as_str)
         .unwrap_or("auto");
+    let recover_missing_rows = mode == "auto" && request["recover_missing_rows"] == true;
     if !matches!(mode, "auto" | "txt" | "ocr") {
         return Err(invalid());
     }
@@ -372,6 +403,7 @@ pub fn plan(request: &Value) -> Result<Value, Error> {
         let r = dets.get_mut(index).ok_or_else(invalid)?;
         let u = useful(&t["useful_list"])?;
         let m = adjusted(&masks, &u)?;
+        let mut native_bands = Vec::new();
         if !enabled && mode != "ocr" {
             if let Some(text) = r
                 .get("native_text")
@@ -389,17 +421,32 @@ pub fn plan(request: &Value) -> Result<Value, Error> {
                     &mut work,
                 )?;
                 added.extend(native_dets(&boxes, &u, r, !m.is_empty())?);
+                if recover_missing_rows && !boxes.is_empty() {
+                    for box_ in &boxes {
+                        let quad = serde_json::from_value(box_.clone()).map_err(|_| invalid())?;
+                        native_bands.push(row_band(&quad));
+                    }
+                    native_bands.sort_by(|a, b| a[0].total_cmp(&b[0]));
+                    let start = number(&u[1])?;
+                    let end = start + number(&u[5])? - number(&u[3])?;
+                    if uncovered_row_gaps(&native_bands, start, end).is_empty() {
+                        native_bands.clear();
+                    }
+                }
                 native.push(json!({"layout_index":index,"boxes":boxes}));
             }
         }
         let need = r.get("need_ocr_det").is_some_and(truth);
-        if enabled || need || mode == "ocr" {
+        if enabled || need || mode == "ocr" || !native_bands.is_empty() {
             r.as_object_mut()
                 .ok_or_else(invalid)?
                 .remove("need_ocr_det");
             let mut task = t.clone();
             task["masks"] = json!(m);
-            task["ocr_enable"] = json!(enabled || need);
+            task["ocr_enable"] = json!(enabled || need || !native_bands.is_empty());
+            if !native_bands.is_empty() {
+                task["native_row_bands"] = json!(native_bands);
+            }
             pending.push(task);
         }
         if added.len() > rapiddoc_core::resources::limit(20_000) {

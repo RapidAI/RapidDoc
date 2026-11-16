@@ -1,5 +1,5 @@
 //! 旧sorted_boxes/merge_det_boxes/update_det_boxes/get_ocr_result_list及rec回填。
-use crate::legacy_model::native_ocr::{number, useful};
+use crate::legacy_model::native_ocr::{number, row_band, useful};
 use crate::legacy_page::{invalid, limit, validate_tree, Work};
 use rapiddoc_core::Error;
 use serde_json::{json, Value};
@@ -356,11 +356,21 @@ pub fn plan(request: &Value) -> Result<Value, Error> {
     let mut added = Vec::new();
     let mut processed = Vec::new();
     for (job, result) in jobs.iter().zip(results) {
-        let q = cut(
+        let mut q = cut(
             merge(ordered(quads(result)?, &mut work)?),
             &masks(&job["masks"])?,
             &mut work,
         )?;
+        if let Some(bands) = job.get("native_row_bands") {
+            let bands: Vec<[f64; 2]> = serde_json::from_value(bands.clone()).map_err(|_| invalid())?;
+            // 只补整行，原生文本所在行的 OCR 框不重复回填。
+            q.retain(|box_| {
+                let [top, bottom] = row_band(box_);
+                bottom > top && !bands.iter().any(|&[start, end]| {
+                    bottom.min(end) - top.max(start) > 0.2 * (bottom - top).min(end - start)
+                })
+            });
+        }
         let r = dets
             .get(job["layout_index"].as_u64().ok_or_else(invalid)? as usize)
             .ok_or_else(invalid)?;
@@ -414,6 +424,32 @@ pub fn plan(request: &Value) -> Result<Value, Error> {
     dets.extend(added);
     Ok(json!({"model":model,"processed":processed,"recognition":rec,"crop_attempts":crops}))
 }
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn partial_native_region_recognizes_only_missing_row() {
+        let plan = json!({
+            "page_index":0,
+            "lang":"ch",
+            "plan":{
+                "model":{"layout_dets":[{"original_label":"text","original_order":0}]},
+                "detect":[{"layout_index":0,"ocr_enable":true,"masks":[],
+                    "crop_source":"ocr-0","useful_list":[5,5,0,0,110,50,120,60],
+                    "native_row_bands":[[35,45],[35,45]]}]
+            },
+            "detections":[[
+                [[20,14],[90,14],[90,23],[20,23]],
+                [[40,35],[70,35],[70,45],[40,45]]
+            ]]
+        });
+        let output = super::plan(&plan).unwrap();
+        assert_eq!(output["recognition"].as_array().unwrap().len(), 1);
+        assert_eq!(output["processed"][0]["boxes"][0][0], json!([20., 14.]));
+    }
+}
+
 pub fn apply(request: &Value) -> Result<Value, Error> {
     validate_tree(request)?;
     let mut model = request["model"].clone();

@@ -163,7 +163,7 @@ impl Engine {
         let started = std::time::Instant::now();
         let native = op(
             "plan_native_ocr",
-            json!({"plan":{"model":page.plan["model"],"ocr":page.plan["ocr"]},"native_page":page.facts,"scale":page.image.scale,"ocr_enable":!r.native_text,"use_det_mode":if r.native_text{r.use_det_mode.as_str()}else{"ocr"}}),
+            json!({"plan":{"model":page.plan["model"],"ocr":page.plan["ocr"]},"native_page":page.facts,"scale":page.image.scale,"ocr_enable":!r.native_text,"use_det_mode":if r.native_text{r.use_det_mode.as_str()}else{"ocr"},"recover_missing_rows":true}),
         )?;
         let sources = array(&native["detect"])?
             .iter()

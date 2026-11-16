@@ -2,6 +2,7 @@
 """Recover runs of text lines missed by the model layout."""
 
 from functools import lru_cache
+from math import isfinite
 from unicodedata import normalize
 
 import cv2
@@ -73,8 +74,10 @@ def _native_lines(page, scale):
     for block in page["blocks"]:
         for line in block["lines"]:
             chars = [char for span in line["spans"] for char in span["chars"]]
+            visible = [char for char in chars if char["char"].strip()]
+            if not visible:
+                continue
             if line.get("rotation", 0):
-                visible = [char for char in chars if char["char"].strip()]
                 if len(visible) < 2:
                     continue
                 left, top, right, bottom = visible[0]["bbox"]
@@ -84,9 +87,15 @@ def _native_lines(page, scale):
                 # PDFium may report a glyph's italic shear as its angle.
                 if abs(dx) <= 2 * abs(dy):
                     continue
-            text = "".join(char["char"] for char in chars)
-            if text.strip():
-                yield tuple(float(v) * scale for v in line["bbox"]), text
+            # PDFium 的空白和换行字符可能把行框撑到可见文字之外。
+            boxes = [tuple(char["bbox"]) if char.get("bbox") is not None else () for char in visible]
+            if all(len(box) == 4 and all(map(isfinite, box))
+                   and box[0] < box[2] and box[1] < box[3] for box in boxes):
+                left, top, right, bottom = zip(*boxes)
+                bbox = (min(left), min(top), max(right), max(bottom))
+            else:
+                bbox = line["bbox"]
+            yield tuple(float(v) * scale for v in bbox), "".join(char["char"] for char in chars)
 
 
 def _table_text_key(text):
