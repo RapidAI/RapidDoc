@@ -139,6 +139,7 @@ class EvidenceScore:
     missing_numbers: set
     text_count: int
     missing: set
+    weak_numbers: set
 
     def separator_gains(self, primary, axis):
         return sum(primary.gaps[key] > 0 and self.gaps[key] == 0
@@ -415,7 +416,7 @@ class TableEvidence:
         if not np.isfinite(logic).all() or np.any(logic < 0) or np.any(logic[:, ::2] > logic[:, 1::2]):
             return None
         exact = token_cells is not None
-        assignments, text, missing_numbers, missing = [], {}, set(), set()
+        assignments, text, missing_numbers, missing, weak_numbers = [], {}, set(), set(), set()
         for i, (token_id, box, confidence) in enumerate(zip(self.ids, self.boxes, self.confidence)):
             if exact:
                 cells = tuple(c for c in token_cells.get(token_id, ()) if 0 <= c < len(boxes))
@@ -441,6 +442,8 @@ class TableEvidence:
             elif len(cells) == 1 and coverage < .7:
                 # 单格只覆盖部分 OCR 框时，框与内容可能错位，或候选边界切穿文字。
                 text[token_id] = confidence * (1 - coverage)
+                if exact and i in self.numbers and coverage < .5:
+                    weak_numbers.add(token_id)
         gaps = {}
         for axis, a, b, separated in self.gaps:
             left, right = assignments[a], assignments[b]
@@ -468,4 +471,4 @@ class TableEvidence:
             # 只有真实线覆盖的区段计分。较短的半框线仍可独立支持局部分隔。
             weight = min(1., (hi - lo) / (5 * self.em))
             lines[axis, i] = weight * max(0., .8 - covered / (hi - lo))
-        return EvidenceScore(text, lines, gaps, exact, missing_numbers, len(self.ids), missing)
+        return EvidenceScore(text, lines, gaps, exact, missing_numbers, len(self.ids), missing, weak_numbers)

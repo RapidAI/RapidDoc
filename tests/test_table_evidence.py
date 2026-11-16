@@ -1,7 +1,9 @@
 import numpy as np
 import pytest
 
-from rapid_doc.model.table.fallback import quality, structure_evidence
+from collections import Counter
+
+from rapid_doc.model.table.fallback import keeps_candidate_numbers, quality, structure_evidence
 from rapid_doc.model.table.table_evidence import TableEvidence, crop_vector_lines
 
 
@@ -22,6 +24,22 @@ def grids():
     merged = ([[0, y, 140, y + 35] for y in (3, 38, 73)],
               [[row, row, 0, 0] for row in range(3)])
     return split, merged
+
+
+def test_weak_numeric_assignment_does_not_waive_other_instances():
+    image, rows = crop()
+    split, _ = grids()
+    boxes, logic = split
+    boxes[1] = [68, 3, 140, 16]  # 仅覆盖第一个 42 的上缘
+    source = TableEvidence(image, rows)
+    assigned = {i: (i,) for i in range(6)}
+    primary = source.score(split, assigned)
+    assert primary.weak_numbers == {1}
+    candidate = source.score(split, {i: cell for i, cell in assigned.items() if i != 1})
+    assert keeps_candidate_numbers(Counter({'42': 3}), Counter({'42': 2}), rows, primary, candidate)
+    assert not keeps_candidate_numbers(Counter({'42': 3}), Counter({'42': 1}), rows, primary, candidate)
+    candidate = source.score(split, {i: cell for i, cell in assigned.items() if i not in {1, 3}})
+    assert not keeps_candidate_numbers(Counter({'42': 3}), Counter({'42': 1}), rows, primary, candidate)
 
 
 @pytest.mark.parametrize('draw', [False, True])

@@ -256,7 +256,7 @@ class RapidTableModel(object):
             main = str(main)
         if self.fallback_model_type is None and not self.fallback_to_text:
             return main
-        from .fallback import (grid_evidence, join_aligned_row_bands, quality, plain_html, repair_local_grid,
+        from .fallback import (grid_evidence, join_aligned_row_bands, keeps_candidate_numbers, quality, plain_html, repair_local_grid,
                                restore_internal_rows, restore_trailing_row, structure_evidence)
         excluded = [i['uuid'] for i in (fill_image_res or [])]
         if mfd_res:
@@ -422,9 +422,9 @@ class RapidTableModel(object):
                                and extra_rows_supported and extra_columns_supported
                                and geometry_supported)
             better_evidence |= second.valid and restores_row_content and losses <= gains
-            keeps_numbers = not (evidence.numbers - backup.numbers)
-            if candidate_score and candidate_score.exact and primary_score.exact:
-                keeps_numbers = keeps_numbers and not (candidate_score.missing_numbers - primary_score.missing_numbers)
+            keeps_numbers = keeps_candidate_numbers(
+                evidence.numbers, backup.numbers, ocr_result, primary_score, candidate_score
+            )
             logger.debug('Table fallback evidence: main {}, alternative {}, delta {}, trigger {}',
                          primary_score.summary() if primary_score else None,
                          candidate_score.summary() if candidate_score else None,

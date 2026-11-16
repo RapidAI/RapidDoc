@@ -57,10 +57,8 @@ pub(super) fn select_candidate(
     let protected_empty_rows = first.valid
         && !ruled_rows.is_empty()
         && primary.rows.saturating_sub(alt.rows) > primary.empty.saturating_sub(ruled_rows.len());
-    let mut keeps_numbers = primary
-        .numbers
-        .iter()
-        .all(|(n, c)| alt.numbers.get(n).unwrap_or(&0) >= c);
+    let mut weak_number_losses = BTreeMap::<String, usize>::new();
+    let mut lost_protected_numbers = false;
     let mut better_evidence = false;
     let mut protected_structure = false;
     let mut ruling_disagrees = false;
@@ -121,7 +119,20 @@ pub(super) fn select_candidate(
             && col_ok
             && (losses < gains + 4 || agrees);
         better_evidence |= second.valid && restored && losses <= gains;
-        keeps_numbers &= b.missing_numbers.is_subset(&a.missing_numbers);
+        for &id in b.missing_numbers.difference(&a.missing_numbers) {
+            if a.weak_numbers.contains(&id) {
+                // 擦边归属仍计入文字证据，只放宽这一处的数字计数。
+                let number = crate::processing::inline_output::unescape_html(
+                    rows[1][id].as_str().unwrap_or_default(),
+                )
+                .chars()
+                .filter(|c| !c.is_whitespace())
+                .collect();
+                *weak_number_losses.entry(number).or_default() += 1;
+            } else {
+                lost_protected_numbers = true;
+            }
+        }
         report["fallback_evidence"] = b.report();
         report["evidence_delta"] = json!([text_gain, line_gain, gap_gain]);
     }
@@ -134,7 +145,14 @@ pub(super) fn select_candidate(
                 && !unsupported
                 && (alt.improves(&primary) || removes_noise_rows)))
         && second.retained as f64 >= first.retained as f64 - first.total as f64 * margin;
+    let keeps_numbers = !lost_protected_numbers
+        && primary.numbers.iter().all(|(number, count)| {
+            alt.numbers.get(number).copied().unwrap_or(0)
+                + weak_number_losses.get(number).copied().unwrap_or(0)
+                >= *count
+        });
     report["keeps_numbers"] = json!(keeps_numbers);
+    report["lost_protected_numbers"] = json!(lost_protected_numbers);
     report["protected_empty_rows"] = json!(protected_empty_rows);
     report["protected_structure"] = json!(protected_structure);
     report["ruling_disagrees"] = json!(ruling_disagrees);
@@ -1105,17 +1123,7 @@ impl Engine {
             // CPU 候选仍须通过完整择优和数字保留检查。
             if backup == "table-transformer"
                 && details["improves_before_number_check"] == true
-                && details["keeps_numbers"] == false
-                && source
-                    .as_ref()
-                    .zip(primary_score.as_ref())
-                    .zip(alternate_grid.as_ref())
-                    .is_some_and(|((source, main), grid)| {
-                        !source
-                            .score(grid)
-                            .missing_numbers
-                            .is_subset(&main.missing_numbers)
-                    })
+                && details["lost_protected_numbers"] == true
             {
                 if let Some(mut descriptor) = self.models.cuda_descriptor("fallback_table_model")? {
                     descriptor.device = "cpu".into();

@@ -441,6 +441,18 @@ def _compact(text):
     return ''.join(text.split())
 
 
+def keeps_candidate_numbers(main, alternative, rows, primary_score, candidate_score):
+    deficits = main - alternative
+    if not (candidate_score and primary_score and candidate_score.exact and primary_score.exact):
+        return not deficits
+    lost = candidate_score.missing_numbers - primary_score.missing_numbers
+    if lost - primary_score.weak_numbers:
+        return False
+    # 仅扣除已证实归属不可靠的实例。相同数值在其他格的缺失仍由计数保护。
+    weak_losses = Counter(_compact(unescape(rows[1][token])) for token in lost)
+    return not (deficits - weak_losses)
+
+
 @dataclass
 class GridEvidence:
     conflicts: set[tuple[int, int]]

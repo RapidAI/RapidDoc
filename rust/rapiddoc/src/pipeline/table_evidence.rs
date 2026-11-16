@@ -98,6 +98,7 @@ pub(super) struct Score {
     lines: BTreeMap<(usize, usize), f64>,
     pub missing: std::collections::BTreeSet<usize>,
     pub missing_numbers: std::collections::BTreeSet<usize>,
+    pub weak_numbers: std::collections::BTreeSet<usize>,
 }
 fn delta<K: Ord>(main: &BTreeMap<K, f64>, alt: &BTreeMap<K, f64>) -> f64 {
     alt.iter()
@@ -559,6 +560,9 @@ impl Source {
             let penalty = match assignments.get(&t.id).map(Vec::as_slice) {
                 Some([i]) => {
                     let ratio = coverage(t.bbox, grid.cells[*i].bbox);
+                    if t.numeric && ratio < 0.5 {
+                        result.weak_numbers.insert(t.id);
+                    }
                     if ratio < 0.7 {
                         t.confidence * (1. - ratio)
                     } else {
@@ -910,6 +914,68 @@ pub(super) fn crop_vectors(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn weak_numeric_assignment_does_not_waive_other_instances() {
+        let white = image::RgbImage::from_pixel(60, 40, image::Rgb([255; 3]));
+        let mut png = std::io::Cursor::new(Vec::new());
+        white.write_to(&mut png, image::ImageFormat::Png).unwrap();
+        let rows = json!([
+            [
+                [[10, 9], [20, 9], [20, 19], [10, 19]],
+                [[30, 9], [40, 9], [40, 19], [30, 19]]
+            ],
+            ["42", "42"],
+            [1., 1.]
+        ]);
+        let source = Source::new(png.get_ref(), &rows, &[], &[]).unwrap();
+        let grid = |tokens: [Vec<usize>; 2]| {
+            Grid::new(vec![
+                GridCell {
+                    bbox: [0., 0., 25., 10.],
+                    logic: [0, 0, 0, 0],
+                    tokens: tokens[0].clone(),
+                },
+                GridCell {
+                    bbox: [25., 0., 45., 30.],
+                    logic: [0, 0, 1, 1],
+                    tokens: tokens[1].clone(),
+                },
+            ])
+            .unwrap()
+        };
+        let main = grid([vec![0], vec![1]]);
+        let primary = json!("<table><tr><td>42</td><td>42</td></tr></table>");
+        for (candidate, html, keeps) in [
+            (
+                grid([vec![], vec![1]]),
+                "<table><tr><td></td><td>42</td></tr></table>",
+                true,
+            ),
+            (
+                grid([vec![0], vec![]]),
+                "<table><tr><td>42</td><td></td></tr></table>",
+                false,
+            ),
+            (
+                grid([vec![], vec![1]]),
+                "<table><tr><td></td><td></td></tr></table>",
+                false,
+            ),
+        ] {
+            let (_, report) = super::super::tables::select_candidate(
+                &primary,
+                Some(&main),
+                &json!(html),
+                Some(&candidate),
+                &rows,
+                &[],
+                Some(&source),
+                &Request::default(),
+            );
+            assert_eq!(report["keeps_numbers"], keeps);
+        }
+    }
 
     #[test]
     fn added_row_boundary_needs_local_evidence_in_multiple_columns() {
